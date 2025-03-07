@@ -1,10 +1,12 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.game.Board;
+
 public class EpidemicCard extends Card{
     public EpidemicCard(int level, boolean isLearner) {
         super(level, isLearner);
     }
 
     @Override
-    public void resolve(){}
+    public void resolve(Board board){}
 }

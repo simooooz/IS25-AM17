@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.Planet;
+import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.Map;
@@ -26,5 +27,5 @@ public class PlanetCard extends Card{
     }
 
     @Override
-    public void resolve(){};
+    public void resolve(Board board){}
 }

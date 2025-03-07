@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.Meteor;
+import it.polimi.ingsw.model.game.Board;
+
 import java.util.List;
 
 public class StrayBigMeteorsCard extends Card{
@@ -17,5 +19,5 @@ public class StrayBigMeteorsCard extends Card{
     }
 
     @Override
-    public void resolve(){};
+    public void resolve(Board board){}
 }

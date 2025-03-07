@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.game.Board;
+
 public class SlaversCard extends Card{
     private final int crew;
     private final int credits;
@@ -31,5 +33,5 @@ public class SlaversCard extends Card{
     }
 
     @Override
-    public void resolve(){}
+    public void resolve(Board board){}
 }

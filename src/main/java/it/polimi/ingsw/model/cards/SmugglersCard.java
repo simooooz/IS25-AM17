@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 
 import java.util.List;
@@ -29,6 +30,6 @@ public class SmugglersCard extends Card{
     }
 
     @Override
-    public void resolve(){}
+    public void resolve(Board board){}
 }
 

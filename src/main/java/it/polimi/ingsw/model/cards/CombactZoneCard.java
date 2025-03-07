@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.CriteriaType;
 import it.polimi.ingsw.model.cards.utils.PenaltyCombatZone;
+import it.polimi.ingsw.model.game.Board;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -20,5 +21,5 @@ public class CombactZoneCard extends Card{
     }
 
     @Override
-    public void resolve(){}
+    public void resolve(Board board){}
 }
