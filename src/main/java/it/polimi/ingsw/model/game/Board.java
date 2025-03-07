@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.game.objects.Good;
 import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -14,7 +15,7 @@ public class Board {
     private final List<Card> cardPile;
     private int cardPilePos;
     private final Time timeManagment;
-    private final List<Good> availableGoods;
+    private final Map<ColorType, Integer> availableGoods;
 
     public Board(List<PlayerData> players) {
         this.players = players; // Da capire
@@ -22,7 +23,7 @@ public class Board {
         this.cardPile = new ArrayList<>();
         this.cardPilePos = 0;
         this.timeManagment = new Time();
-        this.availableGoods = new ArrayList<>();
+        this.availableGoods = new HashMap<>();
 
         startingDeck.addAll(players);
     }
@@ -43,7 +44,7 @@ public class Board {
         return timeManagment;
     }
 
-    public List<Good> getAvailableGoods() {
+    public Map<ColorType, Integer> getAvailableGoods() {
         return availableGoods;
     }
 
