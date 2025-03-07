@@ -2,8 +2,8 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.Planet;
 import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.AbstractMap;
 import java.util.Map;

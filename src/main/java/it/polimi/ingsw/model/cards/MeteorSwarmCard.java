@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.Meteor;
+import it.polimi.ingsw.model.game.Board;
 
 import java.util.List;
 
@@ -17,5 +18,6 @@ public class MeteorSwarmCard extends Card{
         return meteors;
     }
 
-    public void resolve(){};
+    @Override
+    public void resolve(Board board){}
 }

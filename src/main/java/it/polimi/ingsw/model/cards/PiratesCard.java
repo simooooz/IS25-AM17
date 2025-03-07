@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.CannonFire;
+import it.polimi.ingsw.model.game.Board;
 
 import java.util.List;
 
@@ -35,5 +36,5 @@ public class PiratesCard extends Card{
     }
 
     @Override
-    public void resolve(){}
+    public void resolve(Board board){}
 }

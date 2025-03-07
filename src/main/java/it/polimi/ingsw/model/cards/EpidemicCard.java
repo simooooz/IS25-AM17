@@ -7,6 +7,8 @@ import it.polimi.ingsw.model.game.Board
 import java.util.AbstractMap;
 import java.util.List;
 
+import it.polimi.ingsw.model.game.Board;
+
 public class EpidemicCard extends Card{
     public EpidemicCard(int level, boolean isLearner) {
         super(level, isLearner);
@@ -29,4 +31,5 @@ public class EpidemicCard extends Card{
         }
         }
 
+    public void resolve(Board board){}
 }
