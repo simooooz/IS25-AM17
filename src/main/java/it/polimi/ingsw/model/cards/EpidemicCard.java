@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.game.Board
+import it.polimi.ingsw.model.game.Board;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -31,5 +31,4 @@ public class EpidemicCard extends Card{
         }
         }
 
-    public void resolve(Board board){}
 }
