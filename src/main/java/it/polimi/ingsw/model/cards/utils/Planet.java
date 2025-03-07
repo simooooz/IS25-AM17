@@ -14,4 +14,14 @@ public class Planet {
     public List<ColorType> getRewards() {
         return rewards;
     }
+
+    public int getNumberOfRewards(ColorType color) {
+        int result=0;
+        for(ColorType r: rewards){
+            if(r == color){
+                result++;
+            }
+        }
+        return result;
+    }
 }

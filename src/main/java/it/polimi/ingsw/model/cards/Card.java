@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.game.Board;
+
 abstract public class Card {
 
     private final int level;
@@ -18,6 +20,6 @@ abstract public class Card {
         return isLearner;
     }
 
-    public void resolve(){};
+    public void resolve(Board board){}
 
 }

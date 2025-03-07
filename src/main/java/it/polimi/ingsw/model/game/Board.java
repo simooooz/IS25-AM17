@@ -17,8 +17,8 @@ public class Board {
     private final Time timeManagment;
     private final Map<ColorType, Integer> availableGoods;
 
-    public Board(List<PlayerData> players) {
-        this.players = players; // Da capire
+    public Board(List<AbstractMap.SimpleEntry<PlayerData, Integer>> players) {
+        this.players = players;
         this.startingDeck = new ArrayList<>();
         this.cardPile = new ArrayList<>();
         this.cardPilePos = 0;
