@@ -1,0 +1,19 @@
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Maven
+.mvn/
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# File di log
+*.log
+
+mvnw
+mvnw.cmd
