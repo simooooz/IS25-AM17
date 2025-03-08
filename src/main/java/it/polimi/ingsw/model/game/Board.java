@@ -2,10 +2,8 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.game.objects.Good;
 import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
-import javafx.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,7 +25,8 @@ public class Board {
         this.timeManagment = new Time();
         this.availableGoods = new HashMap<>();
 
-        startingDeck.addAll(players);
+        List<PlayerData> playersDataList = players.stream().map(el -> el.getKey()).collect(Collectors.toList());
+        startingDeck.addAll(playersDataList);
     }
 
     public List<AbstractMap.SimpleEntry<PlayerData, Integer>> getPlayers() {
