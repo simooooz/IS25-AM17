@@ -1,16 +1,17 @@
 package it.polimi.ingsw.model.components;
 
 import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.model.player.Ship;
 
 public class BatteryComponent extends Component {
 
     private final boolean isTriple;
     private int batteries;
 
-    public BatteryComponent(ConnectorType[] connectors, boolean isTriple, int batteries) {
+    public BatteryComponent(ConnectorType[] connectors, boolean isTriple) {
         super(connectors);
         this.isTriple = isTriple;
-        this.batteries = batteries;
+        this.batteries = isTriple ? 3 : 2;
     }
 
     public boolean getIsTriple() {
@@ -23,6 +24,13 @@ public class BatteryComponent extends Component {
 
     public void setBatteries(int batteries) {
         this.batteries = batteries;
+    }
+
+    @Override
+    public void insertComponent(Ship ship, int row, int col) throws Exception {
+        super.insertComponent(ship, row, col);
+        if (isTriple) { ship.setBatteries(ship.getBatteries() + 3); }
+        else { ship.setBatteries(ship.getBatteries() + 2); }
     }
 
 }

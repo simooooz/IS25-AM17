@@ -1,11 +1,12 @@
 package it.polimi.ingsw.model.components;
 
 import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
 
 public class CannonComponent extends Component {
 
-    private final DirectionType direction;
+    private DirectionType direction;
     private final boolean isDouble;
 
     public CannonComponent(ConnectorType[] connectors, DirectionType direction, boolean isDouble) {
@@ -20,6 +21,28 @@ public class CannonComponent extends Component {
 
     public boolean getIsDouble() {
         return isDouble;
+    }
+
+    @Override
+    public void rotateComponent(boolean clockwise) {
+        DirectionType[] directions = DirectionType.values();
+        if (clockwise) { this.direction = directions[(this.direction.ordinal() + 1 % 4)]; }
+        else { this.direction = directions[(this.direction.ordinal() + 3 % 4)]; }
+        super.rotateComponent(clockwise);
+    }
+
+    @Override
+    public void insertComponent(Ship ship, int row, int col) throws Exception {
+
+        if (
+            (direction == DirectionType.NORTH && row > 0 && ship.getDashboard()[row-1][col].isPresent()) ||
+            (direction == DirectionType.EAST && col < 6 && ship.getDashboard()[row][col+1].isPresent()) ||
+            (direction == DirectionType.SOUTH && row < 4 && ship.getDashboard()[row+1][col].isPresent()) ||
+            (direction == DirectionType.WEST && col > 0 && ship.getDashboard()[row][col-1].isPresent())
+        )
+            throw new Exception();
+
+        super.insertComponent(ship, row, col);
     }
 
 }
