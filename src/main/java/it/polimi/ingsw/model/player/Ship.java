@@ -1,27 +1,28 @@
 package it.polimi.ingsw.model.player;
 
 import it.polimi.ingsw.model.components.*;
+import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.game.objects.Good;
 import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Ship {
     private final Optional<Component>[][] dashboard;
-    private final List<Optional<Component>> descards;
+    private final List<Optional<Component>> discards;
     private final Optional<Component> reserves;
     private int crew;
     private int batteries;
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
-    public Ship(Optional<Component>[][] dashboard, List<Optional<Component>> descards, Optional<Component> reserves, int crew, int batteries, Map<ColorType, Integer> goods, List<DirectionType> protectedSides) {
+    public Ship(Optional<Component>[][] dashboard, List<Optional<Component>> discards, Optional<Component> reserves, int crew, int batteries, Map<ColorType, Integer> goods, List<DirectionType> protectedSides) {
         this.dashboard = dashboard;
-        this.descards = descards;
+        this.discards = discards;
         this.reserves = reserves;
         this.crew = crew;
         this.batteries = batteries;
@@ -35,24 +36,35 @@ public class Ship {
         return dashboard;
     }
 
-    public void insertComponent(Component component) {
-
-    }
-
     public void destroyComponent(Component component) {
 
     }
 
-    public List<Optional<Component>> getDescards() {
-        return descards;
+    public List<Optional<Component>> getDiscards() {
+        return discards;
     }
 
     public Optional<Component> getReserves() {
         return reserves;
     }
 
-    public int countExposedConnectors(){
-        return 0;
+    public int countExposedConnectors() {
+        AtomicInteger exposedConnectors = new AtomicInteger();
+        for (Optional<Component>[] row : dashboard) {
+            for (Optional<Component> componentOpt : row) {
+                componentOpt.ifPresent((Component component) -> {
+                    if (component.getConnectors()[0] != ConnectorType.EMPTY && (component.getY() == 0 || dashboard[component.getY()-1][component.getX()].isEmpty()))
+                        exposedConnectors.getAndIncrement();
+                    if (component.getConnectors()[1] != ConnectorType.EMPTY && (component.getX() == 6 || dashboard[component.getY()][component.getX()+1].isEmpty()))
+                        exposedConnectors.getAndIncrement();
+                    if (component.getConnectors()[2] != ConnectorType.EMPTY && (component.getY() == 4 || dashboard[component.getY()+1][component.getX()].isEmpty()))
+                        exposedConnectors.getAndIncrement();
+                    if (component.getConnectors()[3] != ConnectorType.EMPTY && (component.getX() == 0 || dashboard[component.getY()][component.getX()-1].isEmpty()))
+                        exposedConnectors.getAndIncrement();
+                });
+            }
+        }
+        return exposedConnectors.get();
     }
 
     public int getCrew() {
@@ -83,8 +95,7 @@ public class Ship {
         List<ShieldComponent> shields = new ArrayList<>();
         for(Optional<Component>[] row : dashboard) {
             for(Optional<Component> component : row) {
-                if(component.isPresent() && component.get() instanceof ShieldComponent) {
-                    ShieldComponent c = (ShieldComponent) component.get();
+                if(component.isPresent() && component.get() instanceof ShieldComponent c) {
                     shields.add(c);
                 }
             }
@@ -102,10 +113,9 @@ public class Ship {
 
     public List<CabinComponent> getCabines(){
         List<CabinComponent> cabines = new ArrayList<>();
-        for(Optional<Component>[] row : dashboard) {
-            for(Optional<Component> component : row) {
-                if(component.isPresent() && component.get() instanceof CabinComponent) {
-                    CabinComponent c = (CabinComponent) component.get();
+        for (Optional<Component>[] row : dashboard) {
+            for (Optional<Component> component : row) {
+                if (component.isPresent() && component.get() instanceof CabinComponent c) {
                     cabines.add(c);
                 }
             }
