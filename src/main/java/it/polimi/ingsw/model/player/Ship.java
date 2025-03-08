@@ -104,7 +104,15 @@ public class Ship {
     }
 
     public List<CannonComponent> getCannons(){
-        return new ArrayList<>();
+        List<CannonComponent> cannon = new ArrayList<>();
+        for(Optional<Component>[] row : dashboard) {
+            for(Optional<Component> component : row) {
+                if(component.isPresent() && component.get() instanceof CannonComponent c) {
+                    cannon.add(c);
+                }
+            }
+        }
+        return cannon;
     }
 
     public List<EngineComponent> getEngines(){
