@@ -30,6 +30,7 @@ public class Board {
     }
 
     public List<AbstractMap.SimpleEntry<PlayerData, Integer>> getPlayers() {
+        players.sort(Comparator.comparing(AbstractMap.SimpleEntry::getValue, Comparator.reverseOrder()));
         return players;
     }
 
@@ -63,18 +64,29 @@ public class Board {
         if (position == 0) return;
         players.forEach(entry -> {
             if (entry.getKey().equals(playerData)) {
-                // Set new position
-                entry.setValue(entry.getValue() + position);
+                for (int d = 0; d < Math.abs(position); d++) {
+                    int currentPosition = entry.getValue();
+                    int nextPosition = (position > 0) ?  currentPosition+1 : currentPosition-1;
+                    boolean moved = false; // check if we've moved
 
-                // Check if there is another player in the new position and eventually update it
-                Optional<AbstractMap.SimpleEntry<PlayerData, Integer>> conflict;
-                do {
-                    conflict = players.stream().filter(player2 -> !player2.getKey().equals(playerData) && Objects.equals(player2.getValue(), entry.getValue())).findFirst();
-                    if (conflict.isPresent() && position > 0) entry.setValue(entry.getValue() + 1);
-                    else if (conflict.isPresent()) entry.setValue(entry.getValue() - 1);
-                } while(conflict.isPresent());
+                    while (nextPosition >= 0 && !moved) {
+                        boolean positionOccupied = false; // check if the position in occupied
 
-                return;
+                        // iterate on the player to check if the player are in the previous position
+                        for (AbstractMap.SimpleEntry<PlayerData, Integer> otherEntry : players) {
+                            if (!otherEntry.equals(entry) && otherEntry.getValue() == nextPosition) {
+                                positionOccupied = true;
+                            }
+                        }
+                        // now we know that the position is free
+                        if (!positionOccupied) {
+                            entry.setValue(nextPosition);
+                            moved = true;
+                        } else {
+                            nextPosition = (position > 0) ? nextPosition+1 : nextPosition-1;
+                        }
+                    }
+                }
             }
         });
         // Eccezione giocatore non trovato

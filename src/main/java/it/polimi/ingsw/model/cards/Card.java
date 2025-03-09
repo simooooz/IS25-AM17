@@ -4,8 +4,8 @@ import it.polimi.ingsw.model.game.Board;
 
 abstract public class Card {
 
-    private final int level;
-    private final boolean isLearner;
+    private final int level;            // card level (1 or 2)
+    private final boolean isLearner;    // learning flight
 
     public Card(int level, boolean isLearner) {
         this.level = level;
@@ -20,6 +20,6 @@ abstract public class Card {
         return isLearner;
     }
 
-    public void resolve(Board board){}
+    public void resolve(Board board) throws Exception {};
 
 }
