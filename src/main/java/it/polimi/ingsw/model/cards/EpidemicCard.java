@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.game.Board;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Optional;
 
 import it.polimi.ingsw.model.game.Board;
 
@@ -14,20 +15,45 @@ public class EpidemicCard extends Card{
         super(level, isLearner);
     }
 
+
+// metodo che decrementa i membri di una cabina (sia nel caso umani che nel caso alieni)
+    private void uploadCabin(List<CabinComponent> cabines, int i, PlayerData playerData) {
+        if (cabines.get(i).getHumans() > 0) {
+            playerData.getShip().setCrew(playerData.getShip().getCrew() - 1);
+            cabines.get(i).setHumans(cabines.get(i).getHumans() - 1);
+        }
+        else if (cabines.get(i).getAlien().isPresent()) {
+            playerData.getShip().setCrew(playerData.getShip().getCrew() - 2);
+            cabines.get(i).setAlien(null);
+            System.out.println(cabines.get(i).getHumans());
+
+        }
+    }
+
     @Override
     public void resolve(Board board){
+        //per ogni giocatore
         for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers()) {
-
             PlayerData player = entry.getKey();
-            List<CabinComponent> cabines = player.getShip().getCabines();
-            for (int i = 0; i < cabines.size(); i++) {
-                for (int j = i+1; j < cabines.size(); j++) {
-                    if (cabines.get(i).isNearTo(cabines.get(j))) {
-                        //rimuovo un membro dell'equipaggio
+            // ottengo tutte le sue cabine
+            List<CabinComponent> cabins = player.getShip().getCabines();
+            boolean[] checkEpidemic = new boolean[cabins.size()]; //inizializzato tutto a false di default
+            for (int i = 0; i < cabins.size(); i++) {
+                for (int j = i+1; j < cabins.size(); j++) {
+                    //se due cabine sono vicine
+                    if (cabins.get(i).isNearTo(cabins.get(j))) {
+                        // se non le ho già visitate, riimuovo l'equipaggio e segno che le ho visitate
+                        if (!checkEpidemic[i]) {
+                            uploadCabin(cabins, i, player);
+                            checkEpidemic[i] = true;
+                        };
+                        if (!checkEpidemic[j]) {
+                            uploadCabin(cabins, j, player);
+                            checkEpidemic[j] = true;
+                        }
                     }
                 }
             }
-
         }
     }
 
