@@ -32,20 +32,23 @@ public class PlanetCard extends Card{
     public void resolve(Board board){
         for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers()) {
             PlayerData player = entry.getKey();
-            Optional<Planet> landingPlanet = Optional.of(pianetadaricevere); //chiedo l'eventuale pianeta all'utente
-
-            landingPlanet.isPresent((Planet planet) -> {
+            Optional<Planet> landingPlanet=null;
+            //Optional.of(pianetadaricevere);
+            //chiedo l'eventuale pianeta all'utente
+            landingPlanet.ifPresent((Planet planet) -> {
                 planet.getRewards().keySet().forEach(goodType -> {
                     int rewardTypeG = planet.getRewards().get(goodType);
                     int availableG = board.getAvailableGoods().get(goodType);
-
-                    int toDecrease = availableG < rewardTypeG ? availableG : rewardTypeG;
+                    int playerG = player.getShip().getGoods().get(goodType);
+                    int toDecrease = Math.min(availableG, rewardTypeG);
                     while (toDecrease > 0) {
-
+                        //chiedo alla view il componente sul quale inserire la merce
+                        // CargoComponent c1 = Funzionecherichiedeilcomponenteallview()
+                        // c1.loadGood(goodType);
                         toDecrease--;
                     }
-                    board.getAvailableGoods().put(g, availableG - toDecrease);
-                    player.getShip().getGoods().put(g, rewardTypeG);
+                    board.getAvailableGoods().put(goodType, availableG - toDecrease);
+                    player.getShip().getGoods().put(goodType, playerG + toDecrease);
                 });
             });
         };
@@ -57,7 +60,7 @@ public class PlanetCard extends Card{
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .anyMatch(playerData -> playerData.equals(player))){
-                        board.getPlayers().get(i).setValue(board.getPlayers().get(i).getValue()-days);
+                        board.movePlayer(player, getDays()*-1);
             }
         }
     }
