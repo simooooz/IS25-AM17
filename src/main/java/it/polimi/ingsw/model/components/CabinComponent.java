@@ -28,8 +28,12 @@ public class CabinComponent extends Component {
         return alien;
     }
 
+    public void setHumans(int humans) {
+        this.humans = humans;
+    }
+
     public void setAlien(AlienType alien) {
-        this.alien = Optional.of(alien);
+        this.alien = Optional.ofNullable(alien);
     }
 
     public boolean getIsStarting() {
