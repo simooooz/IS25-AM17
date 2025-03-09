@@ -104,11 +104,27 @@ public class Ship {
     }
 
     public List<CannonComponent> getCannons(){
-        return new ArrayList<>();
+        List<CannonComponent> cannon = new ArrayList<>();
+        for(Optional<Component>[] row : dashboard) {
+            for(Optional<Component> component : row) {
+                if(component.isPresent() && component.get() instanceof CannonComponent c) {
+                    cannon.add(c);
+                }
+            }
+        }
+        return cannon;
     }
 
     public List<EngineComponent> getEngines(){
-        return new ArrayList<>();
+        List<EngineComponent> engines = new ArrayList<>();
+        for (Optional<Component>[] row : dashboard) {
+            for (Optional<Component> component : row) {
+                if (component.isPresent() && component.get() instanceof EngineComponent e) {
+                    engines.add((EngineComponent) e);
+                }
+            }
+        }
+        return engines;
     }
 
     public List<CabinComponent> getCabines(){
@@ -123,5 +139,39 @@ public class Ship {
         return cabines;
     }
 
-}
+    public int calcEnginePower(List<EngineComponent> l) {
+        return l.stream()
+                .mapToInt(e -> {
+                        if (e.getIsDouble()) {
+//                            response = ?    ask if player wants to activate the double engine
+//                            return (response) ? 2 : 0;
+                            if (getBatteries()-1 >= 0) {
+                                setBatteries(getBatteries()-1);
+                                return 2;
+                            }
+                            return 0;
+                        }
+                        return 1;
+                })   // missing the interaction of player
+                .sum();
+    }
 
+    public double calcFirePower(List<CannonComponent> l) {
+        return l.stream()
+                .mapToDouble(c -> {
+//                    if (c.getIsDouble()) {
+//                        response = ?     ask if player wants to activate the double cannon
+//                        if (response) return c.getDirection() == DirectionType.NORTH ? 2 : 1;
+//                    }
+                    if (c.getIsDouble()) {
+                        if (getBatteries()-1 >= 0) {
+                            setBatteries(getBatteries()-1);
+                            return c.getDirection() == DirectionType.NORTH ? 2 : 1;
+                        }
+                        return 0;
+                    }
+                    return c.getDirection() == DirectionType.NORTH ? 1 : 0.5;
+                })
+                .sum();
+    }
+}
