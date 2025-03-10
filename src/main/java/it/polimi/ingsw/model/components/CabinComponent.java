@@ -37,8 +37,8 @@ public class CabinComponent extends Component {
     public void setAlien(AlienType alien, Ship ship) throws Exception {
         if (isStarting) throw new Exception();
         if (this.alien.isEmpty() && alien != null) {
+            setHumans(0, ship);
             ship.setCrew(ship.getCrew() + 2);
-            this.humans = 0;
         }
         else if (this.alien.isPresent() && alien == null) {
             ship.setCrew(ship.getCrew() - 2);

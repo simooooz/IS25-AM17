@@ -1,26 +1,29 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static it.polimi.ingsw.model.components.utils.ConnectorType.SINGLE;
+import static it.polimi.ingsw.model.game.objects.AlienType.CANNON;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AbandonedShipCardTest {
     private Optional<Component>[][] dashboard;
-    private List<Optional<Component>> discarded;
-    private Optional<Component> component;
-    private int battery;
-    private Map<ColorType, Integer> goods;
-    private List<DirectionType> directions;
+    private List<Component> discarded;
+    private ConnectorType[] connectors;
+    private Component[] reserves;
+
     private Ship ship1;
     private Ship ship2;
     private Ship ship3;
@@ -38,15 +41,10 @@ class AbandonedShipCardTest {
                 dashboard[i][j] = Optional.empty();
             }
         }
-
-        discarded = new ArrayList<>();
-        component = Optional.empty();
-        battery = 0;
-        goods = new HashMap<>();
-        directions = new ArrayList<>();
-        ship1 = new Ship(dashboard, discarded, component, 1, battery, goods, directions);
-        ship2 = new Ship(dashboard, discarded, component, 1, battery, goods, directions);
-        ship3 = new Ship(dashboard, discarded, component, 1, battery, goods, directions);
+        reserves = new Component[2];
+        ship1 = new Ship(dashboard, discarded, reserves);
+        ship2 = new Ship(dashboard, discarded, reserves);
+        ship3 = new Ship(dashboard, discarded, reserves);
         players = new ArrayList<>();
         player1 = new PlayerData(ColorType.BLUE, "Simone", ship1, 0);
         player2 = new PlayerData(ColorType.BLUE, "Davide", ship2, 0);
@@ -63,27 +61,37 @@ class AbandonedShipCardTest {
     }
 
     @Test
-    void testShouldNotUpdateCardIfCrewNotEnough() {
+    void testShouldNotUpdateCardIfCrewNotEnough() throws Exception{
         // Initialization
-        Ship testShip = new Ship(dashboard, discarded, component, 5, battery, goods, directions);
+        Ship testShip = new Ship(dashboard, discarded, reserves);
         PlayerData playerTester = new PlayerData(ColorType.BLUE, "Pippo", testShip, 50);
         players.add(new AbstractMap.SimpleEntry<>(playerTester, 16));
+        CabinComponent cabin1 = new CabinComponent(connectors, false);
+        CabinComponent cabin2 = new CabinComponent(connectors, false);
+        cabin1.insertComponent(testShip, 2, 2);
+        cabin2.insertComponent(testShip, 1, 2);
+        cabin2.setAlien(CANNON, testShip);
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 10, 0, 0);
         // call to the card
         abandonedShipCard.resolve(board);
         // check
-        assertEquals(5, testShip.getCrew());
+        assertEquals(4, testShip.getCrew());
         assertEquals(50, playerTester.getCredits());
         assertEquals(16, players.stream().filter(entry -> entry.getKey().equals(playerTester)).findFirst().get().getValue());
     }
 
     @Test
-    void testShouldCheckIfTheParameterAreUpdateWithNoPlayersInDaysPositionBehind() {
+    void testShouldCheckIfTheParameterAreUpdateWithNoPlayersInDaysPositionBehind() throws Exception{
         // Initialization
-        Ship testShip = new Ship(dashboard, discarded, component, 10, battery, goods, directions);
+        Ship testShip = new Ship(dashboard, discarded, reserves);
         PlayerData playerTester = new PlayerData(ColorType.BLUE, "Pippo", testShip, 50);
         players.add(new AbstractMap.SimpleEntry<>(playerTester, 30));
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 5, 6, 4);
+        CabinComponent cabin1 = new CabinComponent(connectors, false);
+        CabinComponent cabin2 = new CabinComponent(connectors, false);
+        cabin1.insertComponent(testShip, 2, 2);
+        cabin2.insertComponent(testShip, 1, 2);
+        cabin2.setAlien(CANNON, testShip);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 3, 6, 4);
         // call to the card
         abandonedShipCard.resolve(board);
         // check
@@ -93,12 +101,17 @@ class AbandonedShipCardTest {
     }
 
     @Test
-    void testShouldCheckIfTheParameterAreUpdateWithPlayersInDaysPositionBehind() {
+    void testShouldCheckIfTheParameterAreUpdateWithPlayersInDaysPositionBehind() throws Exception{
         // initialization
-        Ship testShip = new Ship(dashboard, discarded, component, 10, battery, goods, directions);
+        Ship testShip = new Ship(dashboard, discarded, reserves);
         PlayerData playerTester = new PlayerData(ColorType.BLUE, "Pippo", testShip, 50);
         players.add(new AbstractMap.SimpleEntry<>(playerTester, 16));
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 5, 6, 7);
+        CabinComponent cabin1 = new CabinComponent(connectors, false);
+        CabinComponent cabin2 = new CabinComponent(connectors, false);
+        cabin1.insertComponent(testShip, 2, 2);
+        cabin2.insertComponent(testShip, 1, 2);
+        cabin2.setAlien(CANNON, testShip);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 3, 6, 7);
         // call to the card
         abandonedShipCard.resolve(board);
         // check
