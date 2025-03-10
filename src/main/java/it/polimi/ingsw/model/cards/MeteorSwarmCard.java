@@ -1,7 +1,10 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.cards.utils.CannonFire;
 import it.polimi.ingsw.model.cards.utils.Meteor;
 import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.game.objects.Dice;
+import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
 
@@ -19,5 +22,13 @@ public class MeteorSwarmCard extends Card{
     }
 
     @Override
-    public void resolve(Board board){}
+    public void resolve(Board board) throws Exception {
+        for (Meteor meteor : meteors) {
+            int coord = Dice.roll() + Dice.roll(); // View => leader rolls dices
+            for (PlayerData playerData : board.getPlayersByPos()) {
+                meteor.hit(playerData.getShip(), coord);
+            }
+        }
+    }
+
 }
