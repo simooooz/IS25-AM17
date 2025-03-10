@@ -14,10 +14,10 @@ public class StardustCard extends Card {
 
     @Override
     public void resolve(Board board) {
-        List<AbstractMap.SimpleEntry<PlayerData, Integer>> players = board.getPlayers().reversed();    // players by inverted position
+        List<PlayerData> players = board.getPlayersByPos().reversed();    // players by inverted position
         players.forEach(p -> {
-            Ship ship = p.getKey().getShip();
-            board.movePlayer(p.getKey(), -1*ship.countExposedConnectors());
+            Ship ship = p.getShip();
+            board.movePlayer(p, -1*ship.countExposedConnectors());
         });
     }
 }
