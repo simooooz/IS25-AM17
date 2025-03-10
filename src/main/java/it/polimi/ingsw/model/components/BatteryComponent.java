@@ -26,11 +26,23 @@ public class BatteryComponent extends Component {
         this.batteries = batteries;
     }
 
+    public void useBattery(Ship ship) throws Exception {
+        if (batteries == 0) throw new Exception();
+        batteries--;
+        ship.setBatteries(ship.getBatteries() - 1);
+    }
+
     @Override
     public void insertComponent(Ship ship, int row, int col) throws Exception {
         super.insertComponent(ship, row, col);
         if (isTriple) { ship.setBatteries(ship.getBatteries() + 3); }
         else { ship.setBatteries(ship.getBatteries() + 2); }
+    }
+
+    @Override
+    public void affectDestroy(Ship ship) {
+        super.affectDestroy(ship);
+        ship.setBatteries(ship.getBatteries() - batteries);
     }
 
 }

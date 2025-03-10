@@ -32,17 +32,14 @@ public class CannonComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col) throws Exception {
-
+    public void checkComponent(Ship ship) throws Exception {
+        super.checkComponent(ship);
         if (
-            (direction == DirectionType.NORTH && row > 0 && ship.getDashboard()[row-1][col].isPresent()) ||
-            (direction == DirectionType.EAST && col < 6 && ship.getDashboard()[row][col+1].isPresent()) ||
-            (direction == DirectionType.SOUTH && row < 4 && ship.getDashboard()[row+1][col].isPresent()) ||
-            (direction == DirectionType.WEST && col > 0 && ship.getDashboard()[row][col-1].isPresent())
-        )
-            throw new Exception();
-
-        super.insertComponent(ship, row, col);
+            (direction == DirectionType.NORTH && ship.getDashboard(y-1, x).isPresent()) ||
+            (direction == DirectionType.EAST && ship.getDashboard(y, x+1).isPresent()) ||
+            (direction == DirectionType.SOUTH && ship.getDashboard(y+1, x).isPresent()) ||
+            (direction == DirectionType.WEST && ship.getDashboard(y, x-1).isPresent())
+        ) throw new Exception();
     }
 
 }

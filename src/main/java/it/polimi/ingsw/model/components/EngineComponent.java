@@ -32,11 +32,10 @@ public class EngineComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col) throws Exception {
-        if (direction != DirectionType.SOUTH || direction == DirectionType.SOUTH && row < 4 && ship.getDashboard()[row+1][col].isPresent())
+    public void checkComponent(Ship ship) throws Exception {
+        if (direction != DirectionType.SOUTH || ship.getDashboard(y+1, x).isPresent())
             throw new Exception();
-
-        super.insertComponent(ship, row, col);
+        super.checkComponent(ship);
     }
 
 }
