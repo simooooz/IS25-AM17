@@ -1,10 +1,12 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.AbstractMap;
 import java.util.List;
+import java.util.Optional;
 
 public class AbandonedShipCard extends Card {
     private final int crew;
@@ -31,7 +33,7 @@ public class AbandonedShipCard extends Card {
     }
 
     @Override
-    public void resolve(Board board) {
+    public void resolve(Board board) throws Exception {
         List<AbstractMap.SimpleEntry<PlayerData, Integer>> players = board.getPlayers();
 
         // iterate on the list of player -> for now I've not implemented if a player does not want to
@@ -39,39 +41,27 @@ public class AbandonedShipCard extends Card {
         for (AbstractMap.SimpleEntry<PlayerData, Integer> entry : players) {
             PlayerData player = entry.getKey();
 
+            int cardCrew = getCrew();
             int crew = player.getShip().getCrew();
             int credits = player.getCredits();
 
             // check if the player can really play the card
-            if (crew > getCrew()) {
-                player.getShip().setCrew(crew - getCrew());
-                player.setCredits(credits + getCredits());
-
-                // iterate on the days to update player position
-                for (int d = 0; d < getDays(); d++) {
-                    int currentPosition = entry.getValue();
-                    int nextPosition = currentPosition - 1;
-                    boolean moved = false; // check if we've moved
-
-                    while (nextPosition >= 0 && !moved) {
-                        boolean positionOccupied = false; // check if the position in occupied
-
-                        // iterate on the player to check if the player are in the previus position
-                        for (AbstractMap.SimpleEntry<PlayerData, Integer> otherEntry : players) {
-                            if (!otherEntry.equals(entry) && otherEntry.getValue() == nextPosition) {
-                                positionOccupied = true;
-                            }
-                        }
-                        // now we know that the position is free
-                        if (!positionOccupied) {
-                            entry.setValue(nextPosition);
-                            moved = true;
-                        } else {
-                            nextPosition--;
-                        }
+            if (crew > cardCrew) {
+                // player need to choose if he wants to get rid of alien and or human
+                while (cardCrew > 0) {
+                    Optional<CabinComponent> chosenComponentOpt = Optional.empty(); // View
+                    CabinComponent chosenComponent = chosenComponentOpt.orElseThrow();
+                    if (chosenComponent.getAlien().isEmpty() && chosenComponent.getHumans() > 0) {
+                        chosenComponent.setHumans(chosenComponent.getHumans() - 1, player.getShip());
+                        cardCrew --;
                     }
-                }
+                    else if (chosenComponent.getAlien().isPresent() && chosenComponent.getHumans() == 0) {
+                        chosenComponent.setAlien(null, player.getShip());
+                        cardCrew =- 2;
+                    }
 
+                }
+                board.movePlayer(player, getDays() * -1);
             }
         }
     }
