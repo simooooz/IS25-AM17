@@ -120,39 +120,58 @@ public class Ship {
     }
 
     public int calcEnginePower(List<EngineComponent> l) {
-        return l.stream()
-                .mapToInt(e -> {
-                        if (e.getIsDouble()) {
-//                            response = ?    ask if player wants to activate the double engine
-//                            return (response) ? 2 : 0;
-                            if (getBatteries()-1 >= 0) {
-                                setBatteries(getBatteries()-1);
-                                return 2;
+        int pwr = l.stream()
+                    .mapToInt(e -> {
+                            if (e.getIsDouble()) {
+                                if (getBatteries() == 0) return 0;      // the player has no batteries => cannot take advantage of the dual motor(s)
+                                else {
+    //                                the player decides whether to use a battery to activate the dual motor
+    //                                probably this response will be given by a user gesture (battery removal, click on a removal button...)
+
+    //                                if (awaitForResponse()) {
+    //                                    if so, the component where to decrement the number of batteries is received.
+
+    //                                    BatteryComponent res = awaitForBatteryComponent();
+    //                                    res.useBattery(this);
+                                        setBatteries(getBatteries() - 1);
+                                        return 2;
+    //                                } else {
+    //                                    return 0;
+    //                                }
+                                }
                             }
-                            return 0;
-                        }
-                        return 1;
-                })   // missing the interaction of player
-                .sum();
+    //                        the engine is single, it does not need to be activated
+                            return 1;
+                    })
+                    .sum();
+        return engineAlien ? pwr+2 : pwr;
     }
 
     public double calcFirePower(List<CannonComponent> l) {
-        return l.stream()
-                .mapToDouble(c -> {
-//                    if (c.getIsDouble()) {
-//                        response = ?     ask if player wants to activate the double cannon
-//                        if (response) return c.getDirection() == DirectionType.NORTH ? 2 : 1;
-//                    }
-                    if (c.getIsDouble()) {
-                        if (getBatteries()-1 >= 0) {
-                            setBatteries(getBatteries()-1);
-                            return c.getDirection() == DirectionType.NORTH ? 2 : 1;
-                        }
-                        return 0;
-                    }
-                    return c.getDirection() == DirectionType.NORTH ? 1 : 0.5;
-                })
-                .sum();
+        double pwr = l.stream()
+                        .mapToDouble(c -> {
+                            if (c.getIsDouble()) {
+                                if (getBatteries() == 0) return 0;      // the player has no batteries => cannot take advantage of the dual cannon(s)
+                                else {
+    //                                the player decides whether to use a battery to activate the dual cannon
+    //                                probably this response will be given by a user gesture (battery removal, click on a removal button...)
+
+    //                                if (awaitForResponse()) {
+    //                                    if so, the component where to decrement the number of batteries is received.
+
+    //                                    BatteryComponent res = awaitForBatteryComponent();
+    //                                    res.useBattery(this);
+                                        setBatteries(getBatteries() - 1);
+                                        return c.getDirection() == DirectionType.NORTH ? 2 : 1;
+    //                                } else {
+    //                                    return 0;
+    //                                }
+                                }
+                            }
+                            return c.getDirection() == DirectionType.NORTH ? 1 : 0.5;
+                        })
+                        .sum();
+        return cannonAlien ? pwr+2 : pwr;
     }
 
 }

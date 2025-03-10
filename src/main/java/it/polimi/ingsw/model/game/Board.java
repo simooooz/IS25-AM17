@@ -64,13 +64,13 @@ public class Board {
     public void movePlayer(PlayerData playerData, int position) {
         if (position == 0) return;
         SimpleEntry<PlayerData, Integer> entry = players.stream()
-            .filter(e -> e.getKey().equals(playerData))
-            .findFirst()
-            .orElseThrow();
+                .filter(e -> e.getKey().equals(playerData))
+                .findFirst()
+                .orElseThrow();
 
         for (int d = 0; d < Math.abs(position); d++) {
             int currentPosition = entry.getValue();
-            int nextPosition = (position > 0) ?  currentPosition+1 : currentPosition-1;
+            int nextPosition = (position > 0) ? currentPosition + 1 : currentPosition - 1;
             boolean moved = false; // check if we've moved
 
             while (!moved) {
@@ -87,28 +87,25 @@ public class Board {
                 if (!positionOccupied) {
                     entry.setValue(nextPosition);
                     moved = true;
-                }
-                else
-                    nextPosition = (position > 0) ? nextPosition+1 : nextPosition-1;
+                } else
+                    nextPosition = (position > 0) ? nextPosition + 1 : nextPosition - 1;
             }
         }
     }
 
     public void moveToStartingDeck(PlayerData player) throws Exception {
-        SimpleEntry<PlayerData, Integer> playerPair = players.stream()
-            .filter(el -> el.getKey().equals(player))
-            .findFirst()
-            .orElseThrow(Exception::new);
-
-        startingDeck.add(playerPair.getKey());
-        players.remove(playerPair);
+        players.stream()
+                .filter(el -> el.getKey().equals(player))
+                .findFirst()
+                .ifPresent(players::remove);
+        startingDeck.add(player);
     }
 
     public void moveToBoard(PlayerData player) throws Exception {
         startingDeck.stream()
-            .filter(p -> p.equals(player))
-            .findFirst()
-            .orElseThrow(Exception::new);
+                .filter(p -> p.equals(player))
+                .findFirst()
+                .orElseThrow(Exception::new);
 
         players.add(new SimpleEntry<>(player, 0));
         players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
