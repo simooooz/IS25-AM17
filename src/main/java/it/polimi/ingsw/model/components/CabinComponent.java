@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.components;
 
 import it.polimi.ingsw.model.components.utils.ConnectorType;
-import it.polimi.ingsw.model.game.objects.Alien;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.player.Ship;
 
@@ -24,15 +23,17 @@ public class CabinComponent extends Component {
         return humans;
     }
 
+    public void setHumans(int humans) throws Exception {
+        if (alien.isPresent()) throw new Exception();
+        this.humans = humans;
+    }
+
     public Optional<AlienType> getAlien() {
         return alien;
     }
 
-    public void setHumans(int humans) {
-        this.humans = humans;
-    }
-
-    public void setAlien(AlienType alien) {
+    public void setAlien(AlienType alien) throws Exception {
+        if (isStarting) throw new Exception();
         this.alien = Optional.ofNullable(alien);
     }
 
@@ -44,6 +45,12 @@ public class CabinComponent extends Component {
     public void insertComponent(Ship ship, int row, int col) throws Exception {
         super.insertComponent(ship, row, col);
         ship.setCrew(ship.getCrew() + 2);
+    }
+
+    @Override
+    public void affectDestroy(Ship ship) {
+        super.affectDestroy(ship);
+        ship.setCrew(ship.getCrew() - (alien.isPresent() ? 2 : humans));
     }
 
 }
