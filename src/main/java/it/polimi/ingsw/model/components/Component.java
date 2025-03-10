@@ -63,21 +63,17 @@ public class Component {
     }
 
     public void insertComponent(Ship ship, int row, int col) throws Exception {
-        if ((row < 0 || row > 4) || (col < 0 || col > 6) || (row == 0 && col == 0) || (row == 0 && col == 1) || (row == 0 && col == 3) || (row == 0 && col == 5) || (row == 0 && col == 6) || (row == 1 && col == 0) || (row == 1 && col == 6) || (row == 4 && col == 3)) throw new Exception(); // Check if position is valid
-        if (ship.getDashboard()[row][col].isPresent()) throw new Exception();
+        if ((row == 0 && col == 0) || (row == 0 && col == 1) || (row == 0 && col == 3) || (row == 0 && col == 5) || (row == 0 && col == 6) || (row == 1 && col == 0) || (row == 1 && col == 6) || (row == 4 && col == 3)) throw new Exception(); // Check if position is valid
+        if (ship.getDashboard(row, col).isPresent()) throw new Exception();
 
-        this.x = row;
-        this.y = col;
+        this.x = col;
+        this.y = row;
         ship.getDashboard()[row][col] = Optional.of(this);
     }
 
     public void checkComponent(Ship ship) throws Exception {
-        if ( // Not isolated check
-            ship.getDashboard(y, x-1).isEmpty() &&
-            ship.getDashboard(y-1, x).isEmpty() &&
-            ship.getDashboard(y, x+1).isEmpty() &&
-            ship.getDashboard(y+1, x).isEmpty()
-        ) throw new Exception();
+        if (getLinkedNeighbors(ship).isEmpty()) // Not isolated check
+            throw new Exception();
 
         if ( // Compatible connectors check
             ship.getDashboard(y, x-1).isPresent() && !Component.areConnectorsCompatible(ship.getDashboard(y, x-1).get().connectors[1], connectors[3]) || // Left connector check
@@ -139,6 +135,7 @@ public class Component {
         if (visited[i][j] || dashboard[i][j].isEmpty()) return;
 
         // Skip if connectors are not linked together
+        // TODO check
         if (otherComponentOpt.isPresent()) {
             if (
                 dashboard[i][j].get().getX() < otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||
@@ -165,14 +162,6 @@ public class Component {
 
     public int getY() {
         return y;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
     }
 
 }

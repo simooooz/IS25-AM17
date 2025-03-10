@@ -5,29 +5,26 @@ import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.properties.DirectionType;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Ship {
     private final Optional<Component>[][] dashboard;
     private final List<Component> discards;
-    private final Optional<Component> reserves;
+    private final Component[] reserves;
     private int crew;
     private int batteries;
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
-    public Ship(Optional<Component>[][] dashboard, List<Component> discards, Optional<Component> reserves, int crew, int batteries, Map<ColorType, Integer> goods, List<DirectionType> protectedSides) {
+    public Ship(Optional<Component>[][] dashboard, List<Component> discards, Component[] reserves) {
         this.dashboard = dashboard;
         this.discards = discards;
         this.reserves = reserves;
-        this.crew = crew;
-        this.batteries = batteries;
-        this.goods = goods;
-        this.protectedSides = protectedSides;
+        this.crew = 0;
+        this.batteries = 0;
+        this.goods = new HashMap<>();
+        this.protectedSides = new ArrayList<>();
     }
 
     public Optional<Component>[][] getDashboard() {
@@ -43,7 +40,7 @@ public class Ship {
         return discards;
     }
 
-    public Optional<Component> getReserves() {
+    public Component[] getReserves() {
         return reserves;
     }
 
@@ -90,55 +87,7 @@ public class Ship {
         return protectedSides;
     }
 
-    public List<ShieldComponent> getShields(){
-        List<ShieldComponent> shields = new ArrayList<>();
-        for(Optional<Component>[] row : dashboard) {
-            for(Optional<Component> component : row) {
-                if(component.isPresent() && component.get() instanceof ShieldComponent c) {
-                    shields.add(c);
-                }
-            }
-        }
-        return shields;
-    }
-
-    public List<CannonComponent> getCannons(){
-        List<CannonComponent> cannon = new ArrayList<>();
-        for(Optional<Component>[] row : dashboard) {
-            for(Optional<Component> component : row) {
-                if(component.isPresent() && component.get() instanceof CannonComponent c) {
-                    cannon.add(c);
-                }
-            }
-        }
-        return cannon;
-    }
-
-    public List<EngineComponent> getEngines(){
-        List<EngineComponent> engines = new ArrayList<>();
-        for (Optional<Component>[] row : dashboard) {
-            for (Optional<Component> component : row) {
-                if (component.isPresent() && component.get() instanceof EngineComponent e) {
-                    engines.add((EngineComponent) e);
-                }
-            }
-        }
-        return engines;
-    }
-
-    public List<CabinComponent> getCabines(){
-        List<CabinComponent> cabines = new ArrayList<>();
-        for (Optional<Component>[] row : dashboard) {
-            for (Optional<Component> component : row) {
-                if (component.isPresent() && component.get() instanceof CabinComponent c) {
-                    cabines.add(c);
-                }
-            }
-        }
-        return cabines;
-    }
-
-    public <T extends Component> List<T> getComponentByType(Class<T> componentType){
+    public <T extends Component> List<T> getComponentByType(Class<T> componentType) {
         List<T> list = new ArrayList<>();
         for (Optional<Component>[] row : dashboard) {
             for (Optional<Component> component : row) {
