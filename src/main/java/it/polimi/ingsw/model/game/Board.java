@@ -6,32 +6,34 @@ import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.Collectors;
 
 public class Board {
 
-    private final List<AbstractMap.SimpleEntry<PlayerData, Integer>> players;
+    private final List<SimpleEntry<PlayerData, Integer>> players;
     private final List<PlayerData> startingDeck;
     private final List<Card> cardPile;
     private int cardPilePos;
     private final Time timeManagment;
     private final Map<ColorType, Integer> availableGoods;
 
-    public Board(List<AbstractMap.SimpleEntry<PlayerData, Integer>> players) {
+    public Board(List<SimpleEntry<PlayerData, Integer>> players) {
         this.players = players;
-        this.startingDeck = new ArrayList<>();
+        this.startingDeck = new ArrayList<>(getPlayersByPos());
         this.cardPile = new ArrayList<>();
         this.cardPilePos = 0;
         this.timeManagment = new Time();
         this.availableGoods = new HashMap<>();
-
-        List<PlayerData> playersDataList = players.stream().map(el -> el.getKey()).collect(Collectors.toList());
-        startingDeck.addAll(playersDataList);
     }
 
-    public List<AbstractMap.SimpleEntry<PlayerData, Integer>> getPlayers() {
+    public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
         players.sort(Comparator.comparing(AbstractMap.SimpleEntry::getValue, Comparator.reverseOrder()));
         return players;
+    }
+
+    public List<PlayerData> getPlayersByPos() {
+        return players.stream().map(SimpleEntry::getKey).collect(Collectors.toList());
     }
 
     public List<PlayerData> getStartingDeck() {
@@ -57,7 +59,7 @@ public class Board {
     public Card drawCard() throws Exception {
         if (cardPilePos < cardPile.size())
             return cardPile.get(cardPilePos++);
-        else throw new Exception(); // Eccezione carte finite
+        else throw new Exception(); // No more cards
     }
 
     public void movePlayer(PlayerData playerData, int position) {
@@ -92,26 +94,24 @@ public class Board {
         // Eccezione giocatore non trovato
     }
 
-    public void moveToStartingDeck(PlayerData player) {
-        players.forEach(entry -> {
-            if (entry.getKey().equals(player)) {
-                startingDeck.add(player);
-                players.remove(entry);
-                return;
-            }
-        });
-        // Eccezione giocatore non trovato
+    public void moveToStartingDeck(PlayerData player) throws Exception {
+        SimpleEntry<PlayerData, Integer> playerPair = players.stream()
+            .filter(el -> el.getKey().equals(player))
+            .findFirst()
+            .orElseThrow(Exception::new);
+
+        startingDeck.add(playerPair.getKey());
+        players.remove(playerPair);
     }
 
-    public void moveToBoard(PlayerData player) {
-        startingDeck.forEach(p -> {
-            if (p.equals(player)) {
-                players.add(new AbstractMap.SimpleEntry<>(player, 0));
-                startingDeck.remove(p);
-                return;
-            }
-        });
-        // Eccezione giocatore non trovato
+    public void moveToBoard(PlayerData player) throws Exception {
+        startingDeck.stream()
+            .filter(p -> p.equals(player))
+            .findFirst()
+            .orElseThrow(Exception::new);
+
+        players.add(new SimpleEntry<>(player, 0));
+        startingDeck.remove(player);
     }
 
 }
