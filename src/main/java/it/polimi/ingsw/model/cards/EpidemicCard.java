@@ -17,26 +17,23 @@ public class EpidemicCard extends Card{
 
 
 // metodo che decrementa i membri di una cabina (sia nel caso umani che nel caso alieni)
-    private void uploadCabin(List<CabinComponent> cabines, int i, PlayerData playerData) {
+    private void uploadCabin(List<CabinComponent> cabines, int i, PlayerData playerData) throws Exception {
         if (cabines.get(i).getHumans() > 0) {
-            playerData.getShip().setCrew(playerData.getShip().getCrew() - 1);
-            cabines.get(i).setHumans(cabines.get(i).getHumans() - 1);
+            cabines.get(i).setHumans(cabines.get(i).getHumans() - 1, playerData.getShip());
         }
         else if (cabines.get(i).getAlien().isPresent()) {
-            playerData.getShip().setCrew(playerData.getShip().getCrew() - 2);
-            cabines.get(i).setAlien(null);
-            System.out.println(cabines.get(i).getHumans());
+            cabines.get(i).setAlien(null, playerData.getShip());
 
         }
     }
 
     @Override
-    public void resolve(Board board){
+    public void resolve(Board board) throws Exception {
         //per ogni giocatore
         for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers()) {
             PlayerData player = entry.getKey();
             // ottengo tutte le sue cabine
-            List<CabinComponent> cabins = player.getShip().getCabines();
+            List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class);
             boolean[] checkEpidemic = new boolean[cabins.size()]; //inizializzato tutto a false di default
             for (int i = 0; i < cabins.size(); i++) {
                 for (int j = i+1; j < cabins.size(); j++) {
