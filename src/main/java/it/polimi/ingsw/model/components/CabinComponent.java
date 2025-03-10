@@ -14,7 +14,7 @@ public class CabinComponent extends Component {
 
     public CabinComponent(ConnectorType[] connectors, boolean isStarting) {
         super(connectors);
-        this.humans = 2;
+        this.humans = 0;
         this.alien = Optional.empty();
         this.isStarting = isStarting;
     }
@@ -24,6 +24,7 @@ public class CabinComponent extends Component {
     }
 
     public void setHumans(int humans, Ship ship) throws Exception {
+        if (humans < 0) humans = 0;
         if (alien.isPresent()) setAlien(null, ship);
         int delta = humans - this.humans;
         ship.setCrew(ship.getCrew() + delta);
@@ -39,9 +40,15 @@ public class CabinComponent extends Component {
         if (this.alien.isEmpty() && alien != null) {
             setHumans(0, ship);
             ship.setCrew(ship.getCrew() + 2);
+            if (alien == AlienType.CANNON && !ship.getCannonAlien()) { ship.setCannonAlien(true); }
+            else if (alien == AlienType.CANNON && ship.getCannonAlien()) throw new Exception();
+            else if (alien == AlienType.ENGINE && !ship.getEngineAlien()) { ship.setEngineAlien(true); }
+            else if (alien == AlienType.ENGINE && ship.getEngineAlien()) throw new Exception();
         }
         else if (this.alien.isPresent() && alien == null) {
             ship.setCrew(ship.getCrew() - 2);
+            if (this.alien.get() == AlienType.CANNON) { ship.setCannonAlien(false); }
+            else { ship.setEngineAlien(false); }
         }
         this.alien = Optional.ofNullable(alien);
     }
@@ -53,13 +60,14 @@ public class CabinComponent extends Component {
     @Override
     public void insertComponent(Ship ship, int row, int col) throws Exception {
         super.insertComponent(ship, row, col);
-        ship.setCrew(ship.getCrew() + 2);
+        setHumans(2, ship);
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
+    public void affectDestroy(Ship ship) throws Exception {
         super.affectDestroy(ship);
-        ship.setCrew(ship.getCrew() - (alien.isPresent() ? 2 : humans));
+        setHumans(0, ship);
+        setAlien(null, ship);
     }
 
 }

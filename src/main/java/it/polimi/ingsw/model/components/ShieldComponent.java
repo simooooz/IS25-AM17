@@ -40,7 +40,7 @@ public class ShieldComponent extends Component {
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
+    public void affectDestroy(Ship ship) throws Exception {
         super.affectDestroy(ship);
         ship.getProtectedSides().remove(directionsProtected[0]);
         ship.getProtectedSides().remove(directionsProtected[1]);

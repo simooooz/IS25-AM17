@@ -57,7 +57,7 @@ public class Component {
         return areConnectorsCompatible(conn1, conn2) && conn1 != ConnectorType.EMPTY && conn2 != ConnectorType.EMPTY;
     }
 
-    public void affectDestroy(Ship ship) {
+    public void affectDestroy(Ship ship) throws Exception {
         ship.getDashboard(y, x).ifPresent(ship.getDiscards()::add);
         ship.getDashboard()[y][x] = Optional.empty();
     }
@@ -100,7 +100,7 @@ public class Component {
         connectors = newConnectors;
     }
 
-    public void destroyComponent(Ship ship) {
+    public void destroyComponent(Ship ship) throws Exception {
         affectDestroy(ship);
 
         // Matrix of booleans to track visited components
@@ -135,7 +135,6 @@ public class Component {
         if (visited[i][j] || dashboard[i][j].isEmpty()) return;
 
         // Skip if connectors are not linked together
-        // TODO check
         if (otherComponentOpt.isPresent()) {
             if (
                 dashboard[i][j].get().getX() < otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||

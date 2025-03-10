@@ -1,61 +1,68 @@
 package it.polimi.ingsw.model.properties;
 
 import it.polimi.ingsw.model.components.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public enum DirectionType {
     NORTH {
         @Override
-        public Optional<Component> firstComponentFromThisDirection(Optional<Component>[][] dashboard, int direction) {
-            if (direction < 4 || direction > 10) return Optional.empty();
+        public List<Component> getComponentsFromThisDirection(Optional<Component>[][] dashboard, int direction) {
+            List<Component> components = new ArrayList<>();
+            if (direction < 4 || direction > 10) return components;
             direction -= 4;
-            for (Optional<Component>[] row : dashboard)
-                if (row[direction].isPresent())
-                    return row[direction];
 
-            return Optional.empty();
+            for (Optional<Component>[] row : dashboard)
+                row[direction].ifPresent(components::add);
+
+            return components;
         }
     },
 
     EAST {
         @Override
-        public Optional<Component> firstComponentFromThisDirection(Optional<Component>[][] dashboard, int direction) {
-            if (direction < 5 || direction > 9) return Optional.empty();
+        public List<Component> getComponentsFromThisDirection(Optional<Component>[][] dashboard, int direction) {
+            List<Component> components = new ArrayList<>();
+            if (direction < 5 || direction > 9) return components;
             direction -= 5;
-            for (int col = dashboard[direction].length-1; col >= 0; col--)
-                if (dashboard[direction][col].isPresent())
-                    return dashboard[direction][col];
 
-            return Optional.empty();
+            for (int col = dashboard[direction].length-1; col >= 0; col--)
+                dashboard[direction][col].ifPresent(components::add);
+
+            return components;
         }
     },
 
     SOUTH {
         @Override
-        public Optional<Component> firstComponentFromThisDirection(Optional<Component>[][] dashboard, int direction) {
-            if (direction < 4 || direction > 10) return Optional.empty();
+        public List<Component> getComponentsFromThisDirection(Optional<Component>[][] dashboard, int direction) {
+            List<Component> components = new ArrayList<>();
+            if (direction < 4 || direction > 10) return components;
             direction -= 4;
-            for (int row = dashboard.length-1; row >= 0; row--)
-                if (dashboard[row][direction].isPresent())
-                    return dashboard[row][direction];
 
-            return Optional.empty();
+            for (int row = dashboard.length-1; row >= 0; row--)
+                dashboard[row][direction].ifPresent(components::add);
+
+            return components;
         }
     },
 
     WEST {
         @Override
-        public Optional<Component> firstComponentFromThisDirection(Optional<Component>[][] dashboard, int direction) {
-            if (direction < 5 || direction > 9) return Optional.empty();
+        public List<Component> getComponentsFromThisDirection(Optional<Component>[][] dashboard, int direction) {
+            List<Component> components = new ArrayList<>();
+            if (direction < 5 || direction > 9) return components;
             direction -= 5;
-            for (int col=0; col < dashboard[direction].length; col++)
-                if (dashboard[direction][col].isPresent())
-                    return dashboard[direction][col];
 
-            return Optional.empty();
+            for (int col=0; col < dashboard[direction].length; col++)
+                dashboard[direction][col].ifPresent(components::add);
+
+            return components;
         }
     };
 
-    public abstract Optional<Component> firstComponentFromThisDirection(Optional<Component>[][] dashboard, int direction);
+    public abstract List<Component> getComponentsFromThisDirection(Optional<Component>[][] dashboard, int direction);
 
 }

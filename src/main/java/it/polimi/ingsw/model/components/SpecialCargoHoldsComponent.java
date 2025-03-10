@@ -39,7 +39,7 @@ public class SpecialCargoHoldsComponent extends Component {
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
+    public void affectDestroy(Ship ship) throws Exception {
         super.affectDestroy(ship);
         for (ColorType good : goods) {
             ship.getGoods().put(good, ship.getGoods().get(good) - 1);

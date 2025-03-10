@@ -22,7 +22,7 @@ public enum CriteriaType {
     CANNON {
         @Override
         public double countCriteria(PlayerData player) throws Exception {
-            double singleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
+            double singleCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(cannon -> !cannon.getIsDouble())
                     .mapToDouble(cannon -> cannon.getDirection() == DirectionType.NORTH ? 1 : 0.5).sum();
             double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
@@ -50,7 +50,7 @@ public enum CriteriaType {
     ENGINE {
         @Override
         public double countCriteria(PlayerData player) throws Exception {
-            double singleEnginePower = player.getShip().getComponentByType(EngineComponent.class).stream()
+            double singleEnginePower = (player.getShip().getEngineAlien() ? 2 : 0) + player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(engine -> !engine.getIsDouble())
                     .toList().size();
             double doubleEnginePower = player.getShip().getComponentByType(EngineComponent.class).stream()

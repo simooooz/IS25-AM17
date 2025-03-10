@@ -14,6 +14,8 @@ public class Ship {
     private final Component[] reserves;
     private int crew;
     private int batteries;
+    private boolean engineAlien;
+    private boolean cannonAlien;
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
@@ -23,6 +25,8 @@ public class Ship {
         this.reserves = reserves;
         this.crew = 0;
         this.batteries = 0;
+        this.engineAlien = false;
+        this.cannonAlien = false;
         this.goods = new HashMap<>();
         this.protectedSides = new ArrayList<>();
     }
@@ -77,6 +81,22 @@ public class Ship {
 
     public void setBatteries(int batteries) {
         this.batteries = batteries;
+    }
+
+    public boolean getEngineAlien() {
+        return engineAlien;
+    }
+
+    public boolean getCannonAlien() {
+        return cannonAlien;
+    }
+
+    public void setEngineAlien(boolean engineAlien) {
+        this.engineAlien = engineAlien;
+    }
+
+    public void setCannonAlien(boolean cannonAlien) {
+        this.cannonAlien = cannonAlien;
     }
 
     public Map<ColorType, Integer> getGoods() {
