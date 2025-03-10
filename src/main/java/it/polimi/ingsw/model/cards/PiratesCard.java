@@ -34,7 +34,7 @@ public class PiratesCard extends Card{
         for (PlayerData player : board.getPlayersByPos()) {
 
             boolean win = false;
-            double singleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
+            double singleCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
                 .filter(cannon -> !cannon.getIsDouble())
                 .mapToDouble(cannon -> cannon.getDirection() == DirectionType.NORTH ? 1 : 0.5).sum();
             double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()

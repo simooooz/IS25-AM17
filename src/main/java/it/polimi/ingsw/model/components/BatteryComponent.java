@@ -40,7 +40,7 @@ public class BatteryComponent extends Component {
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
+    public void affectDestroy(Ship ship) throws Exception {
         super.affectDestroy(ship);
         ship.setBatteries(ship.getBatteries() - batteries);
     }

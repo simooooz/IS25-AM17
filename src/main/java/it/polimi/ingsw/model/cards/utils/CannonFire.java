@@ -2,10 +2,10 @@ package it.polimi.ingsw.model.cards.utils;
 
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.Component;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
 
+import java.util.List;
 import java.util.Optional;
 
 public class CannonFire {
@@ -21,9 +21,9 @@ public class CannonFire {
     public void hit(Ship ship, int coord) throws Exception {
         if (coord > 10 || coord < 4) return; // Miss
 
-        Optional<Component> targetOpt = directionFrom.firstComponentFromThisDirection(ship.getDashboard(), coord); // Find hit component
-        if (targetOpt.isEmpty()) return; // Miss
-        Component target = targetOpt.get();
+        List<Component> targets = directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord); // Find hit component
+        if (targets.isEmpty()) return; // Miss
+        Component target = targets.getFirst();
 
         if (!isBig && ship.getProtectedSides().contains(directionFrom) && ship.getBatteries() > 0) { // Ask user if he wants to use a battery
             Optional<BatteryComponent> chosenComponent = Optional.empty(); // View

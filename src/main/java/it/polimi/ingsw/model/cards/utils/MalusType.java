@@ -71,17 +71,15 @@ public enum MalusType {
         @Override
         public void resolve(int penaltyNumber, Board board, PlayerData player) throws Exception {
             int penalties = penaltyNumber;
-            while (penalties > 0) {
+            while (penalties > 0 && player.getShip().getCrew() > 0) {
                 Optional<CabinComponent> chosenComponentOpt = Optional.empty(); // View => Component where decrease one unit
                 CabinComponent chosenComponent = chosenComponentOpt.orElseThrow();
                 if (chosenComponent.getAlien().isEmpty()) {
-                    chosenComponent.setHumans(chosenComponent.getHumans() - 1);
-                    player.getShip().setCrew(player.getShip().getCrew() - 1);
+                    chosenComponent.setHumans(chosenComponent.getHumans() - 1, player.getShip());
                     penalties--;
                 }
                 else {
-                    chosenComponent.setAlien(null);
-                    player.getShip().setCrew(player.getShip().getCrew() - 2);
+                    chosenComponent.setAlien(null, player.getShip());
                     penalties -= 2;
                 }
             }

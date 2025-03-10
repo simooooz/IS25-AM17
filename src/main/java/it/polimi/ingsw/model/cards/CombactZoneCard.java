@@ -19,6 +19,7 @@ public class CombactZoneCard extends Card{
 
     @Override
     public void resolve(Board board) throws Exception {
+        if (board.getPlayersByPos().size() < 2) return;
         for (SimpleEntry<CriteriaType, PenaltyCombatZone> warLine : warLines) {
             List<PlayerData> players = board.getPlayersByPos();
 

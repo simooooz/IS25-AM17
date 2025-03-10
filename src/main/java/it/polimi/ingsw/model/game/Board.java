@@ -28,7 +28,6 @@ public class Board {
     }
 
     public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
-        players.sort(Comparator.comparing(AbstractMap.SimpleEntry::getValue, Comparator.reverseOrder()));
         return players;
     }
 
@@ -64,34 +63,35 @@ public class Board {
 
     public void movePlayer(PlayerData playerData, int position) {
         if (position == 0) return;
-        players.forEach(entry -> {
-            if (entry.getKey().equals(playerData)) {
-                for (int d = 0; d < Math.abs(position); d++) {
-                    int currentPosition = entry.getValue();
-                    int nextPosition = (position > 0) ?  currentPosition+1 : currentPosition-1;
-                    boolean moved = false; // check if we've moved
+        SimpleEntry<PlayerData, Integer> entry = players.stream()
+            .filter(e -> e.getKey().equals(playerData))
+            .findFirst()
+            .orElseThrow();
 
-                    while (nextPosition >= 0 && !moved) {
-                        boolean positionOccupied = false; // check if the position in occupied
+        for (int d = 0; d < Math.abs(position); d++) {
+            int currentPosition = entry.getValue();
+            int nextPosition = (position > 0) ?  currentPosition+1 : currentPosition-1;
+            boolean moved = false; // check if we've moved
 
-                        // iterate on the player to check if the player are in the previous position
-                        for (AbstractMap.SimpleEntry<PlayerData, Integer> otherEntry : players) {
-                            if (!otherEntry.equals(entry) && otherEntry.getValue() == nextPosition) {
-                                positionOccupied = true;
-                            }
-                        }
-                        // now we know that the position is free
-                        if (!positionOccupied) {
-                            entry.setValue(nextPosition);
-                            moved = true;
-                        } else {
-                            nextPosition = (position > 0) ? nextPosition+1 : nextPosition-1;
-                        }
+            while (!moved) {
+                boolean positionOccupied = false; // check if the position in occupied
+
+                // iterate on the player to check if the player are in the previous position
+                for (SimpleEntry<PlayerData, Integer> otherEntry : players) {
+                    if (!otherEntry.equals(entry) && otherEntry.getValue() == nextPosition) {
+                        positionOccupied = true;
+                        break;
                     }
                 }
+
+                if (!positionOccupied) {
+                    entry.setValue(nextPosition);
+                    moved = true;
+                }
+                else
+                    nextPosition = (position > 0) ? nextPosition+1 : nextPosition-1;
             }
-        });
-        // Eccezione giocatore non trovato
+        }
     }
 
     public void moveToStartingDeck(PlayerData player) throws Exception {
@@ -111,6 +111,7 @@ public class Board {
             .orElseThrow(Exception::new);
 
         players.add(new SimpleEntry<>(player, 0));
+        players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         startingDeck.remove(player);
     }
 
