@@ -13,14 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Ship {
     private final Optional<Component>[][] dashboard;
-    private final List<Optional<Component>> discards;
+    private final List<Component> discards;
     private final Optional<Component> reserves;
     private int crew;
     private int batteries;
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
-    public Ship(Optional<Component>[][] dashboard, List<Optional<Component>> discards, Optional<Component> reserves, int crew, int batteries, Map<ColorType, Integer> goods, List<DirectionType> protectedSides) {
+    public Ship(Optional<Component>[][] dashboard, List<Component> discards, Optional<Component> reserves, int crew, int batteries, Map<ColorType, Integer> goods, List<DirectionType> protectedSides) {
         this.dashboard = dashboard;
         this.discards = discards;
         this.reserves = reserves;
@@ -30,17 +30,16 @@ public class Ship {
         this.protectedSides = protectedSides;
     }
 
-
-
     public Optional<Component>[][] getDashboard() {
         return dashboard;
     }
 
-    public void destroyComponent(Component component) {
-
+    public Optional<Component> getDashboard(int row, int col) {
+        if (row < 0 || col < 0 || row >= dashboard.length || col >= dashboard[0].length) return Optional.empty();
+        return dashboard[row][col];
     }
 
-    public List<Optional<Component>> getDiscards() {
+    public List<Component> getDiscards() {
         return discards;
     }
 
@@ -53,13 +52,13 @@ public class Ship {
         for (Optional<Component>[] row : dashboard) {
             for (Optional<Component> componentOpt : row) {
                 componentOpt.ifPresent((Component component) -> {
-                    if (component.getConnectors()[0] != ConnectorType.EMPTY && (component.getY() == 0 || dashboard[component.getY()-1][component.getX()].isEmpty()))
+                    if (component.getConnectors()[0] != ConnectorType.EMPTY && getDashboard(component.getY()-1, component.getX()).isEmpty())
                         exposedConnectors.getAndIncrement();
-                    if (component.getConnectors()[1] != ConnectorType.EMPTY && (component.getX() == 6 || dashboard[component.getY()][component.getX()+1].isEmpty()))
+                    if (component.getConnectors()[1] != ConnectorType.EMPTY && getDashboard(component.getY(), component.getX()+1).isEmpty())
                         exposedConnectors.getAndIncrement();
-                    if (component.getConnectors()[2] != ConnectorType.EMPTY && (component.getY() == 4 || dashboard[component.getY()+1][component.getX()].isEmpty()))
+                    if (component.getConnectors()[2] != ConnectorType.EMPTY && getDashboard(component.getY()+1, component.getX()).isEmpty())
                         exposedConnectors.getAndIncrement();
-                    if (component.getConnectors()[3] != ConnectorType.EMPTY && (component.getX() == 0 || dashboard[component.getY()][component.getX()-1].isEmpty()))
+                    if (component.getConnectors()[3] != ConnectorType.EMPTY && getDashboard(component.getY(), component.getX()-1).isEmpty())
                         exposedConnectors.getAndIncrement();
                 });
             }
@@ -139,6 +138,18 @@ public class Ship {
         return cabines;
     }
 
+    public <T extends Component> List<T> getComponentByType(Class<T> componentType){
+        List<T> list = new ArrayList<>();
+        for (Optional<Component>[] row : dashboard) {
+            for (Optional<Component> component : row) {
+                if (component.isPresent() && componentType.isInstance(component.get())) {
+                    list.add(componentType.cast(component.get()));
+                }
+            }
+        }
+        return list;
+    }
+
     public int calcEnginePower(List<EngineComponent> l) {
         return l.stream()
                 .mapToInt(e -> {
@@ -174,4 +185,5 @@ public class Ship {
                 })
                 .sum();
     }
+
 }
