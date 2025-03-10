@@ -25,7 +25,7 @@ public class CannonComponent extends Component {
 
     @Override
     public void rotateComponent(boolean clockwise) {
-        DirectionType[] directions = DirectionType.values();
+        DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, EAST = 3
         if (clockwise) { this.direction = directions[(this.direction.ordinal() + 1 % 4)]; }
         else { this.direction = directions[(this.direction.ordinal() + 3 % 4)]; }
         super.rotateComponent(clockwise);

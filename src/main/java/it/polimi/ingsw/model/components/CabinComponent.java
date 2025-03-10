@@ -23,8 +23,10 @@ public class CabinComponent extends Component {
         return humans;
     }
 
-    public void setHumans(int humans) throws Exception {
-        if (alien.isPresent()) throw new Exception();
+    public void setHumans(int humans, Ship ship) throws Exception {
+        if (alien.isPresent()) setAlien(null, ship);
+        int delta = humans - this.humans;
+        ship.setCrew(ship.getCrew() + delta);
         this.humans = humans;
     }
 
@@ -32,8 +34,15 @@ public class CabinComponent extends Component {
         return alien;
     }
 
-    public void setAlien(AlienType alien) throws Exception {
+    public void setAlien(AlienType alien, Ship ship) throws Exception {
         if (isStarting) throw new Exception();
+        if (this.alien.isEmpty() && alien != null) {
+            ship.setCrew(ship.getCrew() + 2);
+            this.humans = 0;
+        }
+        else if (this.alien.isPresent() && alien == null) {
+            ship.setCrew(ship.getCrew() - 2);
+        }
         this.alien = Optional.ofNullable(alien);
     }
 
