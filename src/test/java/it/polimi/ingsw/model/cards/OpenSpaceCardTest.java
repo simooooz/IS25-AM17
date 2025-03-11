@@ -21,12 +21,14 @@ class OpenSpaceCardTest {
     private PlayerData player1;
     private PlayerData player2;
     private PlayerData player3;
+    private PlayerData player4;
 
     private List<AbstractMap.SimpleEntry<PlayerData, Integer>> players;
 
     private Ship ship1;
     private Ship ship2;
     private Ship ship3;
+    private Ship ship4;
 
     private Board board;
 
@@ -51,21 +53,30 @@ class OpenSpaceCardTest {
                 dashboard3[i][j] = Optional.empty();
             }
         }
+        Optional<Component>[][] dashboard4 = new Optional[5][7];
+        for (int i = 0; i < dashboard4.length; i++) {
+            for (int j = 0; j < dashboard4[i].length; j++) {
+                dashboard4[i][j] = Optional.empty();
+            }
+        }
         List<Component> discarded = new ArrayList<>();
         Component[] reserves = new Component[2];
         ship1 = new Ship(dashboard1, discarded, reserves);
         ship2 = new Ship(dashboard2, discarded, reserves);
         ship3 = new Ship(dashboard3, discarded, reserves);
+        ship4 = new Ship(dashboard4, discarded, reserves);
 
         players = new ArrayList<>();
         player1 = new PlayerData(ColorType.BLUE, "simo", ship1, 0);
         player2 = new PlayerData(ColorType.RED, "davide", ship2, 0);
         player3 = new PlayerData(ColorType.GREEN, "tommy", ship3, 0);
+        player4 = new PlayerData(ColorType.BLUE, "gino", ship4, 0);
 
         // adding instances for testing
         players.add(new AbstractMap.SimpleEntry<>(player1, 16));
         players.add(new AbstractMap.SimpleEntry<>(player2, 14));
         players.add(new AbstractMap.SimpleEntry<>(player3, 18));
+        players.add(new AbstractMap.SimpleEntry<>(player4, 20));
 
         board = new Board(players);
 
@@ -83,7 +94,7 @@ class OpenSpaceCardTest {
         EngineComponent singleEngine = new EngineComponent(connectors, DirectionType.SOUTH, false);
         EngineComponent doubleEngine = new EngineComponent(connectors, DirectionType.SOUTH, true);
 
-//        BatteryComponent doubleHoldBatteries = new BatteryComponent(connectors, false);
+        BatteryComponent doubleHoldBatteries = new BatteryComponent(connectors, false);
         BatteryComponent tripleHoldBatteries = new BatteryComponent(connectors, true);
 
         // player1
@@ -97,6 +108,9 @@ class OpenSpaceCardTest {
 
         // player 3
         singleEngine.insertComponent(ship3, 3, 5);
+
+        // player 4
+        doubleHoldBatteries.insertComponent(ship4, 4, 4);
 
         OpenSpaceCard card = new OpenSpaceCard(2, false);
         card.resolve(board);
@@ -119,5 +133,6 @@ class OpenSpaceCardTest {
                         .findFirst()
                         .get()
                         .getValue());
+        assertTrue(board.getStartingDeck().contains(player4));
     }
 }

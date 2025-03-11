@@ -11,8 +11,10 @@ import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.util.AbstractMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SmugglersCard extends Card {
     private final int firePower;            // firePower of the smugglers' ship
@@ -54,10 +56,14 @@ public class SmugglersCard extends Card {
 
     @Override
     public void resolve(Board board) throws Exception {
-        List<AbstractMap.SimpleEntry<PlayerData, Integer>> players = board.getPlayers();
+        List<AbstractMap.SimpleEntry<PlayerData, Integer>> players = board.getPlayers()
+                .stream()
+                .sorted(Comparator.comparing((AbstractMap.SimpleEntry<PlayerData, Integer> entry) -> entry.getValue()).reversed())
+                .toList();
         players.forEach(p -> {
             Ship ship = p.getKey().getShip();
-            if (ship.calcFirePower(ship.getCannons()) > firePower) {
+            double fP = ship.calcFirePower(ship.getComponentByType(CannonComponent.class));
+            if (fP > firePower) {
 //                The player here has the right to claim the reward if he wants to: in case, he will lose #days flight days.
 //                In addition, the player has the right to discard some goods already in his possession. Since
 //                he has free choice, as long as the holds match the color of the goods, of where to
@@ -68,15 +74,9 @@ public class SmugglersCard extends Card {
 //                    if (!(chosenComponent.get() instanceof SpecialCargoHoldsComponent)) throw new Exception("il componente selezionato non è un cargo");
 //                }
 
-                // The player can also choose to do nothing
                 return;     // smugglers have been defeated, the remaining players (if any) are not affected
-            } else if (ship.calcFirePower(ship.getCannons()) < firePower) {
+            } else if (fP < firePower) {
 //                The player loses the number of goods listed in lostGoods in order of value
-
-//                Optional<Component> chosenComponent = Optional.empty();
-//                if (chosenComponent.isPresent()) {
-//                    if (!(chosenComponent.get() instanceof SpecialCargoHoldsComponent)) throw new Exception("il componente selezionato non è un cargo");
-//                }
             }
         });
     }
