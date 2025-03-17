@@ -61,12 +61,6 @@ class StardustCardTest {
         player2 = new PlayerData(ColorType.RED, "davide", ship2, 0);
         player3 = new PlayerData(ColorType.GREEN, "tommy", ship3, 0);
 
-        // adding instances for testing
-//        players.add(new AbstractMap.SimpleEntry<>(player1, 23));
-//        players.add(new AbstractMap.SimpleEntry<>(player2, 24));
-//        players.add(new AbstractMap.SimpleEntry<>(player3, 25));
-//        players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-
         board = new Board(players);
 
         board.moveToStartingDeck(player1);

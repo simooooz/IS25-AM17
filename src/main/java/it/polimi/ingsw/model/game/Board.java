@@ -93,7 +93,7 @@ public class Board {
         }
     }
 
-    public void moveToStartingDeck(PlayerData player) throws Exception {
+    public void moveToStartingDeck(PlayerData player) {
         players.stream()
                 .filter(el -> el.getKey().equals(player))
                 .findFirst()
