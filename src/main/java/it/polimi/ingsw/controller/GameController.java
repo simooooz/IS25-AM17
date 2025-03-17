@@ -1,31 +1,37 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.*;
-import it.polimi.ingsw.model.game.Board;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameController {
 
-    private final Board board;
+    private final ModelFacade model;
     private GameState state;
+    private final Timer timer;
 
-    public GameController(Board board) {
-        // Forse riceve gli username dio porco
-        this.board = new Board();
+    public GameController(List<String> usernames) {
+        this.model = new ModelFacade(usernames);
+        this.timer = new Timer();
+    }
+
+    public void startMatch() {
+        this.state = GameState.BUILDING;
+        startTimer();
     }
 
     public void showComponent(String username, ...) throws Exception {
         if (state != GameState.BUILDING) throw new Exception();
     }
 
-    public void weldComponent(String username, Component component, int row, int col) throws Exception {
+    public void insertComponent(String username, Component component, int row, int col) throws Exception {
         if (state != GameState.BUILDING) throw new Exception();
 
         // TODO Check if player is connected
-        // Può essere un'idea esporre un metodo getPlayerData che ritorna un playerData da un dato username
-        // Verifica che il componente non sia stato inserito in un'altra navicella
-        component.insertComponent(, row, col);
+        model.insertComponent(username, component, row, col);
 
     }
 
@@ -33,15 +39,25 @@ public class GameController {
         if (state != GameState.BUILDING) throw new Exception();
 
         // TODO Check if player is connected
+        // TODO Check if component is already attached
+        model.rotateComponent(component, clockwise);
+    }
 
-        component.rotateComponent(clockwise);
+    public void moveHourglass(String username) throws Exception {
+        if (state != GameState.BUILDING) throw new Exception();
+        if (model.getTimeLeft() != 0) throw new Exception();
+
+        // TODO Check if player is connected
+
+        // Check if player is ready
+        startTimer();
     }
 
     public void drawCard(String username) throws Exception {
         if (state != GameState.PLAY_CARD) throw new Exception();
 
         // TODO Check if player is connected
-        // Check playerByUsername == board.getPlayerByPos.getFirst()
+        // Check playerByUsername == board.getPlayerByPos().getFirst()
         board.drawCard();
     }
 
@@ -81,5 +97,18 @@ public class GameController {
         if (!engineComponents.isEmpty()) state = GameState.WAIT_BATTERIES;
     }
 
+    private void startTimer() {
+        model.rotateHourglass();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if (model.getTimeLeft() == 1) {
+                    timer.cancel();
+                    if (model.getHourglassPos() == 0)
+                        state = GameState. //
+                }
+                model.decrementTimeLeft();
+            }
+        }, 1000, 1000);
+    }
 
 }
