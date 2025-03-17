@@ -19,16 +19,22 @@ public class Ship {
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
-    public Ship(Optional<Component>[][] dashboard, List<Component> discards, Component[] reserves) {
-        this.dashboard = dashboard;
-        this.discards = discards;
-        this.reserves = reserves;
+    public Ship() {
+        this.dashboard = new Optional[4][6];
+        this.discards = new ArrayList<>();
+        this.reserves = new Component[2];
         this.crew = 0;
         this.batteries = 0;
         this.engineAlien = false;
         this.cannonAlien = false;
         this.goods = new HashMap<>();
         this.protectedSides = new ArrayList<>();
+
+        for(int row = 0; row < 4; row++) {
+            for(int col = 0; col < 6; col++) {
+                this.dashboard[row][col] = Optional.empty();
+            }
+        }
     }
 
     public Optional<Component>[][] getDashboard() {
@@ -172,6 +178,23 @@ public class Ship {
                         })
                         .sum();
         return cannonAlien ? pwr+2 : pwr;
+    }
+
+    public void updateComponents(List<Component> components) {
+        for(Component component : components) {
+
+        }
+    }
+
+    public void checkShip(int row, int col) {
+        if (getDashboard(row, col).isEmpty()) return;
+
+        if (!getDashboard(row, col).get().checkComponent(this)) getDashboard(row, col).get().affectDestroy(this);
+
+        checkShip(row-1, col);
+        checkShip(row+1, col);
+        checkShip(row, col-1);
+        checkShip(row, col+1);
     }
 
 }
