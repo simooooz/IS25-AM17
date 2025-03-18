@@ -9,11 +9,11 @@ public class PlayerData {
     private final Ship ship;
     private int credits;
 
-    public PlayerData(ColorType colorType, String username, Ship ship, int credits) {
-        this.color = colorType;
+    public PlayerData(String username) {
         this.username = username;
-        this.ship = ship;
-        this.credits = credits;
+        this.ship = new Ship();
+        this.credits = 0;
+        this.color = null;
     }
 
     @Override

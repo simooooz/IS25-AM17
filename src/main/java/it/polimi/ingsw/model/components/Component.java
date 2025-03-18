@@ -12,9 +12,11 @@ public class Component {
     private ConnectorType[] connectors;
     protected int x;
     protected int y;
+    private boolean inserted;
 
     public Component(ConnectorType[] connectors) {
         this.connectors = connectors;
+        this.inserted = false;
     }
 
     public ConnectorType[] getConnectors() {
@@ -64,8 +66,9 @@ public class Component {
 
     public void insertComponent(Ship ship, int row, int col) throws Exception {
         if ((row == 0 && col == 0) || (row == 0 && col == 1) || (row == 0 && col == 3) || (row == 0 && col == 5) || (row == 0 && col == 6) || (row == 1 && col == 0) || (row == 1 && col == 6) || (row == 4 && col == 3)) throw new Exception(); // Check if position is valid
-        if (ship.getDashboard(row, col).isPresent()) throw new Exception();
+        if (ship.getDashboard(row, col).isPresent() || inserted) throw new Exception();
 
+        this.inserted = true;
         this.x = col;
         this.y = row;
         ship.getDashboard()[row][col] = Optional.of(this);
@@ -83,7 +86,9 @@ public class Component {
         ) throw new Exception();
     }
 
-    public void rotateComponent(boolean clockwise) {
+    public void rotateComponent(boolean clockwise) throws Exception {
+        if (inserted) throw new Exception();
+
         ConnectorType[] newConnectors = new ConnectorType[4];
         if (clockwise) {
             newConnectors[0] = connectors[3];

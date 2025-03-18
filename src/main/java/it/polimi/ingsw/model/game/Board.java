@@ -17,10 +17,14 @@ public class Board {
     private int cardPilePos;
     private final Time timeManagment;
     private final Map<ColorType, Integer> availableGoods;
+    private int currentPlayerIndex;
 
-    public Board(List<SimpleEntry<PlayerData, Integer>> players) {
-        this.players = players;
-        this.startingDeck = new ArrayList<>(getPlayersByPos());
+    public Board(List<String> usernames) {
+        this.startingDeck = new ArrayList<>();
+        for (String username : usernames)
+            this.startingDeck.add(new PlayerData(username));
+
+        this.players = new ArrayList<>();
         this.cardPile = new ArrayList<>();
         this.cardPilePos = 0;
         this.timeManagment = new Time();
@@ -33,6 +37,18 @@ public class Board {
 
     public List<PlayerData> getPlayersByPos() {
         return players.stream().map(SimpleEntry::getKey).collect(Collectors.toList());
+    }
+
+    public PlayerData getPlayer(String username) throws Exception {
+        return players.stream()
+            .map(SimpleEntry::getKey)
+            .filter(p -> p.getUsername().equals(username))
+            .findFirst()
+            .orElseThrow();
+    }
+
+    public PlayerData getCurrentPlayer() {
+        return players.get(currentPlayerIndex).getKey();
     }
 
     public List<PlayerData> getStartingDeck() {

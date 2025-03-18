@@ -18,4 +18,8 @@ public enum GameState {
 
     END_OF_GAME,
 
+    WAIT,
+
+    FLIGHT
+
 }

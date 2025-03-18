@@ -6,11 +6,9 @@ import java.util.TimerTask;
 public class Time {
 
     private int timeLeft;
-    private final Timer timer;
     private int hourglassPos;
 
     public Time() {
-        this.timer = new Timer();
         this.hourglassPos = 4;
     }
 
@@ -22,23 +20,15 @@ public class Time {
         return hourglassPos;
     }
 
-    public void decrementHourglassPos() {
+    public void rotateHourglass() {
         if (hourglassPos > 1) {
+            timeLeft = 60;
             hourglassPos--;
         }
     }
 
-    public void startTimer() {
-        decrementHourglassPos();
-        timeLeft = 60;
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                if (timeLeft == 1) {
-                    timer.cancel();
-                }
-                timeLeft--;
-            }
-        }, 1000, 1000);
+    public void decrementTimeLeft() {
+        timeLeft -= 1;
     }
 
 }
