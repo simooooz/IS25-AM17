@@ -26,7 +26,7 @@ public class ComponentFactory {
                 return new CargoHoldsComponent(connectors, numberCargo);
 
             case "CabinComponent":
-                boolean isStartingCabin = componentJson.optBoolean("isStartingCabin", false);
+                boolean isStartingCabin = componentJson.optBoolean("isStarting", false);
                 return new CabinComponent(connectors, isStartingCabin);
 
             case "Component":
@@ -47,14 +47,14 @@ public class ComponentFactory {
                 return new CannonComponent(connectors, cannonDirection, cannonIsDouble);
 
             case "ShieldComponent":
-                JSONArray directionArray = componentJson.getJSONArray("directionProtected");
+                JSONArray directionArray = componentJson.getJSONArray("directionsProtected");
                 DirectionType[] direction = new DirectionType[directionArray.length()];
                 for (int i = 0; i < directionArray.length(); i++) {
                     direction[i] = (DirectionType.valueOf(directionArray.getString(i)));
                 }
                 return new ShieldComponent(connectors, direction);
 
-            case "OddsComponent":
+            case "OddComponent":
                 AlienType alienType = AlienType.valueOf(componentJson.getString("typeAlien"));
                 return new OddComponent(connectors, alienType);
 
