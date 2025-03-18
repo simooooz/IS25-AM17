@@ -30,7 +30,7 @@ class ComponentFactoryTest {
         componentFactory = new ComponentFactory();
 
         // Load the JSON data
-        String jsonContent = new String(Files.readAllBytes(new File("C:\\Users\\tommy\\IdeaProjects\\IS25-AM17\\src\\main\\java\\it\\polimi\\ingsw\\model\\resources\\factory.json").toPath()));
+        String jsonContent = new String(Files.readAllBytes(new File("src/main/java/it/polimi/ingsw/model/resources/factory.json").toPath()));
         JSONObject rootNode = new JSONObject(jsonContent);
 
         // Extract the cards array
