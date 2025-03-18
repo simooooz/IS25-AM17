@@ -21,13 +21,12 @@ import it.polimi.ingsw.model.cards.StardustCard;
 
 import java.util.*;
 
-public interface CardFactory {
-    public default Card createCard(JSONObject cardJson) {
+public class CardFactory {
+    public static Card createCard(JSONObject cardJson) {
         String type = cardJson.getString("type");
         int level = cardJson.getInt("level");
         boolean isLearner = cardJson.getBoolean("isLearner");
 
-        // Factory pattern
         switch(type) {
             case "SlaversCard":
                 int slaversCrew = cardJson.optInt("crew", 0);
@@ -71,7 +70,7 @@ public interface CardFactory {
                 return new EpidemicCard(level, isLearner);
 
             case "MeteorSwarmCard":
-                JSONArray meteorsArray = cardJson.optJSONArray("cannonFires");
+                JSONArray meteorsArray = cardJson.optJSONArray("meteors");
                 List<Meteor> meteors = new ArrayList<>();
                 for (int i = 0; i < meteorsArray.length(); i++) {
                     JSONObject cannonFireJson = meteorsArray.getJSONObject(i);
@@ -129,11 +128,29 @@ public interface CardFactory {
             case "CombactZoneCard":
                 JSONArray combactArray = cardJson.optJSONArray("warLines");
                 List<AbstractMap.SimpleEntry<CriteriaType, PenaltyCombatZone>> combact = new ArrayList<>();
-
                 for (int i = 0; i < combactArray.length(); i++) {
                     JSONObject combactJson = combactArray.getJSONObject(i);
-                    CriteriaType criteria = CriteriaType.valueOf(combactJson.getString("criteria"));
-                    PenaltyCombatZone penalty = PenaltyCombatZone.valueOf(combactJson.getString("penalty"));
+                    CriteriaType criteria = CriteriaType.valueOf(combactJson.getString("CriteriaType"));
+                    JSONObject penaltyJson = combactJson.getJSONObject("PenaltyCombatZone");
+                    String penaltyType = penaltyJson.getString("type");
+                    PenaltyCombatZone penalty;
+                    if (penaltyType.equals("CountablePenaltyZone")) {
+                        int penaltyNumber = penaltyJson.getInt("penaltyNumber");
+                        MalusType malusType = MalusType.valueOf(penaltyJson.getString("MalusType"));
+                        penalty = new CountablePenaltyZone(penaltyNumber, malusType);
+                    } else if (penaltyType.equals("CannonFirePenaltyCombatZone")) {
+                        JSONArray cannonFiresArray = penaltyJson.getJSONArray("cannonFires");
+                        List<CannonFire> cannonFires = new ArrayList<>();
+                        for (int j = 0; j < cannonFiresArray.length(); j++) {
+                            JSONObject cannonFireJson = cannonFiresArray.getJSONObject(j);
+                            boolean isBig = cannonFireJson.getBoolean("isBig");
+                            DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.getString("directionFrom"));
+                            cannonFires.add(new CannonFire(isBig, directionFrom));
+                        }
+                        penalty = new CannonFirePenaltyCombatZone(cannonFires);
+                    } else {
+                        throw new IllegalArgumentException("Unknown penalty type: " + penaltyType);
+                    }
                     combact.add(new AbstractMap.SimpleEntry<>(criteria, penalty));
                 }
                 return new CombactZoneCard(level, isLearner, combact);

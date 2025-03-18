@@ -7,8 +7,8 @@ import it.polimi.ingsw.model.properties.DirectionType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public interface ComponentFactory {
-    public default Component createComponent(JSONObject componentJson) {
+public class ComponentFactory {
+    public static Component createComponent(JSONObject componentJson) {
         String type = componentJson.getString("type");
         JSONArray connectorsArray = componentJson.getJSONArray("connectors");
         ConnectorType[] connectors = new ConnectorType[connectorsArray.length()];
