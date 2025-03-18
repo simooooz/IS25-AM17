@@ -1,0 +1,1512 @@
+{
+  "cards": [
+    {
+      "type": "SlaversCard",
+      "level": 1,
+      "isLearner": false,
+      "crew": 3,
+      "credits": 5,
+      "days": 1,
+      "firePower": 6
+    },
+    {
+      "type": "SmugglersCard",
+      "level": 1,
+      "isLearner": true,
+      "firePower": 4,
+      "lostGoods": 2,
+      "goods": ["YELLOW", "GREEN", "BLUE"],
+      "days": 1
+    },
+    {
+      "type": "PiratesCard",
+      "level": 1,
+      "isLearner": false,
+      "piratesFirePower": 5,
+      "credits": 4,
+      "days": 1,
+      "cannonFires": [
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        }
+      ]
+    },
+    {
+      "type": "StardustCard",
+      "level": 1,
+      "isLearner": true
+    },
+    {
+      "type": "OpenSpaceCard",
+      "level": 1,
+      "isLearner": true
+    },
+    {
+      "type": "OpenSpaceCard",
+      "level": 1,
+      "isLearner": false
+    },
+    {
+      "type": "OpenSpaceCard",
+      "level": 1,
+      "isLearner": false
+    },
+    {
+      "type": "OpenSpaceCard",
+      "level": 1,
+      "isLearner": false
+    },
+    {
+      "type": "MeteorSwarmCard",
+      "level": 1,
+      "isLearner": true,
+      "meteors": [
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "WEST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "EAST"
+        }
+      ]
+    },
+    {
+      "type": "MeteorSwarmCard",
+      "level": 1,
+      "isLearner": false,
+      "meteors": [
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "WEST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "EAST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "SOUTH"
+        }
+      ]
+    },
+    {
+      "type": "MeteorSwarmCard",
+      "level": 1,
+      "isLearner": false,
+      "meteors": [
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        }
+      ]
+    },
+    {
+      "type": "PlanetCard",
+      "level": 1,
+      "isLearner": false,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "RED": 1,
+            "GREEN": 1,
+            "BLUE": 3
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "RED": 1,
+            "YELLOW": 1,
+            "BLUE": 1
+          },
+          "player": null
+        },
+        "planet3": {
+          "rewards": {
+            "RED": 1,
+            "BLUE": 3
+          },
+          "player": null
+        },
+        "planet4": {
+          "rewards": {
+            "RED": 1,
+            "GREEN": 1
+          },
+          "player": null
+        }
+      },
+      "days": 3
+    },
+    {
+      "type": "PlanetCard",
+      "level": 1,
+      "isLearner": true,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "RED": 2
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "RED": 1,
+            "BLUE": 2
+          },
+          "player": null
+        },
+        "planet3": {
+          "rewards": {
+            "YELLOW": 1
+          },
+          "player": null
+        }
+      },
+      "days": 2
+    },
+    {
+      "type": "PlanetCard",
+      "level": 1,
+      "isLearner": false,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "YELLOW": 1,
+            "GREEN": 1,
+            "BLUE": 2
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "YELLOW": 2
+          },
+          "player": null
+        }
+      },
+      "days": 3
+    },
+    {
+      "type": "PlanetCard",
+      "level": 1,
+      "isLearner": false,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "GREEN": 1,
+            "YELLOW": 1
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "YELLOW": 1
+          },
+          "player": null
+        },
+        "planet3": {
+          "rewards": {
+            "BLUE": 3
+          },
+          "player": null
+        }
+      },
+      "days": 1
+    },
+    {
+      "type": "CombactZoneCard",
+      "level": 1,
+      "isLearner": true,
+      "warLines": [
+        {
+          "CriteriaType": "CREW", 
+          "PenaltyCombatZone": {
+            "type": "CountablePenaltyZone",
+            "penaltyNumber": 3,
+            "MalusType": "DAYS"
+          }
+        },
+        {
+          "CriteriaType": "ENGINE",
+          "PenaltyCombatZone": {
+            "type": "CountablePenaltyZone",
+            "penaltyNumber": 2,
+            "MalusType": "CREW"
+          }
+        },
+        {
+          "CriteriaType": "CANNON",
+          "PenaltyCombatZone": {
+            "type": "CannonFirePenaltyCombatZone",
+            "cannonFires": [
+              {
+                "isBig": false,
+                "directionFrom": "SOUTH"
+              },
+              {
+                "isBig": true,
+                "directionFrom": "SOUTH"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "AbandonedShipCard",
+      "level": 1,
+      "isLearner": false,
+      "crew": 2,
+      "credits": 3,
+      "days": 1
+    },
+    {
+      "type": "AbandonedShipCard",
+      "level": 1,
+      "isLearner": true,
+      "crew": 3,
+      "credits": 4,
+      "days": 1
+    },
+    {
+      "type": "AbandonedStationCard",
+      "level": 1,
+      "isLearner": true,
+      "crew": 5,
+      "days": 1,
+      "goods": {
+            "GREEN": 1,
+            "YELLOW": 1
+          }
+    },
+    {
+      "type": "AbandonedStationCard",
+      "level": 1,
+      "isLearner": false,
+      "crew": 6,
+      "days": 1,
+      "goods": {
+            "RED": 2
+          }
+    },
+    {
+      "type": "SlaversCard",
+      "level": 2,
+      "isLearner": false,
+      "crew": 4,
+      "credits": 8,
+      "days": 2,
+      "firePower": 7
+    },
+    {
+      "type": "SmugglersCard",
+      "level": 2,
+      "isLearner": false,
+      "firePower": 8,
+      "lostGoods": 3,
+      "goods": ["RED", "YELLOW", "YELLOW"],
+      "days": 1
+    },
+    {
+      "type": "PiratesCard",
+      "level": 2,
+      "isLearner": false,
+      "piratesFirePower": 6,
+      "credits": 7,
+      "days": 2,
+      "cannonFires": [
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        }
+      ]
+    },
+    {
+      "type": "StardustCard",
+      "level": 2,
+      "isLearner": false
+    },
+    {
+      "type": "EpidemicCard",
+      "level": 2,
+      "isLearner": false
+    },
+    {
+      "type": "OpenSpaceCard",
+      "level": 2,
+      "isLearner": false
+    },
+    {
+      "type": "OpenSpaceCard",
+      "level": 2,
+      "isLearner": false
+    },
+    {
+      "type": "OpenSpaceCard",
+      "level": 2,
+      "isLearner": false
+    },
+    {
+      "type": "MeteorSwarmCard",
+      "level": 2,
+      "isLearner": false,
+      "meteors": [
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "WEST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "WEST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "WEST"
+        }
+      ]
+    },
+    {
+      "type": "MeteorSwarmCard",
+      "level": 2,
+      "isLearner": false,
+      "meteors": [
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "WEST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "WEST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "WEST"
+        }
+      ]
+    },
+    {
+      "type": "MeteorSwarmCard",
+      "level": 2,
+      "isLearner": false,
+      "meteors": [
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "SOUTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "SOUTH"
+        }
+      ]
+    },
+    {
+      "type": "MeteorSwarmCard",
+      "level": 2,
+      "isLearner": false,
+      "meteors": [
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "EAST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "EAST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "EAST"
+        }
+      ]
+    },
+    {
+      "type": "PlanetCard",
+      "level": 2,
+      "isLearner": false,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "RED": 3,
+            "YELLOW": 1
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "RED": 2,
+            "GREEN": 2
+          },
+          "player": null
+        },
+        "planet3": {
+          "rewards": {
+            "RED": 1,
+            "BLUE": 4
+          },
+          "player": null
+        }
+      },
+      "days": 4
+    },
+    {
+      "type": "PlanetCard",
+      "level": 2,
+      "isLearner": false,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "RED": 2
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "GREEN": 4
+          },
+          "player": null
+        }
+      },
+      "days": 3
+    },
+    {
+      "type": "PlanetCard",
+      "level": 2,
+      "isLearner": false,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "RED": 1,
+            "YELLOW": 1
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "YELLOW": 1,
+            "GREEN": 1,
+            "BLUE": 1
+          },
+          "player": null
+        },
+        "planet3": {
+          "rewards": {
+            "GREEN": 2
+          },
+          "player": null
+        },
+        "planet4": {
+          "rewards": {
+            "YELLOW": 1
+          },
+          "player": null
+        }
+      },
+      "days": 2
+    },
+    {
+      "type": "PlanetCard",
+      "level": 2,
+      "isLearner": false,
+      "planets": {
+        "planet1": {
+          "rewards": {
+            "GREEN": 4
+          },
+          "player": null
+        },
+        "planet2": {
+          "rewards": {
+            "YELLOW": 2
+          },
+          "player": null
+        },
+        "planet3": {
+          "rewards": {
+            "BLUE": 4
+          },
+          "player": null
+        }
+      },
+      "days": 3
+    },
+    {
+      "type": "CombactZoneCard",
+      "level": 2,
+      "isLearner": false,
+      "warLines": [
+        {
+          "CriteriaType": "CANNON", 
+          "PenaltyCombatZone": {
+            "type": "CountablePenaltyZone",
+            "penaltyNumber": 4,
+            "MalusType": "DAYS"
+          }
+        },
+        {
+          "CriteriaType": "ENGINE",
+          "PenaltyCombatZone": {
+            "type": "CountablePenaltyZone",
+            "penaltyNumber": 3,
+            "MalusType": "GOODS"
+          }
+        },
+        {
+          "CriteriaType": "CREW",
+          "PenaltyCombatZone": {
+            "type": "CannonFirePenaltyCombatZone",
+            "cannonFires": [
+              {
+                "isBig": false,
+                "directionFrom": "NORTH"
+              },
+              {
+                "isBig": false,
+                "directionFrom": "EAST"
+              },
+              {
+                "isBig": true,
+                "directionFrom": "SOUTH"
+              },
+              {
+                "isBig": false,
+                "directionFrom": "WEST"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "AbandonedShipCard",
+      "level": 2,
+      "isLearner": false,
+      "crew": 4,
+      "credits": 6,
+      "days": 1
+    },
+    {
+      "type": "AbandonedShipCard",
+      "level": 2,
+      "isLearner": false,
+      "crew": 5,
+      "credits": 8,
+      "days": 2
+    },
+    {
+      "type": "AbandonedStationCard",
+      "level": 2,
+      "isLearner": false,
+      "crew": 7,
+      "days": 1,
+      "goods": {
+            "RED": 1,
+            "YELLOW": 1
+          }
+    },
+    {
+      "type": "AbandonedStationCard",
+      "level": 1,
+      "isLearner": false,
+      "crew": 8,
+      "days": 2,
+      "goods": {
+            "YELLOW": 2,
+            "GREEN": 1
+          }
+    }
+  ],
+  "components": [
+    {
+      "type": "BatteryComponent",
+      "connectors": ["UNIVERSAL", "SINGLE", "DOUBLE", "EMPTY"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "EMPTY"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["UNIVERSAL", "DOUBLE", "SINGLE", "EMPTY"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "SINGLE"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "SINGLE"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["UNIVERSAL", "SINGLE", "SINGLE", "SINGLE"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["UNIVERSAL", "DOUBLE", "DOUBLE", "DOUBLE"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "UNIVERSAL"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "isTriple": false
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["SINGLE", "EMPTY", "DOUBLE", "EMPTY"],
+      "isTriple": true
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["SINGLE", "SINGLE", "DOUBLE", "EMPTY"],
+      "isTriple": true
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
+      "isTriple": true
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["DOUBLE", "SINGLE", "EMPTY", "EMPTY"],
+      "isTriple": true
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["DOUBLE", "DOUBLE", "SINGLE", "EMPTY"],
+      "isTriple": true
+    },
+    {
+      "type": "BatteryComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
+      "isTriple": true
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["DOUBLE", "SINGLE", "UNIVERSAL", "EMPTY"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["DOUBLE", "SINGLE", "UNIVERSAL", "SINGLE"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["DOUBLE", "UNIVERSAL", "EMPTY", "SINGLE"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["EMPTY", "SINGLE", "EMPTY", "UNIVERSAL"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "UNIVERSAL"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "number": 2
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
+      "number": 3
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["SINGLE", "EMPTY", "SINGLE", "EMPTY"],
+      "number": 3
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "DOUBLE"],
+      "number": 3
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["DOUBLE", "EMPTY", "DOUBLE", "EMPTY"],
+      "number": 3
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["SINGLE", "EMPTY", "DOUBLE", "SINGLE"],
+      "number": 3
+    },
+    {
+      "type": "CargoHoldsComponent",
+      "connectors": ["DOUBLE", "EMPTY", "SINGLE", "DOUBLE"],
+      "number": 3
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "SINGLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["SINGLE", "DOUBLE", "SINGLE", "SINGLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["SINGLE", "DOUBLE", "DOUBLE", "SINGLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "SINGLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["DOUBLE", "SINGLE", "EMPTY", "SINGLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "SINGLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "DOUBLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["SINGLE", "DOUBLE", "EMPTY", "DOUBLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "DOUBLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "DOUBLE"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["EMPTY", "SINGLE", "EMPTY", "UNIVERSAL"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["EMPTY", "SINGLE", "SINGLE", "UNIVERSAL"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["SINGLE", "EMPTY", "SINGLE", "UNIVERSAL"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["SINGLE", "EMPTY", "DOUBLE", "UNIVERSAL"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["DOUBLE", "EMPTY", "DOUBLE", "UNIVERSAL"],
+      "isStarting": false
+    },
+    {
+      "type": "CabinComponent",
+      "connectors": ["DOUBLE", "DOUBLE", "EMPTY", "UNIVERSAL"],
+      "isStarting": false
+    },
+    {
+      "type": "Component",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "EMPTY", "SINGLE"]
+    },
+    {
+      "type": "Component",
+      "connectors": ["SINGLE", "UNIVERSAL", "EMPTY", "UNIVERSAL"]
+    },
+    {
+      "type": "Component",
+      "connectors": ["SINGLE", "UNIVERSAL", "SINGLE", "UNIVERSAL"]
+    },
+    {
+      "type": "Component",
+      "connectors": ["SINGLE", "UNIVERSAL", "DOUBLE", "UNIVERSAL"]
+    },
+    {
+      "type": "Component",
+      "connectors": ["DOUBLE", "UNIVERSAL", "EMPTY", "UNIVERSAL"]
+    },
+    {
+      "type": "Component",
+      "connectors": ["UNIVERSAL", "SINGLE", "DOUBLE", "UNIVERSAL"]
+    },
+    {
+      "type": "Component",
+      "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "UNIVERSAL"]
+    },
+    {
+      "type": "Component",
+      "connectors": ["UNIVERSAL", "DOUBLE", "DOUBLE", "UNIVERSAL"]
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["EMPTY", "DOUBLE", "SINGLE", "UNIVERSAL"],
+      "number": 1
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "UNIVERSAL"],
+      "number": 1
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["SINGLE", "SINGLE", "SINGLE", "UNIVERSAL"],
+      "number": 1
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["DOUBLE", "SINGLE", "EMPTY", "UNIVERSAL"],
+      "number": 1
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["DOUBLE", "DOUBLE", "DOUBLE", "UNIVERSAL"],
+      "number": 1
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "number": 1
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
+      "number": 2
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "SINGLE"],
+      "number": 2
+    },
+    {
+      "type": "SpecialCargoHoldsComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "DOUBLE"],
+      "number": 2
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "EMPTY", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "EMPTY", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "SINGLE", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "UNIVERSAL", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "SINGLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "SINGLE", "EMPTY", "SINGLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "SINGLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "SINGLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "SINGLE", "EMPTY", "DOUBLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "DOUBLE", "EMPTY", "DOUBLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "DOUBLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["UNIVERSAL", "SINGLE", "EMPTY", "DOUBLE"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "direction": "SOUTH",
+      "isDouble": false
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "EMPTY", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "UNIVERSAL", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["UNIVERSAL", "SINGLE", "EMPTY", "EMPTY"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["SINGLE", "SINGLE", "EMPTY", "SINGLE"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "DOUBLE", "EMPTY", "DOUBLE"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "DOUBLE"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "UNIVERSAL"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "EngineComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "direction": "SOUTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "SINGLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "SINGLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "DOUBLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "DOUBLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "EMPTY", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "DOUBLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "SINGLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "UNIVERSAL", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "SINGLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "DOUBLE", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "SINGLE", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "UNIVERSAL", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "SINGLE", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "EMPTY", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "DOUBLE", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "SINGLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "DOUBLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "UNIVERSAL", "DOUBLE", "EMPTY"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "SINGLE", "DOUBLE", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "SINGLE"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "DOUBLE", "SINGLE", "DOUBLE"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "SINGLE", "UNIVERSAL"],
+      "direction": "NORTH",
+      "isDouble": true
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["SINGLE", "SINGLE", "EMPTY", "SINGLE"],
+      "typeAlien": "ENGINE"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["DOUBLE", "SINGLE", "EMPTY", "SINGLE"],
+      "typeAlien": "ENGINE"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "typeAlien": "ENGINE"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["EMPTY", "EMPTY", "SINGLE", "UNIVERSAL"],
+      "typeAlien": "ENGINE"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
+      "typeAlien": "ENGINE"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["SINGLE", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "typeAlien": "ENGINE"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["SINGLE", "DOUBLE", "EMPTY", "DOUBLE"],
+      "typeAlien": "CANNON"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["DOUBLE", "DOUBLE", "EMPTY", "DOUBLE"],
+      "typeAlien": "CANNON"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "typeAlien": "CANNON"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["EMPTY", "SINGLE", "EMPTY", "UNIVERSAL"],
+      "typeAlien": "CANNON"
+    },
+    {
+      "type": "OddComponent",
+      "connectors": ["DOUBLE", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "typeAlien": "CANNON"
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "SINGLE"],
+      "directionsProtected": ["NORTH", "EAST"]
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["SINGLE", "EMPTY", "SINGLE", "SINGLE"],
+      "directionsProtected": ["NORTH", "EAST"]
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "SINGLE"],
+      "directionsProtected": ["NORTH", "EAST"]
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "DOUBLE"],
+      "directionsProtected": ["NORTH", "EAST"]
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["EMPTY", "DOUBLE", "DOUBLE", "DOUBLE"],
+      "directionsProtected": ["NORTH", "EAST"]
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["SINGLE", "DOUBLE", "SINGLE", "DOUBLE"],
+      "directionsProtected": ["NORTH", "EAST"]
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["EMPTY", "EMPTY", "SINGLE", "UNIVERSAL"],
+      "directionsProtected": ["NORTH", "EAST"]
+    },
+    {
+      "type": "ShieldComponent",
+      "connectors": ["EMPTY", "DOUBLE", "DOUBLE", "UNIVERSAL"],
+      "directionsProtected": ["NORTH", "EAST"]
+    }
+  ]
+}
