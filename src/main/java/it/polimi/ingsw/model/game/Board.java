@@ -17,6 +17,7 @@ public class Board {
     private int cardPilePos;
     private final Time timeManagment;
     private final Map<ColorType, Integer> availableGoods;
+    private int currentPlayerIndex;
 
     public Board(List<String> usernames) {
         this.startingDeck = new ArrayList<>();
@@ -44,6 +45,10 @@ public class Board {
             .filter(p -> p.getUsername().equals(username))
             .findFirst()
             .orElseThrow();
+    }
+
+    public PlayerData getCurrentPlayer() {
+        return players.get(currentPlayerIndex).getKey();
     }
 
     public List<PlayerData> getStartingDeck() {

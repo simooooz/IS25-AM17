@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Ship {
     private final Optional<Component>[][] dashboard;
@@ -30,8 +31,8 @@ public class Ship {
         this.goods = new HashMap<>();
         this.protectedSides = new ArrayList<>();
 
-        for(int row = 0; row < 4; row++) {
-            for(int col = 0; col < 6; col++) {
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 6; col++) {
                 this.dashboard[row][col] = Optional.empty();
             }
         }
@@ -59,13 +60,13 @@ public class Ship {
         for (Optional<Component>[] row : dashboard) {
             for (Optional<Component> componentOpt : row) {
                 componentOpt.ifPresent((Component component) -> {
-                    if (component.getConnectors()[0] != ConnectorType.EMPTY && getDashboard(component.getY()-1, component.getX()).isEmpty())
+                    if (component.getConnectors()[0] != ConnectorType.EMPTY && getDashboard(component.getY() - 1, component.getX()).isEmpty())
                         exposedConnectors.getAndIncrement();
-                    if (component.getConnectors()[1] != ConnectorType.EMPTY && getDashboard(component.getY(), component.getX()+1).isEmpty())
+                    if (component.getConnectors()[1] != ConnectorType.EMPTY && getDashboard(component.getY(), component.getX() + 1).isEmpty())
                         exposedConnectors.getAndIncrement();
-                    if (component.getConnectors()[2] != ConnectorType.EMPTY && getDashboard(component.getY()+1, component.getX()).isEmpty())
+                    if (component.getConnectors()[2] != ConnectorType.EMPTY && getDashboard(component.getY() + 1, component.getX()).isEmpty())
                         exposedConnectors.getAndIncrement();
-                    if (component.getConnectors()[3] != ConnectorType.EMPTY && getDashboard(component.getY(), component.getX()-1).isEmpty())
+                    if (component.getConnectors()[3] != ConnectorType.EMPTY && getDashboard(component.getY(), component.getX() - 1).isEmpty())
                         exposedConnectors.getAndIncrement();
                 });
             }
@@ -125,63 +126,52 @@ public class Ship {
         return list;
     }
 
-    public int calcEnginePower(List<EngineComponent> l) {
-        int pwr = l.stream()
-                    .mapToInt(e -> {
-                            if (e.getIsDouble()) {
-                                if (getBatteries() == 0) return 0;      // the player has no batteries => cannot take advantage of the dual motor(s)
-                                else {
-    //                                the player decides whether to use a battery to activate the dual motor
-    //                                probably this response will be given by a user gesture (battery removal, click on a removal button...)
+    public boolean hasDoubleEngines() {
+        List<EngineComponent> engines = this.getComponentByType(EngineComponent.class);
+        return engines.stream()
+                .anyMatch(EngineComponent::getIsDouble);
+    }
 
-    //                                if (awaitForResponse()) {
-    //                                    if so, the component where to decrement the number of batteries is received.
-
-    //                                    BatteryComponent res = awaitForBatteryComponent();
-    //                                    res.useBattery(this);
-                                        setBatteries(getBatteries() - 1);
-                                        return 2;
-    //                                } else {
-    //                                    return 0;
-    //                                }
-                                }
-                            }
-    //                        the engine is single, it does not need to be activated
-                            return 1;
-                    })
-                    .sum();
-        return engineAlien ? pwr+2 : pwr;
+    public int calcEnginePower(int numOfDoubleEngineUsed) {
+        int engPower = this.getComponentByType(EngineComponent.class).stream()
+                            .filter(e -> !e.getIsDouble())
+                            .toList()
+                            .size() + 2 * numOfDoubleEngineUsed;
+        return engineAlien
+                ? (engPower + 2)
+                : engPower;
     }
 
     public double calcFirePower(List<CannonComponent> l) {
         double pwr = l.stream()
-                        .mapToDouble(c -> {
-                            if (c.getIsDouble()) {
-                                if (getBatteries() == 0) return 0;      // the player has no batteries => cannot take advantage of the dual cannon(s)
-                                else {
-    //                                the player decides whether to use a battery to activate the dual cannon
-    //                                probably this response will be given by a user gesture (battery removal, click on a removal button...)
+                .mapToDouble(c -> {
+                    if (c.getIsDouble()) {
+                        if (getBatteries() == 0)
+                            return 0;      // the player has no batteries => cannot take advantage of the dual cannon(s)
+                        else {
+                            //                                the player decides whether to use a battery to activate the dual cannon
+                            //                                probably this response will be given by a user gesture (battery removal, click on a removal button...)
 
-    //                                if (awaitForResponse()) {
-    //                                    if so, the component where to decrement the number of batteries is received.
+                            //                                if (awaitForResponse()) {
+                            //                                    if so, the component where to decrement the number of batteries is received.
 
-    //                                    BatteryComponent res = awaitForBatteryComponent();
-    //                                    res.useBattery(this);
-                                        setBatteries(getBatteries() - 1);
-                                        return c.getDirection() == DirectionType.NORTH ? 2 : 1;
-    //                                } else {
-    //                                    return 0;
-    //                                }
-                                }
-                            }
-                            return c.getDirection() == DirectionType.NORTH ? 1 : 0.5;
-                        })
-                        .sum();
-        return cannonAlien ? pwr+2 : pwr;
+                            //                                    BatteryComponent res = awaitForBatteryComponent();
+                            //                                    res.useBattery(this);
+                            setBatteries(getBatteries() - 1);
+                            return c.getDirection() == DirectionType.NORTH ? 2 : 1;
+                            //                                } else {
+                            //                                    return 0;
+                            //                                }
+                        }
+                    }
+                    return c.getDirection() == DirectionType.NORTH ? 1 : 0.5;
+                })
+                .sum();
+        return cannonAlien ? pwr + 2 : pwr;
     }
 
     public void updateComponents(List<Component> components) {
-        for(Component component : components) {
+        for (Component component : components) {
 
         }
     }
@@ -191,10 +181,10 @@ public class Ship {
 
         if (!getDashboard(row, col).get().checkComponent(this)) getDashboard(row, col).get().affectDestroy(this);
 
-        checkShip(row-1, col);
-        checkShip(row+1, col);
-        checkShip(row, col-1);
-        checkShip(row, col+1);
+        checkShip(row - 1, col);
+        checkShip(row + 1, col);
+        checkShip(row, col - 1);
+        checkShip(row, col + 1);
     }
 
 }
