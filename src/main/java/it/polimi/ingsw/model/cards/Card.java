@@ -1,6 +1,10 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.controller.GameState;
+import it.polimi.ingsw.model.Game;
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.player.PlayerData;
 
 abstract public class Card {
 
@@ -20,6 +24,22 @@ abstract public class Card {
         return isLearner;
     }
 
-    public void resolve(Board board) throws Exception {};
+    // definisco il metodo final in modo tale che non possano esserci override nell classi figlie
+    public final void resolve(Game game, PlayerData player) throws Exception {
+        if (requiresPlayerInteraction(player)) {
+            game.setState(GameState.WAIT);
+        } else {
+            complete(game, player, null);
+        }
+    }
+
+    protected abstract boolean requiresPlayerInteraction(PlayerData player);
+    protected abstract void doResolve(Game game, PlayerData player, Object data) throws Exception;
+
+    public final void complete(Game game, PlayerData player, Object data) throws Exception {
+        doResolve(game, player, data);
+
+        game.setState(GameState.FLIGHT);
+    }
 
 }

@@ -1,9 +1,8 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.cards.Card;
-import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.Component;
-import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
@@ -11,43 +10,51 @@ import java.util.List;
 
 public class ModelFacade {
 
-    private final Board board;
+    private final Game game;
 
     public ModelFacade(List<String> usernames) {
-        this.board = new Board(usernames);
+        this.game = new Game(usernames);
+    }
+
+    public GameState getGameState() {
+        return game.getState();
+    }
+
+    public void setGameState(GameState state) {
+        game.setState(state);
     }
 
     public List<PlayerData> getPlayersByPos() {
-        return board.getPlayersByPos();
+        return game.getBoard().getPlayersByPos();
     }
 
     public void rotateHourglass() {
-        board.getTimeManagment().rotateHourglass();
+        game.getBoard().getTimeManagment().rotateHourglass();
     }
 
     public int getTimeLeft() {
-        return board.getTimeManagment().getTimeLeft();
+        return game.getBoard().getTimeManagment().getTimeLeft();
     }
 
     public void decrementTimeLeft() {
-        board.getTimeManagment().decrementTimeLeft();
+        game.getBoard().getTimeManagment().decrementTimeLeft();
     }
 
     public Card drawCard() throws Exception {
-        return board.drawCard();
+        return game.getBoard().drawCard();
+    }
+
+    public void resolveCard(Card card) throws Exception {
+        card.resolve(game, game.getBoard().getCurrentPlayer());
     }
 
     public void insertComponent(String username,  Component component, int row, int col) throws Exception {
-        Ship ship = board.getPlayer(username).getShip();
+        Ship ship = game.getBoard().getPlayer(username).getShip();
         component.insertComponent(ship, row, col);
     }
 
     public void rotateComponent(Component component, boolean clockwise) throws Exception {
         component.rotateComponent(clockwise);
-    }
-
-    public void useBatteries(String username, List<BatteryComponent> batteryComponents) throws Exception {
-        for
     }
 
     // UPDATE BATTERIES, CABIN
