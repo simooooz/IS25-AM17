@@ -1,17 +1,13 @@
-package it.polimi.ingsw.model.components.factory;
+package it.polimi.ingsw.model.factory;
 
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.properties.DirectionType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public interface componentFactory {
+public interface ComponentFactory {
     public default Component createComponent(JSONObject componentJson) {
         String type = componentJson.getString("type");
         JSONArray connectorsArray = componentJson.getJSONArray("connectors");

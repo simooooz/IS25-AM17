@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model.cards.factory;
+package it.polimi.ingsw.model.factory;
 
 import it.polimi.ingsw.model.cards.utils.*;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -18,7 +18,6 @@ import it.polimi.ingsw.model.cards.PlanetCard;
 import it.polimi.ingsw.model.cards.SlaversCard;
 import it.polimi.ingsw.model.cards.SmugglersCard;
 import it.polimi.ingsw.model.cards.StardustCard;
-import it.polimi.ingsw.model.cards.StrayBigMeteorsCard;
 
 import java.util.*;
 
