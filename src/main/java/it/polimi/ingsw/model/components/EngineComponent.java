@@ -38,4 +38,8 @@ public class EngineComponent extends Component {
         super.checkComponent(ship);
     }
 
+    public int calcPower() {
+        return isDouble ? 2 : 1;
+    }
+
 }

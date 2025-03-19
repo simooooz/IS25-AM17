@@ -42,4 +42,8 @@ public class CannonComponent extends Component {
         ) throw new Exception();
     }
 
+    public double calcPower() {
+        int factor = direction == DirectionType.NORTH ? 2 : 1;
+        return (isDouble ? 2.0 : 1.0) / factor;
+    }
 }
