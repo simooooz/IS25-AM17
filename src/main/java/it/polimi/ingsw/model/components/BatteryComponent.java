@@ -26,8 +26,8 @@ public class BatteryComponent extends Component {
         this.batteries = batteries;
     }
 
-    public void useBattery(Ship ship) throws Exception {
-        if (batteries == 0) throw new Exception();
+    public void useBattery(Ship ship) {
+        if (batteries == 0) return;
         batteries--;
         ship.setBatteries(ship.getBatteries() - 1);
     }
