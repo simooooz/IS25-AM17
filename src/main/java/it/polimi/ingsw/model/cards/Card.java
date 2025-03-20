@@ -6,14 +6,19 @@ import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.HashMap;
+import java.util.Map;
+
 abstract public class Card {
 
-    private final int level;            // card level (1 or 2)
-    private final boolean isLearner;    // learning flight
+    private final int level;
+    private final boolean isLearner;
+    Map<String, CardState> playersState;
 
     public Card(int level, boolean isLearner) {
         this.level = level;
         this.isLearner = isLearner;
+        this.playersState = new HashMap<>();
     }
 
     public int getLevel() {
@@ -24,22 +29,6 @@ abstract public class Card {
         return isLearner;
     }
 
-    // definisco il metodo final in modo tale che non possano esserci override nell classi figlie
-    public final void resolve(Game game, PlayerData player) throws Exception {
-        if (requiresPlayerInteraction(player)) {
-            game.setState(GameState.WAIT);
-        } else {
-            complete(game, player, null);
-        }
-    }
-
-    protected abstract boolean requiresPlayerInteraction(PlayerData player);
-    protected abstract void doResolve(Game game, PlayerData player, Object data) throws Exception;
-
-    public final void complete(Game game, PlayerData player, Object data) throws Exception {
-        doResolve(game, player, data);
-
-        game.setState(GameState.FLIGHT);
-    }
+    public void resolve(Board board) throws Exception {}
 
 }

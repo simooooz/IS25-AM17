@@ -1,10 +1,9 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.CannonFire;
-import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CannonComponent;
+import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.Dice;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.properties.DirectionType;
 
@@ -13,10 +12,19 @@ import java.util.List;
 import java.util.Optional;
 
 public class PiratesCard extends Card{
+
     private final int piratesFirePower;
     private final int credits;
     private final int days;
     private final List<CannonFire> cannonFires;
+
+    private List<PlayerData> players;
+    private List<PlayerData> defeatedPlayers;
+    private boolean piratesDefeated;
+    private double userCannonPower;
+    private int playerIndex;
+    private int cannonIndex;
+    private int coord;
 
     public PiratesCard(int level, boolean isLearner, int piratesFirePower, int credits, int days, List<CannonFire> cannonFires) {
         super(level, isLearner);
@@ -28,59 +36,132 @@ public class PiratesCard extends Card{
 
     @Override
     public void resolve(Board board) throws Exception {
-        List<PlayerData> defeatedPlayers = new ArrayList<>();
-        boolean piratesDefeated = false;
+    }
 
-        for (PlayerData player : board.getPlayersByPos()) {
+    public void startCard(Board board) {
+        this.piratesDefeated = false;
+        this.playerIndex = 0;
+        this.cannonIndex = 0;
+        this.defeatedPlayers = new ArrayList<>();
+        this.players = board.getPlayersByPos();
 
-            boolean win = false;
-            double singleCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
-                .filter(cannon -> !cannon.getIsDouble())
-                .mapToDouble(cannon -> cannon.getDirection() == DirectionType.NORTH ? 1 : 0.5).sum();
+        for (PlayerData player : players) {
+            playersState.put(player.getUsername(), CardState.WAIT);
+        }
+        autoCheckPlayers();
+    }
+
+    public void changeState(Board board, String username) throws Exception {
+
+        CardState actState = playersState.get(username);
+
+        switch (actState) {
+            case WAIT_BOOLEAN, WAIT_SHIELD -> playersState.put(username, CardState.DONE);
+            case WAIT_CANNON -> {
+                if (userCannonPower > piratesFirePower && !piratesDefeated) { // Ask if user wants to redeem rewards
+                    playersState.put(username, CardState.WAIT_BOOLEAN);
+                    piratesDefeated = true;
+                }
+                else if (userCannonPower >= piratesFirePower) { // Tie or pirates already defeated
+                    playersState.put(username, CardState.DONE);
+                }
+                else { // Player is defeated
+                    defeatedPlayers.add(board.getPlayerEntityByUsername(username));
+                    playersState.put(username, CardState.DONE);
+                }
+            }
+            case WAIT_ROLL_DICE -> {
+                for (PlayerData player : defeatedPlayers) {
+                    CardState newState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
+                    playersState.put(player.getUsername(), newState);
+                }
+                cannonIndex++;
+            }
+        }
+
+        playerIndex++;
+        autoCheckPlayers();
+
+    }
+
+    private void autoCheckPlayers() {
+        for (; playerIndex < players.size(); playerIndex++) {
+            PlayerData player = players.get(playerIndex);
+
+            double freeCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
+                    .filter(cannon -> !cannon.getIsDouble())
+                    .mapToDouble(CannonComponent::calcPower).sum();
             double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(CannonComponent::getIsDouble)
                     .mapToDouble(cannon -> cannon.getDirection() == DirectionType.NORTH ? 2 : 1).sum();
 
-            if (singleCannonsPower >= piratesFirePower) { // User win automatically
-                win = true;
+            if (piratesDefeated)
+                playersState.put(player.getUsername(), CardState.DONE);
+            else if (freeCannonsPower > piratesFirePower) { // User wins automatically
+                playersState.put(player.getUsername(), CardState.WAIT_BOOLEAN);
+                piratesDefeated = true;
             }
-            else if (singleCannonsPower + doubleCannonsPower >= piratesFirePower) { // User could win
-                List<CannonComponent> cannonsToActivate = new ArrayList<>(); // View => user select which cannons wants to activate. If he hasn't enough batteries he'll press skip
-                if (player.getShip().getBatteries() < cannonsToActivate.size()) throw new Exception(); // Not enough batteries
-
-                double userFirePower = singleCannonsPower;
-                for (CannonComponent doubleCannon : cannonsToActivate) // Calculate firepower
-                    userFirePower += doubleCannon.getDirection() == DirectionType.NORTH ? 2 : 1;
-
-                if (userFirePower >= piratesFirePower) { // Set win to true and use batteries
-                    win = true;
-                    for (int i = 0; i < cannonsToActivate.size(); i++) { // Remove batteries
-                        Optional<BatteryComponent> chosenComponentOpt = Optional.empty(); // View => Ask the user
-                        BatteryComponent chosenComponent = chosenComponentOpt.orElseThrow();
-                        chosenComponent.useBattery(player.getShip());
-                    }
-                }
+            else if (freeCannonsPower == piratesFirePower)
+                playersState.put(player.getUsername(), CardState.DONE);
+            else if (freeCannonsPower + doubleCannonsPower >= piratesFirePower) { // User could win
+                playersState.put(player.getUsername(), CardState.WAIT_CANNON);
+                return;
             }
-
-            if (!win) { // Player is defeated
+            else { // User loses automatically
                 defeatedPlayers.add(player);
-            }
-            else if (!piratesDefeated) {
-                boolean wantRedeem = false; // View => Ask user if he wants to redeem the reward
-                if (wantRedeem) {
-                    board.movePlayer(player, -1*days);
-                    player.setCredits(credits + player.getCredits());
-                    piratesDefeated = true;
-                }
+                playersState.put(player.getUsername(), CardState.DONE);
             }
         }
 
-        for(CannonFire cannonFire : cannonFires) {
-            int coord = Dice.roll() + Dice.roll(); // View => The first defeated player rolls dices
-            for (PlayerData player : defeatedPlayers)
-                cannonFire.hit(player.getShip(), coord);
-        }
+        // Check if everyone has finished
+        boolean hasDone = true;
+        for (PlayerData player : players)
+            if (playersState.get(player.getUsername()) != CardState.DONE)
+                hasDone = false;
 
+        if (hasDone && defeatedPlayers.isEmpty()) {
+            endCard();
+        }
+        else if (hasDone) {
+            if (cannonIndex >= cannonFires.size()) {
+                endCard();
+            }
+            else {
+                for (PlayerData player : defeatedPlayers)
+                    playersState.put(player.getUsername(), CardState.WAIT);
+                playersState.put(defeatedPlayers.getFirst().getUsername(), CardState.WAIT_ROLL_DICE);
+            }
+        }
+    }
+
+    public void endCard() {
+
+    }
+
+    public void doCommandEffects(CardState commandType, Integer value) {
+        if (commandType == CardState.WAIT_ROLL_DICE)
+            this.coord = value;
+    }
+
+    public void doCommandEffects(CardState commandType, Double value) {
+        if (commandType == CardState.WAIT_CANNON) {
+            userCannonPower = value;
+        }
+    }
+
+    public void doCommandEffects(CardState commandType, Boolean value, String username, Board board) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        if (commandType == CardState.WAIT_BOOLEAN && value) {
+            board.movePlayer(player, -1*days);
+            player.setCredits(credits + player.getCredits());
+        }
+        else if (commandType == CardState.WAIT_SHIELD) {
+            if (!value) {
+                Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
+                if (target.isPresent())
+                    target.get().destroyComponent(player.getShip());
+            }
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
-import it.polimi.ingsw.model.components.BatteryComponent;
+import it.polimi.ingsw.model.cards.CardState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
@@ -18,23 +18,24 @@ public class CannonFire {
         this.directionFrom = directionFrom;
     }
 
-    public void hit(Ship ship, int coord) throws Exception {
-        if (coord > 10 || coord < 4) return; // Miss
+    public CardState hit(Ship ship, int coord) throws Exception {
+        if (coord > 10 || coord < 4) return CardState.DONE; // Miss
 
         List<Component> targets = directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord); // Find hit component
-        if (targets.isEmpty()) return; // Miss
+        if (targets.isEmpty()) return CardState.DONE; // Miss
         Component target = targets.getFirst();
 
-        if (!isBig && ship.getProtectedSides().contains(directionFrom) && ship.getBatteries() > 0) { // Ask user if he wants to use a battery
-            Optional<BatteryComponent> chosenComponent = Optional.empty(); // View
-            if (chosenComponent.isPresent()) {
-                chosenComponent.get().useBattery(ship);
-                return;
-            }
-        }
+        if (!isBig && ship.getProtectedSides().contains(directionFrom) && ship.getBatteries() > 0) // Ask user if he wants to use a battery
+            return CardState.WAIT_SHIELD;
 
         target.destroyComponent(ship); // Destroy component
+        return CardState.DONE;
     }
+
+    public Optional<Component> getTarget(Ship ship, int coord) {
+        return directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord).stream().findFirst();
+    }
+
 }
 
 

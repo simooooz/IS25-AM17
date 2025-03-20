@@ -1,33 +1,84 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.model.cards.utils.CannonFire;
 import it.polimi.ingsw.model.cards.utils.Meteor;
+import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.Dice;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
+import java.util.Optional;
 
 public class MeteorSwarmCard extends Card{
 
     private final List<Meteor> meteors;
+    int meteorIndex;
+    private int coord;
 
     public MeteorSwarmCard(int level, boolean isLearner, List<Meteor> meteors) {
         super(level, isLearner);
         this.meteors = meteors;
-    }
-
-    public List<Meteor> getMeteors() {
-        return meteors;
+        this.meteorIndex = 0;
     }
 
     @Override
     public void resolve(Board board) throws Exception {
-        for (Meteor meteor : meteors) {
-            int coord = Dice.roll() + Dice.roll(); // View => leader rolls dices
-            for (PlayerData playerData : board.getPlayersByPos()) {
-                meteor.hit(playerData.getShip(), coord);
+    }
+
+    public void startCard(Board board) {
+        for (PlayerData player : board.getPlayersByPos())
+            playersState.put(player.getUsername(), CardState.WAIT);
+        playersState.put(board.getPlayersByPos().getFirst().getUsername(), CardState.WAIT_ROLL_DICE);
+    }
+
+    public void changeState(Board board, String username) throws Exception {
+
+        CardState actState = playersState.get(username);
+
+        switch (actState) {
+            case WAIT_ROLL_DICE -> {
+                for(PlayerData player : board.getPlayersByPos()) {
+                    CardState newState = meteors.get(meteorIndex).hit(player.getShip(), coord);
+                    playersState.put(player.getUsername(), newState);
+                }
+                meteorIndex++;
             }
+            case WAIT_SHIELD, WAIT_BOOLEAN -> playersState.put(username, CardState.DONE);
+        }
+
+        // Check if everyone has finished
+        boolean hasDone = true;
+        for (PlayerData player : board.getPlayersByPos())
+            if (playersState.get(player.getUsername()) != CardState.DONE)
+                hasDone = false;
+
+        if (hasDone) {
+            if (meteorIndex >= meteors.size()) {
+                endCard();
+            }
+            else {
+                for (PlayerData player : board.getPlayersByPos())
+                    playersState.put(player.getUsername(), CardState.WAIT);
+                playersState.put(board.getPlayersByPos().getFirst().getUsername(), CardState.WAIT_ROLL_DICE);
+            }
+        }
+
+    }
+
+    public void endCard() {
+
+    }
+
+    public void doCommandEffects(CardState commandType, Integer value) {
+        if (commandType == CardState.WAIT_ROLL_DICE)
+            this.coord = value;
+    }
+
+    public void doCommandEffects(CardState commandType, Boolean value, String username, Board board) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        if (commandType == CardState.WAIT_SHIELD && !value) {
+            Optional<Component> target = meteors.get(meteorIndex).getTarget(player.getShip(), coord);
+            if (target.isPresent())
+                target.get().destroyComponent(player.getShip());
         }
     }
 
