@@ -1,9 +1,8 @@
 package it.polimi.ingsw.model.cards.utils;
 
-import it.polimi.ingsw.model.components.CabinComponent;
+import it.polimi.ingsw.model.cards.CardState;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.player.Ship;
 
 public class CountablePenaltyZone extends PenaltyCombatZone {
     private final int penaltyNumber;
@@ -15,8 +14,8 @@ public class CountablePenaltyZone extends PenaltyCombatZone {
     }
 
     @Override
-    public void resolve(Board board, PlayerData player) throws Exception {
-        penaltyType.resolve(penaltyNumber, board, player);
+    public CardState resolve(Board board, PlayerData player) throws Exception {
+        return penaltyType.resolve(penaltyNumber, board, player);
     }
 
 }

@@ -47,7 +47,7 @@ public class Meteor {
             if (singleCannon.isPresent()) return CardState.DONE;
 
             if (!cannonsOverLine.isEmpty()) { // There is a double cannon that could destroy meteor
-                return CardState.WAIT_BOOLEAN;
+                return CardState.WAIT_CANNON;
             }
 
         }

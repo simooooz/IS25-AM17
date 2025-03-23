@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.cards.CardState;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.components.SpecialCargoHoldsComponent;
@@ -13,14 +15,16 @@ import java.util.Optional;
 public enum MalusType {
     DAYS {
         @Override
-        public void resolve(int penaltyNumber, Board board, PlayerData player) throws Exception {
+        public CardState resolve(int penaltyNumber, Board board, PlayerData player) throws Exception {
             board.movePlayer(player, -1*penaltyNumber);
+            return CardState.DONE;
         }
     },
 
     GOODS {
         @Override
-        public void resolve(int penaltyNumber, Board board, PlayerData player) throws Exception {
+        public CardState resolve(int penaltyNumber, Board board, PlayerData player) throws Exception {
+            return CardState.WAIT_REMOVE_GOOD;
             int penalties = penaltyNumber;
             ColorType[] goodTypes = ColorType.values(); // Goods in order of value
 
@@ -69,22 +73,10 @@ public enum MalusType {
 
     CREW {
         @Override
-        public void resolve(int penaltyNumber, Board board, PlayerData player) throws Exception {
-            int penalties = penaltyNumber;
-            while (penalties > 0 && player.getShip().getCrew() > 0) {
-                Optional<CabinComponent> chosenComponentOpt = Optional.empty(); // View => Component where decrease one unit
-                CabinComponent chosenComponent = chosenComponentOpt.orElseThrow();
-                if (chosenComponent.getAlien().isEmpty()) {
-                    chosenComponent.setHumans(chosenComponent.getHumans() - 1, player.getShip());
-                    penalties--;
-                }
-                else {
-                    chosenComponent.setAlien(null, player.getShip());
-                    penalties -= 2;
-                }
-            }
+        public CardState resolve(int penaltyNumber, Board board, PlayerData player) throws Exception {
+            return CardState.WAIT_REMOVE_CREW;
         }
     };
 
-    public abstract void resolve(int penaltyNumber, Board board, PlayerData player) throws Exception;
+    public abstract CardState resolve(int penaltyNumber, Board board, PlayerData player) throws Exception;
 }

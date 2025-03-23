@@ -5,9 +5,9 @@ import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,7 +93,12 @@ public class PiratesCard extends Card{
                     .mapToDouble(CannonComponent::calcPower).sum();
             double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(CannonComponent::getIsDouble)
-                    .mapToDouble(cannon -> cannon.getDirection() == DirectionType.NORTH ? 2 : 1).sum();
+                    .mapToDouble(CannonComponent::calcPower)
+                    .boxed()
+                    .sorted(Comparator.reverseOrder())
+                    .limit(player.getShip().getBatteries())
+                    .mapToDouble(v -> v)
+                    .sum();
 
             if (piratesDefeated)
                 playersState.put(player.getUsername(), CardState.DONE);
@@ -101,7 +106,7 @@ public class PiratesCard extends Card{
                 playersState.put(player.getUsername(), CardState.WAIT_BOOLEAN);
                 piratesDefeated = true;
             }
-            else if (freeCannonsPower == piratesFirePower)
+            else if (freeCannonsPower == piratesFirePower && doubleCannonsPower == 0) // User draws automatically
                 playersState.put(player.getUsername(), CardState.DONE);
             else if (freeCannonsPower + doubleCannonsPower >= piratesFirePower) { // User could win
                 playersState.put(player.getUsername(), CardState.WAIT_CANNON);
@@ -155,12 +160,10 @@ public class PiratesCard extends Card{
             board.movePlayer(player, -1*days);
             player.setCredits(credits + player.getCredits());
         }
-        else if (commandType == CardState.WAIT_SHIELD) {
-            if (!value) {
-                Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
-                if (target.isPresent())
-                    target.get().destroyComponent(player.getShip());
-            }
+        else if (commandType == CardState.WAIT_SHIELD && !value) {
+            Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
+            if (target.isPresent())
+                target.get().destroyComponent(player.getShip());
         }
     }
 
