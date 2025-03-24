@@ -7,6 +7,8 @@ public enum CardState {
     WAIT_ROLL_DICE,
     WAIT_CREW,
     WAIT_SHIELD,
+    WAIT_GOODS,
     WAIT_BOOLEAN,
+    WAIT_INDEX,
     DONE
 }
