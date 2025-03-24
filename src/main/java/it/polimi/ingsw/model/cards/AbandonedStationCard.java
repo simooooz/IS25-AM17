@@ -4,14 +4,17 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
 public class AbandonedStationCard extends Card{
     private final int crew;
     private final int days;
-    private final Map<ColorType, Integer> goods;;
+    private final Map<ColorType, Integer> goods;
+    private int playerIndex;
+    private int conquerorPlayerIndex;
+    private List<PlayerData> players;
+    private boolean shipConquered;
 
     public AbandonedStationCard(int level, boolean isLearner, int crew, int days, Map<ColorType, Integer> goods) {
         super(level, isLearner);
@@ -20,45 +23,76 @@ public class AbandonedStationCard extends Card{
         this.goods = goods;
     }
 
-    public int getCrew() {
-        return crew;
+    public void startCard(Board board) {
+        this.playerIndex = 0;
+        this.conquerorPlayerIndex = -1;
+        this.players = board.getPlayersByPos();
+        this.shipConquered = false;
+
+        for (PlayerData player : board.getPlayersByPos()) {
+            playersState.put(player.getUsername(), CardState.WAIT);
+        }
+        autoCheckPlayers();
     }
 
-    public int getDays() {
-        return days;
-    }
+    public void changeState(Board board, String username) {
 
-    public Map<ColorType, Integer> getGoods() {
-        return goods;
-    }
+        CardState actState = playersState.get(username);
 
-    @Override
-    public void resolve(Board board){
-        List<AbstractMap.SimpleEntry<PlayerData, Integer>> players = board.getPlayers();
-        // iterate on the list of player -> for now I've not implemented if a player does not want to
-        // play this card, it's only to iterate on the list of player
-        for (AbstractMap.SimpleEntry<PlayerData, Integer> entry : players) {
-            PlayerData player = entry.getKey();
+        switch (actState) {
+            case WAIT_GOODS -> playersState.put(username, CardState.DONE);
+            case WAIT_BOOLEAN -> {
+                if (conquerorPlayerIndex == players.indexOf(getPlayerbyEntiy(username))) { // basta !=-1 ??
+                    playersState.put(username, CardState.WAIT_GOODS);
+                    shipConquered = true;
+                }
+                else
+                    playersState.put(username, CardState.DONE);
 
-            int crew = player.getShip().getCrew();
-            // check if the player can really play the card
-            if (crew > getCrew()) {
-                getGoods().keySet().forEach(goodType -> {
-                    int rewardTypeG = getGoods().get(goodType);
-                    int availableG = board.getAvailableGoods().get(goodType);
-                    int playerG = player.getShip().getGoods().get(goodType);
-                    int toDecrease = Math.min(availableG, rewardTypeG);
-                    while (toDecrease > 0) {
-                        //chiedo alla view il componente sul quale inserire la merce
-                        // CargoComponent c1 = Funzionecherichiedeilcomponenteallview()
-                        // c1.loadGood(goodType);
-                        toDecrease--;
-                    }
-                    board.getAvailableGoods().put(goodType, availableG - toDecrease);
-                    player.getShip().getGoods().put(goodType, playerG + toDecrease);
-                });
-                board.movePlayer(player, getDays()* -1);
             }
+        }
+
+        playerIndex++;
+        autoCheckPlayers();
+
+    }
+
+    private void autoCheckPlayers() {
+        for (; playerIndex < players.size(); playerIndex++) {
+            PlayerData player = players.get(playerIndex);
+
+            if (shipConquered)
+                playersState.put(player.getUsername(), CardState.DONE);
+            else if (player.getShip().getCrew() < crew) // User loses automatically
+                playersState.put(player.getUsername(), CardState.DONE);
+            else { // User could win
+                playersState.put(player.getUsername(), CardState.WAIT_BOOLEAN);
+                return;
+            }
+        }
+
+        // Check if everyone has finished
+        boolean hasDone = true;
+        for (PlayerData player : players)
+            if (playersState.get(player.getUsername()) != CardState.DONE)
+                hasDone = false;
+
+        if (hasDone) {
+            endCard();
+        }
+    }
+
+    public void endCard(){
+
+    }
+
+    public void doCommandEffects(CardState commandType, Boolean value, String username, Board board) {
+        PlayerData player = board.getPlayerEntitybyUsername(username);
+        if (commandType == CardState.WAIT_BOOLEAN && value) {
+            conquerorPlayerIndex = players.indexOf(getPlayerbyEntity(username));
+        }
+        else if (commandType == CardState.WAIT_GOODS) {
+            board.movePlayer(player, days * -1);
         }
     }
 }
