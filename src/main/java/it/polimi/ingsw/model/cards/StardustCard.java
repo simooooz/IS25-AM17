@@ -1,23 +1,18 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-
-import java.util.AbstractMap;
-import java.util.List;
 
 public class StardustCard extends Card {
     public StardustCard(int level, boolean isLearner) {
         super(level, isLearner);
     }
 
-    @Override
-    public void resolve(Board board) {
-        List<PlayerData> players = board.getPlayersByPos().reversed();    // players by inverted position
-        players.forEach(p -> {
-            Ship ship = p.getShip();
-            board.movePlayer(p, -1*ship.countExposedConnectors());
-        });
+    public void startCard(Board board) {
+        board.getPlayersByPos()
+                .forEach(player -> {
+                    Ship ship = player.getShip();
+                    board.movePlayer(player, -1 * ship.countExposedConnectors());
+                });
     }
 }

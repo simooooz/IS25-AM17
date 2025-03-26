@@ -8,5 +8,6 @@ public enum CardState {
     WAIT_CREW,
     WAIT_SHIELD,
     WAIT_BOOLEAN,
+    WAIT_GOODS,
     DONE
 }
