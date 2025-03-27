@@ -35,10 +35,7 @@ public class PiratesCard extends Card{
     }
 
     @Override
-    public void resolve(Board board) throws Exception {
-    }
-
-    public void startCard(Board board) {
+    public boolean startCard(Board board) {
         this.piratesDefeated = false;
         this.playerIndex = 0;
         this.cannonIndex = 0;
@@ -46,33 +43,34 @@ public class PiratesCard extends Card{
         this.players = board.getPlayersByPos();
 
         for (PlayerData player : players) {
-            playersState.put(player.getUsername(), CardState.WAIT);
+            playersState.put(player.getUsername(), PlayerState.WAIT);
         }
-        autoCheckPlayers();
+        return autoCheckPlayers(board);
     }
 
-    public void changeState(Board board, String username) throws Exception {
+    @Override
+    protected boolean changeState(Board board, String username) {
 
-        CardState actState = playersState.get(username);
+        PlayerState actState = playersState.get(username);
 
         switch (actState) {
-            case WAIT_BOOLEAN, WAIT_SHIELD -> playersState.put(username, CardState.DONE);
-            case WAIT_CANNON -> {
+            case WAIT_BOOLEAN, WAIT_SHIELD -> playersState.put(username, PlayerState.DONE);
+            case WAIT_CANNONS -> {
                 if (userCannonPower > piratesFirePower && !piratesDefeated) { // Ask if user wants to redeem rewards
-                    playersState.put(username, CardState.WAIT_BOOLEAN);
+                    playersState.put(username, PlayerState.WAIT_BOOLEAN);
                     piratesDefeated = true;
                 }
                 else if (userCannonPower >= piratesFirePower) { // Tie or pirates already defeated
-                    playersState.put(username, CardState.DONE);
+                    playersState.put(username, PlayerState.DONE);
                 }
                 else { // Player is defeated
                     defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    playersState.put(username, CardState.DONE);
+                    playersState.put(username, PlayerState.DONE);
                 }
             }
-            case WAIT_ROLL_DICE -> {
+            case WAIT_ROLL_DICES -> {
                 for (PlayerData player : defeatedPlayers) {
-                    CardState newState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
+                    PlayerState newState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
                     playersState.put(player.getUsername(), newState);
                 }
                 cannonIndex++;
@@ -80,11 +78,11 @@ public class PiratesCard extends Card{
         }
 
         playerIndex++;
-        autoCheckPlayers();
+        return autoCheckPlayers(board);
 
     }
 
-    private void autoCheckPlayers() {
+    private boolean autoCheckPlayers(Board board) {
         for (; playerIndex < players.size(); playerIndex++) {
             PlayerData player = players.get(playerIndex);
 
@@ -101,69 +99,70 @@ public class PiratesCard extends Card{
                     .sum();
 
             if (piratesDefeated)
-                playersState.put(player.getUsername(), CardState.DONE);
+                playersState.put(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower > piratesFirePower) { // User wins automatically
-                playersState.put(player.getUsername(), CardState.WAIT_BOOLEAN);
+                playersState.put(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 piratesDefeated = true;
             }
             else if (freeCannonsPower == piratesFirePower && doubleCannonsPower == 0) // User draws automatically
-                playersState.put(player.getUsername(), CardState.DONE);
+                playersState.put(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower + doubleCannonsPower >= piratesFirePower) { // User could win
-                playersState.put(player.getUsername(), CardState.WAIT_CANNON);
-                return;
+                playersState.put(player.getUsername(), PlayerState.WAIT_CANNONS);
+                return false;
             }
             else { // User loses automatically
                 defeatedPlayers.add(player);
-                playersState.put(player.getUsername(), CardState.DONE);
+                playersState.put(player.getUsername(), PlayerState.DONE);
             }
         }
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : players)
-            if (playersState.get(player.getUsername()) != CardState.DONE)
+            if (playersState.get(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone && defeatedPlayers.isEmpty()) {
-            endCard();
+            endCard(board);
+            return true;
         }
         else if (hasDone) {
             if (cannonIndex >= cannonFires.size()) {
-                endCard();
+                endCard(board);
+                return true;
             }
             else {
                 for (PlayerData player : defeatedPlayers)
-                    playersState.put(player.getUsername(), CardState.WAIT);
-                playersState.put(defeatedPlayers.getFirst().getUsername(), CardState.WAIT_ROLL_DICE);
+                    playersState.put(player.getUsername(), PlayerState.WAIT);
+                playersState.put(defeatedPlayers.getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
             }
         }
+        return false;
     }
 
-    public void endCard() {
-
-    }
-
-    public void doCommandEffects(CardState commandType, Integer value) {
-        if (commandType == CardState.WAIT_ROLL_DICE)
+    @Override
+    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
+        if (commandType == PlayerState.WAIT_ROLL_DICES)
             this.coord = value;
     }
 
-    public void doCommandEffects(CardState commandType, Double value) {
-        if (commandType == CardState.WAIT_CANNON) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
+        if (commandType == PlayerState.WAIT_CANNONS) {
             userCannonPower = value;
         }
     }
 
-    public void doCommandEffects(CardState commandType, Boolean value, String username, Board board) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == CardState.WAIT_BOOLEAN && value) {
+        if (commandType == PlayerState.WAIT_BOOLEAN && value) {
             board.movePlayer(player, -1*days);
             player.setCredits(credits + player.getCredits());
         }
-        else if (commandType == CardState.WAIT_SHIELD && !value) {
+        else if (commandType == PlayerState.WAIT_SHIELD && !value) {
             Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
-            if (target.isPresent())
-                target.get().destroyComponent(player.getShip());
+            target.ifPresent(component -> component.destroyComponent(player.getShip()));
         }
     }
 
