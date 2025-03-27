@@ -1,29 +1,37 @@
 package it.polimi.ingsw.model.cards.commands;
 
+import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
+import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.components.EngineComponent;
+import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
+import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
+import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.Ship;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class EngineCommand implements Command<Integer> {
+public class EngineCommand implements Command {
 
-    private final Ship ship;
+    private final String username;
+    private final Board board;
     private final List<BatteryComponent> batteries;
     private final List<EngineComponent> engines;
 
-    public EngineCommand(Ship ship, List<BatteryComponent> batteries, List<EngineComponent> engines) {
-        this.ship = ship;
+    public EngineCommand(String username, Board board, List<BatteryComponent> batteries, List<EngineComponent> engines) {
+        this.username = username;
+        this.board = board;
         this.batteries = batteries;
         this.engines = engines;
     }
 
     @Override
-    public Integer execute() {
-        // TODO check correttezza capiamo dove farlo, è più generale
-        // Sono nella nave giusta
-        // Sono componenti diversi e corrispondono al tipo di componente giusto
-        // Ci sono abbastanza batterie
+    public void execute(Card card) {
+        Ship ship = board.getPlayerEntityByUsername(username).getShip();
+        checkInput(ship);
 
         int singleEnginePower = ship.getComponentByType(EngineComponent.class).stream()
                 .filter(engine -> !engine.getIsDouble())
@@ -32,7 +40,30 @@ public class EngineCommand implements Command<Integer> {
         int userEnginePower = singleEnginePower + dobuleEnginePower + (ship.getEngineAlien() ? 2 : 0);
 
         batteries.forEach(batteryComponent -> batteryComponent.useBattery(ship));
-        return userEnginePower;
+        card.doCommandEffects(PlayerState.WAIT_ENGINES, userEnginePower, username, board);
+    }
+
+    private void checkInput(Ship ship) {
+        for (Component component : batteries)
+            if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
+                throw new ComponentNotValidException("Battery component not valid");
+
+        for (Component component : engines)
+            if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
+                throw new ComponentNotValidException("Engine component not valid");
+
+        if (batteries.size() != engines.size())
+            throw new RuntimeException("Inconsistent number of batteries components");
+
+        boolean enoughBatteries = batteries.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .allMatch(entry -> entry.getValue() <= entry.getKey().getBatteries());
+        if (!enoughBatteries)
+            throw new BatteryComponentNotValidException("Not enough batteries");
+
+        if (engines.size() != engines.stream().distinct().count())
+            throw new ComponentNotValidException("Duplicate engines");
     }
 
 }

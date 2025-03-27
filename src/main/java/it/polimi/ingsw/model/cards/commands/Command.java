@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.cards.commands;
 
-public interface Command<T> {
+import it.polimi.ingsw.model.cards.Card;
 
-    T execute();
+public interface Command {
+
+    void execute(Card card);
 
 }
