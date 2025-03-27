@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.components;
 
 import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
+import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.player.Ship;
 
@@ -19,11 +21,15 @@ public class CabinComponent extends Component {
         this.isStarting = isStarting;
     }
 
+    public boolean getIsStarting() {
+        return isStarting;
+    }
+
     public int getHumans() {
         return humans;
     }
 
-    public void setHumans(int humans, Ship ship) throws Exception {
+    public void setHumans(int humans, Ship ship) {
         if (humans < 0) humans = 0;
         if (alien.isPresent()) setAlien(null, ship);
         int delta = humans - this.humans;
@@ -35,36 +41,42 @@ public class CabinComponent extends Component {
         return alien;
     }
 
-    public void setAlien(AlienType alien, Ship ship) throws Exception {
-        if (isStarting) throw new Exception();
-        if (this.alien.isEmpty() && alien != null) {
+    public void setAlien(AlienType newAlien, Ship ship) {
+        if (isStarting) throw new ComponentNotValidException("Alien isn't compatible with staring cabin tile");
+        else if (this.alien.isEmpty() && newAlien != null) { // Should set new alien
+
+            // Check if exists an odd component
+            this.getLinkedNeighbors(ship).stream()
+                    .filter(c -> c instanceof OddComponent)
+                    .map(c -> (OddComponent) c)
+                    .filter(c -> c.getType() == newAlien)
+                    .findFirst()
+                    .orElseThrow(() -> new CabinComponentNotValidException("Alien " + newAlien + " is not compatible with this cabin"));
+
+            if (newAlien == AlienType.CANNON && !ship.getCannonAlien()) { ship.setCannonAlien(true); }
+            else if (newAlien == AlienType.CANNON && ship.getCannonAlien()) throw new CabinComponentNotValidException("Alien " + newAlien + " is already present");
+            else if (newAlien == AlienType.ENGINE && !ship.getEngineAlien()) { ship.setEngineAlien(true); }
+            else if (newAlien == AlienType.ENGINE && ship.getEngineAlien()) throw new CabinComponentNotValidException("Alien " + newAlien + " is already present");
+
             setHumans(0, ship);
             ship.setCrew(ship.getCrew() + 2);
-            if (alien == AlienType.CANNON && !ship.getCannonAlien()) { ship.setCannonAlien(true); }
-            else if (alien == AlienType.CANNON && ship.getCannonAlien()) throw new Exception();
-            else if (alien == AlienType.ENGINE && !ship.getEngineAlien()) { ship.setEngineAlien(true); }
-            else if (alien == AlienType.ENGINE && ship.getEngineAlien()) throw new Exception();
         }
-        else if (this.alien.isPresent() && alien == null) {
+        else if (this.alien.isPresent() && newAlien == null) { // Should remove alien
             ship.setCrew(ship.getCrew() - 2);
             if (this.alien.get() == AlienType.CANNON) { ship.setCannonAlien(false); }
             else { ship.setEngineAlien(false); }
         }
-        this.alien = Optional.ofNullable(alien);
-    }
-
-    public boolean getIsStarting() {
-        return isStarting;
+        this.alien = Optional.ofNullable(newAlien);
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col) throws Exception {
+    public void insertComponent(Ship ship, int row, int col) {
         super.insertComponent(ship, row, col);
         setHumans(2, ship);
     }
 
     @Override
-    public void affectDestroy(Ship ship) throws Exception {
+    public void affectDestroy(Ship ship) {
         super.affectDestroy(ship);
         setHumans(0, ship);
         setAlien(null, ship);
