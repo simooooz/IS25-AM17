@@ -13,7 +13,8 @@ public class EpidemicCard extends Card {
         super(level, isLearner);
     }
 
-    public void startCard(Board board) throws Exception {
+    @Override
+    public boolean startCard(Board board) {
         for (PlayerData player : board.getPlayersByPos()) {
             List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class);
             boolean[] checkEpidemic = new boolean[cabins.size()]; // to check if cabins are already visited
@@ -36,19 +37,15 @@ public class EpidemicCard extends Card {
             }
         }
 
-        endCard();
+        endCard(board);
+        return true;
     }
 
-
-    private void decrementCrew(List<CabinComponent> cabines, int i, PlayerData playerData) throws Exception {
-        if (cabines.get(i).getHumans() > 0)
-            cabines.get(i).setHumans(cabines.get(i).getHumans() - 1, playerData.getShip());
-        else if (cabines.get(i).getAlien().isPresent())
-            cabines.get(i).setAlien(null, playerData.getShip());
-    }
-
-    public void endCard() {
-
+    private void decrementCrew(List<CabinComponent> cabins, int i, PlayerData playerData) {
+        if (cabins.get(i).getHumans() > 0)
+            cabins.get(i).setHumans(cabins.get(i).getHumans() - 1, playerData.getShip());
+        else if (cabins.get(i).getAlien().isPresent())
+            cabins.get(i).setAlien(null, playerData.getShip());
     }
 
 }
