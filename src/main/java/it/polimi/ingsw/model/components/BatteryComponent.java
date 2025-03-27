@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.components;
 
 import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.player.Ship;
 
 public class BatteryComponent extends Component {
@@ -22,25 +23,21 @@ public class BatteryComponent extends Component {
         return batteries;
     }
 
-    public void setBatteries(int batteries) {
-        this.batteries = batteries;
-    }
-
     public void useBattery(Ship ship) {
-        if (batteries == 0) return;
+        if (batteries == 0) throw new BatteryComponentNotValidException("Not enough batteries");
         batteries--;
         ship.setBatteries(ship.getBatteries() - 1);
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col) throws Exception {
+    public void insertComponent(Ship ship, int row, int col) {
         super.insertComponent(ship, row, col);
         if (isTriple) { ship.setBatteries(ship.getBatteries() + 3); }
         else { ship.setBatteries(ship.getBatteries() + 2); }
     }
 
     @Override
-    public void affectDestroy(Ship ship) throws Exception {
+    public void affectDestroy(Ship ship) {
         super.affectDestroy(ship);
         ship.setBatteries(ship.getBatteries() - batteries);
     }
