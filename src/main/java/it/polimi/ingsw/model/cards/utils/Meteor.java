@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
-import it.polimi.ingsw.model.cards.CardState;
+import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
@@ -19,17 +19,17 @@ public class Meteor {
         this.directionFrom = directionFrom;
     }
 
-    public CardState hit(Ship ship, int coord) throws Exception {
-        if (coord > 10 || coord < 4) return CardState.DONE; // Miss
+    public PlayerState hit(Ship ship, int coord) {
+        if (coord > 10 || coord < 4) return PlayerState.DONE; // Miss
 
-        List<Component> targets = directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord); // Find hit component
-        if (targets.isEmpty()) return CardState.DONE; // Miss
+        List<Component> targets = getTargets(ship, coord); // Find hit component
+        if (targets.isEmpty()) return PlayerState.DONE; // Miss
         Component target = targets.getFirst();
 
         if (!isBig && target.getConnectors()[directionFrom.ordinal()] == ConnectorType.EMPTY) // Ship is safe
-            return CardState.DONE;
+            return PlayerState.DONE;
         else if (!isBig && ship.getProtectedSides().contains(directionFrom) && ship.getBatteries() > 0) // Ask user if he wants to use a battery
-            return CardState.WAIT_SHIELD;
+            return PlayerState.WAIT_SHIELD;
         else if (isBig) {
 
             if (directionFrom != DirectionType.NORTH) {
@@ -44,20 +44,23 @@ public class Meteor {
                 .toList();
 
             Optional<CannonComponent> singleCannon = cannonsOverLine.stream().filter(c -> !c.getIsDouble()).findFirst();
-            if (singleCannon.isPresent()) return CardState.DONE;
+            if (singleCannon.isPresent()) return PlayerState.DONE;
 
             if (!cannonsOverLine.isEmpty()) { // There is a double cannon that could destroy meteor
-                return CardState.WAIT_CANNON;
+                return PlayerState.WAIT_CANNONS;
             }
 
         }
 
         target.destroyComponent(ship); // Destroy component
-        return CardState.DONE;
+        return PlayerState.DONE;
     }
 
-    public Optional<Component> getTarget(Ship ship, int coord) {
-        return directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord).stream().findFirst();
+    public List<Component> getTargets(Ship ship, int coord) {
+        return directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord).stream().toList();
     }
 
+    public DirectionType getDirectionFrom() {
+        return directionFrom;
+    }
 }

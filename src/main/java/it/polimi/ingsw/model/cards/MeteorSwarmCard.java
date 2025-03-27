@@ -1,9 +1,11 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.Meteor;
+import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,76 +22,95 @@ public class MeteorSwarmCard extends Card{
     }
 
     @Override
-    public void resolve(Board board) throws Exception {
-    }
-
-    public void startCard(Board board) {
+    public boolean startCard(Board board) {
         this.meteorIndex = 0;
 
         for (PlayerData player : board.getPlayersByPos())
-            playersState.put(player.getUsername(), CardState.WAIT);
-        playersState.put(board.getPlayersByPos().getFirst().getUsername(), CardState.WAIT_ROLL_DICE);
+            playersState.put(player.getUsername(), PlayerState.WAIT);
+        playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
+        return false;
     }
 
-    public void changeState(Board board, String username) throws Exception {
+    @Override
+    protected boolean changeState(Board board, String username) {
 
-        CardState actState = playersState.get(username);
+        PlayerState actState = playersState.get(username);
 
         switch (actState) {
-            case WAIT_ROLL_DICE -> {
+            case WAIT_ROLL_DICES -> {
                 for(PlayerData player : board.getPlayersByPos()) {
-                    CardState newState = meteors.get(meteorIndex).hit(player.getShip(), coord);
+                    PlayerState newState = meteors.get(meteorIndex).hit(player.getShip(), coord);
                     playersState.put(player.getUsername(), newState);
                 }
                 meteorIndex++;
             }
-            case WAIT_SHIELD, WAIT_CANNON -> playersState.put(username, CardState.DONE);
+            case WAIT_SHIELD, WAIT_CANNONS -> playersState.put(username, PlayerState.DONE);
         }
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != CardState.DONE)
+            if (playersState.get(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone) {
             if (meteorIndex >= meteors.size()) {
-                endCard();
+                endCard(board);
+                return true;
             }
             else {
                 for (PlayerData player : board.getPlayersByPos())
-                    playersState.put(player.getUsername(), CardState.WAIT);
-                playersState.put(board.getPlayersByPos().getFirst().getUsername(), CardState.WAIT_ROLL_DICE);
+                    playersState.put(player.getUsername(), PlayerState.WAIT);
+                playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
             }
         }
-
+        return false;
     }
 
-    public void endCard() {
+    @Override
+    public void doSpecificCheck(PlayerState commandType, List<CannonComponent> cannons, String username, Board board) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        if (commandType == PlayerState.WAIT_CANNONS) {
+            if (cannons.size() != 1) throw new IllegalArgumentException("Too many cannon components provided");
+            CannonComponent chosenCannon = cannons.getFirst();
 
+            List<Component> targets = meteors.get(meteorIndex).getTargets(player.getShip(), coord);
+            if (meteors.get(meteorIndex).getDirectionFrom() != DirectionType.NORTH) {
+                targets.addAll(meteors.get(meteorIndex).getDirectionFrom().getComponentsFromThisDirection(player.getShip().getDashboard(), coord-1));
+                targets.addAll(meteors.get(meteorIndex).getDirectionFrom().getComponentsFromThisDirection(player.getShip().getDashboard(), coord+1));
+            }
+
+            targets.stream()
+                .filter(c -> c instanceof CannonComponent)
+                .map(c -> (CannonComponent) c)
+                .filter(c -> c.getDirection() == meteors.get(meteorIndex).getDirectionFrom())
+                .filter(cannonComponent -> cannonComponent.equals(chosenCannon))
+                .findFirst()
+                .orElseThrow(() -> new  IllegalArgumentException("Cannon component not found in target coordinates"));
+        }
     }
 
-    public void doCommandEffects(CardState commandType, Integer value) {
-        if (commandType == CardState.WAIT_ROLL_DICE)
+    @Override
+    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
+        if (commandType == PlayerState.WAIT_ROLL_DICES)
             this.coord = value;
     }
 
-    public void doCommandEffects(CardState commandType, Double value, String username, Board board) {
-        // TODO pre check that cannon is the right one and is effectly activated
+    @Override
+    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == CardState.WAIT_CANNON && value > 0) {
-            Optional<Component> target = meteors.get(meteorIndex).getTarget(player.getShip(), coord);
-            if (target.isPresent())
-                target.get().destroyComponent(player.getShip());
+        if (commandType == PlayerState.WAIT_CANNONS && value == 0) {
+            Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coord).stream().findFirst();
+            target.ifPresent(component -> component.destroyComponent(player.getShip()));
         }
     }
 
-    public void doCommandEffects(CardState commandType, Boolean value, String username, Board board) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == CardState.WAIT_SHIELD && !value) {
-            Optional<Component> target = meteors.get(meteorIndex).getTarget(player.getShip(), coord);
-            if (target.isPresent())
-                target.get().destroyComponent(player.getShip());
+        if (commandType == PlayerState.WAIT_SHIELD && !value) {
+            Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coord).stream().findFirst();
+            target.ifPresent(component -> component.destroyComponent(player.getShip()));
         }
     }
 
