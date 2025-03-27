@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.components;
 
 import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
+import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.Ship;
 
 import java.util.ArrayList;
@@ -13,10 +15,12 @@ public class Component {
     protected int x;
     protected int y;
     private boolean inserted;
+    private boolean shown;
 
     public Component(ConnectorType[] connectors) {
         this.connectors = connectors;
         this.inserted = false;
+        this.shown = false;
     }
 
     public ConnectorType[] getConnectors() {
@@ -59,35 +63,89 @@ public class Component {
         return areConnectorsCompatible(conn1, conn2) && conn1 != ConnectorType.EMPTY && conn2 != ConnectorType.EMPTY;
     }
 
-    public void affectDestroy(Ship ship) throws Exception {
+    public static boolean validPositions(int row, int col) {
+        return !((col < 0 || col > 6) || (row < 0 || row > 5) || (row == 0 && col == 0) || (row == 0 && col == 1) || (row == 0 && col == 3) || (row == 0 && col == 5) || (row == 0 && col == 6) || (row == 1 && col == 0) || (row == 1 && col == 6) || (row == 4 && col == 3));
+    }
+
+    public void affectDestroy(Ship ship) {
         ship.getDashboard(y, x).ifPresent(ship.getDiscards()::add);
         ship.getDashboard()[y][x] = Optional.empty();
     }
 
-    public void insertComponent(Ship ship, int row, int col) throws Exception {
-        if ((row == 0 && col == 0) || (row == 0 && col == 1) || (row == 0 && col == 3) || (row == 0 && col == 5) || (row == 0 && col == 6) || (row == 1 && col == 0) || (row == 1 && col == 6) || (row == 4 && col == 3)) throw new Exception(); // Check if position is valid
-        if (ship.getDashboard(row, col).isPresent() || inserted) throw new Exception();
+    public void showComponent() {
+        this.shown = true;
+    }
 
-        this.inserted = true;
+    public void pickComponent(Board board, Ship ship) {
+        if (!board.getCommonComponents().contains(this) || !shown) throw new ComponentNotValidException("This component is not pickable");
+
+        if (ship.getHandComponent().isPresent())
+            ship.getHandComponent().get().releaseComponent(board, ship);
+
+        board.getCommonComponents().remove(this);
+        ship.setHandComponent(this);
+    }
+
+    public void releaseComponent(Board board, Ship ship) {
+        if (board.getCommonComponents().contains(this) || inserted || !shown) throw new ComponentNotValidException("This component is not releaseble");
+
+        if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) { // Component to release is in hand
+            ship.setHandComponent(null);
+            board.getCommonComponents().add(this);
+        }
+        else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) { // Component to release is in dashboard
+            ship.getDashboard()[y][x] = Optional.empty();
+            board.getCommonComponents().add(this);
+            ship.setPreviousComponent(null);
+        }
+    }
+
+    public void reserveComponent(Board board, Ship ship) {
+        if (!board.getCommonComponents().contains(this) || !shown) throw new ComponentNotValidException("This component is not reservable");
+        if (ship.getReserves().size() >= 2) throw new ComponentNotValidException("Reserves are full");
+
+        board.getCommonComponents().remove(this);
+        ship.getReserves().add(this);
+    }
+
+    public void insertComponent(Ship ship, int row, int col) {
+        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent()) throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
+        else if (!shown) throw new ComponentNotValidException("Hidden tile");
+
+        if (ship.getReserves().contains(this)) // Component is into reserves
+            ship.getReserves().remove(this);
+        else if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) // Component is in hand
+            ship.setHandComponent(null);
+        else
+            throw new ComponentNotValidException("Tile to insert isn't present");
+
+        this.x = col;
+        this.y = row;
+        ship.getDashboard()[row][col] = Optional.of(this);
+
+        // Weld previous component and update attribute to new component
+        ship.getPreviousComponent().ifPresent(Component::weldComponent);
+        ship.setPreviousComponent(this);
+    }
+
+    public void weldComponent() {
+        inserted = true;
+    }
+
+    public void moveComponent(Ship ship, int row, int col) {
+        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) throw new ComponentNotValidException("Tile not valid");
+        if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
+        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent()) throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
+
+        ship.getDashboard()[y][x] = Optional.empty();
         this.x = col;
         this.y = row;
         ship.getDashboard()[row][col] = Optional.of(this);
     }
 
-    public void checkComponent(Ship ship) throws Exception {
-        if (getLinkedNeighbors(ship).isEmpty()) // Not isolated check
-            throw new Exception();
-
-        if ( // Compatible connectors check
-            ship.getDashboard(y, x-1).isPresent() && !Component.areConnectorsCompatible(ship.getDashboard(y, x-1).get().connectors[1], connectors[3]) || // Left connector check
-            ship.getDashboard(y-1, x).isPresent() && !Component.areConnectorsCompatible(ship.getDashboard(y-1, x).get().connectors[2], connectors[0]) || // Top connector check
-            ship.getDashboard(y, x+1).isPresent() && !Component.areConnectorsCompatible(ship.getDashboard(y, x+1).get().connectors[3], connectors[1]) || // Right connector check
-            ship.getDashboard(y+1, x).isPresent() && !Component.areConnectorsCompatible(ship.getDashboard(y+1, x).get().connectors[0], connectors[2]) // Bottom connector check
-        ) throw new Exception();
-    }
-
-    public void rotateComponent(boolean clockwise) throws Exception {
-        if (inserted) throw new Exception();
+    public void rotateComponent(Ship ship, boolean clockwise) {
+        if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
+        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) throw new ComponentNotValidException("Tile not valid");
 
         ConnectorType[] newConnectors = new ConnectorType[4];
         if (clockwise) {
@@ -105,7 +163,18 @@ public class Component {
         connectors = newConnectors;
     }
 
-    public void destroyComponent(Ship ship) throws Exception {
+    public boolean checkComponent(Ship ship) {
+        if (getLinkedNeighbors(ship).isEmpty()) // Not isolated check
+            return false;
+
+        // Compatible connectors check
+        return (ship.getDashboard(y, x - 1).isEmpty() || Component.areConnectorsCompatible(ship.getDashboard(y, x - 1).get().connectors[1], connectors[3])) && // Left connector check
+                (ship.getDashboard(y - 1, x).isEmpty() || Component.areConnectorsCompatible(ship.getDashboard(y - 1, x).get().connectors[2], connectors[0])) && // Top connector check
+                (ship.getDashboard(y, x + 1).isEmpty() || Component.areConnectorsCompatible(ship.getDashboard(y, x + 1).get().connectors[3], connectors[1])) && // Right connector check
+                (ship.getDashboard(y + 1, x).isEmpty() || Component.areConnectorsCompatible(ship.getDashboard(y + 1, x).get().connectors[0], connectors[2])); // Bottom connector check
+    }
+
+    public void destroyComponent(Ship ship) {
         affectDestroy(ship);
 
         // Matrix of booleans to track visited components
@@ -135,6 +204,7 @@ public class Component {
         }
     }
 
+    @SuppressWarnings({"OptionalGetWithoutIsPresent", "OptionalUsedAsFieldOrParameterType"})
     private void dfs(Optional<Component>[][] dashboard, int i, int j, boolean[][] visited, List<Component> group, Optional<Component> otherComponentOpt) {
         if (i < 0 || i >= dashboard.length || j < 0 || j >= dashboard[0].length) return;
         if (visited[i][j] || dashboard[i][j].isEmpty()) return;
@@ -142,10 +212,10 @@ public class Component {
         // Skip if connectors are not linked together
         if (otherComponentOpt.isPresent()) {
             if (
-                dashboard[i][j].get().getX() < otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||
-                dashboard[i][j].get().getX() > otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[3], otherComponentOpt.get().getConnectors()[1]) ||
-                dashboard[i][j].get().getY() < otherComponentOpt.get().getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.get().getConnectors()[2]) ||
-                dashboard[i][j].get().getY() > otherComponentOpt.get().getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.get().getConnectors()[0])
+                    dashboard[i][j].get().x < otherComponentOpt.get().x && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||
+                            dashboard[i][j].get().x > otherComponentOpt.get().x && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[3], otherComponentOpt.get().getConnectors()[1]) ||
+                            dashboard[i][j].get().y < otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.get().getConnectors()[2]) ||
+                            dashboard[i][j].get().y > otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.get().getConnectors()[0])
             )
                 return;
         }
