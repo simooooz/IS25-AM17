@@ -19,14 +19,14 @@ public class ShieldComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col) throws Exception {
+    public void insertComponent(Ship ship, int row, int col) {
         super.insertComponent(ship, row, col);
         for (DirectionType direction : directionsProtected)
             ship.getProtectedSides().add(direction);
     }
 
     @Override
-    public void rotateComponent(boolean clockwise) {
+    public void rotateComponent(Ship ship, boolean clockwise) {
         DirectionType[] directions = DirectionType.values();
         if (clockwise) {
             this.directionsProtected[0] = directions[(this.directionsProtected[0].ordinal() + 1 % 4)];
@@ -36,11 +36,11 @@ public class ShieldComponent extends Component {
             this.directionsProtected[0] = directions[(this.directionsProtected[0].ordinal() + 3 % 4)];
             this.directionsProtected[1] = directions[(this.directionsProtected[1].ordinal() + 3 % 4)];
         }
-        super.rotateComponent(clockwise);
+        super.rotateComponent(ship, clockwise);
     }
 
     @Override
-    public void affectDestroy(Ship ship) throws Exception {
+    public void affectDestroy(Ship ship) {
         super.affectDestroy(ship);
         ship.getProtectedSides().remove(directionsProtected[0]);
         ship.getProtectedSides().remove(directionsProtected[1]);
