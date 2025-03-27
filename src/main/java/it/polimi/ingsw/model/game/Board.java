@@ -1,6 +1,9 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -8,16 +11,18 @@ import it.polimi.ingsw.model.player.PlayerData;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Board {
 
     private final List<SimpleEntry<PlayerData, Integer>> players;
+    private final List<PlayerData> wantEndFlight;
+    private final List<Component> commonComponents;
     private final List<PlayerData> startingDeck;
     private final List<Card> cardPile;
     private int cardPilePos;
-    private final Time timeManagment;
+    private final Time timeManagement;
     private final Map<ColorType, Integer> availableGoods;
-    private int currentPlayerIndex;
 
     public Board(List<String> usernames) {
         this.startingDeck = new ArrayList<>();
@@ -25,9 +30,11 @@ public class Board {
             this.startingDeck.add(new PlayerData(username));
 
         this.players = new ArrayList<>();
+        this.wantEndFlight = new ArrayList<>();
+        this.commonComponents = new ArrayList<>();
         this.cardPile = new ArrayList<>();
         this.cardPilePos = 0;
-        this.timeManagment = new Time();
+        this.timeManagement = new Time();
         this.availableGoods = new HashMap<>();
     }
 
@@ -39,28 +46,35 @@ public class Board {
         return players.stream().map(SimpleEntry::getKey).collect(Collectors.toList());
     }
 
-    public PlayerData getPlayer(String username) throws Exception {
-        return players.stream()
-            .map(SimpleEntry::getKey)
+    public PlayerData getPlayerEntityByUsername(String username) {
+        return Stream.concat(players.stream().map(SimpleEntry::getKey), startingDeck.stream())
             .filter(p -> p.getUsername().equals(username))
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(PlayerNotFoundException::new);
     }
 
-    public PlayerData getCurrentPlayer() {
-        return players.get(currentPlayerIndex).getKey();
+    public List<PlayerData> getWantEndFlight() {
+        return wantEndFlight;
     }
 
     public List<PlayerData> getStartingDeck() {
         return startingDeck;
     }
 
+    public List<Component> getCommonComponents() {
+        return commonComponents;
+    }
+
     public List<Card> getCardPile() {
         return cardPile;
     }
 
-    public Time getTimeManagment() {
-        return timeManagment;
+    public int getCardPilePos() {
+        return cardPilePos;
+    }
+
+    public Time getTimeManagement() {
+        return timeManagement;
     }
 
     public Map<ColorType, Integer> getAvailableGoods() {
@@ -71,10 +85,19 @@ public class Board {
         Collections.shuffle(cardPile);
     }
 
-    public Card drawCard() throws Exception {
-        if (cardPilePos < cardPile.size())
-            return cardPile.get(cardPilePos++);
-        else throw new Exception(); // No more cards
+    public GameState drawCard(PlayerData player) {
+        if (!player.equals(getPlayersByPos().getFirst())) throw new PlayerNotFoundException("Payer is not the leader");
+
+        if (cardPilePos < cardPile.size()) {
+            Card card = cardPile.get(cardPilePos++);
+            boolean finish = card.startCard(this);
+            if (finish) {
+                if (cardPilePos == cardPile.size() -1) return GameState.END;
+                else return GameState.DRAW_CARD;
+            }
+            return GameState.PLAY_CARD;
+        }
+        else throw new RuntimeException("Card index out of bound");
     }
 
     public void movePlayer(PlayerData playerData, int position) {
@@ -82,7 +105,7 @@ public class Board {
         SimpleEntry<PlayerData, Integer> entry = players.stream()
                 .filter(e -> e.getKey().equals(playerData))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(PlayerNotFoundException::new);
 
         for (int d = 0; d < Math.abs(position); d++) {
             int currentPosition = entry.getValue();
@@ -117,13 +140,15 @@ public class Board {
         startingDeck.add(player);
     }
 
-    public void moveToBoard(PlayerData player) throws Exception {
+    public void moveToBoard(PlayerData player) {
         startingDeck.stream()
                 .filter(p -> p.equals(player))
                 .findFirst()
-                .orElseThrow(Exception::new);
+                .orElseThrow(PlayerNotFoundException::new);
 
-        players.add(new SimpleEntry<>(player, 0));
+        int pos = players.isEmpty() ? 6 : (players.size() == 1 ? 3 : (players.size() == 2 ? 1 : 0));
+        players.add(new SimpleEntry<>(player, pos));
+
         players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         startingDeck.remove(player);
     }
