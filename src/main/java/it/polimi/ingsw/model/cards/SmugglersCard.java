@@ -1,95 +1,82 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CannonComponent;
-import it.polimi.ingsw.model.components.Component;
-import it.polimi.ingsw.model.components.EngineComponent;
-import it.polimi.ingsw.model.components.SpecialCargoHoldsComponent;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SmugglersCard extends Card {
-    private final int firePower;                // firePower of the smugglers' ship
-    private final int penalty;                  // number of goods to lose if player doesn't win the battle with smugglers
-    private final List<ColorType> reward;       // reward
-    private final int days;                     // number of days to lose if player win the battle and decides to pick the reward (goods)
 
-    private boolean defeated;                   // smugglers defeated?
+    private final int smugglersFirePower;
+    private final int penalty;
+    private final Map<ColorType, Integer> reward;
+    private final int days;
+
+    private boolean defeated;
     private int playerIndex;
     private List<PlayerData> defeatedPlayers;
-
-    // todo: maybe not appropriate
     private double power;
 
-    public SmugglersCard(
-            int level,
-            boolean isLearner,
-
-            int firePower,
-            int penalty,
-            List<ColorType> reward,
-            int days
-    ) {
+    public SmugglersCard(int level, boolean isLearner, int smugglersFirePower, int penalty, Map<ColorType, Integer> reward, int days) {
         super(level, isLearner);
-        this.firePower = firePower;
+        this.smugglersFirePower = smugglersFirePower;
         this.penalty = penalty;
         this.reward = reward;
         this.days = days;
     }
 
-    public void startCard(Board board) {
+    @Override
+    public boolean startCard(Board board) {
         this.defeated = false;
         this.playerIndex = 0;
         this.defeatedPlayers = new ArrayList<>();
 
         board.getPlayers().forEach(player ->
-            playersState.put(player.getKey().getUsername(), CardState.WAIT)
+                playersState.put(player.getKey().getUsername(), PlayerState.WAIT)
         );
-        autoCheckPlayers(board);
+        return autoCheckPlayers(board);
     }
 
-    public void changeState(Board board, String username) {
-        CardState state = playersState.get(username);
+    @Override
+    protected boolean changeState(Board board, String username) {
+        PlayerState state = playersState.get(username);
 
         switch (state) {
-            case WAIT_BOOLEAN -> playersState.put(username, CardState.DONE);
-            case WAIT_CANNON -> {
-                if (power > firePower && !defeated) {       // ask if user wants to redeem rewards
-                    playersState.put(username, CardState.WAIT_BOOLEAN);
+            case WAIT_BOOLEAN -> playersState.put(username, PlayerState.DONE);
+            case WAIT_CANNONS -> {
+                if (power > smugglersFirePower && !defeated) {       // ask if user wants to redeem rewards
+                    playersState.put(username, PlayerState.WAIT_BOOLEAN);
                     this.defeated = true;
                 }
-                else if (power >= firePower)                // tie or smugglers already defeated
-                    playersState.put(username, CardState.DONE);
+                else if (power >= smugglersFirePower)                // tie or smugglers already defeated
+                    playersState.put(username, PlayerState.DONE);
                 else {                                      // player is defeated
                     defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    playersState.put(username, CardState.DONE);
+                    playersState.put(username, PlayerState.DONE);
                 }
             }
             case WAIT_GOODS -> {
                 defeatedPlayers.remove(board.getPlayerEntityByUsername(username));
-                playersState.put(username, CardState.DONE);
+                playersState.put(username, PlayerState.DONE);
             }
         }
 
         playerIndex++;
-        autoCheckPlayers(board);
+        return autoCheckPlayers(board);
     }
 
-    private void autoCheckPlayers(Board board) {
+    private boolean autoCheckPlayers(Board board) {
         for (; playerIndex < board.getPlayers().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
-            double singleEnginesPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
+            double freeCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(cannon -> !cannon.getIsDouble())
                     .mapToDouble(CannonComponent::calcPower)
                     .sum();
-            double doubleEnginesPower = player.getShip().getComponentByType(CannonComponent.class).stream()
+            double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(CannonComponent::getIsDouble)
                     .mapToDouble(CannonComponent::calcPower)
                     .boxed()
@@ -99,57 +86,66 @@ public class SmugglersCard extends Card {
                     .sum();
 
             if (defeated)
-                playersState.put(player.getUsername(), CardState.DONE);
-            else if (singleEnginesPower > firePower) {      // user win automatically
-                playersState.put(player.getUsername(), CardState.WAIT_BOOLEAN);
+                playersState.put(player.getUsername(), PlayerState.DONE);
+            else if (freeCannonsPower > smugglersFirePower) {      // user win automatically
+                playersState.put(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 defeated = true;
             }
-            else if (singleEnginesPower == firePower && doubleEnginesPower == 0)        // user draws automatically
-                playersState.put(player.getUsername(), CardState.DONE);
-            else if (singleEnginesPower + doubleEnginesPower >= firePower) {            // user could win
-                playersState.put(player.getUsername(), CardState.WAIT_CANNON);
-                return;
+            else if (freeCannonsPower == smugglersFirePower && doubleCannonsPower == 0)        // user draws automatically
+                playersState.put(player.getUsername(), PlayerState.DONE);
+            else if (freeCannonsPower + doubleCannonsPower >= smugglersFirePower) {            // user could win
+                playersState.put(player.getUsername(), PlayerState.WAIT_CANNONS);
+                return false;
             }
             else {      // user loses automatically
                 defeatedPlayers.add(player);
-                playersState.put(player.getUsername(), CardState.DONE);
+                playersState.put(player.getUsername(), PlayerState.DONE);
             }
 
             boolean hasDone = true;
             for (PlayerData p : board.getPlayersByPos())
-                if (playersState.get(p.getUsername()) != CardState.DONE)
+                if (playersState.get(p.getUsername()) != PlayerState.DONE)
                     hasDone = false;
 
-            if (hasDone && defeatedPlayers.isEmpty())
-                endCard();
+            if (hasDone && defeatedPlayers.isEmpty()) {
+                endCard(board);
+                return true;
+            }
             else if (hasDone) {
                 defeatedPlayers.forEach(p -> {
-                    playersState.put(p.getUsername(), CardState.WAIT_GOODS);
+                    playersState.put(p.getUsername(), PlayerState.WAIT_GOODS);
                 });
             }
         }
+        return false;
     }
 
-    // handle cannons
-    public void doCommandEffect(CardState commandType, Double power, String username, Board board) {
-        if (commandType == CardState.WAIT_CANNON) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Double power, String username, Board board) {
+        if (commandType == PlayerState.WAIT_CANNONS) {
             this.power = power;
         }
     }
 
-    // handle boolean
-    public void doCommandEffect(CardState commandType, Boolean value, String username, Board board) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == CardState.WAIT_BOOLEAN && value) {
+        if (commandType == PlayerState.WAIT_BOOLEAN && value) {
             board.movePlayer(player, -1*this.days);
-            playersState.put(username, CardState.WAIT_GOODS);
-        } else if (!value) {
-            playersState.put(username, CardState.DONE);
+            playersState.put(username, PlayerState.WAIT_GOODS);
         }
+        else if (!value)
+            playersState.put(username, PlayerState.DONE);
     }
 
-    // todo: goods?
+    @Override
+    public void doSpecificCheck(PlayerState commandType, int number, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
+        super.doSpecificCheck(commandType, penalty, deltaGood, batteries, username, board);
+    }
 
-    public void endCard() {}
+    @Override
+    public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> r, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
+        super.doSpecificCheck(commandType, this.reward, deltaGood, batteries, username, board);
+    }
 
 }

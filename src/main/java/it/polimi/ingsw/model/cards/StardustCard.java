@@ -4,15 +4,18 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.Ship;
 
 public class StardustCard extends Card {
+
     public StardustCard(int level, boolean isLearner) {
         super(level, isLearner);
     }
 
-    public void startCard(Board board) {
-        board.getPlayersByPos()
-                .forEach(player -> {
-                    Ship ship = player.getShip();
-                    board.movePlayer(player, -1 * ship.countExposedConnectors());
-                });
+    @Override
+    public boolean startCard(Board board) {
+        board.getPlayersByPos().forEach(player -> {
+            Ship ship = player.getShip();
+            board.movePlayer(player, -1 * ship.countExposedConnectors());
+        });
+        return true;
     }
+
 }

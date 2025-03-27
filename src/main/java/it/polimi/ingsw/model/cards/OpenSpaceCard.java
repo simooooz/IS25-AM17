@@ -4,44 +4,48 @@ import it.polimi.ingsw.model.components.EngineComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class OpenSpaceCard extends Card {
+
     private int playerIndex;
+    private Map<PlayerData, Integer> enginesActivated = new HashMap<>();
 
     public OpenSpaceCard(int level, boolean isLearner) {
         super(level, isLearner);
     }
 
-    public void startCard(Board board) {
+    @Override
+    public boolean startCard(Board board) {
         playerIndex = 0;
+        this.enginesActivated = new HashMap<>();
 
         board.getPlayersByPos().forEach(player ->
-                playersState.put(player.getUsername(), CardState.WAIT)
+                playersState.put(player.getUsername(), PlayerState.WAIT)
         );
-        playersState.put(board.getPlayersByPos().get(playerIndex).getUsername(), CardState.WAIT_ENGINE);
-
-        autoCheckPlayers(board);
+        return autoCheckPlayers(board);
     }
 
-    public void changeState(Board board, String username) {
-        CardState state = playersState.get(username);
+    @Override
+    protected boolean changeState(Board board, String username) {
+        PlayerState state = playersState.get(username);
 
-        if (state == CardState.WAIT_ENGINE)
-            playersState.put(username, CardState.DONE);
+        if (state == PlayerState.WAIT_ENGINES)
+            playersState.put(username, PlayerState.DONE);
 
         playerIndex++;
-        autoCheckPlayers(board);
-
-        if (playerIndex >= board.getPlayersByPos().size())
-            endCard();
+        return autoCheckPlayers(board);
     }
 
-    public void autoCheckPlayers(Board board) {
+    public boolean autoCheckPlayers(Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
+
             int singleEnginesPower = (player.getShip().getEngineAlien() ? 2 : 0) + player.getShip().getComponentByType(EngineComponent.class).stream()
-                            .filter(engine -> !engine.getIsDouble())
-                            .mapToInt(EngineComponent::calcPower)
-                            .sum();
+                    .filter(engine -> !engine.getIsDouble())
+                    .mapToInt(EngineComponent::calcPower)
+                    .sum();
             int doubleEnginesPower = player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(EngineComponent::getIsDouble)
                     .mapToInt(EngineComponent::calcPower)
@@ -49,24 +53,40 @@ public class OpenSpaceCard extends Card {
                     .sum();
 
             if (doubleEnginesPower != 0) {
-                playersState.put(player.getUsername(), CardState.WAIT_ENGINE);
-                return;
+                playersState.put(player.getUsername(), PlayerState.WAIT_ENGINES);
+                return false;
             } else {
-                board.movePlayer(player, singleEnginesPower);
-                playersState.put(player.getUsername(), CardState.DONE);
+                enginesActivated.put(player, singleEnginesPower);
+                playersState.put(player.getUsername(), PlayerState.DONE);
             }
         }
+
+        // Check if everyone has finished
+        if (playerIndex >= board.getPlayersByPos().size()) {
+
+            for (PlayerData player : board.getPlayersByPos())
+                board.movePlayer(player, enginesActivated.get(player));
+
+            endCard(board);
+            return true;
+        }
+        return false;
     }
 
-    public void doCommandEffects(CardState commandType, Integer power, String username, Board board) {
-        PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == CardState.WAIT_ENGINE) {
-            board.movePlayer(player, power);
+    @Override
+    public void doCommandEffects(PlayerState commandType, Integer power, String username, Board board) {
+        if (commandType == PlayerState.WAIT_ENGINES) {
+            PlayerData player = board.getPlayerEntityByUsername(username);
+            enginesActivated.put(player, power);
         }
     }
 
-    void endCard() {
-        // todo
+    @Override
+    protected void endCard(Board board) {
+        for (PlayerData player : board.getPlayersByPos())
+            if (enginesActivated.get(player) == 0)
+                board.moveToStartingDeck(player);
+        super.endCard(board);
     }
 
 }
