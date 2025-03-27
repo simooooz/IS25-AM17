@@ -24,18 +24,16 @@ public class EngineComponent extends Component {
     }
 
     @Override
-    public void rotateComponent(boolean clockwise) {
+    public void rotateComponent(Ship ship, boolean clockwise) {
         DirectionType[] directions = DirectionType.values();
         if (clockwise) { this.direction = directions[(this.direction.ordinal() + 1 % 4)]; }
         else { this.direction = directions[(this.direction.ordinal() + 3 % 4)]; }
-        super.rotateComponent(clockwise);
+        super.rotateComponent(ship, clockwise);
     }
 
     @Override
-    public void checkComponent(Ship ship) throws Exception {
-        if (direction != DirectionType.SOUTH || ship.getDashboard(y+1, x).isPresent())
-            throw new Exception();
-        super.checkComponent(ship);
+    public boolean checkComponent(Ship ship) {
+        return super.checkComponent(ship) && (direction == DirectionType.SOUTH && ship.getDashboard(y+1, x).isEmpty());
     }
 
     public int calcPower() {
