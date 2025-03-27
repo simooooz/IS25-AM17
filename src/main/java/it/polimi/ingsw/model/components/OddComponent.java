@@ -21,27 +21,27 @@ public class OddComponent extends Component {
     }
 
     @Override
-    public void affectDestroy(Ship ship) throws Exception {
+    public void affectDestroy(Ship ship) {
         super.affectDestroy(ship);
 
-        List<Component> linkedNeighbors = this.getLinkedNeighbors(ship);
-        Optional<CabinComponent> linkedCabin = linkedNeighbors.stream()
-            .filter(c -> c instanceof CabinComponent)
-            .map(c -> (CabinComponent) c)
-            .filter(c -> c.getAlien().isPresent() && c.getAlien().get() == type)
-            .findFirst();
+        if (type == AlienType.CANNON && !ship.getCannonAlien() || type == AlienType.ENGINE && !ship.getEngineAlien())
+            return;
 
-        if (linkedCabin.isPresent()) {
-            List<Component> linkedLinkedNeighbors = linkedCabin.get().getLinkedNeighbors(ship);
-            Optional<OddComponent> anotherOdd = linkedLinkedNeighbors.stream()
-                .filter(c -> c instanceof OddComponent)
-                .map(c -> (OddComponent) c)
-                .filter(o -> o.getType() == type && !o.equals(this))
+        Optional<CabinComponent> linkedCabin = this.getLinkedNeighbors(ship).stream()
+                .filter(c -> c instanceof CabinComponent)
+                .map(c -> (CabinComponent) c)
+                .filter(c -> c.getAlien().isPresent() && c.getAlien().get() == type)
                 .findFirst();
 
-            if (anotherOdd.isEmpty()) { // Remove alien in linkedCabin
+        if (linkedCabin.isPresent()) {
+            Optional<OddComponent> anotherOdd = linkedCabin.get().getLinkedNeighbors(ship).stream()
+                    .filter(c -> c instanceof OddComponent)
+                    .map(c -> (OddComponent) c)
+                    .filter(o -> o.getType() == type && !o.equals(this))
+                    .findFirst();
+
+            if (anotherOdd.isEmpty()) // Remove alien in linkedCabin
                 linkedCabin.get().setAlien(null, ship);
-            }
         }
     }
 
