@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.CriteriaType;
 import it.polimi.ingsw.model.cards.utils.PenaltyCombatZone;
+import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
@@ -22,12 +23,11 @@ public class CombatZoneCard extends Card{
     }
 
     @Override
-    public void resolve(Board board) throws Exception {
-    }
-
-    public void startCard(Board board) {
-        if (board.getPlayersByPos().size() < 2)
-            endCard();
+    public boolean startCard(Board board) {
+        if (board.getPlayersByPos().size() < 2) {
+            endCard(board);
+            return true;
+        }
         else {
             this.warLineIndex = 0;
             this.playerIndex = 0;
@@ -35,88 +35,98 @@ public class CombatZoneCard extends Card{
             this.worst = new SimpleEntry<>(temp, 0.0);
 
             for (PlayerData player : board.getPlayersByPos())
-                playersState.put(player.getUsername(), CardState.WAIT);
+                playersState.put(player.getUsername(), PlayerState.WAIT);
 
-            autoCheckPlayers(board);
+            return autoCheckPlayers(board);
         }
     }
 
-    public void changeState(Board board, String username) throws Exception {
+    @Override
+    protected boolean changeState(Board board, String username) {
 
-        CardState actState = playersState.get(username);
+        PlayerState actState = playersState.get(username);
 
         switch (actState) {
-            case WAIT_CANNON, WAIT_ENGINE, WAIT_REMOVE_CREW, WAIT_REMOVE_GOOD, WAIT_SHIELD, WAIT_ROLL_DICE -> playersState.put(username, CardState.DONE);
+            case WAIT_CANNONS, WAIT_ENGINES, WAIT_REMOVE_CREW, WAIT_REMOVE_GOODS, WAIT_SHIELD, WAIT_ROLL_DICES -> playersState.put(username, PlayerState.DONE);
         }
 
         playerIndex++;
-        autoCheckPlayers(board);
+        return autoCheckPlayers(board);
 
     }
 
-    private void autoCheckPlayers(Board board) {
+    private boolean autoCheckPlayers(Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
-            CardState newState = warLines.get(warLineIndex).getKey().countCriteria(player, worst);
+            PlayerState newState = warLines.get(warLineIndex).getKey().countCriteria(player, worst);
             playersState.put(player.getUsername(), newState);
-            if (newState != CardState.DONE)
-                return;
+            if (newState != PlayerState.DONE)
+                return false;
         }
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != CardState.DONE)
+            if (playersState.get(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone && worst.getKey().getValue().isPresent()) { // Apply malus
-            CardState newState = warLines.get(warLineIndex).getValue().resolve(board, worst.getKey().getValue().get());
+            PlayerState newState = warLines.get(warLineIndex).getValue().resolve(board, worst.getKey().getValue().get());
             playersState.put(worst.getKey().getValue().get().getUsername(), newState);
-            if (newState == CardState.DONE)
+            if (newState == PlayerState.DONE)
                 worst.getKey().setValue(Optional.empty());
         }
 
         if (hasDone && worst.getKey().getValue().isEmpty()) { // Malus already applied, go to the next line
             warLineIndex++;
             if (warLineIndex >= warLines.size()) {
-                endCard();
+                endCard(board);
+                return true;
             }
             else {
                 for (PlayerData player : board.getPlayersByPos())
-                    playersState.put(player.getUsername(), CardState.WAIT);
+                    playersState.put(player.getUsername(), PlayerState.WAIT);
                 this.playerIndex = 0;
-                autoCheckPlayers(board);
+                return autoCheckPlayers(board);
             }
         }
+        return false;
     }
 
-    public void endCard() {
-
-    }
-
-    public void doCommandEffects(CardState commandType, Integer value, String username, Board board) {
-        if (commandType == CardState.WAIT_ENGINE && worst.getValue() > value) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
+        if (commandType == PlayerState.WAIT_ENGINES && worst.getValue() > value) {
             PlayerData player = board.getPlayerEntityByUsername(username);
             worst.getKey().setValue(Optional.of(player));
             worst.setValue(value.doubleValue());
         }
-        else if (commandType == CardState.WAIT_ROLL_DICE) {
+        else if (commandType == PlayerState.WAIT_ROLL_DICES) {
             warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value);
         }
     }
 
-    public void doCommandEffects(CardState commandType, Boolean value, String username, Board board) {
-        if (commandType == CardState.WAIT_SHIELD) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
+        if (commandType == PlayerState.WAIT_SHIELD) {
             warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value, username, board);
         }
     }
 
-    public void doCommandEffects(CardState commandType, Double value, String username, Board board) {
+    @Override
+    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == CardState.WAIT_CANNON && worst.getValue() > value) {
+        if (commandType == PlayerState.WAIT_CANNONS && worst.getValue() > value) {
             worst.getKey().setValue(Optional.of(player));
             worst.setValue(value);
+        }
+    }
+
+    @Override
+    public void doSpecificCheck(PlayerState commandType, List<CabinComponent> cabins, int toRemove, String username, Board board) {
+        if (commandType == PlayerState.WAIT_REMOVE_CREW) {
+            int num = warLines.get(warLineIndex).getValue().getPenaltyNumber();
+            super.doSpecificCheck(commandType, cabins, num, username, board);
         }
     }
 

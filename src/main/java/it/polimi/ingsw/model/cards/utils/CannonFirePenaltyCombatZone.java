@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
-import it.polimi.ingsw.model.cards.CardState;
+import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -11,7 +11,7 @@ import java.util.Optional;
 public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
     private final List<CannonFire> cannonFires;
-    private CardState actState;
+    private PlayerState actState;
     private int coord;
     private int cannonIndex;
 
@@ -20,19 +20,19 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     }
 
     @Override
-    public CardState resolve(Board board, PlayerData player) throws Exception {
+    public PlayerState resolve(Board board, PlayerData player) {
         switch (actState) {
             case WAIT_SHIELD -> {
                 if (cannonIndex < cannonFires.size())
-                    actState = CardState.WAIT_ROLL_DICE;
+                    actState = PlayerState.WAIT_ROLL_DICES;
                 else
-                    actState = CardState.DONE;
+                    actState = PlayerState.DONE;
             }
-            case WAIT_ROLL_DICE -> {
+            case WAIT_ROLL_DICES -> {
                 this.actState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
                 cannonIndex++;
-                if (actState == CardState.DONE && cannonIndex < cannonFires.size()) // Cannot go in done if it's not really finished because is a sub-state.
-                    actState = CardState.WAIT_ROLL_DICE;
+                if (actState == PlayerState.DONE && cannonIndex < cannonFires.size()) // Cannot go in done if it's not really finished because is a sub-state.
+                    actState = PlayerState.WAIT_ROLL_DICES;
             }
         }
 
@@ -40,18 +40,17 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     }
 
     @Override
-    public void doCommandEffects(CardState commandType, Integer value) {
-        if (commandType == CardState.WAIT_ROLL_DICE)
+    public void doCommandEffects(PlayerState commandType, Integer value) {
+        if (commandType == PlayerState.WAIT_ROLL_DICES)
             this.coord = value;
     }
 
     @Override
-    public void doCommandEffects(CardState commandType, Boolean value, String username, Board board) {
+    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == CardState.WAIT_SHIELD && !value) {
+        if (commandType == PlayerState.WAIT_SHIELD && !value) {
             Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
-            if (target.isPresent())
-                target.get().destroyComponent(player.getShip());
+            target.ifPresent(component -> component.destroyComponent(player.getShip()));
         }
     }
 
