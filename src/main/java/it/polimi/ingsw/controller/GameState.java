@@ -1,25 +1,12 @@
 package it.polimi.ingsw.controller;
 
+/**
+ * This enum represents the game macro-status
+ */
 public enum GameState {
-
-    BUILDING,
-
-    CHECKING,
-
+    BUILD,
+    CHECK,
+    DRAW_CARD,
     PLAY_CARD,
-
-    WAIT_ENGINES,
-
-    WAIT_BATTERIES,
-
-    WAIT_GOODS,
-
-    WAIT_CANNONS,
-
-    END_OF_GAME,
-
-    WAIT,
-
-    FLIGHT
-
+    END
 }
