@@ -24,22 +24,20 @@ public class CannonComponent extends Component {
     }
 
     @Override
-    public void rotateComponent(boolean clockwise) {
+    public void rotateComponent(Ship ship, boolean clockwise) {
         DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, EAST = 3
         if (clockwise) { this.direction = directions[(this.direction.ordinal() + 1 % 4)]; }
         else { this.direction = directions[(this.direction.ordinal() + 3 % 4)]; }
-        super.rotateComponent(clockwise);
+        super.rotateComponent(ship, clockwise);
     }
 
     @Override
-    public void checkComponent(Ship ship) throws Exception {
-        super.checkComponent(ship);
-        if (
-            (direction == DirectionType.NORTH && ship.getDashboard(y-1, x).isPresent()) ||
-            (direction == DirectionType.EAST && ship.getDashboard(y, x+1).isPresent()) ||
-            (direction == DirectionType.SOUTH && ship.getDashboard(y+1, x).isPresent()) ||
-            (direction == DirectionType.WEST && ship.getDashboard(y, x-1).isPresent())
-        ) throw new Exception();
+    public boolean checkComponent(Ship ship) {
+        return super.checkComponent(ship) &&
+                (direction == DirectionType.NORTH && ship.getDashboard(y - 1, x).isEmpty()) ||
+                (direction == DirectionType.EAST && ship.getDashboard(y, x + 1).isEmpty()) ||
+                (direction == DirectionType.SOUTH && ship.getDashboard(y + 1, x).isEmpty()) ||
+                (direction == DirectionType.WEST && ship.getDashboard(y, x - 1).isEmpty());
     }
 
     public double calcPower() {
