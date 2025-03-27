@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 public class Ship {
     private final Optional<Component>[][] dashboard;
     private final List<Component> discards;
-    private final Component[] reserves;
+    private final List<Component> reserves;
+    private Optional<Component> handComponent;
+    private Optional<Component> previousComponent;
     private int crew;
     private int batteries;
     private boolean engineAlien;
@@ -23,7 +25,9 @@ public class Ship {
     public Ship() {
         this.dashboard = new Optional[4][6];
         this.discards = new ArrayList<>();
-        this.reserves = new Component[2];
+        this.reserves = new ArrayList<>();
+        this.handComponent = Optional.empty();
+        this.previousComponent = Optional.empty();
         this.crew = 0;
         this.batteries = 0;
         this.engineAlien = false;
@@ -51,8 +55,24 @@ public class Ship {
         return discards;
     }
 
-    public Component[] getReserves() {
+    public List<Component> getReserves() {
         return reserves;
+    }
+
+    public Optional<Component> getHandComponent() {
+        return handComponent;
+    }
+
+    public void setHandComponent(Component component) {
+        this.handComponent = Optional.ofNullable(component);
+    }
+
+    public Optional<Component> getPreviousComponent() {
+        return previousComponent;
+    }
+
+    public void setPreviousComponent(Component component) {
+        this.previousComponent = Optional.ofNullable(component);
     }
 
     public int countExposedConnectors() {
@@ -126,65 +146,12 @@ public class Ship {
         return list;
     }
 
-    public boolean hasDoubleEngines() {
-        List<EngineComponent> engines = this.getComponentByType(EngineComponent.class);
-        return engines.stream()
-                .anyMatch(EngineComponent::getIsDouble);
-    }
-
-    public int calcEnginePower(int numOfDoubleEngineUsed) {
-        int engPower = this.getComponentByType(EngineComponent.class).stream()
-                            .filter(e -> !e.getIsDouble())
-                            .toList()
-                            .size() + 2 * numOfDoubleEngineUsed;
-        return engineAlien
-                ? (engPower + 2)
-                : engPower;
-    }
-
-    public double calcFirePower(List<CannonComponent> l) {
-        double pwr = l.stream()
-                .mapToDouble(c -> {
-                    if (c.getIsDouble()) {
-                        if (getBatteries() == 0)
-                            return 0;      // the player has no batteries => cannot take advantage of the dual cannon(s)
-                        else {
-                            //                                the player decides whether to use a battery to activate the dual cannon
-                            //                                probably this response will be given by a user gesture (battery removal, click on a removal button...)
-
-                            //                                if (awaitForResponse()) {
-                            //                                    if so, the component where to decrement the number of batteries is received.
-
-                            //                                    BatteryComponent res = awaitForBatteryComponent();
-                            //                                    res.useBattery(this);
-                            setBatteries(getBatteries() - 1);
-                            return c.getDirection() == DirectionType.NORTH ? 2 : 1;
-                            //                                } else {
-                            //                                    return 0;
-                            //                                }
-                        }
-                    }
-                    return c.getDirection() == DirectionType.NORTH ? 1 : 0.5;
-                })
-                .sum();
-        return cannonAlien ? pwr + 2 : pwr;
-    }
-
-    public void updateComponents(List<Component> components) {
-        for (Component component : components) {
-
-        }
-    }
-
-    public void checkShip(int row, int col) {
-        if (getDashboard(row, col).isEmpty()) return;
-
-        if (!getDashboard(row, col).get().checkComponent(this)) getDashboard(row, col).get().affectDestroy(this);
-
-        checkShip(row - 1, col);
-        checkShip(row + 1, col);
-        checkShip(row, col - 1);
-        checkShip(row, col + 1);
+    public boolean checkShip() {
+        for (Optional<Component>[] row : dashboard)
+            for (Optional<Component> component : row)
+                if (component.isPresent() && !component.get().checkComponent(this))
+                    return false;
+        return true;
     }
 
 }
