@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.Planet;
+import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.HashMap;
@@ -10,11 +12,11 @@ import java.util.Map;
 
 public class PlanetCard extends Card{
 
-    private final List<Planet> planets
+    private final List<Planet> planets;
     private Map<PlayerData, Planet> landedPlayers;
     private final int days;
-    private int playerIndex;
 
+    private int playerIndex;
 
     public PlanetCard(int level, boolean isLearner, List<Planet> planets, int days) {
         super(level, isLearner);
@@ -22,60 +24,70 @@ public class PlanetCard extends Card{
         this.days = days;
     }
 
-
-    public void startCard(Board board){
+    @Override
+    public boolean startCard(Board board){
         this.playerIndex = 0;
         this.landedPlayers = new HashMap<>();
-        for (PlayerData player: board.getPlayersByPos()){
-            playersState.put(player.getUsername(), CardState.WAIT);
-        }
-        playersState.put(board.getPlayersByPos().getFirst().getUsername(), CardState.WAIT_INDEX);
+
+        for (PlayerData player: board.getPlayersByPos())
+            playersState.put(player.getUsername(), PlayerState.WAIT);
+        playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_INDEX);
+        return false;
     }
 
-    public void changeState(Board board, String username) throws Exception {
+    @Override
+    protected boolean changeState(Board board, String username) {
 
-        CardState actState = playersState.get(username);
+        PlayerState actState = playersState.get(username);
 
-        switch (actState){
-            case WAIT_GOODS -> playersState.put(username, CardState.DONE);
+        switch (actState) {
+            case WAIT_GOODS -> playersState.put(username, PlayerState.DONE);
             case WAIT_INDEX -> {
-                if (landedPlayers.containsKey(board.getPlayerEntitybyUsername(username))) {
-                    playersState.put(username, CardState.WAIT_GOODS);
+                if (landedPlayers.containsKey(board.getPlayerEntityByUsername(username))) {
+                    playersState.put(username, PlayerState.WAIT_GOODS);
                 }
-                else {
-                    playersState.put(username, CardState.DONE);
-                }
+                else
+                    playersState.put(username, PlayerState.DONE);
             }
         }
 
         playerIndex++;
-        if (playerIndex < board.getPlayersByPos().size())
-            playersState.put(board.getPlayersByPos().get(playerIndex).getUsername(), CardState.WAIT_INDEX);
+        if (playerIndex < board.getPlayersByPos().size() && landedPlayers.size() < planets.size())
+            playersState.put(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
+        else if (playerIndex < board.getPlayersByPos().size()) // Planets are finished
+            playersState.put(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.DONE);
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != CardState.DONE)
+            if (playersState.get(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone) {
             for (PlayerData player : board.getPlayersByPos().reversed())
                 if (landedPlayers.containsKey(player))
                     board.movePlayer(player, days * -1);
-            endCard();
+            endCard(board);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        if (commandType == PlayerState.WAIT_INDEX && value != -1) {
+            if (value >= planets.size() || value < 0)
+                throw new RuntimeException("Index not valid");
+            landedPlayers.put(player, planets.get(value));
         }
     }
 
-    public void endCard() {
-
+    @Override
+    public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> r, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        super.doSpecificCheck(commandType, landedPlayers.get(player).getRewards(), deltaGood, batteries, username, board);
     }
-
-    public void doCommandEffects(CardState commandType, Integer value, String username, Board board) {
-        PlayerData player = board.getPlayerEntitybyUsername(username);
-        // if player decides to land on a planet
-        if (commandType == CardState.WAIT_INDEX && value != -1)
-            landedPlayers.put(player, planets.get(value));
-    }
-
 
 }
