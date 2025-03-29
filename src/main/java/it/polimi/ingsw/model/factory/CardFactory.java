@@ -1,33 +1,87 @@
 package it.polimi.ingsw.model.factory;
 
-import it.polimi.ingsw.model.cards.utils.*;
-import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.properties.DirectionType;
+
+import it.polimi.ingsw.model.cards.SlaversCard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.cards.utils.*;
+import it.polimi.ingsw.model.game.objects.ColorType;
+
+import it.polimi.ingsw.model.properties.DirectionType;
 import it.polimi.ingsw.model.cards.AbandonedShipCard;
 import it.polimi.ingsw.model.cards.AbandonedStationCard;
-import it.polimi.ingsw.model.cards.CombactZoneCard;
+import it.polimi.ingsw.model.cards.CombatZoneCard;
 import it.polimi.ingsw.model.cards.EpidemicCard;
 import it.polimi.ingsw.model.cards.MeteorSwarmCard;
 import it.polimi.ingsw.model.cards.OpenSpaceCard;
 import it.polimi.ingsw.model.cards.PiratesCard;
 import it.polimi.ingsw.model.cards.PlanetCard;
-import it.polimi.ingsw.model.cards.SlaversCard;
 import it.polimi.ingsw.model.cards.SmugglersCard;
 import it.polimi.ingsw.model.cards.StardustCard;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
+
 public class CardFactory {
-    public static Card createCard(JSONObject cardJson) {
+
+    private final List<Card> cards;
+
+
+    public CardFactory() {
+        // Costruttore che genera il mazzo dalle carte nel JSON
+        this.cards = new ArrayList<>();
+        List<Card> level1Cards = new ArrayList<>();
+        List<Card> level2Cards = new ArrayList<>();
+
+        JSONObject deckJson = loadJsonConfig();
+        JSONArray cardsArray = deckJson.getJSONArray("cards");
+
+        for (int i = 0; i < cardsArray.length(); i++) {
+            JSONObject cardJson = cardsArray.getJSONObject(i);
+            Card card = createCard(cardJson);
+            if (card.getLevel() == 1)
+                level1Cards.add(card);
+            else if (card.getLevel() == 2)
+                level2Cards.add(card);
+        }
+        Collections.shuffle(level1Cards);
+        Collections.shuffle(level2Cards);
+
+        for (int i = 0; i < 12; i++){
+            if ((i+1) % 3 == 0)
+                cards.add(level1Cards.get(i));
+            else
+                cards.add(level2Cards.get(i));
+        }
+
+    }
+
+    // Metodo per ottenere la lista di carte
+    public List<Card> getCards() {
+        return cards;
+    }
+
+    private JSONObject loadJsonConfig() {
+        try {
+            String jsonContent = new String(Files.readAllBytes(new File("src/main/java/it/polimi/ingsw/model/resources/factory.json").toPath()));
+            return new JSONObject(jsonContent);
+        } catch (IOException e) {
+            System.err.println("Errore nel caricamento del file JSON: " + e.getMessage());
+            return new JSONObject(); // Restituisce un JSON vuoto
+        }
+    }
+
+    // Generate single card
+    private Card createCard(JSONObject cardJson) {
         String type = cardJson.getString("type");
         int level = cardJson.getInt("level");
         boolean isLearner = cardJson.getBoolean("isLearner");
 
-        switch(type) {
+        switch (type) {
             case "SlaversCard":
                 int slaversCrew = cardJson.optInt("crew", 0);
                 int slaversCredits = cardJson.optInt("credits", 0);
@@ -38,13 +92,13 @@ public class CardFactory {
             case "SmugglersCard":
                 int smugFirePower = cardJson.optInt("firePower", 0);
                 int smugLostGoods = cardJson.optInt("lostGoods", 0);
-                JSONArray smugGoodsArray = cardJson.getJSONArray("goods");
-                List<ColorType> smugGoods = new ArrayList<>();
-                for (int i = 0; i < smugGoodsArray.length(); i++) {
-                    smugGoods.add(ColorType.valueOf(smugGoodsArray.getString(i)));
+                JSONObject rewardsJson = cardJson.getJSONObject("rewards");
+                Map<ColorType, Integer> rewards = new HashMap<>();
+                for (String color : rewardsJson.keySet()) {
+                    rewards.put(ColorType.valueOf(color.toUpperCase()), rewardsJson.getInt(color));
                 }
                 int smugDays = cardJson.optInt("days", 0);
-                return new SmugglersCard(level, isLearner, smugFirePower, smugLostGoods, smugGoods, smugDays);
+                return new SmugglersCard(level, isLearner, smugFirePower, smugLostGoods, rewards, smugDays);
 
             case "PiratesCard":
                 int pirateFirePower = cardJson.optInt("piratesFirePower", 0);
@@ -108,19 +162,17 @@ public class CardFactory {
                 return new AbandonedStationCard(level, isLearner, crew, stationDays, goods);
 
             case "PlanetCard":
-                JSONObject planetsJson = cardJson.getJSONObject("planets");
-                Map<Planet, Optional<PlayerData>> planets = new HashMap<>();
-                for (String planetName : planetsJson.keySet()) {
-                    JSONObject planetData = planetsJson.getJSONObject(planetName);
-                    JSONObject rewardsJson = planetData.getJSONObject("rewards");
-                    Map<ColorType, Integer> rewards = new HashMap<>();
-
-                    for (String color : rewardsJson.keySet()) {
-                        rewards.put(ColorType.valueOf(color.toUpperCase()), rewardsJson.getInt(color));
+                JSONArray planetsJsonArray = cardJson.optJSONArray("planets");
+                List<Planet> planets = new ArrayList<>();
+                for (int i = 0; i < planetsJsonArray.length(); i++) {
+                    JSONObject planetJson = planetsJsonArray.getJSONObject(i);
+                    JSONObject rewardsJsonPlanet = planetJson.getJSONObject("rewards");
+                    Map<ColorType, Integer> rewardsPlanet = new HashMap<>();
+                    for (String color : rewardsJsonPlanet.keySet()) {
+                        rewardsPlanet.put(ColorType.valueOf(color.toUpperCase()), rewardsJsonPlanet.getInt(color));
                     }
-
-                    Planet planet = new Planet(rewards);
-                    planets.put(planet, null);
+                    Planet planet = new Planet(rewardsPlanet);
+                    planets.add(planet);
                 }
                 int days = cardJson.optInt("days", 0);
                 return new PlanetCard(level, isLearner, planets, days);
@@ -153,10 +205,11 @@ public class CardFactory {
                     }
                     combact.add(new AbstractMap.SimpleEntry<>(criteria, penalty));
                 }
-                return new CombactZoneCard(level, isLearner, combact);
+                return new CombatZoneCard(level, isLearner, combact);
 
             default:
                 throw new IllegalArgumentException("Unknown card type: " + type);
         }
     }
 }
+
