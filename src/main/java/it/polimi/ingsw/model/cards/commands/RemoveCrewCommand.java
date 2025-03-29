@@ -54,7 +54,7 @@ public class RemoveCrewCommand implements Command {
                 .entrySet().stream()
                 .allMatch(entry -> entry.getValue() <= (entry.getKey().getAlien().isPresent() ? 2 : entry.getKey().getHumans()));
         if (!enoughCrew)
-            throw new CabinComponentNotValidException("Not enough crew");
+            throw new CabinComponentNotValidException("Not enough crew in a cabin");
     }
 
 }

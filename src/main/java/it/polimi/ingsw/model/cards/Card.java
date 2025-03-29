@@ -104,7 +104,8 @@ abstract public class Card {
     }
 
     public void doSpecificCheck(PlayerState commandType, List<CabinComponent> cabins, int toRemove, String username, Board board) {
-        if (commandType == PlayerState.WAIT_REMOVE_CREW && cabins.size() != toRemove)
+        int crew = cabins.stream().mapToInt(c -> c.getAlien().isPresent() ? 2 : 1).sum();
+        if (commandType == PlayerState.WAIT_REMOVE_CREW && crew != toRemove)
             throw new IllegalArgumentException("Too few cabin components provided");
     }
 
