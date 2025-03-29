@@ -51,10 +51,12 @@ abstract public class Card {
             if (player.getShip().getCrew() == 0)
                 board.moveToStartingDeck(player);
 
-        int leaderPos = board.getPlayers().getFirst().getValue();
-        for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
-            if (leaderPos >= entry.getValue() + 24)
-                board.moveToStartingDeck(entry.getKey());
+        if (!board.getPlayers().isEmpty()) {
+            int leaderPos = board.getPlayers().getFirst().getValue();
+            for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
+                if (leaderPos >= entry.getValue() + 24)
+                    board.moveToStartingDeck(entry.getKey());
+        }
 
         for (PlayerData player : board.getWantEndFlight())
             board.moveToStartingDeck(player);
@@ -64,6 +66,7 @@ abstract public class Card {
     public GameState changeCardState(Board board, String username) {
         boolean finish = changeState(board, username);
         if (finish) {
+
             if (board.getCardPilePos() == board.getCardPile().size() -1) return GameState.END;
             return GameState.DRAW_CARD;
         }
@@ -74,7 +77,7 @@ abstract public class Card {
         if (commandType != PlayerState.WAIT_GOODS) return;
 
         for (ColorType good : ColorType.values())
-            if (deltaGood.get(good) > rewards.get(good))
+            if ((deltaGood.get(good) > 0 && !rewards.containsKey(good)) || (rewards.containsKey(good) && deltaGood.get(good) > rewards.get(good)))
                 throw new GoodNotValidException("Reward check not valid");
 
         if (!batteries.isEmpty())

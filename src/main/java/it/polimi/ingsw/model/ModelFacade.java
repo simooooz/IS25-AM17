@@ -204,7 +204,7 @@ public class ModelFacade {
         Card card = board.getCardPile().get(board.getCardPilePos());
         if (card.getPlayersState().get(username) != PlayerState.WAIT_INDEX) throw new IllegalStateException("Player " + username + " state is not WAIT_INDEX");
 
-        card.doCommandEffects(PlayerState.WAIT_BOOLEAN, value, username, board);
+        card.doCommandEffects(PlayerState.WAIT_INDEX, value, username, board);
         setState(card.changeCardState(board, username));
     }
 
@@ -216,4 +216,7 @@ public class ModelFacade {
             board.getWantEndFlight().add(player);
     }
 
+    public Board getBoard() {
+        return board;
+    }
 }

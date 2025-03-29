@@ -30,6 +30,9 @@ public class GoodCommand implements Command {
         this.username = username;
         this.board = board;
         this.deltaGood = new HashMap<>();
+        for(ColorType c : ColorType.values()) {
+            this.deltaGood.put(c, 0);
+        }
         this.cargoHolds = cargoHolds;
         this.batteries = batteries;
     }

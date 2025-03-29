@@ -4,9 +4,12 @@ import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
+import it.polimi.ingsw.model.factory.CardFactory;
+import it.polimi.ingsw.model.factory.ComponentFactory;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
+
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
@@ -22,6 +25,7 @@ public class Board {
     private final List<Card> cardPile;
     private int cardPilePos;
     private final Time timeManagement;
+    private final Map<Integer, Component> mapComponents;
     private final Map<ColorType, Integer> availableGoods;
 
     public Board(List<String> usernames) {
@@ -31,8 +35,13 @@ public class Board {
 
         this.players = new ArrayList<>();
         this.wantEndFlight = new ArrayList<>();
-        this.commonComponents = new ArrayList<>();
-        this.cardPile = new ArrayList<>();
+
+        ComponentFactory componentFactory = new ComponentFactory();
+        this.commonComponents = new ArrayList<>(componentFactory.getComponents());
+        this.mapComponents = new HashMap<>(componentFactory.getComponentsMap());
+
+
+        this.cardPile = new ArrayList<>(new CardFactory().getCards());
         this.cardPilePos = 0;
         this.timeManagement = new Time();
         this.availableGoods = new HashMap<>();
@@ -89,9 +98,10 @@ public class Board {
         if (!player.equals(getPlayersByPos().getFirst())) throw new PlayerNotFoundException("Payer is not the leader");
 
         if (cardPilePos < cardPile.size()) {
-            Card card = cardPile.get(cardPilePos++);
+            Card card = cardPile.get(cardPilePos);
             boolean finish = card.startCard(this);
             if (finish) {
+                cardPilePos++;
                 if (cardPilePos == cardPile.size() -1) return GameState.END;
                 else return GameState.DRAW_CARD;
             }

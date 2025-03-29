@@ -33,6 +33,9 @@ public class Ship {
         this.engineAlien = false;
         this.cannonAlien = false;
         this.goods = new HashMap<>();
+        for(ColorType c : ColorType.values()) {
+            this.goods.put(c, 0);
+        }
         this.protectedSides = new ArrayList<>();
 
         for (int row = 0; row < 4; row++) {
