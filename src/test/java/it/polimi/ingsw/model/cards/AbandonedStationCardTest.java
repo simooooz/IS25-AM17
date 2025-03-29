@@ -1,11 +1,12 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.model.components.CabinComponent;
+import it.polimi.ingsw.model.components.SpecialCargoHoldsComponent;
+import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,127 +16,147 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AbandonedStationCardTest {
-//
-//    // Declare these as class fields instead of local variables
-//    private Optional<Component>[][] dashboard;
-//    private List<Optional<Component>> discarded;
-//    private Optional<Component> component;
-//    private int battery;
-//    private Map<ColorType, Integer> goods;
-//    private Map<ColorType, Integer> cardGoods;
-//    private List<DirectionType> directions;
-//    private Ship ship1;
-//    private Ship ship2;
-//    private Ship ship3;
-//    private List<AbstractMap.SimpleEntry<PlayerData, Integer>> players;
-//    private PlayerData player1;
-//    private PlayerData player2;
-//    private PlayerData player3;
-//    private Board board;
-//
-//    @BeforeEach
-//    void setUp() {
-//        // Initialize the fields here
-//        dashboard = new Optional[3][3]; // Specify actual dimensions
-//        // Initialize each cell with Optional.empty()
-//        for (int i = 0; i < dashboard.length; i++) {
-//            for (int j = 0; j < dashboard[i].length; j++) {
-//                dashboard[i][j] = Optional.empty();
-//            }
-//        }
-//
-//        discarded = new ArrayList<>();
-//        component = Optional.empty();
-//        battery = 0;
-//        directions = new ArrayList<>();
-//
-//        goods = Map.ofEntries(
-//                Map.entry(ColorType.RED, 10),
-//                Map.entry(ColorType.GREEN, 15),
-//                Map.entry(ColorType.BLUE, 20),
-//                Map.entry(ColorType.YELLOW, 25)
-//        );
-//        cardGoods = Map.ofEntries(
-//                Map.entry(ColorType.GREEN, 10),
-//                Map.entry(ColorType.BLUE, 15),
-//                Map.entry(ColorType.RED, 20),
-//                Map.entry(ColorType.YELLOW, 25)
-//        );
-//
-//        // initialization of the ships
-//        ship1 = new Ship(dashboard, discarded, component, 1, battery, goods, directions);
-//        ship2 = new Ship(dashboard, discarded, component, 1, battery, goods, directions);
-//        ship3 = new Ship(dashboard, discarded, component, 1, battery, goods, directions);
-//        // initilization of the players
-//        players = new ArrayList<>();
-//        player1 = new PlayerData(ColorType.BLUE, "Simone", ship1, 0);
-//        player2 = new PlayerData(ColorType.BLUE, "Davide", ship2, 0);
-//        player3 = new PlayerData(ColorType.BLUE, "Tommaso", ship3, 0);
-//        // add player with their initial value of goods
-//        players.add(new AbstractMap.SimpleEntry<>(player1, 11));
-//        players.add(new AbstractMap.SimpleEntry<>(player2, 12));
-//        players.add(new AbstractMap.SimpleEntry<>(player3, 15));
-//        // create the board Game
-//        board = new Board(players);
-//    }
-//
-//    @AfterEach
-//    void tearDown() {
-//        players.clear();
-//    }
-//
-//    @Test
-//    void testShouldNotUpdateCardIfCrewNotEnough() {
-//        // Initialization
-//        Ship testShip = new Ship(dashboard, discarded, component, 5, battery, goods, directions);
-//        PlayerData playerTester = new PlayerData(ColorType.BLUE, "Pippo", testShip, 50);
-//        players.add(new AbstractMap.SimpleEntry<>(playerTester, 16));
-//        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 10, 0, cardGoods);
-//        // call to the card
-//        abandonedStationCard.resolve(board);
-//        // check
-//        assertEquals(3, testShip.getGoods().size() - 1);
-//        assertEquals(16, players.stream()
-//                .filter(entry -> entry.getKey().equals(playerTester))
-//                .findFirst()
-//                .get()
-//                .getValue());
-//    }
-//
-//    @Test
-//    void testShouldCheckIfTheParameterAreUpdateWithNoPlayersInDaysPositionBehind() {
-//        // Initialization
-//        Ship testShip = new Ship(dashboard, discarded, component, 5, battery, goods, directions);
-//        PlayerData playerTester = new PlayerData(ColorType.BLUE, "Pippo", testShip, 50);
-//        players.add(new AbstractMap.SimpleEntry<>(playerTester, 16));
-//        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 10, 0, cardGoods);
-//        // call to the card
-//        abandonedStationCard.resolve(board);
-//        // check
-//        assertEquals(8, testShip.getGoods().size() - 1);
-//        assertEquals(26, players.stream()
-//                .filter(entry -> entry.getKey().equals(playerTester))
-//                .findFirst()
-//                .get()
-//                .getValue());
-//    }
-//
-//    @Test
-//    void testShouldCheckIfTheParameterAreUpdateWithPlayersInDaysPositionBehind() {
-//        // Initialization
-//        Ship testShip = new Ship(dashboard, discarded, component, 5, battery, goods, directions);
-//        PlayerData playerTester = new PlayerData(ColorType.BLUE, "Pippo", testShip, 50);
-//        players.add(new AbstractMap.SimpleEntry<>(playerTester, 16));
-//        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 10, 0, cardGoods);
-//        // call to the card
-//        abandonedStationCard.resolve(board);
-//        // check
-//        assertEquals(8, testShip.getGoods().size() - 1);
-//        assertEquals(6, players.stream()
-//                .filter(entry -> entry.getKey().equals(playerTester))
-//                .findFirst()
-//                .get()
-//                .getValue());
-//    }
 
+    private List<String> usernames;
+    private PlayerData p1;
+    private PlayerData p2;
+    private PlayerData p3;
+    private ModelFacade modelFacade;
+    private Board board;
+    private ConnectorType[] connectors;
+
+    private SpecialCargoHoldsComponent cargo1;
+    private SpecialCargoHoldsComponent cargo2;
+    private SpecialCargoHoldsComponent cargo3;
+    private Map<ColorType, Integer> cardGoods;
+
+    private CabinComponent cabin1;
+    private CabinComponent cabin2;
+
+    private int battery;
+
+    @BeforeEach
+    void setUp() {
+        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
+
+        usernames = new ArrayList<>();
+        usernames.add("Simone");
+        usernames.add("Davide");
+        usernames.add("Tommaso");
+
+        p1 = new PlayerData(usernames.get(0));
+        p2 = new PlayerData(usernames.get(1));
+        p3 = new PlayerData(usernames.get(2));
+
+        modelFacade = new ModelFacade(usernames);
+        board = modelFacade.getBoard();
+
+        board.moveToBoard(p1);
+        board.movePlayer(p1, 9);
+        board.moveToBoard(p2);
+        board.movePlayer(p2, 9);
+        board.moveToBoard(p3);
+        board.movePlayer(p3, 10);
+
+        cardGoods = new HashMap<>();
+        cardGoods.put(ColorType.RED, 2);
+        cardGoods.put(ColorType.GREEN, 1);
+
+        cargo1 = new SpecialCargoHoldsComponent(connectors, 3);
+        board.getCommonComponents().add(cargo1);
+
+        cargo2 = new SpecialCargoHoldsComponent(connectors, 3);
+        board.getCommonComponents().add(cargo2);
+
+        cargo3 = new SpecialCargoHoldsComponent(connectors, 3);
+        board.getCommonComponents().add(cargo3);
+
+        cargo1.showComponent();
+        cargo1.pickComponent(board, p1.getShip());
+        cargo1.insertComponent(p1.getShip(), 1, 1);
+        cargo1.weldComponent();
+
+        cargo1.loadGood(ColorType.BLUE, p1.getShip());
+        cargo1.loadGood(ColorType.RED, p1.getShip());
+
+        cargo2.showComponent();
+        cargo2.pickComponent(board, p1.getShip());
+        cargo2.insertComponent(p1.getShip(), 2, 1);
+        cargo2.weldComponent();
+
+        cargo3.showComponent();
+        cargo3.pickComponent(board, p2.getShip());
+        cargo3.insertComponent(p2.getShip(), 2, 1);
+        cargo3.weldComponent();
+
+        cabin1 = new CabinComponent(connectors, false);
+        board.getCommonComponents().add(cabin1);
+
+        cabin1.showComponent();
+        cabin1.pickComponent(board, p1.getShip());
+        cabin1.insertComponent(p1.getShip(), 1, 2);
+        cabin1.weldComponent();
+
+        cabin2 = new CabinComponent(connectors, false);
+        board.getCommonComponents().add(cabin2);
+
+        cabin2.showComponent();
+        cabin2.pickComponent(board, p2.getShip());
+        cabin2.insertComponent(p2.getShip(), 1, 2);
+        cabin2.weldComponent();
+    }
+
+    @AfterEach
+    void tearDown() {
+        usernames.clear();
+    }
+
+    @Test
+    void testShouldNotUpdateIfCrewNotEnough() {
+        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 10, 5, cardGoods);
+        board.getCardPile().add(abandonedStationCard);
+
+        modelFacade.nextCard(p1.getUsername());
+
+        assertEquals(2, p1.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
+        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+    }
+
+    @Test
+    void testShouldCheckIfTheParameterAreUpdate() {
+        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 2, 5, cardGoods);
+        board.getCardPile().add(abandonedStationCard);
+
+        modelFacade.nextCard(p1.getUsername());
+
+        modelFacade.getBoolean(p1.getUsername(), true);
+
+        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap = new HashMap<>();
+        cargoMap.put(cargo2, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+
+        modelFacade.updateGoods(p1.getUsername(), cargoMap, new ArrayList<>());
+
+        assertEquals(4, p1.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
+        assertEquals(8, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+    }
+
+    @Test
+    void testShouldCheckIfTheCardIsUsedBySecondPlayer() throws Exception{
+        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 2, 2, cardGoods);
+        board.getCardPile().add(abandonedStationCard);
+
+        modelFacade.nextCard(p1.getUsername());
+        modelFacade.getBoolean(p1.getUsername(), false);
+        modelFacade.getBoolean(p2.getUsername(), true);
+
+        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap = new HashMap<>();
+        cargoMap.put(cargo3, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+
+        modelFacade.updateGoods(p2.getUsername(), cargoMap, new ArrayList<>());
+
+        assertEquals(2, p1.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
+        assertEquals(2, p2.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
+        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+        assertEquals(9, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().get().getValue());
+    }
 }
