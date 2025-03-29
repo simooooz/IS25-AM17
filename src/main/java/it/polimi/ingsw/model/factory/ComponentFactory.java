@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.factory;
 
+
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.objects.AlienType;
@@ -7,7 +8,51 @@ import it.polimi.ingsw.model.properties.DirectionType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
+
 public class ComponentFactory {
+
+    private List<Component> components;
+    private Map<Integer, Component> componentsMap;
+
+    public ComponentFactory() {
+        // Costruttore che genera il mazzo dalle carte nel JSON
+        this.components = new ArrayList<>();
+        this.componentsMap = new HashMap<>();
+
+        JSONObject deckJson = loadJsonConfig();
+        JSONArray componentsArray = deckJson.getJSONArray("components");
+
+        for (int i = 0; i < componentsArray.length(); i++) {
+            JSONObject cardJson = componentsArray.getJSONObject(i);
+            Component component = createComponent(cardJson);
+            components.add(component);
+            componentsMap.put(i+1, component);
+        }
+    }
+
+    public List<Component> getComponents(){
+        return components;
+    }
+
+    private JSONObject loadJsonConfig() {
+        try {
+            String jsonContent = new String(Files.readAllBytes(new File("src/main/java/it/polimi/ingsw/model/resources/factory.json").toPath()));
+            return new JSONObject(jsonContent);
+        } catch (IOException e) {
+            System.err.println("Errore nel caricamento del file JSON: " + e.getMessage());
+            return new JSONObject(); // Restituisce un JSON vuoto
+        }
+    }
+
+    public Map<Integer, Component> getComponentsMap() {
+        return new HashMap<>(componentsMap);
+    }
+
+
     public static Component createComponent(JSONObject componentJson) {
         String type = componentJson.getString("type");
         JSONArray connectorsArray = componentJson.getJSONArray("connectors");
