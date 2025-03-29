@@ -2,29 +2,21 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.CabinComponent;
-import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.components.OddComponent;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.player.Ship;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static it.polimi.ingsw.model.components.utils.ConnectorType.SINGLE;
-import static it.polimi.ingsw.model.game.objects.AlienType.CANNON;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AbandonedShipCardTest {
 
-    private Optional<Component>[][] dashboard1;
-    private Optional<Component>[][] dashboard2;
-    private Optional<Component>[][] dashboard3;
     private List<String> usernames;
     private PlayerData p1;
     private PlayerData p2;
@@ -43,41 +35,26 @@ class AbandonedShipCardTest {
 
     @BeforeEach
     void setUp() {
-        // inizializzazione delle variabili comuni ai test
-        dashboard1 = new Optional[4][6];
-        for (int i = 0; i < dashboard1.length; i++) {
-            for (int j = 0; j < dashboard1[i].length; j++) {
-                dashboard1[i][j] = Optional.empty();
-            }
-        }
-
-        dashboard2 = new Optional[4][6];
-        for (int i = 0; i < dashboard2.length; i++) {
-            for (int j = 0; j < dashboard2[i].length; j++) {
-                dashboard2[i][j] = Optional.empty();
-            }
-        }
-
-        dashboard3 = new Optional[4][6];
-        for (int i = 0; i < dashboard3.length; i++) {
-            for (int j = 0; j < dashboard3[i].length; j++) {
-                dashboard3[i][j] = Optional.empty();
-            }
-        }
+        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
 
         usernames = new ArrayList<>();
         usernames.add("Simone");
         usernames.add("Davide");
         usernames.add("Tommaso");
+
         p1 = new PlayerData(usernames.get(0));
         p2 = new PlayerData(usernames.get(1));
         p3 = new PlayerData(usernames.get(2));
+
         modelFacade = new ModelFacade(usernames);
         board = modelFacade.getBoard();
-        board.getPlayers().add(new AbstractMap.SimpleEntry<>(p1, 15));
-        board.getPlayers().add(new AbstractMap.SimpleEntry<>(p2, 12));
-        board.getPlayers().add(new AbstractMap.SimpleEntry<>(p3, 11));
-        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
+
+        board.moveToBoard(p1);
+        board.movePlayer(p1, 9);
+        board.moveToBoard(p2);
+        board.movePlayer(p2, 9);
+        board.moveToBoard(p3);
+        board.movePlayer(p3, 10);
 
         p1.setCredits(50);
         p2.setCredits(40);
