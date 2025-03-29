@@ -15,7 +15,11 @@
       "isLearner": true,
       "firePower": 4,
       "lostGoods": 2,
-      "goods": ["YELLOW", "GREEN", "BLUE"],
+      "rewards": {
+        "YELLOW": 1,
+        "GREEN": 1,
+        "BLUE": 1
+      },
       "days": 1
     },
     {
@@ -134,114 +138,125 @@
       "type": "PlanetCard",
       "level": 1,
       "isLearner": false,
-      "planets": {
-        "planet1": {
+      "planets": [
+        {
           "rewards": {
-            "RED": 1,
-            "GREEN": 1,
-            "BLUE": 3
-          },
-          "player": null
+              "RED": 1,
+              "GREEN": 1,
+              "BLUE": 3
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "RED": 1,
-            "YELLOW": 1,
-            "BLUE": 1
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "RED": 1,
+              "YELLOW": 1,
+              "BLUE": 1
+            }
+
         },
-        "planet3": {
-          "rewards": {
-            "RED": 1,
-            "BLUE": 3
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "RED": 1,
+              "BLUE": 3
+            }
+
         },
-        "planet4": {
-          "rewards": {
-            "RED": 1,
-            "GREEN": 1
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "RED": 1,
+              "GREEN": 1
+            }
+
         }
-      },
+      ],
       "days": 3
     },
     {
       "type": "PlanetCard",
       "level": 1,
       "isLearner": true,
-      "planets": {
-        "planet1": {
-          "rewards": {
-            "RED": 2
-          },
-          "player": null
+      "planets": [
+        {
+
+            "rewards": {
+              "RED": 2
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "RED": 1,
-            "BLUE": 2
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "RED": 1,
+              "BLUE": 2
+            }
+
         },
-        "planet3": {
-          "rewards": {
-            "YELLOW": 1
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "YELLOW": 1
+            }
+
         }
-      },
+      ],
       "days": 2
     },
     {
       "type": "PlanetCard",
       "level": 1,
       "isLearner": false,
-      "planets": {
-        "planet1": {
-          "rewards": {
-            "YELLOW": 1,
-            "GREEN": 1,
-            "BLUE": 2
-          },
-          "player": null
+      "planets": [
+        {
+
+            "rewards": {
+              "YELLOW": 1,
+              "GREEN": 1,
+              "BLUE": 2
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "YELLOW": 2
-          },
-          "player": null
-        }
-      },
+        {
+
+            "rewards": {
+              "YELLOW": 2
+            }
+          }
+
+      ],
       "days": 3
     },
     {
       "type": "PlanetCard",
       "level": 1,
       "isLearner": false,
-      "planets": {
-        "planet1": {
-          "rewards": {
-            "GREEN": 1,
-            "YELLOW": 1
-          },
-          "player": null
+      "planets": [
+        {
+
+            "rewards": {
+              "GREEN": 1,
+              "YELLOW": 1
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "YELLOW": 1
+        {
+
+            "rewards": {
+              "YELLOW": 1
+            }
+
           },
-          "player": null
-        },
-        "planet3": {
-          "rewards": {
-            "BLUE": 3
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "BLUE": 3
+            }
+
         }
-      },
+      ],
       "days": 1
     },
     {
@@ -335,7 +350,10 @@
       "isLearner": false,
       "firePower": 8,
       "lostGoods": 3,
-      "goods": ["RED", "YELLOW", "YELLOW"],
+      "rewards": {
+        "YELLOW": 2,
+        "RED": 1
+      },
       "days": 1
     },
     {
@@ -493,110 +511,122 @@
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
-      "planets": {
-        "planet1": {
-          "rewards": {
-            "RED": 3,
-            "YELLOW": 1
-          },
-          "player": null
+      "planets": [
+        {
+
+            "rewards": {
+              "RED": 3,
+              "YELLOW": 1
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "RED": 2,
-            "GREEN": 2
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "RED": 2,
+              "GREEN": 2
+            }
+
         },
-        "planet3": {
-          "rewards": {
-            "RED": 1,
-            "BLUE": 4
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "RED": 1,
+              "BLUE": 4
+            }
+
         }
-      },
+      ],
       "days": 4
     },
     {
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
-      "planets": {
-        "planet1": {
-          "rewards": {
-            "RED": 2
-          },
-          "player": null
+      "planets": [
+        {
+
+            "rewards": {
+              "RED": 2
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "GREEN": 4
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "GREEN": 4
+            }
+
         }
-      },
+      ],
       "days": 3
     },
     {
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
-      "planets": {
-        "planet1": {
-          "rewards": {
-            "RED": 1,
-            "YELLOW": 1
-          },
-          "player": null
+      "planets": [
+        {
+
+            "rewards": {
+              "RED": 1,
+              "YELLOW": 1
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "YELLOW": 1,
-            "GREEN": 1,
-            "BLUE": 1
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "YELLOW": 1,
+              "GREEN": 1,
+              "BLUE": 1
+            }
+
         },
-        "planet3": {
-          "rewards": {
-            "GREEN": 2
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "GREEN": 2
+            }
+
         },
-        "planet4": {
-          "rewards": {
-            "YELLOW": 1
-          },
-          "player": null
-        }
-      },
+        {
+
+            "rewards": {
+              "YELLOW": 1
+            }
+          }
+
+      ],
       "days": 2
     },
     {
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
-      "planets": {
-        "planet1": {
-          "rewards": {
-            "GREEN": 4
-          },
-          "player": null
+      "planets": [
+        {
+
+            "rewards": {
+              "GREEN": 4
+            }
+
         },
-        "planet2": {
-          "rewards": {
-            "YELLOW": 2
-          },
-          "player": null
+        {
+
+            "rewards": {
+              "YELLOW": 2
+            }
+
         },
-        "planet3": {
+        {
+
           "rewards": {
             "BLUE": 4
-          },
-          "player": null
+          }
+
         }
-      },
+      ],
       "days": 3
     },
     {
