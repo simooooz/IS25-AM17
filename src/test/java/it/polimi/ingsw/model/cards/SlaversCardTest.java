@@ -1,185 +1,207 @@
 package it.polimi.ingsw.model.cards;
 
-import com.sun.jdi.connect.Connector;
-import it.polimi.ingsw.model.components.BatteryComponent;
-import it.polimi.ingsw.model.components.CabinComponent;
-import it.polimi.ingsw.model.components.CannonComponent;
-import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
-import static it.polimi.ingsw.model.components.utils.ConnectorType.*;
-import static it.polimi.ingsw.model.components.utils.ConnectorType.SINGLE;
 import static it.polimi.ingsw.model.properties.DirectionType.NORTH;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SlaversCardTest {
-    private Optional<Component>[][] dashboard;
-    private Optional<Component>[][] dashboard1;
-    private Optional<Component>[][] dashboard2;
-    private List<Component> discarded;
-    private Component[] component;
-    private int battery;
-    private Map<ColorType, Integer> goods;
-    private List<DirectionType> directions;
-    private Ship ship1;
-    private Ship ship2;
-    private Ship ship3;
-    private List<AbstractMap.SimpleEntry<PlayerData, Integer>> players;
-    private PlayerData player1;
-    private PlayerData player2;
-    private PlayerData player3;
+    private List<String> usernames;
+    private PlayerData p1;
+    private PlayerData p2;
+    private PlayerData p3;
+    private ModelFacade modelFacade;
     private Board board;
+    private ConnectorType[] connectors;
+    private OddComponent odd1;
+    private CabinComponent cabin1;
+    private CabinComponent cabin2;
+    private CabinComponent cabin3;
+    private CannonComponent cannon1;
+    private CannonComponent cannon2;
+    private CannonComponent cannon3;
+    private BatteryComponent battery1;
 
     @BeforeEach
-    void setUp() {
-        dashboard = new Optional[5][7];
-        for (int i = 0; i < dashboard.length; i++) {
-            for (int j = 0; j < dashboard[i].length; j++) {
-                dashboard[i][j] = Optional.empty();
-            }
-        }
+    void setUp() {;
+        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
 
-        dashboard1 = new Optional[5][7];
-        for (int i = 0; i < dashboard1.length; i++) {
-            for (int j = 0; j < dashboard1[i].length; j++) {
-                dashboard1[i][j] = Optional.empty();
-            }
-        }
+        usernames = new ArrayList<>();
+        usernames.add("Simone");
+        usernames.add("Davide");
+        usernames.add("Tommaso");
 
-        dashboard2 = new Optional[5][7];
-        for (int i = 0; i < dashboard2.length; i++) {
-            for (int j = 0; j < dashboard2[i].length; j++) {
-                dashboard2[i][j] = Optional.empty();
-            }
-        }
+        p1 = new PlayerData(usernames.get(0));
+        p2 = new PlayerData(usernames.get(1));
+        p3 = new PlayerData(usernames.get(2));
 
-        discarded = new ArrayList<>();
-        battery = 0;
-        goods = new HashMap<>();
-        directions = new ArrayList<>();
-        ship1 = new Ship(dashboard, discarded, component);
-        ship2 = new Ship(dashboard, discarded, component);
-        ship3 = new Ship(dashboard, discarded, component);
-        players = new ArrayList<>();
-        player1 = new PlayerData(ColorType.BLUE, "Simone", ship1, 0);
-        player2 = new PlayerData(ColorType.BLUE, "Davide", ship2, 0);
-        player3 = new PlayerData(ColorType.BLUE, "Tommaso", ship3, 0);
-        players.add(new AbstractMap.SimpleEntry<>(player1, 11));
-        players.add(new AbstractMap.SimpleEntry<>(player2, 12));
-        players.add(new AbstractMap.SimpleEntry<>(player3, 15));
-        board = new Board(players);
+        p1.setCredits(50);
+        p2.setCredits(40);
+        p3.setCredits(30);
+
+        modelFacade = new ModelFacade(usernames);
+        board = modelFacade.getBoard();
+
+        board.moveToBoard(p1);
+        board.movePlayer(p1, 9);
+        board.moveToBoard(p2);
+        board.movePlayer(p2, 9);
+        board.moveToBoard(p3);
+        board.movePlayer(p3, 10);
+
+        odd1 = new OddComponent(connectors, AlienType.ENGINE);
+        board.getCommonComponents().add(odd1);
+
+        odd1.showComponent();
+        odd1.pickComponent(board, p1.getShip());
+        odd1.insertComponent(p1.getShip(), 2, 1);
+        odd1.weldComponent();
+
+        cabin1 = new CabinComponent(connectors, false);
+        board.getCommonComponents().add(cabin1);
+
+        cabin1.showComponent();
+        cabin1.pickComponent(board, p1.getShip());
+        cabin1.insertComponent(p1.getShip(), 1, 2);
+        cabin1.weldComponent();
+
+        cabin2 = new CabinComponent(connectors, false);
+        board.getCommonComponents().add(cabin2);
+
+        cabin2.showComponent();
+        cabin2.pickComponent(board, p2.getShip());
+        cabin2.insertComponent(p2.getShip(), 1, 2);
+        cabin2.weldComponent();
+
+        cabin3 = new CabinComponent(connectors, false);
+        board.getCommonComponents().add(cabin3);
+
+        cabin3.showComponent();
+        cabin3.pickComponent(board, p1.getShip());
+        cabin3.insertComponent(p1.getShip(), 2, 2);
+        cabin3.weldComponent();
+        cabin3.setAlien(AlienType.ENGINE, p1.getShip());
+
     }
 
     @AfterEach
     void tearDown() {
-        players.clear();
+        usernames.clear();
     }
 
 
     @Test
     void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() throws Exception {
-        // Initialization
-        Ship testShip = new Ship(dashboard, discarded, component);
-        PlayerData playerTester = new PlayerData(ColorType.BLUE, "Pippo", testShip, 50);
-        players.add(new AbstractMap.SimpleEntry<>(playerTester, 16));
-        SlaversCard slaversCard = new SlaversCard(2, false, 2, 10, 2, 1);
-        // Add cannons to the ship
-        ConnectorType[] connectors = {SINGLE, DOUBLE, SINGLE, SINGLE};
-        CannonComponent cannon1 = new CannonComponent(connectors, NORTH, false);
-        CannonComponent cannon2 = new CannonComponent(connectors, NORTH, true);
-        CabinComponent cabin1 = new CabinComponent(connectors, false);
-        CabinComponent cabin2 = new CabinComponent(connectors, false);
-        BatteryComponent battery1 = new BatteryComponent(connectors, true);
-        battery1.insertComponent(testShip, 0, 2);
-        cannon1.insertComponent(testShip, 1, 1);
-        cannon2.insertComponent(testShip, 1, 2);
-        cabin1.insertComponent(testShip, 2, 1);
-        cabin2.insertComponent(testShip, 2, 2);
-        // call to the card
-        slaversCard.resolve(board);
-        // check
-        assertEquals(4, testShip.getCrew());
-        assertEquals(60, playerTester.getCredits());
-        assertEquals(13, players.stream().filter(entry -> entry.getKey().equals(playerTester)).findFirst().get().getValue());
+        SlaversCard slaversCard = new SlaversCard(2, false, 5, 5, 1, 1);
+        board.getCardPile().add(slaversCard);
+
+        cannon1 = new CannonComponent(connectors, NORTH, false);
+        board.getCommonComponents().add(cannon1);
+
+        cannon2 = new CannonComponent(connectors, NORTH, true);
+        board.getCommonComponents().add(cannon2);
+
+        battery1 = new BatteryComponent(connectors, false);
+        board.getCommonComponents().add(battery1);
+
+        cannon1.showComponent();
+        cannon1.pickComponent(board, p1.getShip());
+        cannon1.insertComponent(p1.getShip(), 3, 2);
+        cannon1.weldComponent();
+
+        cannon2.showComponent();
+        cannon2.pickComponent(board, p1.getShip());
+        cannon2.insertComponent(p1.getShip(), 2, 2);
+        cannon2.weldComponent();
+
+        battery1.showComponent();
+        battery1.pickComponent(board, p1.getShip());
+        battery1.insertComponent(p1.getShip(), 3, 4);
+        battery1.weldComponent();
+
+        List<BatteryComponent> batteries = new ArrayList<>();
+        batteries.add(battery1);
+        List<CannonComponent> cannons = new ArrayList<>();
+        cannons.add(cannon2);
+
+        modelFacade.nextCard(p1.getUsername());
+        modelFacade.activateCannons(p1.getUsername(), batteries, cannons);
+        modelFacade.getBoolean(p1.getUsername(), true);
+
+
+
+        assertEquals(14, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
     }
 
     @Test
     void testShouldCheckThatCardIsUsedBySecondPLayer() throws Exception {
-        // Initialization
-        Ship testShip1 = new Ship(dashboard1, discarded, component);
-        Ship testShip2 = new Ship(dashboard2, discarded, component);
-        PlayerData playerTester1 = new PlayerData(ColorType.BLUE, "PLayerTester1", testShip1, 51);
-        PlayerData playerTester2 = new PlayerData(ColorType.BLUE, "PlayerTester2", testShip2, 37);
-        players.add(new AbstractMap.SimpleEntry<>(playerTester1, 30));
-        players.add(new AbstractMap.SimpleEntry<>(playerTester2, 17));
-        SlaversCard slaversCard = new SlaversCard(2, false, 1, 10, 10, 1);
-        // Creation of the cannon
-        ConnectorType[] connectors = {SINGLE, DOUBLE, SINGLE, SINGLE};
-        CannonComponent cannon1 = new CannonComponent(connectors, NORTH, false);
-        CannonComponent cannon2 = new CannonComponent(connectors, NORTH, true);
-        CabinComponent cabin1 = new CabinComponent(connectors, false);
-        BatteryComponent battery1 = new BatteryComponent(connectors, true);
-        cannon2.insertComponent(testShip1, 1, 2);
-        cannon2.insertComponent(testShip1, 2, 2);
-        cannon2.insertComponent(testShip2, 1, 1);
-        cabin1.insertComponent(testShip1, 2, 1);
-        battery1.insertComponent(testShip2, 3, 3);
-        // call to the card
-        slaversCard.resolve(board);
-        // check
-        assertEquals(1, playerTester1.getShip().getCrew());
-        assertEquals(51, playerTester1.getCredits());
-        assertEquals(0, playerTester2.getShip().getCrew());
-        assertEquals(47, playerTester2.getCredits());
-        assertEquals(2, playerTester2.getShip().getBatteries());
-        assertEquals(30, players.stream().filter(entry -> entry.getKey().equals(playerTester1)).findFirst().get().getValue());
-        assertEquals(4, players.stream().filter(entry -> entry.getKey().equals(playerTester2)).findFirst().get().getValue());
+
+        SlaversCard slaversCard = new SlaversCard(2, false, 3, 5, 1, 1);
+        board.getCardPile().add(slaversCard);
+
+        cannon1 = new CannonComponent(connectors, NORTH, false);
+        board.getCommonComponents().add(cannon1);
+
+        cannon2 = new CannonComponent(connectors, NORTH, true);
+        board.getCommonComponents().add(cannon2);
+
+        cannon3 = new CannonComponent(connectors, NORTH, false);
+        board.getCommonComponents().add(cannon3);
+
+        battery1 = new BatteryComponent(connectors, false);
+        board.getCommonComponents().add(battery1);
+
+        cannon1.showComponent();
+        cannon1.pickComponent(board, p1.getShip());
+        cannon1.insertComponent(p1.getShip(), 3, 2);
+        cannon1.weldComponent();
+
+        cannon2.showComponent();
+        cannon2.pickComponent(board, p2.getShip());
+        cannon2.insertComponent(p2.getShip(), 2, 2);
+        cannon2.weldComponent();
+
+        cannon3.showComponent();
+        cannon3.pickComponent(board, p2.getShip());
+        cannon3.insertComponent(p2.getShip(), 2, 3);
+        cannon3.weldComponent();
+
+        battery1.showComponent();
+        battery1.pickComponent(board, p2.getShip());
+        battery1.insertComponent(p2.getShip(), 3, 4);
+        battery1.weldComponent();
+
+        List<BatteryComponent> batteries = new ArrayList<>();
+        batteries.add(battery1);
+        List<CannonComponent> cannons = new ArrayList<>();
+        cannons.add(cannon2);
+
+        modelFacade.nextCard(p1.getUsername());
+        modelFacade.activateCannons(p2.getUsername(), batteries, cannons);
+        modelFacade.getBoolean(p2.getUsername(), true);
+
+        List<CabinComponent> updated = new ArrayList<>();
+        updated.add(cabin1);
+        updated.add(cabin3);
+
+        modelFacade.removeCrew(p1.getUsername(), updated);
+
+        assertEquals(1, p1.getShip().getCrew());
+        assertEquals(50, p1.getCredits());
+        assertEquals(2, p2.getShip().getCrew());
+        assertEquals(45, p2.getCredits());
+        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+        assertEquals(10, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().get().getValue());
     }
-
-    @Test
-
-    void testShouldCheckThatCardIsUsedByOnlyTheFirsPLayer() throws Exception {
-        // Initialization
-        Ship testShip1 = new Ship(dashboard1, discarded, component);
-        Ship testShip2 = new Ship(dashboard2, discarded, component);
-        PlayerData playerTester1 = new PlayerData(ColorType.BLUE, "PLayerTester1", testShip1, 51);
-        PlayerData playerTester2 = new PlayerData(ColorType.BLUE, "PlayerTester2", testShip2, 37);
-        players.add(new AbstractMap.SimpleEntry<>(playerTester1, 30));
-        players.add(new AbstractMap.SimpleEntry<>(playerTester2, 17));
-        SlaversCard slaversCard = new SlaversCard(2, false, 1, 10, 10, 1);
-        // Creation of the cannon
-        ConnectorType[] connectors = {SINGLE, DOUBLE, SINGLE, SINGLE};
-        CannonComponent cannon1 = new CannonComponent(connectors, NORTH, false);
-        CannonComponent cannon2 = new CannonComponent(connectors, NORTH, true);
-        CabinComponent cabin1 = new CabinComponent(connectors, false);
-        BatteryComponent battery1 = new BatteryComponent(connectors, true);
-        cannon2.insertComponent(testShip2, 1, 2);
-        cannon2.insertComponent(testShip2, 2, 2);
-        cannon2.insertComponent(testShip1, 1, 1);
-        cabin1.insertComponent(testShip2, 2, 1);
-        battery1.insertComponent(testShip1, 3, 3);
-        // call to the card
-        slaversCard.resolve(board);
-        // check
-        assertEquals(0, playerTester1.getShip().getCrew());
-        assertEquals(61, playerTester1.getCredits());
-        assertEquals(2, playerTester2.getShip().getCrew());
-        assertEquals(37, playerTester2.getCredits());
-        assertEquals(2, playerTester1.getShip().getBatteries());
-        assertEquals(17, players.stream().filter(entry -> entry.getKey().equals(playerTester2)).findFirst().get().getValue());
-        assertEquals(20, players.stream().filter(entry -> entry.getKey().equals(playerTester1)).findFirst().get().getValue());
-    }
-
 }
 

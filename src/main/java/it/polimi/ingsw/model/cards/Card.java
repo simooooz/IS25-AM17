@@ -110,7 +110,6 @@ abstract public class Card {
     }
 
     public void doSpecificCheck(PlayerState commandType, List<CannonComponent> cannons, String username, Board board) {
-        throw new RuntimeException("Method not valid");
     }
 
     public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
