@@ -6,13 +6,15 @@ import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
+import it.polimi.ingsw.model.exceptions.NoEnoughPlayerException;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class ModelFacade {
 
@@ -32,6 +34,8 @@ public class ModelFacade {
     }
 
     public void startMatch() {
+        if (this.board.getPlayers().size() < 2) throw new NoEnoughPlayerException("MIN players required: 2");
+
         state = GameState.BUILD;
         board.getTimeManagement().startTimer(this);
     }
@@ -107,6 +111,14 @@ public class ModelFacade {
 
     private boolean arePlayersReady() {
         return board.getStartingDeck().isEmpty();
+    }
+
+    public void playerJoined(String username) {
+        // todo
+    }
+
+    public void playerLeft(String username) {
+        this.board.removePlayer(username);
     }
 
     public void moveStateAfterBuilding() {
@@ -216,6 +228,9 @@ public class ModelFacade {
             board.getWantEndFlight().add(player);
     }
 
+    /**
+     * only for tests
+     */
     public Board getBoard() {
         return board;
     }

@@ -41,7 +41,7 @@ public class Board {
         this.mapComponents = new HashMap<>(componentFactory.getComponentsMap());
 
 
-        this.cardPile = new ArrayList<>(new CardFactory().getCards());
+        this.cardPile = new ArrayList<>();
         this.cardPilePos = 0;
         this.timeManagement = new Time();
         this.availableGoods = new HashMap<>();
@@ -51,15 +51,25 @@ public class Board {
         return players;
     }
 
+    public void addPlayer(SimpleEntry<PlayerData, Integer> player) {
+        // todo
+    }
+
+    public void removePlayer(String username) {
+        boolean removed = this.players.removeIf(e -> e.getKey().getUsername().equals(username));
+        if (!removed)
+            this.startingDeck.removeIf(e -> e.getUsername().equals(username));
+    }
+
     public List<PlayerData> getPlayersByPos() {
         return players.stream().map(SimpleEntry::getKey).collect(Collectors.toList());
     }
 
     public PlayerData getPlayerEntityByUsername(String username) {
         return Stream.concat(players.stream().map(SimpleEntry::getKey), startingDeck.stream())
-            .filter(p -> p.getUsername().equals(username))
-            .findFirst()
-            .orElseThrow(PlayerNotFoundException::new);
+                .filter(p -> p.getUsername().equals(username))
+                .findFirst()
+                .orElseThrow(PlayerNotFoundException::new);
     }
 
     public List<PlayerData> getWantEndFlight() {
@@ -102,12 +112,11 @@ public class Board {
             boolean finish = card.startCard(this);
             if (finish) {
                 cardPilePos++;
-                if (cardPilePos == cardPile.size() -1) return GameState.END;
+                if (cardPilePos == cardPile.size() - 1) return GameState.END;
                 else return GameState.DRAW_CARD;
             }
             return GameState.PLAY_CARD;
-        }
-        else throw new RuntimeException("Card index out of bound");
+        } else throw new RuntimeException("Card index out of bound");
     }
 
     public void movePlayer(PlayerData playerData, int position) {
