@@ -11,10 +11,12 @@ public class StardustCard extends Card {
 
     @Override
     public boolean startCard(Board board) {
-        board.getPlayersByPos().forEach(player -> {
+        board.getPlayersByPos().reversed().forEach(player -> {
             Ship ship = player.getShip();
             board.movePlayer(player, -1 * ship.countExposedConnectors());
         });
+
+        endCard(board);
         return true;
     }
 

@@ -23,7 +23,7 @@ public class Ship {
     private final List<DirectionType> protectedSides;
 
     public Ship() {
-        this.dashboard = new Optional[4][6];
+        this.dashboard = new Optional[5][7];
         this.discards = new ArrayList<>();
         this.reserves = new ArrayList<>();
         this.handComponent = Optional.empty();
@@ -38,8 +38,8 @@ public class Ship {
         }
         this.protectedSides = new ArrayList<>();
 
-        for (int row = 0; row < 4; row++) {
-            for (int col = 0; col < 6; col++) {
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 7; col++) {
                 this.dashboard[row][col] = Optional.empty();
             }
         }
@@ -62,6 +62,9 @@ public class Ship {
         return reserves;
     }
 
+    /**
+     * @return the component in hand
+     */
     public Optional<Component> getHandComponent() {
         return handComponent;
     }
