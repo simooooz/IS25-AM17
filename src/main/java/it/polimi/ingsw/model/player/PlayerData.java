@@ -8,12 +8,14 @@ public class PlayerData {
     private final String username;
     private final Ship ship;
     private int credits;
+    private boolean endedInAdvance;
 
     public PlayerData(String username) {
         this.username = username;
         this.ship = new Ship();
         this.credits = 0;
         this.color = null;
+        this.endedInAdvance = false;
     }
 
     @Override
@@ -41,5 +43,13 @@ public class PlayerData {
 
     public void setCredits(int credits) {
         this.credits = credits;
+    }
+
+    public void endFlight() {
+        endedInAdvance = true;
+    }
+
+    public boolean hasEndedInAdvance() {
+        return endedInAdvance;
     }
 }

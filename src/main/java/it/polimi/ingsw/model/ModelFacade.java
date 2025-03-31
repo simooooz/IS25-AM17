@@ -222,10 +222,12 @@ public class ModelFacade {
 
     public void endFlight(String username) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (state == GameState.DRAW_CARD)
+        if (state == GameState.DRAW_CARD) {
+            player.endFlight();
             board.moveToStartingDeck(player);
+        }
         else
-            board.getWantEndFlight().add(player);
+            player.endFlight();
     }
 
     /**

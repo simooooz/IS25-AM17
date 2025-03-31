@@ -47,7 +47,9 @@ abstract public class Card {
     }
 
     protected void endCard(Board board) {
-        for (PlayerData player : board.getPlayersByPos())
+        List<PlayerData> players = board.getPlayersByPos();
+
+        for (PlayerData player : players)
             if (player.getShip().getCrew() == 0)
                 board.moveToStartingDeck(player);
 
@@ -58,15 +60,16 @@ abstract public class Card {
                     board.moveToStartingDeck(entry.getKey());
         }
 
-        for (PlayerData player : board.getWantEndFlight())
-            board.moveToStartingDeck(player);
-        board.getWantEndFlight().clear();
+        for (PlayerData player : players)
+            if (player.hasEndedInAdvance())
+                board.moveToStartingDeck(player);
+
     }
 
     public GameState changeCardState(Board board, String username) {
         boolean finish = changeState(board, username);
         if (finish) {
-
+            board.setCardPilePos(board.getCardPilePos() + 1);
             if (board.getCardPilePos() == board.getCardPile().size() -1) return GameState.END;
             return GameState.DRAW_CARD;
         }
