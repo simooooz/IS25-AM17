@@ -22,7 +22,7 @@ public class EpidemicCard extends Card {
             for (int i = 0; i < cabins.size(); i++) {
                 for (int j = i+1; j < cabins.size(); j++) {
 
-                    if (cabins.get(i).isNearTo(cabins.get(j))) {
+                    if (cabins.get(i).isNearTo(cabins.get(j)) && (cabins.get(i).getHumans() > 0 || cabins.get(i).getAlien().isPresent()) && (cabins.get(j).getHumans() > 0 || cabins.get(j).getAlien().isPresent())) {
                         if (!checkEpidemic[i]) { // if not visited yet
                             decrementCrew(cabins, i, player);
                             checkEpidemic[i] = true;
