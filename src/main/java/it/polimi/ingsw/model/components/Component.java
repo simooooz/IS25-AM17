@@ -35,19 +35,19 @@ public class Component {
 
     public List<Component> getLinkedNeighbors(Ship ship) {
         List<Component> neighbors = new ArrayList<>();
-        ship.getDashboard(y-1, x).ifPresent(n -> {
+        ship.getDashboard(y - 1, x).ifPresent(n -> {
             if (areConnectorsLinked(connectors[0], n.connectors[2]))
                 neighbors.add(n);
         });
-        ship.getDashboard(y+1, x).ifPresent(n -> {
+        ship.getDashboard(y + 1, x).ifPresent(n -> {
             if (areConnectorsLinked(connectors[2], n.connectors[0]))
                 neighbors.add(n);
         });
-        ship.getDashboard(y, x-1).ifPresent(n -> {
+        ship.getDashboard(y, x - 1).ifPresent(n -> {
             if (areConnectorsLinked(connectors[3], n.connectors[1]))
                 neighbors.add(n);
         });
-        ship.getDashboard(y, x+1).ifPresent(n -> {
+        ship.getDashboard(y, x + 1).ifPresent(n -> {
             if (areConnectorsLinked(connectors[1], n.connectors[3]))
                 neighbors.add(n);
         });
@@ -72,12 +72,24 @@ public class Component {
         ship.getDashboard()[y][x] = Optional.empty();
     }
 
+    /**
+     * Sets the shown attribute of this(component) to true
+     */
     public void showComponent() {
         this.shown = true;
     }
 
+    /**
+     * Handles the selection of this(component) by a ship from the
+     * board's list with the components available
+     *
+     * @param board Board ref
+     * @param ship  Ship ref
+     * @throws ComponentNotValidException if the component is not pickable
+     */
     public void pickComponent(Board board, Ship ship) {
-        if (!board.getCommonComponents().contains(this) || !shown) throw new ComponentNotValidException("This component is not pickable");
+        if (!board.getCommonComponents().contains(this) || !shown)
+            throw new ComponentNotValidException("This component is not pickable");
 
         if (ship.getHandComponent().isPresent())
             ship.getHandComponent().get().releaseComponent(board, ship);
@@ -86,14 +98,20 @@ public class Component {
         ship.setHandComponent(this);
     }
 
+    /**
+     * Releases to the board this(component) from the hand, or ship if not inserted yet
+     *
+     * @param board
+     * @param ship
+     */
     public void releaseComponent(Board board, Ship ship) {
-        if (board.getCommonComponents().contains(this) || inserted || !shown) throw new ComponentNotValidException("This component is not releaseble");
+        if (board.getCommonComponents().contains(this) || inserted || !shown)
+            throw new ComponentNotValidException("This component is not releaseble");
 
         if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) { // Component to release is in hand
             ship.setHandComponent(null);
             board.getCommonComponents().add(this);
-        }
-        else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) { // Component to release is in dashboard
+        } else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) { // Component to release is in dashboard
             ship.getDashboard()[y][x] = Optional.empty();
             board.getCommonComponents().add(this);
             ship.setPreviousComponent(null);
@@ -101,7 +119,8 @@ public class Component {
     }
 
     public void reserveComponent(Board board, Ship ship) {
-        if (!board.getCommonComponents().contains(this) || !shown) throw new ComponentNotValidException("This component is not reservable");
+        if (!board.getCommonComponents().contains(this) || !shown)
+            throw new ComponentNotValidException("This component is not reservable");
         if (ship.getReserves().size() >= 2) throw new ComponentNotValidException("Reserves are full");
 
         board.getCommonComponents().remove(this);
@@ -109,7 +128,8 @@ public class Component {
     }
 
     public void insertComponent(Ship ship, int row, int col) {
-        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent()) throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
+        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
+            throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
         else if (!shown) throw new ComponentNotValidException("Hidden tile");
 
         if (ship.getReserves().contains(this)) // Component is into reserves
@@ -133,9 +153,11 @@ public class Component {
     }
 
     public void moveComponent(Ship ship, int row, int col) {
-        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) throw new ComponentNotValidException("Tile not valid");
+        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
+            throw new ComponentNotValidException("Tile not valid");
         if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
-        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent()) throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
+        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
+            throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
 
         ship.getDashboard()[y][x] = Optional.empty();
         this.x = col;
@@ -145,7 +167,8 @@ public class Component {
 
     public void rotateComponent(Ship ship, boolean clockwise) {
         if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
-        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) throw new ComponentNotValidException("Tile not valid");
+        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
+            throw new ComponentNotValidException("Tile not valid");
 
         ConnectorType[] newConnectors = new ConnectorType[4];
         if (clockwise) {
@@ -153,8 +176,7 @@ public class Component {
             newConnectors[1] = connectors[0];
             newConnectors[2] = connectors[1];
             newConnectors[3] = connectors[2];
-        }
-        else {
+        } else {
             newConnectors[0] = connectors[1];
             newConnectors[1] = connectors[2];
             newConnectors[2] = connectors[3];
