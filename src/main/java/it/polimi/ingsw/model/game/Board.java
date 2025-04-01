@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 public class Board {
 
     private final List<SimpleEntry<PlayerData, Integer>> players;
-    private final List<PlayerData> wantEndFlight;
     private final List<Component> commonComponents;
     private final List<PlayerData> startingDeck;
     private final List<Card> cardPile;
@@ -34,14 +33,13 @@ public class Board {
             this.startingDeck.add(new PlayerData(username));
 
         this.players = new ArrayList<>();
-        this.wantEndFlight = new ArrayList<>();
 
         ComponentFactory componentFactory = new ComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
         this.mapComponents = new HashMap<>(componentFactory.getComponentsMap());
 
 
-        this.cardPile = new ArrayList<>();
+        this.cardPile = new ArrayList<>(new CardFactory().getCards());
         this.cardPilePos = 0;
         this.timeManagement = new Time();
         this.availableGoods = new HashMap<>();
@@ -67,13 +65,9 @@ public class Board {
 
     public PlayerData getPlayerEntityByUsername(String username) {
         return Stream.concat(players.stream().map(SimpleEntry::getKey), startingDeck.stream())
-                .filter(p -> p.getUsername().equals(username))
-                .findFirst()
-                .orElseThrow(PlayerNotFoundException::new);
-    }
-
-    public List<PlayerData> getWantEndFlight() {
-        return wantEndFlight;
+            .filter(p -> p.getUsername().equals(username))
+            .findFirst()
+            .orElseThrow(PlayerNotFoundException::new);
     }
 
     public List<PlayerData> getStartingDeck() {
@@ -86,6 +80,10 @@ public class Board {
 
     public List<Card> getCardPile() {
         return cardPile;
+    }
+
+    public void setCardPilePos(int cardPilePos) {
+        this.cardPilePos = cardPilePos;
     }
 
     public int getCardPilePos() {
@@ -105,7 +103,7 @@ public class Board {
     }
 
     public GameState drawCard(PlayerData player) {
-        if (!player.equals(getPlayersByPos().getFirst())) throw new PlayerNotFoundException("Payer is not the leader");
+        if (!player.equals(getPlayersByPos().getFirst())) throw new PlayerNotFoundException("Player is not the leader");
 
         if (cardPilePos < cardPile.size()) {
             Card card = cardPile.get(cardPilePos);
@@ -116,7 +114,8 @@ public class Board {
                 else return GameState.DRAW_CARD;
             }
             return GameState.PLAY_CARD;
-        } else throw new RuntimeException("Card index out of bound");
+        }
+        else throw new RuntimeException("Card index out of bound");
     }
 
     public void movePlayer(PlayerData playerData, int position) {
