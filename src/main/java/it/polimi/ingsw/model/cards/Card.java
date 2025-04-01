@@ -70,7 +70,7 @@ abstract public class Card {
         boolean finish = changeState(board, username);
         if (finish) {
             board.setCardPilePos(board.getCardPilePos() + 1);
-            if (board.getCardPilePos() == board.getCardPile().size() -1) return GameState.END;
+            if (board.getCardPilePos() == board.getCardPile().size()) return GameState.END;
             return GameState.DRAW_CARD;
         }
         return GameState.PLAY_CARD;
