@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.properties.DirectionType;
 
+import java.io.Console;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +43,6 @@ public class MeteorSwarmCard extends Card{
                     PlayerState newState = meteors.get(meteorIndex).hit(player.getShip(), coord);
                     playersState.put(player.getUsername(), newState);
                 }
-                meteorIndex++;
             }
             case WAIT_SHIELD, WAIT_CANNONS -> playersState.put(username, PlayerState.DONE);
         }
@@ -54,11 +54,13 @@ public class MeteorSwarmCard extends Card{
                 hasDone = false;
 
         if (hasDone) {
+            meteorIndex ++;
             if (meteorIndex >= meteors.size()) {
                 endCard(board);
                 return true;
             }
             else {
+
                 for (PlayerData player : board.getPlayersByPos())
                     playersState.put(player.getUsername(), PlayerState.WAIT);
                 playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);

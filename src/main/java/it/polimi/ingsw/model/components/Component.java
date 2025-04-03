@@ -236,8 +236,8 @@ public class Component {
             if (
                     dashboard[i][j].get().x < otherComponentOpt.get().x && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||
                             dashboard[i][j].get().x > otherComponentOpt.get().x && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[3], otherComponentOpt.get().getConnectors()[1]) ||
-                            dashboard[i][j].get().y < otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.get().getConnectors()[2]) ||
-                            dashboard[i][j].get().y > otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.get().getConnectors()[0])
+                            dashboard[i][j].get().y < otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.get().getConnectors()[0]) ||
+                            dashboard[i][j].get().y > otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.get().getConnectors()[2])
             )
                 return;
         }
