@@ -16,6 +16,7 @@ public class SmugglersCard extends Card {
     private final int days;
 
     private boolean defeated;
+    private boolean redeem;
     private int playerIndex;
     private List<PlayerData> defeatedPlayers;
     private double power;
@@ -31,6 +32,7 @@ public class SmugglersCard extends Card {
     @Override
     public boolean startCard(Board board) {
         this.defeated = false;
+        this.redeem = false;
         this.playerIndex = 0;
         this.defeatedPlayers = new ArrayList<>();
 
@@ -45,7 +47,10 @@ public class SmugglersCard extends Card {
         PlayerState state = playersState.get(username);
 
         switch (state) {
-            case WAIT_BOOLEAN -> playersState.put(username, PlayerState.DONE);
+            case WAIT_BOOLEAN -> {
+                if (redeem) {playersState.put(username, PlayerState.WAIT_GOODS);}
+                else {playersState.put(username, PlayerState.DONE);}
+            }
             case WAIT_CANNONS -> {
                 if (power > smugglersFirePower && !defeated) {       // ask if user wants to redeem rewards
                     playersState.put(username, PlayerState.WAIT_BOOLEAN);
@@ -55,10 +60,12 @@ public class SmugglersCard extends Card {
                     playersState.put(username, PlayerState.DONE);
                 else {                                      // player is defeated
                     defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    playersState.put(username, PlayerState.DONE);
+                    playersState.put(username, PlayerState.WAIT_REMOVE_GOODS);
                 }
             }
-            case WAIT_GOODS -> {
+            case WAIT_GOODS -> playersState.put(username, PlayerState.DONE);
+
+            case WAIT_REMOVE_GOODS -> {
                 defeatedPlayers.remove(board.getPlayerEntityByUsername(username));
                 playersState.put(username, PlayerState.DONE);
             }
@@ -99,7 +106,7 @@ public class SmugglersCard extends Card {
             }
             else {      // user loses automatically
                 defeatedPlayers.add(player);
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                playersState.put(player.getUsername(), PlayerState.WAIT_REMOVE_GOODS);
             }
 
             boolean hasDone = true;
@@ -110,11 +117,6 @@ public class SmugglersCard extends Card {
             if (hasDone && defeatedPlayers.isEmpty()) {
                 endCard(board);
                 return true;
-            }
-            else if (hasDone) {
-                defeatedPlayers.forEach(p -> {
-                    playersState.put(p.getUsername(), PlayerState.WAIT_GOODS);
-                });
             }
         }
         return false;
@@ -132,10 +134,10 @@ public class SmugglersCard extends Card {
         PlayerData player = board.getPlayerEntityByUsername(username);
         if (commandType == PlayerState.WAIT_BOOLEAN && value) {
             board.movePlayer(player, -1*this.days);
-            playersState.put(username, PlayerState.WAIT_GOODS);
+            redeem = true;
         }
         else if (!value)
-            playersState.put(username, PlayerState.DONE);
+            redeem = false;
     }
 
     @Override
