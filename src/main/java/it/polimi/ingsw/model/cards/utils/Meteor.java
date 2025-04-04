@@ -57,7 +57,7 @@ public class Meteor {
     }
 
     public List<Component> getTargets(Ship ship, int coord) {
-        return directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord).stream().toList();
+        return directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord);
     }
 
     public DirectionType getDirectionFrom() {

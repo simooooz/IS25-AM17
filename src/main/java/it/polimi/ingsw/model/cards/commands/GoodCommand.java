@@ -12,6 +12,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.Ship;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,8 @@ public class GoodCommand implements Command {
             card.doSpecificCheck(PlayerState.WAIT_REMOVE_GOODS, 0, deltaGood, batteries, username, board);
 
         for (SpecialCargoHoldsComponent component : cargoHolds.keySet()) {
-            for (ColorType good : component.getGoods()) {
+            List<ColorType> currentGoods = new ArrayList<>(component.getGoods());
+            for (ColorType good : currentGoods) {
                 component.unloadGood(good, ship);
             }
             for (ColorType good : cargoHolds.get(component)) {

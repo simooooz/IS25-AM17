@@ -25,9 +25,9 @@ public class CannonComponent extends Component {
 
     @Override
     public void rotateComponent(Ship ship, boolean clockwise) {
-        DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, EAST = 3
+        DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3
         if (clockwise) { this.direction = directions[(this.direction.ordinal() + 1 % 4)]; }
-        else { this.direction = directions[(this.direction.ordinal() + 3 % 4)]; }
+        else { this.direction = directions[(this.direction.ordinal() + 3 )% 4]; }
         super.rotateComponent(ship, clockwise);
     }
 
@@ -41,7 +41,7 @@ public class CannonComponent extends Component {
     }
 
     public double calcPower() {
-        int factor = direction == DirectionType.NORTH ? 2 : 1;
+        int factor = direction == DirectionType.NORTH ? 1 : 2;
         return (isDouble ? 2.0 : 1.0) / factor;
     }
 }

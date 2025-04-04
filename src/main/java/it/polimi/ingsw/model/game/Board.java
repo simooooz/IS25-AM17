@@ -37,8 +37,6 @@ public class Board {
         ComponentFactory componentFactory = new ComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
         this.mapComponents = new HashMap<>(componentFactory.getComponentsMap());
-
-
         this.cardPile = new ArrayList<>(new CardFactory().getCards());
         this.cardPilePos = 0;
         this.timeManagement = new Time();
@@ -110,7 +108,7 @@ public class Board {
             boolean finish = card.startCard(this);
             if (finish) {
                 cardPilePos++;
-                if (cardPilePos == cardPile.size() - 1) return GameState.END;
+                if (cardPilePos == cardPile.size()) return GameState.END;
                 else return GameState.DRAW_CARD;
             }
             return GameState.PLAY_CARD;
