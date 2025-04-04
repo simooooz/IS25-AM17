@@ -2,12 +2,15 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.cards.utils.CriteriaType;
 import it.polimi.ingsw.model.cards.utils.PenaltyCombatZone;
+import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CombatZoneCard extends Card{
@@ -47,7 +50,11 @@ public class CombatZoneCard extends Card{
         PlayerState actState = playersState.get(username);
 
         switch (actState) {
-            case WAIT_CANNONS, WAIT_ENGINES, WAIT_REMOVE_CREW, WAIT_REMOVE_GOODS, WAIT_SHIELD, WAIT_ROLL_DICES -> playersState.put(username, PlayerState.DONE);
+            case WAIT_CANNONS, WAIT_ENGINES, WAIT_SHIELD, WAIT_ROLL_DICES -> playersState.put(username, PlayerState.DONE);
+            case WAIT_REMOVE_CREW, WAIT_REMOVE_GOODS -> {
+                worst.getKey().setValue(Optional.empty());
+                playersState.put(username, PlayerState.DONE);
+            }
         }
 
         playerIndex++;
@@ -129,5 +136,14 @@ public class CombatZoneCard extends Card{
             super.doSpecificCheck(commandType, cabins, num, username, board);
         }
     }
+
+    @Override
+    public void doSpecificCheck(PlayerState commandType, int number, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
+        if (commandType == PlayerState.WAIT_REMOVE_GOODS) {
+            int num = warLines.get(warLineIndex).getValue().getPenaltyNumber();
+            super.doSpecificCheck(commandType, num, deltaGood, batteries, username, board);
+        }
+    }
+
 
 }
