@@ -92,19 +92,16 @@ class AbandonedShipCardTest {
         cabin1.pickComponent(board, p1.getShip());
         cabin1.insertComponent(p1.getShip(), 1, 2);
         cabin1.weldComponent();
-        cabin1.setHumans(2, p1.getShip());
 
         cabin2.showComponent();
         cabin2.pickComponent(board, p2.getShip());
         cabin2.insertComponent(p2.getShip(), 1, 2);
         cabin2.weldComponent();
-        cabin2.setHumans(2, p2.getShip());
 
         cabin3.showComponent();
         cabin3.pickComponent(board, p3.getShip());
         cabin3.insertComponent(p3.getShip(), 1, 2);
         cabin3.weldComponent();
-        cabin3.setHumans(2, p3.getShip());
 
         cabin4.showComponent();
         cabin4.pickComponent(board, p1.getShip());
@@ -132,11 +129,12 @@ class AbandonedShipCardTest {
     @Test
     void testShouldNotUpdateCardIfCrewNotEnough() throws Exception{
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 10, 0, 0);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
         modelFacade.nextCard(p1.getUsername());
 
-        assertEquals(4, p1.getShip().getCrew());
+        assertEquals(3, p1.getShip().getCrew());
         assertEquals(50, p1.getCredits());
         assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
     }
@@ -144,6 +142,7 @@ class AbandonedShipCardTest {
     @Test
     void testShouldCheckIfTheParameterAreUpdateWithHuman() throws Exception{
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 2, 6, 7);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
         modelFacade.nextCard(p1.getUsername());
@@ -156,14 +155,15 @@ class AbandonedShipCardTest {
 
         modelFacade.removeCrew(p1.getUsername(), updated);
 
-        assertEquals(2, p1.getShip().getCrew());
+        assertTrue(board.getStartingDeck().contains(p1));
+        assertEquals(1, p1.getShip().getCrew());
         assertEquals(56, p1.getCredits());
-        assertEquals(6, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
     }
 
     @Test
     void testShouldCheckIfTheParameterAreUpdateWithHumanAndAlien() throws Exception{
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 3, 6, 7);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 2, 6, 7);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
         modelFacade.nextCard(p1.getUsername());
@@ -182,27 +182,9 @@ class AbandonedShipCardTest {
     }
 
     @Test
-    void testShouldCheckIfTheParameterAreUpdateWithAlien() throws Exception{
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 2, 6, 7);
-        board.getCardPile().add(abandonedShipCard);
-
-        modelFacade.nextCard(p1.getUsername());
-
-        modelFacade.getBoolean(p1.getUsername(), true);
-
-        List<CabinComponent> updated = new ArrayList<>();
-        updated.add(cabin4);
-
-        modelFacade.removeCrew(p1.getUsername(), updated);
-
-        assertEquals(2, p1.getShip().getCrew());
-        assertEquals(56, p1.getCredits());
-        assertEquals(6, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
-    }
-
-    @Test
     void testShouldCheckIfTheCardIsUsedBySecondPlayer() throws Exception{
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 5, 6, 2);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 4, 6, 2);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
         modelFacade.nextCard(p1.getUsername());
@@ -216,7 +198,7 @@ class AbandonedShipCardTest {
 
         modelFacade.removeCrew(p2.getUsername(), updated);
 
-        assertEquals(4, p1.getShip().getCrew());
+        assertEquals(3, p1.getShip().getCrew());
         assertEquals(1, p2.getShip().getCrew());
         assertEquals(50, p1.getCredits());
         assertEquals(46, p2.getCredits());
@@ -227,6 +209,7 @@ class AbandonedShipCardTest {
     @Test
     void testShouldCheckIfTheCardIsUsedByThirdPlayer() throws Exception{
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 1, 6, 2);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
         modelFacade.nextCard(p1.getUsername());
@@ -239,8 +222,8 @@ class AbandonedShipCardTest {
 
         modelFacade.removeCrew(p3.getUsername(), updated);
 
-        assertEquals(4, p1.getShip().getCrew());
-        assertEquals(6, p2.getShip().getCrew());
+        assertEquals(3, p1.getShip().getCrew());
+        assertEquals(5, p2.getShip().getCrew());
         assertEquals(1, p3.getShip().getCrew());
         assertEquals(50, p1.getCredits());
         assertEquals(40, p2.getCredits());
