@@ -114,6 +114,7 @@ class AbandonedStationCardTest {
     @Test
     void testShouldNotUpdateIfCrewNotEnough() {
         AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 10, 5, cardGoods);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
         modelFacade.nextCard(p1.getUsername());
@@ -125,6 +126,7 @@ class AbandonedStationCardTest {
     @Test
     void testShouldCheckIfTheParameterAreUpdate() {
         AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 2, 5, cardGoods);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
         modelFacade.nextCard(p1.getUsername());
@@ -143,6 +145,7 @@ class AbandonedStationCardTest {
     @Test
     void testShouldCheckIfTheCardIsUsedBySecondPlayer() throws Exception{
         AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 2, 2, cardGoods);
+        board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
         modelFacade.nextCard(p1.getUsername());
