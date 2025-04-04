@@ -7,6 +7,8 @@ import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
 
+import java.io.Console;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,13 +24,13 @@ public class Meteor {
     public PlayerState hit(Ship ship, int coord) {
         if (coord > 10 || coord < 4) return PlayerState.DONE; // Miss
 
-        List<Component> targets = getTargets(ship, coord); // Find hit component
+        List<Component> targets = getTargets(ship, coord);// Find hit component
         if (targets.isEmpty()) return PlayerState.DONE; // Miss
         Component target = targets.getFirst();
 
         if (!isBig && target.getConnectors()[directionFrom.ordinal()] == ConnectorType.EMPTY) // Ship is safe
             return PlayerState.DONE;
-        else if (!isBig && ship.getProtectedSides().contains(directionFrom) && ship.getBatteries() > 0) // Ask user if he wants to use a battery
+        else if (!isBig && ship.getProtectedSides().contains(directionFrom) && ship.getBatteries() > 0)// Ask user if he wants to use a battery
             return PlayerState.WAIT_SHIELD;
         else if (isBig) {
 
@@ -51,8 +53,7 @@ public class Meteor {
             }
 
         }
-
-        target.destroyComponent(ship); // Destroy component
+        target.destroyComponent(ship);// Destroy component
         return PlayerState.DONE;
     }
 

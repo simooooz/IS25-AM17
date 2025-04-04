@@ -42,7 +42,7 @@ public class CabinComponent extends Component {
     }
 
     public void setAlien(AlienType newAlien, Ship ship) {
-        if (isStarting) throw new ComponentNotValidException("Alien isn't compatible with staring cabin tile");
+        if (isStarting && newAlien != null) throw new ComponentNotValidException("Alien isn't compatible with staring cabin tile");
         else if (this.alien.isEmpty() && newAlien != null) { // Should set new alien
 
             // Check if exists an odd component
