@@ -25,9 +25,12 @@ public enum CriteriaType {
         @Override
         public PlayerState countCriteria(PlayerData player, SimpleEntry<SimpleEntry<Character, Optional<PlayerData>>, Double> worst) {
 
-            double freeCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
+            double freeCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                 .filter(cannon -> !cannon.getIsDouble())
                 .mapToDouble(CannonComponent::calcPower).sum();
+            if (freeCannonsPower > 0 && player.getShip().getCannonAlien())
+                freeCannonsPower += 2;
+
             double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                 .filter(CannonComponent::getIsDouble)
                 .mapToDouble(CannonComponent::calcPower)
@@ -53,9 +56,12 @@ public enum CriteriaType {
         @Override
         public PlayerState countCriteria(PlayerData player, SimpleEntry<SimpleEntry<Character, Optional<PlayerData>>, Double> worst) {
 
-            double freeEnginesPower = (player.getShip().getEngineAlien() ? 2 : 0) + player.getShip().getComponentByType(EngineComponent.class).stream()
+            double freeEnginesPower = player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(engine -> !engine.getIsDouble())
                     .mapToDouble(EngineComponent::calcPower).sum();
+            if (freeEnginesPower > 0 && player.getShip().getEngineAlien())
+                freeEnginesPower += 2;
+
             double doubleEnginesPower = player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(EngineComponent::getIsDouble)
                     .mapToDouble(EngineComponent::calcPower)

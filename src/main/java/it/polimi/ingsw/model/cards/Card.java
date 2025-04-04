@@ -50,7 +50,7 @@ abstract public class Card {
         List<PlayerData> players = board.getPlayersByPos();
 
         for (PlayerData player : players)
-            if (player.getShip().getCrew() == 0)
+            if (player.getShip().getCrew() - (player.getShip().getCannonAlien() ? 1 : 0) - (player.getShip().getEngineAlien() ? 1 : 0) == 0)
                 board.moveToStartingDeck(player);
 
         if (!board.getPlayers().isEmpty()) {
@@ -107,7 +107,7 @@ abstract public class Card {
     }
 
     public void doSpecificCheck(PlayerState commandType, List<CabinComponent> cabins, int toRemove, String username, Board board) {
-        int crew = cabins.stream().mapToInt(c -> c.getAlien().isPresent() ? 2 : 1).sum();
+        int crew = cabins.size();
         if (commandType == PlayerState.WAIT_REMOVE_CREW && crew != toRemove)
             throw new IllegalArgumentException("Too few cabin components provided");
     }

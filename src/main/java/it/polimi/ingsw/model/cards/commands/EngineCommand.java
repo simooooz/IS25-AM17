@@ -37,7 +37,9 @@ public class EngineCommand implements Command {
                 .filter(engine -> !engine.getIsDouble())
                 .toList().size();
         int dobuleEnginePower = engines.stream().mapToInt(EngineComponent::calcPower).sum();
-        int userEnginePower = singleEnginePower + dobuleEnginePower + (ship.getEngineAlien() ? 2 : 0);
+        int userEnginePower = singleEnginePower + dobuleEnginePower;
+        if (userEnginePower > 0 && ship.getEngineAlien())
+            userEnginePower += 2;
 
         batteries.forEach(batteryComponent -> batteryComponent.useBattery(ship));
         card.doCommandEffects(PlayerState.WAIT_ENGINES, userEnginePower, username, board);

@@ -59,10 +59,10 @@ public class CabinComponent extends Component {
             else if (newAlien == AlienType.ENGINE && ship.getEngineAlien()) throw new CabinComponentNotValidException("Alien " + newAlien + " is already present");
 
             setHumans(0, ship);
-            ship.setCrew(ship.getCrew() + 2);
+            ship.setCrew(ship.getCrew() + 1);
         }
         else if (this.alien.isPresent() && newAlien == null) { // Should remove alien
-            ship.setCrew(ship.getCrew() - 2);
+            ship.setCrew(ship.getCrew() - 1);
             if (this.alien.get() == AlienType.CANNON) { ship.setCannonAlien(false); }
             else { ship.setEngineAlien(false); }
         }

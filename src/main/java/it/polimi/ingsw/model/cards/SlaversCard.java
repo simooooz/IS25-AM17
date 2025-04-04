@@ -76,9 +76,12 @@ public class SlaversCard extends Card {
         for (; playerIndex < players.size(); playerIndex++) {
             PlayerData player = players.get(playerIndex);
 
-            double freeCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
+            double freeCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(cannon -> !cannon.getIsDouble())
                     .mapToDouble(CannonComponent::calcPower).sum();
+            if (freeCannonsPower > 0 && player.getShip().getCannonAlien())
+                freeCannonsPower += 2;
+
             double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(CannonComponent::getIsDouble)
                     .mapToDouble(cannon -> cannon.getDirection() == DirectionType.NORTH ? 2 : 1).sum();
@@ -89,7 +92,7 @@ public class SlaversCard extends Card {
                 playersState.put(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 slaversDefeated = true;
             }
-            else if (freeCannonsPower == slaversFirePower)
+            else if (freeCannonsPower == slaversFirePower && doubleCannonsPower == 0)
                 playersState.put(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower + doubleCannonsPower >= slaversFirePower) { // User could win
                 playersState.put(player.getUsername(), PlayerState.WAIT_CANNONS);

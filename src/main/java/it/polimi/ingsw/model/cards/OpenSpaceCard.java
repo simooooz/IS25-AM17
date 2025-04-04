@@ -42,10 +42,13 @@ public class OpenSpaceCard extends Card {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
-            int singleEnginesPower = (player.getShip().getEngineAlien() ? 2 : 0) + player.getShip().getComponentByType(EngineComponent.class).stream()
+            int singleEnginesPower = player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(engine -> !engine.getIsDouble())
                     .mapToInt(EngineComponent::calcPower)
                     .sum();
+            if (singleEnginesPower > 0 && player.getShip().getEngineAlien())
+                singleEnginesPower += 2;
+
             int doubleEnginesPower = player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(EngineComponent::getIsDouble)
                     .mapToInt(EngineComponent::calcPower)

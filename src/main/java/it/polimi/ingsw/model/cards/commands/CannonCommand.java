@@ -39,7 +39,9 @@ public class CannonCommand implements Command {
                 .mapToDouble(CannonComponent::calcPower)
                 .sum();
         double doubleCannonPower = cannons.stream().mapToDouble(CannonComponent::calcPower).sum();
-        double userCannonPower = singleCannonPower + doubleCannonPower + (ship.getCannonAlien() ? 2 : 0);
+        double userCannonPower = singleCannonPower + doubleCannonPower;
+        if (userCannonPower > 0 && ship.getCannonAlien())
+            userCannonPower += 2;
 
         batteries.forEach(batteryComponent -> batteryComponent.useBattery(ship));
         card.doCommandEffects(PlayerState.WAIT_CANNONS, userCannonPower, username, board);

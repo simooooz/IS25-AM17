@@ -86,9 +86,12 @@ public class PiratesCard extends Card{
         for (; playerIndex < players.size(); playerIndex++) {
             PlayerData player = players.get(playerIndex);
 
-            double freeCannonsPower = (player.getShip().getCannonAlien() ? 2 : 0) + player.getShip().getComponentByType(CannonComponent.class).stream()
+            double freeCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(cannon -> !cannon.getIsDouble())
                     .mapToDouble(CannonComponent::calcPower).sum();
+            if (freeCannonsPower > 0 && player.getShip().getCannonAlien())
+                freeCannonsPower += 2;
+
             double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(CannonComponent::getIsDouble)
                     .mapToDouble(CannonComponent::calcPower)
