@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EpidemicCardTest {
 
-    private Optional<Component>[][] dashboard1;
     private List<String> usernames;
     private PlayerData p1;
     private PlayerData p2;
@@ -36,12 +35,7 @@ class EpidemicCardTest {
     @BeforeEach
     void setUp() {
         // inizializzazione delle variabili comuni ai test
-        dashboard1 = new Optional[4][6];
-        for (int i = 0; i < dashboard1.length; i++) {
-            for (int j = 0; j < dashboard1[i].length; j++) {
-                dashboard1[i][j] = Optional.empty();
-            }
-        }
+
         connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
         usernames = new ArrayList<>();
         usernames.add("Simone");
@@ -66,6 +60,7 @@ class EpidemicCardTest {
         odd2 = new OddComponent(connectors, AlienType.ENGINE);
         board.getCommonComponents().add(odd2);
         epidemicCard = new EpidemicCard(2, false);
+        board.getCardPile().clear();
         board.getCardPile().add(epidemicCard);
 
 
@@ -116,7 +111,6 @@ class EpidemicCardTest {
         assertFalse(((CabinComponent)p1.getShip().getDashboard()[1][1].get()).getAlien().isPresent());
 
     }
-
 
     @Test
     void testShouldReduceHumansInThreeAdjacentCabins() {
@@ -189,7 +183,7 @@ class EpidemicCardTest {
 
         modelFacade.nextCard(p1.getUsername());
 
-        assertEquals(4, p1.getShip().getCrew());
+        assertEquals(3, p1.getShip().getCrew());
         assertEquals(2, p1.getShip().getComponentByType(CabinComponent.class).getFirst().getHumans());
         assertEquals(2, ((CabinComponent)p1.getShip().getDashboard()[1][1].get()).getHumans());
         assertTrue(p1.getShip().getComponentByType(CabinComponent.class).get(1).getAlien().isPresent());

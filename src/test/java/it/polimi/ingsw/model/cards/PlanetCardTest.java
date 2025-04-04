@@ -2,12 +2,10 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.ModelFacade;
-import it.polimi.ingsw.model.cards.commands.GoodCommand;
 import it.polimi.ingsw.model.cards.utils.Planet;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.properties.DirectionType;
@@ -21,9 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlanetCardTest {
 
-    private Optional<Component>[][] dashboard1;
-    private Optional<Component>[][] dashboard2;
-    private Optional<Component>[][] dashboard3;
     private Map<ColorType, Integer> goods;
     private List<DirectionType> directions;
     private List<String> usernames;
@@ -48,31 +43,10 @@ class PlanetCardTest {
     private ModelFacade modelFacade;
 
 
-
-
     @BeforeEach
     void setUp() {
         // inizializzazione delle variabili comuni ai test
-        dashboard1 = new Optional[4][6];
-        for (int i = 0; i < dashboard1.length; i++) {
-            for (int j = 0; j < dashboard1[i].length; j++) {
-                dashboard1[i][j] = Optional.empty();
-            }
-        }
 
-        dashboard2 = new Optional[4][6];
-        for (int i = 0; i < dashboard2.length; i++) {
-            for (int j = 0; j < dashboard2[i].length; j++) {
-                dashboard2[i][j] = Optional.empty();
-            }
-        }
-
-        dashboard3 = new Optional[4][6];
-        for (int i = 0; i < dashboard3.length; i++) {
-            for (int j = 0; j < dashboard3[i].length; j++) {
-                dashboard3[i][j] = Optional.empty();
-            }
-        }
         connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
         usernames = new ArrayList<>();
         usernames.add("Simone");
@@ -113,6 +87,7 @@ class PlanetCardTest {
         planetList.add(planet2);
         planetList.add(planet3);
         planetCard = new PlanetCard(2, true, planetList, 3);
+        board.getCardPile().clear();
         board.getCardPile().add(planetCard);
 
     }

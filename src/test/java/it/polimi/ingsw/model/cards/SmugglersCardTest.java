@@ -126,8 +126,9 @@ class SmugglersCardTest {
     }
 
     @Test
-    void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() throws Exception {
+    void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() {
         SmugglersCard smugglersCard = new SmugglersCard(2, false, 1, 5, rewards1, 1);
+        board.getCardPile().clear();
         board.getCardPile().add(smugglersCard);
 
         cannon1 = new CannonComponent(connectors, NORTH, false);
@@ -174,8 +175,9 @@ class SmugglersCardTest {
     }
 
     @Test
-    void testShouldCheckThatCardIsUsedBySecondPLayer() throws Exception {
+    void testShouldCheckThatCardIsUsedBySecondPLayer() {
         SmugglersCard smugglersCard = new SmugglersCard(2, false, 2, 2, rewards1, 1);
+        board.getCardPile().clear();
         board.getCardPile().add(smugglersCard);
 
         cannon1 = new CannonComponent(connectors, NORTH, false);

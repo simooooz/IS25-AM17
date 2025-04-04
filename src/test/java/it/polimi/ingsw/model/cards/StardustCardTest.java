@@ -94,6 +94,7 @@ class StardustCardTest {
         board.getCommonComponents().add(component9);
 
         StardustCard stardustCard = new StardustCard(2, false);
+        board.getCardPile().clear();
         board.getCardPile().add(stardustCard);
 
     }

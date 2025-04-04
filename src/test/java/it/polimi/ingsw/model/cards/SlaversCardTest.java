@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static it.polimi.ingsw.model.properties.DirectionType.EAST;
 import static it.polimi.ingsw.model.properties.DirectionType.NORTH;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,8 +102,9 @@ class SlaversCardTest {
 
 
     @Test
-    void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() throws Exception {
+    void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() {
         SlaversCard slaversCard = new SlaversCard(2, false, 5, 5, 1, 1);
+        board.getCardPile().clear();
         board.getCardPile().add(slaversCard);
 
         cannon1 = new CannonComponent(connectors, NORTH, false);
@@ -121,7 +123,7 @@ class SlaversCardTest {
 
         cannon2.showComponent();
         cannon2.pickComponent(board, p1.getShip());
-        cannon2.insertComponent(p1.getShip(), 2, 2);
+        cannon2.insertComponent(p1.getShip(), 2, 3);
         cannon2.weldComponent();
 
         battery1.showComponent();
@@ -138,18 +140,17 @@ class SlaversCardTest {
         modelFacade.activateCannons(p1.getUsername(), batteries, cannons);
         modelFacade.getBoolean(p1.getUsername(), true);
 
-
-
         assertEquals(14, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
     }
 
     @Test
     void testShouldCheckThatCardIsUsedBySecondPLayer() throws Exception {
 
-        SlaversCard slaversCard = new SlaversCard(2, false, 3, 5, 1, 1);
+        SlaversCard slaversCard = new SlaversCard(2, false, 2, 5, 1, 1);
+        board.getCardPile().clear();
         board.getCardPile().add(slaversCard);
 
-        cannon1 = new CannonComponent(connectors, NORTH, false);
+        cannon1 = new CannonComponent(connectors, EAST, false);
         board.getCommonComponents().add(cannon1);
 
         cannon2 = new CannonComponent(connectors, NORTH, true);

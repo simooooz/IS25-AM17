@@ -78,6 +78,7 @@ class OpenSpaceCardTest {
 
 
         openSpaceCard = new OpenSpaceCard(2, false);
+        board.getCardPile().clear();
         board.getCardPile().add(openSpaceCard);
 
     }
