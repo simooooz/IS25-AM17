@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.controller.GameState;
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 import it.polimi.ingsw.model.factory.CardFactory;
@@ -105,18 +107,22 @@ public class Board {
         Collections.shuffle(cardPile);
     }
 
-    public GameState drawCard(PlayerData player) {
-        if (!player.equals(getPlayersByPos().getFirst())) throw new PlayerNotFoundException("Player is not the leader");
-
+    public void drawCard(ModelFacade model) {
         if (cardPilePos < cardPile.size()) {
             Card card = cardPile.get(cardPilePos);
-            boolean finish = card.startCard(this);
+            boolean finish = card.startCard(model, this);
             if (finish) {
                 cardPilePos++;
-                if (cardPilePos == cardPile.size()) return GameState.END;
-                else return GameState.DRAW_CARD;
+                if (cardPilePos == cardPile.size()) { // All cards are resolved
+                    for (PlayerData p : getPlayersByPos())
+                        model.setPlayerState(p.getUsername(), PlayerState.END);
+                }
+                else { // Change card
+                    for (PlayerData p : getPlayersByPos())
+                        model.setPlayerState(p.getUsername(), PlayerState.WAIT);
+                    model.setPlayerState(getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+                }
             }
-            return GameState.PLAY_CARD;
         }
         else throw new RuntimeException("Card index out of bound");
     }

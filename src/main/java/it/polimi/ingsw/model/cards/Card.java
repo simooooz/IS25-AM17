@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.controller.GameState;
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.components.CannonComponent;
@@ -20,12 +21,10 @@ abstract public class Card {
 
     private final int level;
     private final boolean isLearner;
-    Map<String, PlayerState> playersState;
 
     public Card(int level, boolean isLearner) {
         this.level = level;
         this.isLearner = isLearner;
-        this.playersState = new HashMap<>();
     }
 
     public int getLevel() {
@@ -36,13 +35,9 @@ abstract public class Card {
         return isLearner;
     }
 
-    public Map<String, PlayerState> getPlayersState() {
-        return playersState;
-    }
+    public abstract boolean startCard(ModelFacade model, Board board);
 
-    public abstract boolean startCard(Board board);
-
-    protected boolean changeState(Board board, String username) {
+    protected boolean changeState(ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
 
@@ -66,14 +61,20 @@ abstract public class Card {
 
     }
 
-    public GameState changeCardState(Board board, String username) {
-        boolean finish = changeState(board, username);
+    public void changeCardState(ModelFacade model, Board board, String username) {
+        boolean finish = changeState(model, board, username);
         if (finish) {
             board.setCardPilePos(board.getCardPilePos() + 1);
-            if (board.getCardPilePos() == board.getCardPile().size()) return GameState.END;
-            return GameState.DRAW_CARD;
+            if (board.getCardPilePos() == board.getCardPile().size()) { // All cards are resolved
+                for (PlayerData player : board.getPlayersByPos())
+                    model.setPlayerState(player.getUsername(), PlayerState.END);
+            }
+            else { // Change card
+                for (PlayerData player : board.getPlayersByPos())
+                    model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+                model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+            }
         }
-        return GameState.PLAY_CARD;
     }
 
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> rewards, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {

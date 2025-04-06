@@ -19,24 +19,29 @@ import java.util.stream.Stream;
 public class ModelFacade {
 
     private final Board board;
-    private GameState state;
+    private final List<String> usernames;
+    private final Map<String, PlayerState> playersState;
 
     public ModelFacade(List<String> usernames) {
+        this.usernames = usernames;
         this.board = new Board(usernames);
+        this.playersState = new HashMap<>();
     }
 
-    public GameState getState() {
-        return state;
+    public PlayerState getPlayerState(String username) {
+        return playersState.get(username);
     }
 
-    public void setState(GameState state) {
-        this.state = state;
+    public void setPlayerState(String username, PlayerState newState) {
+        this.playersState.put(username, newState);
     }
 
     public void startMatch() {
         if (this.board.getPlayers().size() < 2) throw new NoEnoughPlayerException("MIN players required: 2");
 
-        state = GameState.BUILD;
+        for (String username : usernames)
+            playersState.put(username, PlayerState.BUILD);
+
         board.getTimeManagement().startTimer(this);
     }
 
@@ -107,7 +112,7 @@ public class ModelFacade {
 
     public boolean isPlayerReady(String username) {
         return board.getStartingDeck().stream()
-            .anyMatch(p -> p.getUsername().equals(username));
+            .noneMatch(p -> p.getUsername().equals(username));
     }
 
     private boolean arePlayersReady() {
@@ -119,14 +124,20 @@ public class ModelFacade {
     }
 
     public void playerLeft(String username) {
-        this.board.removePlayer(username);
+        // todo this.board.removePlayer(username);
     }
 
     public void moveStateAfterBuilding() {
-        state = GameState.CHECK;
+        for (String username: usernames)
+            playersState.put(username, PlayerState.CHECK);
+
         board.shuffleCards();
-        if (areShipsReady())
-            state = GameState.DRAW_CARD;
+
+        if (areShipsReady()) {
+            for (PlayerData player : board.getPlayersByPos())
+                playersState.put(player.getUsername(), PlayerState.WAIT);
+            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+        }
     }
 
     public void checkShip(String username, List<Integer> toRemove) {
@@ -136,8 +147,11 @@ public class ModelFacade {
         for (int componentId : toRemove)
             board.getMapIdComponents().get(componentId).affectDestroy(ship);
 
-        if (areShipsReady())
-            state = GameState.DRAW_CARD;
+        if (areShipsReady()) {
+            for (PlayerData player : board.getPlayersByPos())
+                playersState.put(player.getUsername(), PlayerState.WAIT);
+            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+        }
     }
 
     public boolean areShipsReady() {
@@ -147,97 +161,88 @@ public class ModelFacade {
         return true;
     }
 
-    public void nextCard(String username) {
-        this.state = board.drawCard(board.getPlayerEntityByUsername(username));
+    public void nextCard() {
+        board.drawCard(this);
     }
 
     public void activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
-        Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_CANNONS) throw new IllegalStateException("Player " + username + " state is not WAIT_CANNONS");
-
         List<BatteryComponent> batteries = batteriesIds.stream().map(id -> (BatteryComponent) board.getMapIdComponents().get(id)).toList();
         List<CannonComponent> cannonComponents = cannonComponentsIds.stream().map(id -> (CannonComponent) board.getMapIdComponents().get(id)).toList();
+
+        Card card = board.getCardPile().get(board.getCardPilePos());
         Command command = new CannonCommand(username, board, batteries, cannonComponents);
         command.execute(card);
-        card.changeCardState(board, username);
+        card.changeCardState(this, board, username);
     }
 
     public void activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
-        Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_ENGINES) throw new IllegalStateException("Player " + username + " state is not WAIT_ENGINES");
-
         List<BatteryComponent> batteries = batteriesIds.stream().map(id -> (BatteryComponent) board.getMapIdComponents().get(id)).toList();
         List<EngineComponent> engineComponents = engineComponentsIds.stream().map(id -> (EngineComponent) board.getMapIdComponents().get(id)).toList();
+
+        Card card = board.getCardPile().get(board.getCardPilePos());
         Command command = new EngineCommand(username, board, batteries, engineComponents);
         command.execute(card);
-        setState(card.changeCardState(board, username));
+        card.changeCardState(this, board, username);
     }
 
     public void activateShield(String username, int batteryId) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_SHIELD) throw new IllegalStateException("Player " + username + " state is not WAIT_SHIELD");
-
         Command command = new ShieldCommand(username, board, (BatteryComponent) board.getMapIdComponents().get(batteryId));
         command.execute(card);
-        setState(card.changeCardState(board, username));
+        card.changeCardState(this, board, username);
     }
 
     public void updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
-        Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_GOODS && card.getPlayersState().get(username) != PlayerState.WAIT_REMOVE_GOODS) throw new IllegalStateException("Player " + username + " state is not WAIT_GOODS or WAIT_REMOVE_GOODS");
-
         List<BatteryComponent> batteries = batteriesIds.stream().map(id -> (BatteryComponent) board.getMapIdComponents().get(id)).toList();
         Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds = new HashMap<>();
         cargoHoldsIds.forEach((id, value) -> cargoHolds.put((SpecialCargoHoldsComponent) board.getMapIdComponents().get(id), value));
 
-        Command command = new GoodCommand(username, board, cargoHolds, batteries);
+        Card card = board.getCardPile().get(board.getCardPilePos());
+        Command command = new GoodCommand(username, this, board, cargoHolds, batteries);
         command.execute(card);
-        setState(card.changeCardState(board, username));
+        card.changeCardState(this, board, username);
     }
 
     public void removeCrew(String username, List<Integer> cabinsIds) {
-        Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_REMOVE_CREW) throw new IllegalStateException("Player " + username + " state is not WAIT_REMOVE_CREW");
-
         List<CabinComponent> cabins = cabinsIds.stream().map(id -> (CabinComponent) board.getMapIdComponents().get(id)).toList();
+
+        Card card = board.getCardPile().get(board.getCardPilePos());
         Command command = new RemoveCrewCommand(username, board, cabins);
         command.execute(card);
-        setState(card.changeCardState(board, username));
+        card.changeCardState(this, board, username);
     }
 
     public void rollDices(String username) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_ROLL_DICES) throw new IllegalStateException("Player " + username + " state is not WAIT_ROLL_DICES");
-
         Command command = new RollDicesCommand(username, board);
         command.execute(card);
-        setState(card.changeCardState(board, username));
+        card.changeCardState(this, board, username);
     }
 
     public void getBoolean(String username, boolean value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_BOOLEAN) throw new IllegalStateException("Player " + username + " state is not WAIT_BOOLEAN");
-
         card.doCommandEffects(PlayerState.WAIT_BOOLEAN, value, username, board);
-        setState(card.changeCardState(board, username));
+        card.changeCardState(this, board, username);
     }
 
     public void getIndex(String username, int value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        if (card.getPlayersState().get(username) != PlayerState.WAIT_INDEX) throw new IllegalStateException("Player " + username + " state is not WAIT_INDEX");
-
         card.doCommandEffects(PlayerState.WAIT_INDEX, value, username, board);
-        setState(card.changeCardState(board, username));
+        card.changeCardState(this, board, username);
     }
 
     public void endFlight(String username) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (state == GameState.DRAW_CARD) {
-            player.endFlight();
+
+        boolean isDrawPhase = true;
+        for (PlayerData p : board.getPlayersByPos())
+            if (playersState.get(p.getUsername()) != PlayerState.WAIT || playersState.get(p.getUsername()) != PlayerState.DRAW_CARD)
+                isDrawPhase = false;
+
+        player.endFlight();
+        if (isDrawPhase) {
             board.moveToStartingDeck(player);
         }
-        else
-            player.endFlight();
     }
 
     /**

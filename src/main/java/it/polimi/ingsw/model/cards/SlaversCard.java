@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.components.CannonComponent;
@@ -32,47 +33,47 @@ public class SlaversCard extends Card {
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         this.playerIndex = 0;
         this.defeatedPlayers = new ArrayList<>();
         this.players = board.getPlayersByPos();
 
         for (PlayerData player : players)
-            playersState.put(player.getUsername(), PlayerState.WAIT);
-        return autoCheckPlayers(board);
+            model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+        return autoCheckPlayers(model, board);
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
+    protected boolean changeState(ModelFacade model, Board board, String username) {
 
-        PlayerState actState = playersState.get(username);
+        PlayerState actState = model.getPlayerState(username);
 
         switch (actState) {
-            case WAIT_BOOLEAN -> playersState.put(username, PlayerState.DONE);
+            case WAIT_BOOLEAN -> model.setPlayerState(username, PlayerState.DONE);
             case WAIT_CANNONS -> {
                 if (userCannonPower > slaversFirePower && !slaversDefeated) { // Ask if user wants to redeem rewards
-                    playersState.put(username, PlayerState.WAIT_BOOLEAN);
+                    model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
                     slaversDefeated = true;
                 }
                 else if (userCannonPower >= slaversFirePower) { // Tie or slavers already defeated
-                    playersState.put(username, PlayerState.DONE);
+                    model.setPlayerState(username, PlayerState.DONE);
                 }
                 else { // Player is defeated
                     defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    playersState.put(username, PlayerState.DONE);
+                    model.setPlayerState(username, PlayerState.DONE);
                 }
             }
             case WAIT_REMOVE_CREW -> {
                 defeatedPlayers.remove(board.getPlayerEntityByUsername(username));
-                playersState.put(username, PlayerState.DONE);
+                model.setPlayerState(username, PlayerState.DONE);
             }
         }
 
         playerIndex++;
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
     }
 
-    private boolean autoCheckPlayers(Board board) {
+    private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < players.size(); playerIndex++) {
             PlayerData player = players.get(playerIndex);
 
@@ -87,27 +88,27 @@ public class SlaversCard extends Card {
                     .mapToDouble(cannon -> cannon.getDirection() == DirectionType.NORTH ? 2 : 1).sum();
 
             if (slaversDefeated)
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower > slaversFirePower) { // User wins automatically
-                playersState.put(player.getUsername(), PlayerState.WAIT_BOOLEAN);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 slaversDefeated = true;
             }
             else if (freeCannonsPower == slaversFirePower && doubleCannonsPower == 0)
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower + doubleCannonsPower >= slaversFirePower) { // User could win
-                playersState.put(player.getUsername(), PlayerState.WAIT_CANNONS);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_CANNONS);
                 return false;
             }
             else { // User loses automatically
                 defeatedPlayers.add(player);
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             }
         }
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : players)
-            if (playersState.get(player.getUsername()) != PlayerState.DONE)
+            if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone && defeatedPlayers.isEmpty()) {
@@ -116,7 +117,7 @@ public class SlaversCard extends Card {
         }
         else if (hasDone) {
             for (PlayerData player : defeatedPlayers)
-                playersState.put(player.getUsername(), PlayerState.WAIT_REMOVE_CREW);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_REMOVE_CREW);
         }
 
         return false;

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.CannonFire;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
@@ -35,7 +36,7 @@ public class PiratesCard extends Card{
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         this.piratesDefeated = false;
         this.playerIndex = 0;
         this.cannonIndex = 0;
@@ -43,46 +44,46 @@ public class PiratesCard extends Card{
         this.players = board.getPlayersByPos();
 
         for (PlayerData player : players) {
-            playersState.put(player.getUsername(), PlayerState.WAIT);
+            model.setPlayerState(player.getUsername(), PlayerState.WAIT);
         }
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
+    protected boolean changeState(ModelFacade model, Board board, String username) {
 
-        PlayerState actState = playersState.get(username);
+        PlayerState actState = model.getPlayerState(username);
 
         switch (actState) {
-            case WAIT_BOOLEAN, WAIT_SHIELD -> playersState.put(username, PlayerState.DONE);
+            case WAIT_BOOLEAN, WAIT_SHIELD -> model.setPlayerState(username, PlayerState.DONE);
             case WAIT_CANNONS -> {
                 if (userCannonPower > piratesFirePower && !piratesDefeated) { // Ask if user wants to redeem rewards
-                    playersState.put(username, PlayerState.WAIT_BOOLEAN);
+                    model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
                     piratesDefeated = true;
                 }
                 else if (userCannonPower >= piratesFirePower) { // Tie or pirates already defeated
-                    playersState.put(username, PlayerState.DONE);
+                    model.setPlayerState(username, PlayerState.DONE);
                 }
                 else { // Player is defeated
                     defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    playersState.put(username, PlayerState.DONE);
+                    model.setPlayerState(username, PlayerState.DONE);
                 }
             }
             case WAIT_ROLL_DICES -> {
                 for (PlayerData player : defeatedPlayers) {
                     PlayerState newState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
-                    playersState.put(player.getUsername(), newState);
+                    model.setPlayerState(player.getUsername(), newState);
                 }
                 cannonIndex++;
             }
         }
 
         playerIndex++;
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
 
     }
 
-    private boolean autoCheckPlayers(Board board) {
+    private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < players.size(); playerIndex++) {
             PlayerData player = players.get(playerIndex);
 
@@ -102,27 +103,27 @@ public class PiratesCard extends Card{
                     .sum();
 
             if (piratesDefeated)
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower > piratesFirePower) { // User wins automatically
-                playersState.put(player.getUsername(), PlayerState.WAIT_BOOLEAN);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 piratesDefeated = true;
             }
             else if (freeCannonsPower == piratesFirePower && doubleCannonsPower == 0) // User draws automatically
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower + doubleCannonsPower >= piratesFirePower) { // User could win
-                playersState.put(player.getUsername(), PlayerState.WAIT_CANNONS);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_CANNONS);
                 return false;
             }
             else { // User loses automatically
                 defeatedPlayers.add(player);
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             }
         }
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : players)
-            if (playersState.get(player.getUsername()) != PlayerState.DONE)
+            if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone && defeatedPlayers.isEmpty()) {
@@ -136,8 +137,8 @@ public class PiratesCard extends Card{
             }
             else {
                 for (PlayerData player : defeatedPlayers)
-                    playersState.put(player.getUsername(), PlayerState.WAIT);
-                playersState.put(defeatedPlayers.getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
+                    model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+                model.setPlayerState(defeatedPlayers.getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
             }
         }
         return false;

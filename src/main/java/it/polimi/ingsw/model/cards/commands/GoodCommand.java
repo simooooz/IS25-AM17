@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.commands;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
@@ -23,13 +24,15 @@ public class GoodCommand implements Command {
 
     private final String username;
     private final Board board;
+    private final ModelFacade model;
     Map<ColorType, Integer> deltaGood;
     private final Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds;
     private final List<BatteryComponent> batteries;
 
-    public GoodCommand(String username, Board board, Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds, List<BatteryComponent> batteries) {
+    public GoodCommand(String username, ModelFacade model, Board board, Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds, List<BatteryComponent> batteries) {
         this.username = username;
         this.board = board;
+        this.model = model;
         this.deltaGood = new HashMap<>();
         for(ColorType c : ColorType.values()) {
             this.deltaGood.put(c, 0);
@@ -52,7 +55,7 @@ public class GoodCommand implements Command {
         for (ColorType good : ColorType.values())
             deltaGood.put(good, deltaGood.get(good) - ship.getGoods().get(good));
 
-        if (card.getPlayersState().get(username) == PlayerState.WAIT_GOODS)
+        if (model.getPlayerState(username) == PlayerState.WAIT_GOODS)
             card.doSpecificCheck(PlayerState.WAIT_GOODS, null, deltaGood, batteries, username, board);
         else
             card.doSpecificCheck(PlayerState.WAIT_REMOVE_GOODS, 0, deltaGood, batteries, username, board);

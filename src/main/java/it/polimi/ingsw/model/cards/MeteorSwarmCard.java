@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.Meteor;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
@@ -23,34 +24,34 @@ public class MeteorSwarmCard extends Card{
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         this.meteorIndex = 0;
 
         for (PlayerData player : board.getPlayersByPos())
-            playersState.put(player.getUsername(), PlayerState.WAIT);
-        playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
+            model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+        model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
         return false;
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
+    protected boolean changeState(ModelFacade model, Board board, String username) {
 
-        PlayerState actState = playersState.get(username);
+        PlayerState actState = model.getPlayerState(username);
 
         switch (actState) {
             case WAIT_ROLL_DICES -> {
                 for(PlayerData player : board.getPlayersByPos()) {
                     PlayerState newState = meteors.get(meteorIndex).hit(player.getShip(), coord);
-                    playersState.put(player.getUsername(), newState);
+                    model.setPlayerState(player.getUsername(), newState);
                 }
             }
-            case WAIT_SHIELD, WAIT_CANNONS -> playersState.put(username, PlayerState.DONE);
+            case WAIT_SHIELD, WAIT_CANNONS -> model.setPlayerState(username, PlayerState.DONE);
         }
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != PlayerState.DONE)
+            if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone) {
@@ -62,8 +63,8 @@ public class MeteorSwarmCard extends Card{
             else {
 
                 for (PlayerData player : board.getPlayersByPos())
-                    playersState.put(player.getUsername(), PlayerState.WAIT);
-                playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
+                    model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+                model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
             }
         }
         return false;

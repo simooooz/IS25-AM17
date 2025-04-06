@@ -1,6 +1,11 @@
 package it.polimi.ingsw.model.cards;
 
 public enum PlayerState {
+    BUILD,
+    CHECK,
+    DRAW_CARD,
+    END,
+
     WAIT,
     WAIT_CANNONS,
     WAIT_ENGINES,

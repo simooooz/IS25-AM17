@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.game.Board;
@@ -30,52 +31,52 @@ public class SmugglersCard extends Card {
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         this.defeated = false;
         this.redeem = false;
         this.playerIndex = 0;
         this.defeatedPlayers = new ArrayList<>();
 
         board.getPlayers().forEach(player ->
-                playersState.put(player.getKey().getUsername(), PlayerState.WAIT)
+                model.setPlayerState(player.getKey().getUsername(), PlayerState.WAIT)
         );
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
-        PlayerState state = playersState.get(username);
+    protected boolean changeState(ModelFacade model, Board board, String username) {
+        PlayerState state = model.getPlayerState(username);
 
         switch (state) {
             case WAIT_BOOLEAN -> {
-                if (redeem) {playersState.put(username, PlayerState.WAIT_GOODS);}
-                else {playersState.put(username, PlayerState.DONE);}
+                if (redeem) { model.setPlayerState(username, PlayerState.WAIT_GOODS); }
+                else { model.setPlayerState(username, PlayerState.DONE); }
             }
             case WAIT_CANNONS -> {
                 if (power > smugglersFirePower && !defeated) {       // ask if user wants to redeem rewards
-                    playersState.put(username, PlayerState.WAIT_BOOLEAN);
+                    model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
                     this.defeated = true;
                 }
                 else if (power >= smugglersFirePower)                // tie or smugglers already defeated
-                    playersState.put(username, PlayerState.DONE);
+                    model.setPlayerState(username, PlayerState.DONE);
                 else {                                      // player is defeated
                     defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    playersState.put(username, PlayerState.WAIT_REMOVE_GOODS);
+                    model.setPlayerState(username, PlayerState.WAIT_REMOVE_GOODS);
                 }
             }
-            case WAIT_GOODS -> playersState.put(username, PlayerState.DONE);
+            case WAIT_GOODS -> model.setPlayerState(username, PlayerState.DONE);
 
             case WAIT_REMOVE_GOODS -> {
                 defeatedPlayers.remove(board.getPlayerEntityByUsername(username));
-                playersState.put(username, PlayerState.DONE);
+                model.setPlayerState(username, PlayerState.DONE);
             }
         }
 
         playerIndex++;
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
     }
 
-    private boolean autoCheckPlayers(Board board) {
+    private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < board.getPlayers().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
@@ -96,25 +97,25 @@ public class SmugglersCard extends Card {
                     .sum();
 
             if (defeated)
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower > smugglersFirePower) {      // user win automatically
-                playersState.put(player.getUsername(), PlayerState.WAIT_BOOLEAN);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 defeated = true;
             }
             else if (freeCannonsPower == smugglersFirePower && doubleCannonsPower == 0)        // user draws automatically
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else if (freeCannonsPower + doubleCannonsPower >= smugglersFirePower) {            // user could win
-                playersState.put(player.getUsername(), PlayerState.WAIT_CANNONS);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_CANNONS);
                 return false;
             }
             else {      // user loses automatically
                 defeatedPlayers.add(player);
-                playersState.put(player.getUsername(), PlayerState.WAIT_REMOVE_GOODS);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_REMOVE_GOODS);
             }
 
             boolean hasDone = true;
             for (PlayerData p : board.getPlayersByPos())
-                if (playersState.get(p.getUsername()) != PlayerState.DONE)
+                if (model.getPlayerState(p.getUsername()) != PlayerState.DONE)
                     hasDone = false;
 
             if (hasDone && defeatedPlayers.isEmpty()) {

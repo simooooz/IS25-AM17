@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.EngineComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -17,28 +18,28 @@ public class OpenSpaceCard extends Card {
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         playerIndex = 0;
         this.enginesActivated = new HashMap<>();
 
         board.getPlayersByPos().forEach(player ->
-                playersState.put(player.getUsername(), PlayerState.WAIT)
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT)
         );
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
-        PlayerState state = playersState.get(username);
+    protected boolean changeState(ModelFacade model, Board board, String username) {
+        PlayerState state = model.getPlayerState(username);
 
         if (state == PlayerState.WAIT_ENGINES)
-            playersState.put(username, PlayerState.DONE);
+            model.setPlayerState(username, PlayerState.DONE);
 
         playerIndex++;
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
     }
 
-    public boolean autoCheckPlayers(Board board) {
+    public boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
@@ -56,11 +57,11 @@ public class OpenSpaceCard extends Card {
                     .sum();
 
             if (doubleEnginesPower != 0) {
-                playersState.put(player.getUsername(), PlayerState.WAIT_ENGINES);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_ENGINES);
                 return false;
             } else {
                 enginesActivated.put(player, singleEnginesPower);
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             }
         }
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.game.Board;
@@ -15,7 +16,7 @@ public class EpidemicCard extends Card {
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         for (PlayerData player : board.getPlayersByPos()) {
             List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class);
             boolean[] checkEpidemic = new boolean[cabins.size()]; // to check if cabins are already visited

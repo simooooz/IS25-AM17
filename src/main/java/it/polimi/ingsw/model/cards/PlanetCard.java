@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.Planet;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.game.Board;
@@ -25,42 +26,42 @@ public class PlanetCard extends Card{
     }
 
     @Override
-    public boolean startCard(Board board){
+    public boolean startCard(ModelFacade model, Board board){
         this.playerIndex = 0;
         this.landedPlayers = new HashMap<>();
 
         for (PlayerData player: board.getPlayersByPos())
-            playersState.put(player.getUsername(), PlayerState.WAIT);
-        playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_INDEX);
+            model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+        model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_INDEX);
         return false;
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
+    protected boolean changeState(ModelFacade model, Board board, String username) {
 
-        PlayerState actState = playersState.get(username);
+        PlayerState actState = model.getPlayerState(username);
 
         switch (actState) {
-            case WAIT_GOODS -> playersState.put(username, PlayerState.DONE);
+            case WAIT_GOODS -> model.setPlayerState(username, PlayerState.DONE);
             case WAIT_INDEX -> {
                 if (landedPlayers.containsKey(board.getPlayerEntityByUsername(username))) {
-                    playersState.put(username, PlayerState.WAIT_GOODS);
+                    model.setPlayerState(username, PlayerState.WAIT_GOODS);
                 }
                 else
-                    playersState.put(username, PlayerState.DONE);
+                    model.setPlayerState(username, PlayerState.DONE);
             }
         }
 
         playerIndex++;
         if (playerIndex < board.getPlayersByPos().size() && landedPlayers.size() < planets.size())
-            playersState.put(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
+            model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
         else if (playerIndex < board.getPlayersByPos().size()) // Planets are finished
-            playersState.put(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.DONE);
+            model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.DONE);
 
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != PlayerState.DONE)
+            if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone) {

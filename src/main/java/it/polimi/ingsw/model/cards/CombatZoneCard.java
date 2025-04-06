@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.CriteriaType;
 import it.polimi.ingsw.model.cards.utils.PenaltyCombatZone;
 import it.polimi.ingsw.model.components.BatteryComponent;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CombatZoneCard extends Card{
+public class CombatZoneCard extends Card {
 
     private final List<SimpleEntry<CriteriaType, PenaltyCombatZone>> warLines;
     private int warLineIndex;
@@ -26,7 +27,7 @@ public class CombatZoneCard extends Card{
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         if (board.getPlayersByPos().size() < 2) {
             endCard(board);
             return true;
@@ -38,36 +39,36 @@ public class CombatZoneCard extends Card{
             this.worst = new SimpleEntry<>(temp, 0.0);
 
             for (PlayerData player : board.getPlayersByPos())
-                playersState.put(player.getUsername(), PlayerState.WAIT);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT);
 
-            return autoCheckPlayers(board);
+            return autoCheckPlayers(model, board);
         }
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
+    protected boolean changeState(ModelFacade model, Board board, String username) {
 
-        PlayerState actState = playersState.get(username);
+        PlayerState actState = model.getPlayerState(username);
 
         switch (actState) {
-            case WAIT_CANNONS, WAIT_ENGINES, WAIT_SHIELD, WAIT_ROLL_DICES -> playersState.put(username, PlayerState.DONE);
+            case WAIT_CANNONS, WAIT_ENGINES, WAIT_SHIELD, WAIT_ROLL_DICES -> model.setPlayerState(username, PlayerState.DONE);
             case WAIT_REMOVE_CREW, WAIT_REMOVE_GOODS -> {
                 worst.getKey().setValue(Optional.empty());
-                playersState.put(username, PlayerState.DONE);
+                model.setPlayerState(username, PlayerState.DONE);
             }
         }
 
         playerIndex++;
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
 
     }
 
-    private boolean autoCheckPlayers(Board board) {
+    private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
             PlayerState newState = warLines.get(warLineIndex).getKey().countCriteria(player, worst);
-            playersState.put(player.getUsername(), newState);
+            model.setPlayerState(player.getUsername(), newState);
             if (newState != PlayerState.DONE)
                 return false;
         }
@@ -75,12 +76,12 @@ public class CombatZoneCard extends Card{
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != PlayerState.DONE)
+            if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone && worst.getKey().getValue().isPresent()) { // Apply malus
             PlayerState newState = warLines.get(warLineIndex).getValue().resolve(board, worst.getKey().getValue().get());
-            playersState.put(worst.getKey().getValue().get().getUsername(), newState);
+            model.setPlayerState(worst.getKey().getValue().get().getUsername(), newState);
             if (newState == PlayerState.DONE)
                 worst.getKey().setValue(Optional.empty());
         }
@@ -93,9 +94,9 @@ public class CombatZoneCard extends Card{
             }
             else {
                 for (PlayerData player : board.getPlayersByPos())
-                    playersState.put(player.getUsername(), PlayerState.WAIT);
+                    model.setPlayerState(player.getUsername(), PlayerState.WAIT);
                 this.playerIndex = 0;
-                return autoCheckPlayers(board);
+                return autoCheckPlayers(model, board);
             }
         }
         return false;

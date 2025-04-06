@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -26,51 +27,51 @@ public class AbandonedStationCard extends Card{
     }
 
     @Override
-    public boolean startCard(Board board) {
+    public boolean startCard(ModelFacade model, Board board) {
         this.playerIndex = 0;
         this.conquerorPlayerIndex = -1;
         this.shipConquered = false;
 
         for (PlayerData player : board.getPlayersByPos())
-            playersState.put(player.getUsername(), PlayerState.WAIT);
-        return autoCheckPlayers(board);
+            model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+        return autoCheckPlayers(model, board);
     }
 
     @Override
-    protected boolean changeState(Board board, String username) {
+    protected boolean changeState(ModelFacade model, Board board, String username) {
 
-        PlayerState actState = playersState.get(username);
+        PlayerState actState = model.getPlayerState(username);
 
         switch (actState) {
             case WAIT_GOODS -> {
                 PlayerData player = board.getPlayerEntityByUsername(username);
-                playersState.put(username, PlayerState.DONE);
+                model.setPlayerState(username, PlayerState.DONE);
                 board.movePlayer(player, days * -1);
             }
             case WAIT_BOOLEAN -> {
                 if (conquerorPlayerIndex == board.getPlayersByPos().indexOf(board.getPlayerEntityByUsername(username))) {
-                    playersState.put(username, PlayerState.WAIT_GOODS);
+                    model.setPlayerState(username, PlayerState.WAIT_GOODS);
                     shipConquered = true;
                 }
                 else
-                    playersState.put(username, PlayerState.DONE);
+                    model.setPlayerState(username, PlayerState.DONE);
             }
         }
 
         playerIndex++;
-        return autoCheckPlayers(board);
+        return autoCheckPlayers(model, board);
     }
 
-    private boolean autoCheckPlayers(Board board) {
+    private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
             if (shipConquered)
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else if (player.getShip().getCrew() < crew) // User loses automatically
-                playersState.put(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else { // User could win
-                playersState.put(player.getUsername(), PlayerState.WAIT_BOOLEAN);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 return false;
             }
         }
@@ -78,7 +79,7 @@ public class AbandonedStationCard extends Card{
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != PlayerState.DONE)
+            if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone) {
