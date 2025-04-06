@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -8,7 +9,7 @@ public abstract class PenaltyCombatZone {
 
     public PenaltyCombatZone() {}
 
-    public abstract PlayerState resolve(Board board, PlayerData player);
+    public abstract PlayerState resolve(ModelFacade model, Board board, PlayerData player);
 
     public void doCommandEffects(PlayerState commandType, Integer value) {
         throw new RuntimeException("Method not valid");

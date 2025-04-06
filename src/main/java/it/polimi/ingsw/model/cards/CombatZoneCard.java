@@ -80,7 +80,7 @@ public class CombatZoneCard extends Card {
                 hasDone = false;
 
         if (hasDone && worst.getKey().getValue().isPresent()) { // Apply malus
-            PlayerState newState = warLines.get(warLineIndex).getValue().resolve(board, worst.getKey().getValue().get());
+            PlayerState newState = warLines.get(warLineIndex).getValue().resolve(model, board, worst.getKey().getValue().get());
             model.setPlayerState(worst.getKey().getValue().get().getUsername(), newState);
             if (newState == PlayerState.DONE)
                 worst.getKey().setValue(Optional.empty());

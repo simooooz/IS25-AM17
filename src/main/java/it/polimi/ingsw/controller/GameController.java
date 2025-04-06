@@ -128,7 +128,7 @@ public class GameController {
         model.activateEngines(username, batteriesIds, engineComponentsIds);
     }
 
-    public void activateShield(String username, int batteryId) {
+    public void activateShield(String username, Integer batteryId) {
         if (model.getPlayerState(username) != PlayerState.WAIT_SHIELD) throw new IllegalStateException("State is not WAIT_SHIELD");
         model.activateShield(username, batteryId);
     }

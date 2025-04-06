@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -14,7 +15,7 @@ public class CountablePenaltyZone extends PenaltyCombatZone {
     }
 
     @Override
-    public PlayerState resolve(Board board, PlayerData player) {
+    public PlayerState resolve(ModelFacade model, Board board, PlayerData player) {
         return penaltyType.resolve(penaltyNumber, board, player);
     }
 

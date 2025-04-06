@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
@@ -11,7 +12,6 @@ import java.util.Optional;
 public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
     private final List<CannonFire> cannonFires;
-    private PlayerState actState;
     private int coord;
     private int cannonIndex;
 
@@ -20,7 +20,9 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     }
 
     @Override
-    public PlayerState resolve(Board board, PlayerData player) {
+    public PlayerState resolve(ModelFacade model, Board board, PlayerData player) {
+        PlayerState actState = model.getPlayerState(player.getUsername());
+
         switch (actState) {
             case WAIT_SHIELD -> {
                 if (cannonIndex < cannonFires.size())
@@ -29,7 +31,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
                     actState = PlayerState.DONE;
             }
             case WAIT_ROLL_DICES -> {
-                this.actState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
+                actState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
                 cannonIndex++;
                 if (actState == PlayerState.DONE && cannonIndex < cannonFires.size()) // Cannot go in done if it's not really finished because is a sub-state.
                     actState = PlayerState.WAIT_ROLL_DICES;

@@ -39,7 +39,7 @@ public class ModelFacade {
     }
 
     public void startMatch() {
-        if (this.board.getPlayers().size() < 2) throw new NoEnoughPlayerException("MIN players required: 2");
+        if (this.board.getStartingDeck().size() < 2) throw new NoEnoughPlayerException("MIN players required: 2");
 
         for (String username : usernames)
             playersState.put(username, PlayerState.BUILD);
@@ -157,14 +157,14 @@ public class ModelFacade {
 
     private boolean areShipsReady() {
         for (PlayerData player : board.getPlayersByPos())
-            if (playersState.get(player.getUsername()) != PlayerState.CHECK)
+            if (playersState.get(player.getUsername()) != PlayerState.WAIT)
                 return false;
         return true;
     }
 
     private void manageChooseAlienPhase(int playerIndex) {
         boolean phaseDone = true;
-        for (; playerIndex <= board.getPlayersByPos().size(); playerIndex++) { // Check if next players have to choose alien
+        for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) { // Check if next players have to choose alien
             PlayerData player = board.getPlayers().get(playerIndex).getKey();
             List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class);
             for (CabinComponent cabin : cabins) {
@@ -219,9 +219,10 @@ public class ModelFacade {
         card.changeCardState(this, board, username);
     }
 
-    public void activateShield(String username, int batteryId) {
+    public void activateShield(String username, Integer batteryId) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        Command command = new ShieldCommand(username, board, (BatteryComponent) board.getMapIdComponents().get(batteryId));
+        BatteryComponent component = batteryId == null ? null : (BatteryComponent) board.getMapIdComponents().get(batteryId);
+        Command command = new ShieldCommand(username, board, component);
         command.execute(card);
         card.changeCardState(this, board, username);
     }

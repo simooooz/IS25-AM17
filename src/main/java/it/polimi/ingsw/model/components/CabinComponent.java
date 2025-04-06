@@ -30,6 +30,8 @@ public class CabinComponent extends Component {
     }
 
     public void setHumans(int humans, Ship ship) {
+        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
+            throw new ComponentNotValidException("Tile not valid");
         if (humans < 0) humans = 0;
         if (alien.isPresent()) setAlien(null, ship);
         int delta = humans - this.humans;
@@ -42,6 +44,8 @@ public class CabinComponent extends Component {
     }
 
     public void setAlien(AlienType newAlien, Ship ship) {
+        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
+            throw new ComponentNotValidException("Tile not valid");
         if (isStarting && newAlien != null) throw new ComponentNotValidException("Alien isn't compatible with staring cabin tile");
         else if (this.alien.isEmpty() && newAlien != null) { // Should set new alien
 
