@@ -14,6 +14,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Board {
@@ -47,11 +48,11 @@ public class Board {
         return players;
     }
 
-    public void addPlayer(SimpleEntry<PlayerData, Integer> player) {
+    public void reconnectPlayer(SimpleEntry<PlayerData, Integer> player) {
         // todo
     }
 
-    public void removePlayer(String username) {
+    public void disconnectPlayer(String username) {
         boolean removed = this.players.removeIf(e -> e.getKey().getUsername().equals(username));
         if (!removed)
             this.startingDeck.removeIf(e -> e.getUsername().equals(username));
@@ -171,6 +172,50 @@ public class Board {
 
         players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         startingDeck.remove(player);
+    }
+
+    public List<PlayerData> getRanking() {
+        List<PlayerData> players = Stream.concat(
+                this.getPlayersByPos().stream(),
+                this.getStartingDeck().stream()
+        ).toList();
+
+        int[] credits = {8, 6, 4, 2};       // 1°, 2°, 3°, 4°
+        Map<ColorType, Integer> CREDIT_MULTIPLIERS = Map.of(
+                ColorType.RED, 4,
+                ColorType.YELLOW, 3,
+                ColorType.GREEN, 2,
+                ColorType.BLUE, 1
+        );
+
+        IntStream.range(0, players.size())
+                .forEach(i -> {
+                    PlayerData player = players.get(i);
+                    // reward for the order of arrival (only not dropped ou players)
+                    if (this.getPlayersByPos().contains(player))
+                        player.setCredits(player.getCredits() + credits[i]);
+                    // handling sale of goods
+                    player.getShip().getGoods().keySet().forEach(good -> {
+                        int c = CREDIT_MULTIPLIERS.get(good) * player.getShip().getGoods().get(good);
+                        if (this.getStartingDeck().contains(player))
+                            c = c / 2;
+                        player.setCredits(player.getCredits() + c);
+                    });
+                    // component leaks
+                    player.setCredits(player.getCredits() - player.getShip().getDiscards().size());
+                });
+
+        // reward for the most beautiful ship
+        int[] exposedConnectors = players.stream()
+                .mapToInt(p -> p.getShip().countExposedConnectors())
+                .toArray();
+        players.stream()
+                .filter(p -> p.getShip().countExposedConnectors() == Arrays.stream(exposedConnectors).min().getAsInt())
+                .forEach(p -> p.setCredits(p.getCredits() + 4));
+
+        return players.stream()
+                .sorted(Comparator.comparingInt(PlayerData::getCredits))
+                .toList();
     }
 
 }
