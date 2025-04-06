@@ -76,11 +76,11 @@ public class GameController {
         model.moveComponent(username, componentId, row, col);
     }
 
-    public void rotateComponent(String username, int componentId, boolean clockwise) {
+    public void rotateComponent(String username, int componentId, int num) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.rotateComponent(username, componentId, clockwise);
+        model.rotateComponent(username, componentId, num);
     }
 
     public void lookCardPile(String username, int deckIndex) {
