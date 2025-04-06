@@ -5,9 +5,11 @@ import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
+import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.exceptions.NoEnoughPlayerException;
 import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
@@ -66,7 +68,7 @@ public class ModelFacade {
 
     public void insertComponent(String username,  int componentId, int row, int col) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getCommonComponents().get(componentId).insertComponent(ship, row, col);
+        board.getMapIdComponents().get(componentId).insertComponent(ship, row, col);
     }
 
     public void moveComponent(String username, int componentId, int row, int col) {
@@ -128,37 +130,69 @@ public class ModelFacade {
     }
 
     public void moveStateAfterBuilding() {
-        for (String username: usernames)
-            playersState.put(username, PlayerState.CHECK);
+        for (PlayerData player : board.getPlayersByPos())
+            if (!player.getShip().checkShip())
+                playersState.put(player.getUsername(), PlayerState.CHECK);
+            else
+                playersState.put(player.getUsername(), PlayerState.WAIT);
 
         board.shuffleCards();
 
-        if (areShipsReady()) {
-            for (PlayerData player : board.getPlayersByPos())
-                playersState.put(player.getUsername(), PlayerState.WAIT);
-            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
-        }
+        if (areShipsReady())
+            manageChooseAlienPhase(0);
     }
 
     public void checkShip(String username, List<Integer> toRemove) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        if (ship.checkShip()) throw new RuntimeException("Ship was already ready");
 
         for (int componentId : toRemove)
             board.getMapIdComponents().get(componentId).affectDestroy(ship);
 
-        if (areShipsReady()) {
-            for (PlayerData player : board.getPlayersByPos())
-                playersState.put(player.getUsername(), PlayerState.WAIT);
-            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
-        }
+        if (ship.checkShip()) // If now ship is ready
+            playersState.put(username, PlayerState.WAIT);
+
+        if (areShipsReady())
+            manageChooseAlienPhase(0);
     }
 
-    public boolean areShipsReady() {
+    private boolean areShipsReady() {
         for (PlayerData player : board.getPlayersByPos())
-            if (!player.getShip().checkShip())
+            if (playersState.get(player.getUsername()) != PlayerState.CHECK)
                 return false;
         return true;
+    }
+
+    private void manageChooseAlienPhase(int playerIndex) {
+        boolean phaseDone = true;
+        for (; playerIndex <= board.getPlayersByPos().size(); playerIndex++) { // Check if next players have to choose alien
+            PlayerData player = board.getPlayers().get(playerIndex).getKey();
+            List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class);
+            for (CabinComponent cabin : cabins) {
+                if (!cabin.getLinkedNeighbors(player.getShip()).stream()
+                        .filter(c -> c instanceof OddComponent)
+                        .toList().isEmpty()
+                ) { // There is a cabin with an odd near odd component => player has to choose and phase isn't done
+                    phaseDone = false;
+                    playersState.put(player.getUsername(), PlayerState.WAIT_ALIEN);
+                    break;
+                }
+            }
+            if (!phaseDone) break;
+        }
+
+        if (phaseDone)
+            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+    }
+
+    public void chooseAlien(String username, Map<Integer, AlienType> aliensIds) {
+        for (int id : aliensIds.keySet()) { // Put alien in all cabins in aliensIds list
+            if (!(board.getMapIdComponents().get(id) instanceof CabinComponent cabin)) throw new CabinComponentNotValidException("Component is not a cabin");
+            cabin.setAlien(aliensIds.get(id), board.getPlayerEntityByUsername(username).getShip());
+        }
+        playersState.put(username, PlayerState.WAIT);
+
+        int playerIndex = board.getPlayersByPos().indexOf(board.getPlayerEntityByUsername(username)) + 1;
+        manageChooseAlienPhase(playerIndex);
     }
 
     public void nextCard() {

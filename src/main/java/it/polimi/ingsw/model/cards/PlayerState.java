@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.cards;
 public enum PlayerState {
     BUILD,
     CHECK,
+    WAIT_ALIEN,
     DRAW_CARD,
     END,
 

@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
+import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.network.messages.Message;
@@ -105,6 +106,11 @@ public class GameController {
     public void checkShip(String username, List<Integer> toRemove) {
         if (model.getPlayerState(username) != PlayerState.CHECK) throw new IllegalStateException("State is not CHECKING");
         model.checkShip(username, toRemove);
+    }
+
+    public void chooseAlien(String username, Map<Integer, AlienType> aliensIds) {
+        if (model.getPlayerState(username) != PlayerState.WAIT_ALIEN) throw new IllegalStateException("State is not WAIT_ALIEN");
+        model.chooseAlien(username, aliensIds);
     }
 
     public void drawCard(String username) {
