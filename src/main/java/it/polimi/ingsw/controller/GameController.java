@@ -7,7 +7,6 @@ import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.network.messages.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -134,7 +133,7 @@ public class GameController {
     }
 
     public void updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
-        if (model.getPlayerState(username) != PlayerState.WAIT_GOODS || model.getPlayerState(username) != PlayerState.WAIT_REMOVE_GOODS) throw new IllegalStateException("State is not WAIT_GOODS or WAIT_REMOVE_GOODS");
+        if (model.getPlayerState(username) != PlayerState.WAIT_GOODS && model.getPlayerState(username) != PlayerState.WAIT_REMOVE_GOODS) throw new IllegalStateException("State is not WAIT_GOODS or WAIT_REMOVE_GOODS");
         model.updateGoods(username, cargoHoldsIds, batteriesIds);
     }
 
@@ -173,6 +172,10 @@ public class GameController {
     // TEST only
     public PlayerState getState(String username) {
         return model.getPlayerState(username);
+    }
+
+    public ModelFacade getModel() {
+        return model;
     }
 
 }

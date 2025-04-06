@@ -51,7 +51,8 @@ public class CombatZoneCard extends Card {
         PlayerState actState = model.getPlayerState(username);
 
         switch (actState) {
-            case WAIT_CANNONS, WAIT_ENGINES, WAIT_SHIELD, WAIT_ROLL_DICES -> model.setPlayerState(username, PlayerState.DONE);
+            case WAIT_CANNONS, WAIT_ENGINES -> model.setPlayerState(username, PlayerState.DONE);
+            case WAIT_ROLL_DICES, WAIT_SHIELD -> model.setPlayerState(username, warLines.get(warLineIndex).getValue().resolve(model, board, board.getPlayerEntityByUsername(username)));
             case WAIT_REMOVE_CREW, WAIT_REMOVE_GOODS -> {
                 worst.getKey().setValue(Optional.empty());
                 model.setPlayerState(username, PlayerState.DONE);
@@ -104,7 +105,7 @@ public class CombatZoneCard extends Card {
 
     @Override
     public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
-        if (commandType == PlayerState.WAIT_ENGINES && worst.getValue() > value) {
+        if (commandType == PlayerState.WAIT_ENGINES && (worst.getKey().getValue().isEmpty() || worst.getValue() > value)) {
             PlayerData player = board.getPlayerEntityByUsername(username);
             worst.getKey().setValue(Optional.of(player));
             worst.setValue(value.doubleValue());
@@ -124,7 +125,7 @@ public class CombatZoneCard extends Card {
     @Override
     public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == PlayerState.WAIT_CANNONS && worst.getValue() > value) {
+        if (commandType == PlayerState.WAIT_CANNONS && (worst.getKey().getValue().isEmpty() || worst.getValue() > value)) {
             worst.getKey().setValue(Optional.of(player));
             worst.setValue(value);
         }

@@ -26,7 +26,7 @@ public class EngineComponent extends Component {
     @Override
     public void rotateComponent(Ship ship) {
         DirectionType[] directions = DirectionType.values();
-        this.direction = directions[(this.direction.ordinal() + 1 % 4)];
+        this.direction = directions[((this.direction.ordinal() + 1) % 4)];
         super.rotateComponent(ship);
     }
 

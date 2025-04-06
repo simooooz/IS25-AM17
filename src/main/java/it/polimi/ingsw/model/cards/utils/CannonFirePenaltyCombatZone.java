@@ -24,6 +24,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
         PlayerState actState = model.getPlayerState(player.getUsername());
 
         switch (actState) {
+            case DONE -> actState = PlayerState.WAIT_ROLL_DICES;
             case WAIT_SHIELD -> {
                 if (cannonIndex < cannonFires.size())
                     actState = PlayerState.WAIT_ROLL_DICES;

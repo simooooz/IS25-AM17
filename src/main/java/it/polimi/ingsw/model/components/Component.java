@@ -167,7 +167,7 @@ public class Component {
 
     public void rotateComponent(Ship ship) {
         if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
-        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
+        if ((ship.getDashboard(y, x).isPresent() && !ship.getDashboard(y, x).get().equals(this)) || (ship.getHandComponent().isPresent() && !ship.getHandComponent().get().equals(this)))
             throw new ComponentNotValidException("Tile not valid");
 
         ConnectorType[] newConnectors = new ConnectorType[4];

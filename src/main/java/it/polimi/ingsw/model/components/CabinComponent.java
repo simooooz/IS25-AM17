@@ -81,9 +81,9 @@ public class CabinComponent extends Component {
 
     @Override
     public void affectDestroy(Ship ship) {
-        super.affectDestroy(ship);
         setHumans(0, ship);
         setAlien(null, ship);
+        super.affectDestroy(ship);
     }
 
 }

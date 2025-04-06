@@ -1,12 +1,10 @@
 package it.polimi.ingsw.model;
 
-import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
-import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.exceptions.NoEnoughPlayerException;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.AlienType;
@@ -15,8 +13,6 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
 import java.util.*;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class ModelFacade {
 
