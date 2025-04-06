@@ -24,11 +24,10 @@ public class EngineComponent extends Component {
     }
 
     @Override
-    public void rotateComponent(Ship ship, boolean clockwise) {
+    public void rotateComponent(Ship ship) {
         DirectionType[] directions = DirectionType.values();
-        if (clockwise) { this.direction = directions[(this.direction.ordinal() + 1 % 4)]; }
-        else { this.direction = directions[((this.direction.ordinal() + 3) % 4)]; }
-        super.rotateComponent(ship, clockwise);
+        this.direction = directions[(this.direction.ordinal() + 1 % 4)];
+        super.rotateComponent(ship);
     }
 
     @Override

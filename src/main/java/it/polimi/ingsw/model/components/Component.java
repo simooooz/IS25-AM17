@@ -165,23 +165,16 @@ public class Component {
         ship.getDashboard()[row][col] = Optional.of(this);
     }
 
-    public void rotateComponent(Ship ship, boolean clockwise) {
+    public void rotateComponent(Ship ship) {
         if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
         if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
             throw new ComponentNotValidException("Tile not valid");
 
         ConnectorType[] newConnectors = new ConnectorType[4];
-        if (clockwise) {
-            newConnectors[0] = connectors[3];
-            newConnectors[1] = connectors[0];
-            newConnectors[2] = connectors[1];
-            newConnectors[3] = connectors[2];
-        } else {
-            newConnectors[0] = connectors[1];
-            newConnectors[1] = connectors[2];
-            newConnectors[2] = connectors[3];
-            newConnectors[3] = connectors[0];
-        }
+        newConnectors[0] = connectors[3];
+        newConnectors[1] = connectors[0];
+        newConnectors[2] = connectors[1];
+        newConnectors[3] = connectors[2];
         connectors = newConnectors;
     }
 

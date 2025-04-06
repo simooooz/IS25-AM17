@@ -69,9 +69,10 @@ public class ModelFacade {
         board.getMapIdComponents().get(componentId).moveComponent(ship, row, col);
     }
 
-    public void rotateComponent(String username, int componentId, boolean clockwise) {
+    public void rotateComponent(String username, int componentId, int num) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).rotateComponent(ship, clockwise);
+        for (int i=0; i<num; i++)
+            board.getMapIdComponents().get(componentId).rotateComponent(ship);
     }
 
     public void lookCardPile(String username, int deckIndex) {

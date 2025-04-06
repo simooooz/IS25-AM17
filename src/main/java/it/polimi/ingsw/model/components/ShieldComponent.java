@@ -26,17 +26,11 @@ public class ShieldComponent extends Component {
     }
 
     @Override
-    public void rotateComponent(Ship ship, boolean clockwise) {
+    public void rotateComponent(Ship ship) {
         DirectionType[] directions = DirectionType.values();
-        if (clockwise) {
-            this.directionsProtected[0] = directions[(this.directionsProtected[0].ordinal() + 1 % 4)];
-            this.directionsProtected[1] = directions[(this.directionsProtected[1].ordinal() + 1 % 4)];
-        }
-        else {
-            this.directionsProtected[0] = directions[(this.directionsProtected[0].ordinal() + 3 % 4)];
-            this.directionsProtected[1] = directions[(this.directionsProtected[1].ordinal() + 3 % 4)];
-        }
-        super.rotateComponent(ship, clockwise);
+        this.directionsProtected[0] = directions[(this.directionsProtected[0].ordinal() + 1 % 4)];
+        this.directionsProtected[1] = directions[(this.directionsProtected[1].ordinal() + 1 % 4)];
+        super.rotateComponent(ship);
     }
 
     @Override
