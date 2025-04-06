@@ -208,7 +208,7 @@ public class Board {
                         player.setCredits(player.getCredits() + c);
                     });
                     // component leaks
-                    player.setCredits(player.getCredits() - player.getShip().getDiscards().size());
+                    player.setCredits(player.getCredits() - player.getShip().getDiscards().size() - player.getShip().getReserves().size());
                 });
 
         // reward for the most beautiful ship

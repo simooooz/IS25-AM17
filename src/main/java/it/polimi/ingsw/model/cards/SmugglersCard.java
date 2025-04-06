@@ -112,16 +112,16 @@ public class SmugglersCard extends Card {
                 defeatedPlayers.add(player);
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT_REMOVE_GOODS);
             }
+        }
 
-            boolean hasDone = true;
-            for (PlayerData p : board.getPlayersByPos())
-                if (model.getPlayerState(p.getUsername()) != PlayerState.DONE)
-                    hasDone = false;
+        boolean hasDone = true;
+        for (PlayerData p : board.getPlayersByPos())
+            if (model.getPlayerState(p.getUsername()) != PlayerState.DONE)
+                hasDone = false;
 
-            if (hasDone && defeatedPlayers.isEmpty()) {
-                endCard(board);
-                return true;
-            }
+        if (hasDone && defeatedPlayers.isEmpty()) {
+            endCard(board);
+            return true;
         }
         return false;
     }

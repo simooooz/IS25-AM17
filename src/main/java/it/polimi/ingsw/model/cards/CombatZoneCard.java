@@ -52,7 +52,12 @@ public class CombatZoneCard extends Card {
 
         switch (actState) {
             case WAIT_CANNONS, WAIT_ENGINES -> model.setPlayerState(username, PlayerState.DONE);
-            case WAIT_ROLL_DICES, WAIT_SHIELD -> model.setPlayerState(username, warLines.get(warLineIndex).getValue().resolve(model, board, board.getPlayerEntityByUsername(username)));
+            case WAIT_ROLL_DICES, WAIT_SHIELD -> {
+                PlayerState newState = warLines.get(warLineIndex).getValue().resolve(model, board, board.getPlayerEntityByUsername(username));
+                model.setPlayerState(username, newState);
+                if (newState == PlayerState.DONE)
+                    worst.getKey().setValue(Optional.empty());
+            }
             case WAIT_REMOVE_CREW, WAIT_REMOVE_GOODS -> {
                 worst.getKey().setValue(Optional.empty());
                 model.setPlayerState(username, PlayerState.DONE);

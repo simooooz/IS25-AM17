@@ -26,6 +26,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
         switch (actState) {
             case DONE -> actState = PlayerState.WAIT_ROLL_DICES;
             case WAIT_SHIELD -> {
+                cannonIndex++;
                 if (cannonIndex < cannonFires.size())
                     actState = PlayerState.WAIT_ROLL_DICES;
                 else
@@ -33,9 +34,10 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             }
             case WAIT_ROLL_DICES -> {
                 actState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
-                cannonIndex++;
-                if (actState == PlayerState.DONE && cannonIndex < cannonFires.size()) // Cannot go in done if it's not really finished because is a sub-state.
+                if (actState == PlayerState.DONE && cannonIndex < cannonFires.size() - 1) { // Cannot go in done if it's not really finished because is a sub-state.
                     actState = PlayerState.WAIT_ROLL_DICES;
+                    cannonIndex++;
+                }
             }
         }
 
