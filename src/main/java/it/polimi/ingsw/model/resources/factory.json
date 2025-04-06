@@ -717,823 +717,976 @@
   ],
   "components": [
     {
+      "id": 1,
       "type": "BatteryComponent",
       "connectors": ["UNIVERSAL", "SINGLE", "DOUBLE", "EMPTY"],
       "isTriple": false
     },
     {
+      "id": 2,
       "type": "BatteryComponent",
       "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "EMPTY"],
       "isTriple": false
     },
     {
+      "id": 3,
       "type": "BatteryComponent",
       "connectors": ["UNIVERSAL", "DOUBLE", "SINGLE", "EMPTY"],
       "isTriple": false
     },
     {
+      "id": 4,
       "type": "BatteryComponent",
       "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "SINGLE"],
       "isTriple": false
     },
     {
+      "id": 5,
       "type": "BatteryComponent",
       "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "SINGLE"],
       "isTriple": false
     },
     {
+      "id": 6,
       "type": "BatteryComponent",
       "connectors": ["UNIVERSAL", "SINGLE", "SINGLE", "SINGLE"],
       "isTriple": false
     },
     {
+      "id": 7,
       "type": "BatteryComponent",
       "connectors": ["UNIVERSAL", "DOUBLE", "DOUBLE", "DOUBLE"],
       "isTriple": false
     },
     {
+      "id": 8,
       "type": "BatteryComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "isTriple": false
     },
     {
+      "id": 9,
       "type": "BatteryComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "UNIVERSAL"],
       "isTriple": false
     },
     {
+      "id": 10,
       "type": "BatteryComponent",
       "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "UNIVERSAL"],
       "isTriple": false
     },
     {
+      "id": 11,
       "type": "BatteryComponent",
       "connectors": ["SINGLE", "EMPTY", "DOUBLE", "EMPTY"],
       "isTriple": true
     },
     {
+      "id": 12,
       "type": "BatteryComponent",
       "connectors": ["SINGLE", "SINGLE", "DOUBLE", "EMPTY"],
       "isTriple": true
     },
     {
+      "id": 13,
       "type": "BatteryComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
       "isTriple": true
     },
     {
+      "id": 14,
       "type": "BatteryComponent",
       "connectors": ["DOUBLE", "SINGLE", "EMPTY", "EMPTY"],
       "isTriple": true
     },
     {
+      "id": 15,
       "type": "BatteryComponent",
       "connectors": ["DOUBLE", "DOUBLE", "SINGLE", "EMPTY"],
       "isTriple": true
     },
     {
+      "id": 16,
       "type": "BatteryComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
       "isTriple": true
     },
     {
+      "id": 17,
       "type": "CargoHoldsComponent",
       "connectors": ["DOUBLE", "SINGLE", "UNIVERSAL", "EMPTY"],
       "number": 2
     },
     {
+      "id": 18,
       "type": "CargoHoldsComponent",
       "connectors": ["DOUBLE", "SINGLE", "UNIVERSAL", "SINGLE"],
       "number": 2
     },
     {
+      "id": 19,
       "type": "CargoHoldsComponent",
       "connectors": ["DOUBLE", "UNIVERSAL", "EMPTY", "SINGLE"],
       "number": 2
     },
     {
+      "id": 20,
       "type": "CargoHoldsComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "number": 2
     },
     {
+      "id": 21,
       "type": "CargoHoldsComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "number": 2
     },
     {
+      "id": 22,
       "type": "CargoHoldsComponent",
       "connectors": ["EMPTY", "SINGLE", "EMPTY", "UNIVERSAL"],
       "number": 2
     },
     {
+      "id": 23,
       "type": "CargoHoldsComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
       "number": 2
     },
     {
+      "id": 24,
       "type": "CargoHoldsComponent",
       "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "UNIVERSAL"],
       "number": 2
     },
     {
+      "id": 25,
       "type": "CargoHoldsComponent",
       "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "UNIVERSAL"],
       "number": 2
     },
     {
+      "id": 26,
       "type": "CargoHoldsComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
       "number": 3
     },
     {
+      "id": 27,
       "type": "CargoHoldsComponent",
       "connectors": ["SINGLE", "EMPTY", "SINGLE", "EMPTY"],
       "number": 3
     },
     {
+      "id": 28,
       "type": "CargoHoldsComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "DOUBLE"],
       "number": 3
     },
     {
+      "id": 29,
       "type": "CargoHoldsComponent",
       "connectors": ["DOUBLE", "EMPTY", "DOUBLE", "EMPTY"],
       "number": 3
     },
     {
+      "id": 30,
       "type": "CargoHoldsComponent",
       "connectors": ["SINGLE", "EMPTY", "DOUBLE", "SINGLE"],
       "number": 3
     },
     {
+      "id": 31,
       "type": "CargoHoldsComponent",
       "connectors": ["DOUBLE", "EMPTY", "SINGLE", "DOUBLE"],
       "number": 3
     },
     {
+      "id": 32,
       "type": "CabinComponent",
       "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
       "isStarting": true
     },
     {
+      "id": 33,
       "type": "CabinComponent",
       "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
       "isStarting": true
     },
     {
+      "id": 34,
       "type": "CabinComponent",
       "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
       "isStarting": true
     },
     {
+      "id": 35,
       "type": "CabinComponent",
       "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
       "isStarting": true
     },
     {
+      "id": 36,
       "type": "CabinComponent",
       "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "SINGLE"],
       "isStarting": false
     },
     {
+      "id": 37,
       "type": "CabinComponent",
       "connectors": ["SINGLE", "DOUBLE", "SINGLE", "SINGLE"],
       "isStarting": false
     },
     {
+      "id": 38,
       "type": "CabinComponent",
       "connectors": ["SINGLE", "DOUBLE", "DOUBLE", "SINGLE"],
       "isStarting": false
     },
     {
+      "id": 39,
       "type": "CabinComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "SINGLE"],
       "isStarting": false
     },
     {
+      "id": 40,
       "type": "CabinComponent",
       "connectors": ["DOUBLE", "SINGLE", "EMPTY", "SINGLE"],
       "isStarting": false
     },
     {
+      "id": 41,
       "type": "CabinComponent",
       "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "SINGLE"],
       "isStarting": false
     },
     {
+      "id": 42,
       "type": "CabinComponent",
       "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "DOUBLE"],
       "isStarting": false
     },
     {
+      "id": 43,
       "type": "CabinComponent",
       "connectors": ["SINGLE", "DOUBLE", "EMPTY", "DOUBLE"],
       "isStarting": false
     },
     {
+      "id": 44,
       "type": "CabinComponent",
       "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "DOUBLE"],
       "isStarting": false
     },
     {
+      "id": 45,
       "type": "CabinComponent",
       "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "DOUBLE"],
       "isStarting": false
     },
     {
+      "id": 46,
       "type": "CabinComponent",
       "connectors": ["EMPTY", "SINGLE", "EMPTY", "UNIVERSAL"],
       "isStarting": false
     },
     {
+      "id": 47,
       "type": "CabinComponent",
       "connectors": ["EMPTY", "SINGLE", "SINGLE", "UNIVERSAL"],
       "isStarting": false
     },
     {
+      "id": 48,
       "type": "CabinComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
       "isStarting": false
     },
     {
+      "id": 49,
       "type": "CabinComponent",
       "connectors": ["SINGLE", "EMPTY", "SINGLE", "UNIVERSAL"],
       "isStarting": false
     },
     {
+      "id": 50,
       "type": "CabinComponent",
       "connectors": ["SINGLE", "EMPTY", "DOUBLE", "UNIVERSAL"],
       "isStarting": false
     },
     {
+      "id": 51,
       "type": "CabinComponent",
       "connectors": ["DOUBLE", "EMPTY", "DOUBLE", "UNIVERSAL"],
       "isStarting": false
     },
     {
+      "id": 52,
       "type": "CabinComponent",
       "connectors": ["DOUBLE", "DOUBLE", "EMPTY", "UNIVERSAL"],
       "isStarting": false
     },
     {
+      "id": 53,
       "type": "Component",
       "connectors": ["UNIVERSAL", "UNIVERSAL", "EMPTY", "SINGLE"]
     },
     {
+      "id": 54,
       "type": "Component",
       "connectors": ["SINGLE", "UNIVERSAL", "EMPTY", "UNIVERSAL"]
     },
     {
+      "id": 55,
       "type": "Component",
       "connectors": ["SINGLE", "UNIVERSAL", "SINGLE", "UNIVERSAL"]
     },
     {
+      "id": 56,
       "type": "Component",
       "connectors": ["SINGLE", "UNIVERSAL", "DOUBLE", "UNIVERSAL"]
     },
     {
+      "id": 57,
       "type": "Component",
       "connectors": ["DOUBLE", "UNIVERSAL", "EMPTY", "UNIVERSAL"]
     },
     {
+      "id": 58,
       "type": "Component",
       "connectors": ["UNIVERSAL", "SINGLE", "DOUBLE", "UNIVERSAL"]
     },
     {
+      "id": 59,
       "type": "Component",
       "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "UNIVERSAL"]
     },
     {
+      "id": 60,
       "type": "Component",
       "connectors": ["UNIVERSAL", "DOUBLE", "DOUBLE", "UNIVERSAL"]
     },
     {
+      "id": 61,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["EMPTY", "DOUBLE", "SINGLE", "UNIVERSAL"],
       "number": 1
     },
     {
+      "id": 62,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "UNIVERSAL"],
       "number": 1
     },
     {
+      "id": 63,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["SINGLE", "SINGLE", "SINGLE", "UNIVERSAL"],
       "number": 1
     },
     {
+      "id": 64,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["DOUBLE", "SINGLE", "EMPTY", "UNIVERSAL"],
       "number": 1
     },
     {
+      "id": 65,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["DOUBLE", "DOUBLE", "DOUBLE", "UNIVERSAL"],
       "number": 1
     },
     {
+      "id": 66,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "UNIVERSAL"],
       "number": 1
     },
     {
+      "id": 67,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
       "number": 2
     },
     {
+      "id": 68,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "SINGLE"],
       "number": 2
     },
     {
+      "id": 69,
       "type": "SpecialCargoHoldsComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "DOUBLE"],
       "number": 2
     },
     {
+      "id": 70,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 71,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 72,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "EMPTY", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 73,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "EMPTY", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 74,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "SINGLE", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 75,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 76,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 77,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "UNIVERSAL", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 78,
       "type": "EngineComponent",
       "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 79,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "SINGLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 80,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "SINGLE", "EMPTY", "SINGLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 81,
       "type": "EngineComponent",
       "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "SINGLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 82,
       "type": "EngineComponent",
       "connectors": ["UNIVERSAL", "DOUBLE", "EMPTY", "SINGLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 83,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "SINGLE", "EMPTY", "DOUBLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 84,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "DOUBLE", "EMPTY", "DOUBLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 85,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "DOUBLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 86,
       "type": "EngineComponent",
       "connectors": ["UNIVERSAL", "SINGLE", "EMPTY", "DOUBLE"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 87,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 88,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 89,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 90,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "EMPTY", "EMPTY", "UNIVERSAL"],
       "direction": "SOUTH",
       "isDouble": false
     },
     {
+      "id": 91,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "EMPTY", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 92,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "UNIVERSAL", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 93,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 94,
       "type": "EngineComponent",
       "connectors": ["UNIVERSAL", "SINGLE", "EMPTY", "EMPTY"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 95,
       "type": "EngineComponent",
       "connectors": ["SINGLE", "SINGLE", "EMPTY", "SINGLE"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 96,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "DOUBLE", "EMPTY", "DOUBLE"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 97,
       "type": "EngineComponent",
       "connectors": ["UNIVERSAL", "EMPTY", "EMPTY", "DOUBLE"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 98,
       "type": "EngineComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "UNIVERSAL"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 99,
       "type": "EngineComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "UNIVERSAL"],
       "direction": "SOUTH",
       "isDouble": true
     },
     {
+      "id": 100,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "SINGLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 101,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "SINGLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 102,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "DOUBLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 103,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "DOUBLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 104,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "EMPTY", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 105,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "DOUBLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 106,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 107,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 108,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "SINGLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 109,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "UNIVERSAL", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 110,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "SINGLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 111,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "SINGLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 112,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "DOUBLE", "SINGLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 113,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "SINGLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 114,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "SINGLE", "SINGLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 115,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "UNIVERSAL", "SINGLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 116,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "SINGLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 117,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 118,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "SINGLE", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 119,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 120,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "EMPTY", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 121,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 122,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "DOUBLE", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 123,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
       "direction": "NORTH",
       "isDouble": false
     },
     {
+      "id": 124,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "SINGLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 125,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "DOUBLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 126,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "EMPTY"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 127,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "EMPTY"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 128,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "DOUBLE", "EMPTY"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 129,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "SINGLE", "DOUBLE", "SINGLE"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 130,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "SINGLE"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 131,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 132,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "SINGLE", "DOUBLE"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 133,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 134,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "EMPTY", "SINGLE", "UNIVERSAL"],
       "direction": "NORTH",
       "isDouble": true
     },
     {
+      "id": 135,
       "type": "OddComponent",
       "connectors": ["SINGLE", "SINGLE", "EMPTY", "SINGLE"],
       "typeAlien": "ENGINE"
     },
     {
+      "id": 136,
       "type": "OddComponent",
       "connectors": ["DOUBLE", "SINGLE", "EMPTY", "SINGLE"],
       "typeAlien": "ENGINE"
     },
     {
+      "id": 137,
       "type": "OddComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "typeAlien": "ENGINE"
     },
     {
+      "id": 138,
       "type": "OddComponent",
       "connectors": ["EMPTY", "EMPTY", "SINGLE", "UNIVERSAL"],
       "typeAlien": "ENGINE"
     },
     {
+      "id": 139,
       "type": "OddComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
       "typeAlien": "ENGINE"
     },
     {
+      "id": 140,
       "type": "OddComponent",
       "connectors": ["SINGLE", "EMPTY", "EMPTY", "UNIVERSAL"],
       "typeAlien": "ENGINE"
     },
     {
+      "id": 141,
       "type": "OddComponent",
       "connectors": ["SINGLE", "DOUBLE", "EMPTY", "DOUBLE"],
       "typeAlien": "CANNON"
     },
     {
+      "id": 142,
       "type": "OddComponent",
       "connectors": ["DOUBLE", "DOUBLE", "EMPTY", "DOUBLE"],
       "typeAlien": "CANNON"
     },
     {
+      "id": 143,
       "type": "OddComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
       "typeAlien": "CANNON"
     },
     {
+      "id": 144,
       "type": "OddComponent",
       "connectors": ["EMPTY", "SINGLE", "EMPTY", "UNIVERSAL"],
       "typeAlien": "CANNON"
     },
     {
+      "id": 145,
       "type": "OddComponent",
       "connectors": ["DOUBLE", "EMPTY", "EMPTY", "UNIVERSAL"],
       "typeAlien": "CANNON"
     },
     {
+      "id": 146,
       "type": "ShieldComponent",
       "connectors": ["EMPTY", "SINGLE", "UNIVERSAL", "SINGLE"],
       "directionsProtected": ["NORTH", "EAST"]
     },
     {
+      "id": 147,
       "type": "ShieldComponent",
       "connectors": ["SINGLE", "EMPTY", "SINGLE", "SINGLE"],
       "directionsProtected": ["NORTH", "EAST"]
     },
     {
+      "id": 148,
       "type": "ShieldComponent",
       "connectors": ["DOUBLE", "SINGLE", "DOUBLE", "SINGLE"],
       "directionsProtected": ["NORTH", "EAST"]
     },
     {
+      "id": 149,
       "type": "ShieldComponent",
       "connectors": ["EMPTY", "EMPTY", "UNIVERSAL", "DOUBLE"],
       "directionsProtected": ["NORTH", "EAST"]
     },
     {
+      "id": 150,
       "type": "ShieldComponent",
       "connectors": ["EMPTY", "DOUBLE", "DOUBLE", "DOUBLE"],
       "directionsProtected": ["NORTH", "EAST"]
     },
     {
+      "id": 151,
       "type": "ShieldComponent",
       "connectors": ["SINGLE", "DOUBLE", "SINGLE", "DOUBLE"],
       "directionsProtected": ["NORTH", "EAST"]
     },
     {
+      "id": 152,
       "type": "ShieldComponent",
       "connectors": ["EMPTY", "EMPTY", "SINGLE", "UNIVERSAL"],
       "directionsProtected": ["NORTH", "EAST"]
     },
     {
+      "id": 153,
       "type": "ShieldComponent",
       "connectors": ["EMPTY", "DOUBLE", "DOUBLE", "UNIVERSAL"],
       "directionsProtected": ["NORTH", "EAST"]

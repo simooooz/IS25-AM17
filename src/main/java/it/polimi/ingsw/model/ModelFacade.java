@@ -40,38 +40,38 @@ public class ModelFacade {
         board.getTimeManagement().startTimer(this);
     }
 
-    public void showComponent(Component component) {
-        component.showComponent();
+    public void showComponent(int componentId) {
+        board.getMapIdComponents().get(componentId).showComponent();
     }
 
-    public void pickComponent(String username, Component component) {
+    public void pickComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        component.pickComponent(board, ship);
+        board.getMapIdComponents().get(componentId).pickComponent(board, ship);
     }
 
-    public void releaseComponent(String username, Component component) {
+    public void releaseComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        component.releaseComponent(board, ship);
+        board.getMapIdComponents().get(componentId).releaseComponent(board, ship);
     }
 
-    public void reserveComponent(String username, Component component) {
+    public void reserveComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        component.reserveComponent(board, ship);
+        board.getMapIdComponents().get(componentId).reserveComponent(board, ship);
     }
 
-    public void insertComponent(String username,  Component component, int row, int col) {
+    public void insertComponent(String username,  int componentId, int row, int col) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        component.insertComponent(ship, row, col);
+        board.getCommonComponents().get(componentId).insertComponent(ship, row, col);
     }
 
-    public void moveComponent(String username, Component component, int row, int col) {
+    public void moveComponent(String username, int componentId, int row, int col) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        component.moveComponent(ship, row, col);
+        board.getMapIdComponents().get(componentId).moveComponent(ship, row, col);
     }
 
-    public void rotateComponent(String username, Component component, boolean clockwise) {
+    public void rotateComponent(String username, int componentId, boolean clockwise) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        component.rotateComponent(ship, clockwise);
+        board.getMapIdComponents().get(componentId).rotateComponent(ship, clockwise);
     }
 
     public void lookCardPile(String username, int deckIndex) {
@@ -128,12 +128,12 @@ public class ModelFacade {
             state = GameState.DRAW_CARD;
     }
 
-    public void checkShip(String username, List<Component> toRemove) {
+    public void checkShip(String username, List<Integer> toRemove) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         if (ship.checkShip()) throw new RuntimeException("Ship was already ready");
 
-        for (Component component : toRemove)
-            component.affectDestroy(ship);
+        for (int componentId : toRemove)
+            board.getMapIdComponents().get(componentId).affectDestroy(ship);
 
         if (areShipsReady())
             state = GameState.DRAW_CARD;
@@ -150,46 +150,55 @@ public class ModelFacade {
         this.state = board.drawCard(board.getPlayerEntityByUsername(username));
     }
 
-    public void activateCannons(String username, List<BatteryComponent> batteries, List<CannonComponent> cannonComponents) {
+    public void activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         if (card.getPlayersState().get(username) != PlayerState.WAIT_CANNONS) throw new IllegalStateException("Player " + username + " state is not WAIT_CANNONS");
 
+        List<BatteryComponent> batteries = batteriesIds.stream().map(id -> (BatteryComponent) board.getMapIdComponents().get(id)).toList();
+        List<CannonComponent> cannonComponents = cannonComponentsIds.stream().map(id -> (CannonComponent) board.getMapIdComponents().get(id)).toList();
         Command command = new CannonCommand(username, board, batteries, cannonComponents);
         command.execute(card);
         card.changeCardState(board, username);
     }
 
-    public void activateEngines(String username, List<BatteryComponent> batteries, List<EngineComponent> engineComponents) {
+    public void activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         if (card.getPlayersState().get(username) != PlayerState.WAIT_ENGINES) throw new IllegalStateException("Player " + username + " state is not WAIT_ENGINES");
 
+        List<BatteryComponent> batteries = batteriesIds.stream().map(id -> (BatteryComponent) board.getMapIdComponents().get(id)).toList();
+        List<EngineComponent> engineComponents = engineComponentsIds.stream().map(id -> (EngineComponent) board.getMapIdComponents().get(id)).toList();
         Command command = new EngineCommand(username, board, batteries, engineComponents);
         command.execute(card);
         setState(card.changeCardState(board, username));
     }
 
-    public void activateShield(String username, BatteryComponent battery) {
+    public void activateShield(String username, int batteryId) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         if (card.getPlayersState().get(username) != PlayerState.WAIT_SHIELD) throw new IllegalStateException("Player " + username + " state is not WAIT_SHIELD");
 
-        Command command = new ShieldCommand(username, board, battery);
+        Command command = new ShieldCommand(username, board, (BatteryComponent) board.getMapIdComponents().get(batteryId));
         command.execute(card);
         setState(card.changeCardState(board, username));
     }
 
-    public void updateGoods(String username, Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds, List<BatteryComponent> batteries) {
+    public void updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         if (card.getPlayersState().get(username) != PlayerState.WAIT_GOODS && card.getPlayersState().get(username) != PlayerState.WAIT_REMOVE_GOODS) throw new IllegalStateException("Player " + username + " state is not WAIT_GOODS or WAIT_REMOVE_GOODS");
+
+        List<BatteryComponent> batteries = batteriesIds.stream().map(id -> (BatteryComponent) board.getMapIdComponents().get(id)).toList();
+        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds = new HashMap<>();
+        cargoHoldsIds.forEach((id, value) -> cargoHolds.put((SpecialCargoHoldsComponent) board.getMapIdComponents().get(id), value));
 
         Command command = new GoodCommand(username, board, cargoHolds, batteries);
         command.execute(card);
         setState(card.changeCardState(board, username));
     }
 
-    public void removeCrew(String username, List<CabinComponent> cabins) {
+    public void removeCrew(String username, List<Integer> cabinsIds) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         if (card.getPlayersState().get(username) != PlayerState.WAIT_REMOVE_CREW) throw new IllegalStateException("Player " + username + " state is not WAIT_REMOVE_CREW");
 
+        List<CabinComponent> cabins = cabinsIds.stream().map(id -> (CabinComponent) board.getMapIdComponents().get(id)).toList();
         Command command = new RemoveCrewCommand(username, board, cabins);
         command.execute(card);
         setState(card.changeCardState(board, username));

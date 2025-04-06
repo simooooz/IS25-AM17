@@ -24,7 +24,7 @@ public class Board {
     private final List<Card> cardPile;
     private int cardPilePos;
     private final Time timeManagement;
-    private final Map<Integer, Component> mapComponents;
+    private final Map<Integer, Component> mapIdComponents;
     private final Map<ColorType, Integer> availableGoods;
 
     public Board(List<String> usernames) {
@@ -36,7 +36,7 @@ public class Board {
 
         ComponentFactory componentFactory = new ComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
-        this.mapComponents = new HashMap<>(componentFactory.getComponentsMap());
+        this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
         this.cardPile = new ArrayList<>(new CardFactory().getCards());
         this.cardPilePos = 0;
         this.timeManagement = new Time();
@@ -70,6 +70,10 @@ public class Board {
 
     public List<PlayerData> getStartingDeck() {
         return startingDeck;
+    }
+
+    public Map<Integer, Component> getMapIdComponents() {
+        return mapIdComponents;
     }
 
     public List<Component> getCommonComponents() {

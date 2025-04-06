@@ -15,22 +15,21 @@ import java.util.*;
 
 public class ComponentFactory {
 
-    private List<Component> components;
-    private Map<Integer, Component> componentsMap;
+    private final List<Component> components;
+    private final Map<Integer, Component> componentsMap;
 
     public ComponentFactory() {
-        // Costruttore che genera il mazzo dalle carte nel JSON
         this.components = new ArrayList<>();
         this.componentsMap = new HashMap<>();
 
-        JSONObject deckJson = loadJsonConfig();
-        JSONArray componentsArray = deckJson.getJSONArray("components");
+        JSONObject componentsJson = loadJsonConfig();
+        JSONArray componentsArray = componentsJson.getJSONArray("components");
 
         for (int i = 0; i < componentsArray.length(); i++) {
-            JSONObject cardJson = componentsArray.getJSONObject(i);
-            Component component = createComponent(cardJson);
+            JSONObject componentJson = componentsArray.getJSONObject(i);
+            Component component = createComponent(componentJson);
             components.add(component);
-            componentsMap.put(i+1, component);
+            componentsMap.put(componentJson.getInt("id"), component);
         }
     }
 
@@ -43,8 +42,8 @@ public class ComponentFactory {
             String jsonContent = new String(Files.readAllBytes(new File("src/main/java/it/polimi/ingsw/model/resources/factory.json").toPath()));
             return new JSONObject(jsonContent);
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento del file JSON: " + e.getMessage());
-            return new JSONObject(); // Restituisce un JSON vuoto
+            System.err.println("Error while loading JSON file: " + e.getMessage());
+            return new JSONObject(); // Return an empty JSON
         }
     }
 
@@ -53,7 +52,7 @@ public class ComponentFactory {
     }
 
 
-    public static Component createComponent(JSONObject componentJson) {
+    private Component createComponent(JSONObject componentJson) {
         String type = componentJson.getString("type");
         JSONArray connectorsArray = componentJson.getJSONArray("connectors");
         ConnectorType[] connectors = new ConnectorType[connectorsArray.length()];

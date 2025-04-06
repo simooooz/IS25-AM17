@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.network.messages.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -33,53 +34,53 @@ public class GameController {
         model.startMatch();
     }
 
-    public void showComponent(String username, Component component) {
+    public void showComponent(String username, int componentId) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.showComponent(component);
+        model.showComponent(componentId);
     }
 
-    public void pickComponent(String username, Component component) {
+    public void pickComponent(String username, int componentId) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.pickComponent(username, component);
+        model.pickComponent(username, componentId);
     }
 
-    public void releaseComponent(String username, Component component) {
+    public void releaseComponent(String username, int componentId) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.releaseComponent(username, component);
+        model.releaseComponent(username, componentId);
     }
 
-    public void reserveComponent(String username, Component component) {
+    public void reserveComponent(String username, int componentId) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.reserveComponent(username, component);
+        model.reserveComponent(username, componentId);
     }
 
-    public void insertComponent(String username, Component component, int row, int col) {
+    public void insertComponent(String username, int componentId, int row, int col) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.insertComponent(username, component, row, col);
+        model.insertComponent(username, componentId, row, col);
     }
 
-    public void moveComponent(String username, Component component, int row, int col) {
+    public void moveComponent(String username, int componentId, int row, int col) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.moveComponent(username, component, row, col);
+        model.moveComponent(username, componentId, row, col);
     }
 
-    public void rotateComponent(String username, Component component, boolean clockwise) {
+    public void rotateComponent(String username, int componentId, boolean clockwise) {
         if (model.getState() != GameState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.rotateComponent(username, component, clockwise);
+        model.rotateComponent(username, componentId, clockwise);
     }
 
     public void lookCardPile(String username, int deckIndex) {
@@ -100,7 +101,7 @@ public class GameController {
         model.setReady(username);
     }
 
-    public void checkShip(String username, List<Component> toRemove) {
+    public void checkShip(String username, List<Integer> toRemove) {
         if (model.getState() != GameState.CHECK) throw new IllegalStateException("State is not CHECKING");
         model.checkShip(username, toRemove);
     }
@@ -110,61 +111,52 @@ public class GameController {
         model.nextCard(username);
     }
 
-    public void activateCannons(String username, List<BatteryComponent> batteries, List<CannonComponent> cannonComponents) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
-        model.activateCannons(username, batteries, cannonComponents);
+    public void activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
+        model.activateCannons(username, batteriesIds, cannonComponentsIds);
     }
 
-    public void activateEngines(String username, List<BatteryComponent> batteries, List<EngineComponent> engineComponents) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
-        model.activateEngines(username, batteries, engineComponents);
+    public void activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
+        model.activateEngines(username, batteriesIds, engineComponentsIds);
     }
 
-    public void activateShield(String username, BatteryComponent battery) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
-        model.activateShield(username, battery);
+    public void activateShield(String username, int batteryId) {
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
+        model.activateShield(username, batteryId);
     }
 
-    public void updateGoods(String username, Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds, List<BatteryComponent> batteries) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
-        model.updateGoods(username, cargoHolds, batteries);
+    public void updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
+        model.updateGoods(username, cargoHoldsIds, batteriesIds);
     }
 
-    public void removeCrew(String username, List<CabinComponent> cabins) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
-        model.removeCrew(username, cabins);
+    public void removeCrew(String username, List<Integer> cabinsIds) {
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
+        model.removeCrew(username, cabinsIds);
     }
 
     public void rollDices(String username) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
         model.rollDices(username);
     }
 
     public void getBoolean(String username, boolean value) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
         model.getBoolean(username, value);
     }
 
     public void getIndex(String username, int value) {
-        if (model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not PLAY_CARD");
+        if (model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not PLAY_CARD");
         model.getIndex(username, value);
     }
 
     public void endFlight(String username) {
-        if (model.getState() != GameState.DRAW_CARD || model.getState() != GameState.PLAY_CARD)
-            throw new java.lang.IllegalStateException("State is not DRAW_CARD or PLAY_CARD");
+        if (model.getState() != GameState.DRAW_CARD || model.getState() != GameState.PLAY_CARD) throw new IllegalStateException("State is not DRAW_CARD or PLAY_CARD");
         model.endFlight(username);
     }
 
-    public void playerJoined(String username) {
+    public void playerRejoined(String username) {
         // todo
     }
 
