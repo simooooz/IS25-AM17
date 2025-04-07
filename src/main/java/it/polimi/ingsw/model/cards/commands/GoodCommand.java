@@ -26,10 +26,10 @@ public class GoodCommand implements Command {
     private final Board board;
     private final ModelFacade model;
     Map<ColorType, Integer> deltaGood;
-    private final Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds;
+    private final Map<SpecialCargoHoldsComponent, List<ColorType>> newDisposition;
     private final List<BatteryComponent> batteries;
 
-    public GoodCommand(String username, ModelFacade model, Board board, Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds, List<BatteryComponent> batteries) {
+    public GoodCommand(String username, ModelFacade model, Board board, Map<SpecialCargoHoldsComponent, List<ColorType>> newDisposition, List<BatteryComponent> batteries) {
         this.username = username;
         this.board = board;
         this.model = model;
@@ -37,7 +37,7 @@ public class GoodCommand implements Command {
         for(ColorType c : ColorType.values()) {
             this.deltaGood.put(c, 0);
         }
-        this.cargoHolds = cargoHolds;
+        this.newDisposition = newDisposition;
         this.batteries = batteries;
     }
 
@@ -47,9 +47,9 @@ public class GoodCommand implements Command {
         checkInput(ship);
 
         // increases goods value for each good which is present after the call
-        for (SpecialCargoHoldsComponent c : cargoHolds.keySet())
-            for (int i = 0; i < cargoHolds.get(c).size(); i++)
-                deltaGood.put(cargoHolds.get(c).get(i), deltaGood.get(cargoHolds.get(c).get(i)) + 1);
+        for (SpecialCargoHoldsComponent c : newDisposition.keySet())
+            for (int i = 0; i < newDisposition.get(c).size(); i++)
+                deltaGood.put(newDisposition.get(c).get(i), deltaGood.get(newDisposition.get(c).get(i)) + 1);
 
         // decreases goods value for each good which is present before the call
         for (ColorType good : ColorType.values())
@@ -60,14 +60,15 @@ public class GoodCommand implements Command {
         else
             card.doSpecificCheck(PlayerState.WAIT_REMOVE_GOODS, 0, deltaGood, batteries, username, board);
 
-        for (SpecialCargoHoldsComponent component : cargoHolds.keySet()) {
+        List<SpecialCargoHoldsComponent> componentsInShip = ship.getComponentByType(SpecialCargoHoldsComponent.class);
+        for (SpecialCargoHoldsComponent component : componentsInShip) {
             List<ColorType> currentGoods = new ArrayList<>(component.getGoods());
             for (ColorType good : currentGoods) {
                 component.unloadGood(good, ship);
             }
-            for (ColorType good : cargoHolds.get(component)) {
-                component.loadGood(good, ship);
-            }
+            if (newDisposition.containsKey(component))
+                for (ColorType good : newDisposition.get(component))
+                    component.loadGood(good, ship);
         }
 
         batteries.forEach(batteryComponent -> batteryComponent.useBattery(ship));
@@ -75,12 +76,12 @@ public class GoodCommand implements Command {
     }
 
     private void checkInput(Ship ship) {
-        for (Component component : cargoHolds.keySet())
+        for (Component component : newDisposition.keySet())
             if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
                 throw new ComponentNotValidException("Cargo hold component not valid");
 
-        for (SpecialCargoHoldsComponent component : cargoHolds.keySet())
-            if (cargoHolds.get(component).size() > component.getNumber())
+        for (SpecialCargoHoldsComponent component : newDisposition.keySet())
+            if (newDisposition.get(component).size() > component.getNumber())
                 throw new GoodNotValidException("Too many goods in cargo hold");
 
         for (Component component : batteries)
@@ -93,8 +94,6 @@ public class GoodCommand implements Command {
                 .allMatch(entry -> entry.getValue() <= entry.getKey().getBatteries());
         if (!enoughBatteries)
             throw new CabinComponentNotValidException("Not enough batteries in a single component");
-
-        // TODO ulteriore controllo se la merce è rossa e il cargo special?
     }
 
 }
