@@ -765,6 +765,12 @@
       "isTriple": false
     },
     {
+      "id": 154,
+      "type": "BatteryComponent",
+      "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "isTriple": false
+    },
+    {
       "id": 9,
       "type": "BatteryComponent",
       "connectors": ["EMPTY", "UNIVERSAL", "EMPTY", "UNIVERSAL"],
@@ -1494,6 +1500,13 @@
       "isDouble": false
     },
     {
+      "id": 155,
+      "type": "CannonComponent",
+      "connectors": ["EMPTY", "EMPTY", "DOUBLE", "UNIVERSAL"],
+      "direction": "NORTH",
+      "isDouble": false
+    },
+    {
       "id": 123,
       "type": "CannonComponent",
       "connectors": ["EMPTY", "DOUBLE", "EMPTY", "UNIVERSAL"],
@@ -1629,6 +1642,12 @@
       "id": 143,
       "type": "OddComponent",
       "connectors": ["EMPTY", "EMPTY", "EMPTY", "UNIVERSAL"],
+      "typeAlien": "CANNON"
+    },
+    {
+      "id": 156,
+      "type": "OddComponent",
+      "connectors": ["EMPTY", "EMPTY", "DOUBLE", "UNIVERSAL"],
       "typeAlien": "CANNON"
     },
     {
