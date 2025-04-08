@@ -29,7 +29,7 @@ public class GoodCommand implements Command {
     private final Map<SpecialCargoHoldsComponent, List<ColorType>> newDisposition;
     private final List<BatteryComponent> batteries;
 
-    public GoodCommand(String username, ModelFacade model, Board board, Map<SpecialCargoHoldsComponent, List<ColorType>> newDisposition, List<BatteryComponent> batteries) {
+    public GoodCommand(ModelFacade model, Board board, String username, Map<SpecialCargoHoldsComponent, List<ColorType>> newDisposition, List<BatteryComponent> batteries) {
         this.username = username;
         this.board = board;
         this.model = model;
@@ -42,7 +42,7 @@ public class GoodCommand implements Command {
     }
 
     @Override
-    public void execute(Card card) {
+    public boolean execute(Card card) {
         Ship ship = this.board.getPlayerEntityByUsername(username).getShip();
         checkInput(ship);
 
@@ -72,7 +72,7 @@ public class GoodCommand implements Command {
         }
 
         batteries.forEach(batteryComponent -> batteryComponent.useBattery(ship));
-
+        return card.doCommandEffects(model.getPlayerState(username), model, board, username);
     }
 
     private void checkInput(Ship ship) {

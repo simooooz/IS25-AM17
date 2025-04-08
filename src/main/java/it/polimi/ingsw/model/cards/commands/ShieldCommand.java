@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.commands;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
@@ -12,27 +13,25 @@ import java.util.Optional;
 
 public class ShieldCommand implements Command {
 
+    private final ModelFacade model;
     private final String username;
     private final Board board;
     private final Optional<BatteryComponent> battery;
 
-    public ShieldCommand(String username, Board board, BatteryComponent battery) {
+    public ShieldCommand(ModelFacade model, Board board, String username, BatteryComponent battery) {
+        this.model = model;
         this.username = username;
         this.board = board;
         this.battery = Optional.ofNullable(battery);
     }
 
     @Override
-    public void execute(Card card) {
+    public boolean execute(Card card) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         checkInput(ship);
 
-        if (battery.isPresent()) {
-            battery.get().useBattery(ship);
-            card.doCommandEffects(PlayerState.WAIT_SHIELD, true, username, board);
-        }
-        else
-            card.doCommandEffects(PlayerState.WAIT_SHIELD, false, username, board);
+        battery.ifPresent(batteryComponent -> batteryComponent.useBattery(ship));
+        return card.doCommandEffects(PlayerState.WAIT_SHIELD, battery.isPresent(), model, board, username);
     }
 
     private void checkInput(Ship ship) {

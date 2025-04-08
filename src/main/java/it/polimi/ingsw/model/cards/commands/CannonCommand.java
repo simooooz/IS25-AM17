@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.commands;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
@@ -17,11 +18,13 @@ import java.util.stream.Collectors;
 public class CannonCommand implements Command {
 
     private final String username;
+    private final ModelFacade model;
     private final Board board;
     private final List<BatteryComponent> batteries;
     private final List<CannonComponent> cannons;
 
-    public CannonCommand(String username, Board board, List<BatteryComponent> batteries, List<CannonComponent> cannons) {
+    public CannonCommand(ModelFacade model, Board board, String username, List<BatteryComponent> batteries, List<CannonComponent> cannons) {
+        this.model = model;
         this.username = username;
         this.board = board;
         this.batteries = batteries;
@@ -29,7 +32,7 @@ public class CannonCommand implements Command {
     }
 
     @Override
-    public void execute(Card card) {
+    public boolean execute(Card card) {
         Ship ship = this.board.getPlayerEntityByUsername(username).getShip();
         checkInput(ship);
         card.doSpecificCheck(PlayerState.WAIT_CANNONS, cannons, username, board);
@@ -44,7 +47,7 @@ public class CannonCommand implements Command {
             userCannonPower += 2;
 
         batteries.forEach(batteryComponent -> batteryComponent.useBattery(ship));
-        card.doCommandEffects(PlayerState.WAIT_CANNONS, userCannonPower, username, board);
+        return card.doCommandEffects(PlayerState.WAIT_CANNONS, userCannonPower, model, board, username);
     }
 
     private void checkInput(Ship ship) {

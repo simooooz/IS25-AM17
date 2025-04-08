@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.commands;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
@@ -16,12 +17,14 @@ import java.util.stream.Collectors;
 
 public class EngineCommand implements Command {
 
+    private final ModelFacade model;
     private final String username;
     private final Board board;
     private final List<BatteryComponent> batteries;
     private final List<EngineComponent> engines;
 
-    public EngineCommand(String username, Board board, List<BatteryComponent> batteries, List<EngineComponent> engines) {
+    public EngineCommand(ModelFacade model, Board board, String username, List<BatteryComponent> batteries, List<EngineComponent> engines) {
+        this.model = model;
         this.username = username;
         this.board = board;
         this.batteries = batteries;
@@ -29,7 +32,7 @@ public class EngineCommand implements Command {
     }
 
     @Override
-    public void execute(Card card) {
+    public boolean execute(Card card) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         checkInput(ship);
 
@@ -42,7 +45,7 @@ public class EngineCommand implements Command {
             userEnginePower += 2;
 
         batteries.forEach(batteryComponent -> batteryComponent.useBattery(ship));
-        card.doCommandEffects(PlayerState.WAIT_ENGINES, userEnginePower, username, board);
+        return card.doCommandEffects(PlayerState.WAIT_ENGINES, userEnginePower, model, board, username);
     }
 
     private void checkInput(Ship ship) {

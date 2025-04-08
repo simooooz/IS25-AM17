@@ -4,6 +4,6 @@ import it.polimi.ingsw.model.cards.Card;
 
 public interface Command {
 
-    void execute(Card card);
+    boolean execute(Card card);
 
 }

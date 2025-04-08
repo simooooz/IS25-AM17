@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.commands;
 
+import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.CabinComponent;
@@ -19,18 +20,20 @@ import java.util.stream.Collectors;
 
 public class RemoveCrewCommand implements Command {
 
+    private final ModelFacade model;
     private final String username;
     private final Board board;
     private final List<CabinComponent> cabinComponents;
 
-    public RemoveCrewCommand(String username, Board board, List<CabinComponent> cabinComponents) {
+    public RemoveCrewCommand(ModelFacade model, Board board, String username, List<CabinComponent> cabinComponents) {
+        this.model = model;
         this.username = username;
         this.board = board;
         this.cabinComponents = cabinComponents;
     }
 
     @Override
-    public void execute(Card card) {
+    public boolean execute(Card card) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         checkInput(ship);
         card.doSpecificCheck(PlayerState.WAIT_REMOVE_CREW, cabinComponents, 0, username, board);
@@ -42,6 +45,7 @@ public class RemoveCrewCommand implements Command {
                 cabin.setHumans(cabin.getHumans() - 1, ship);
         }
 
+        return card.doCommandEffects(PlayerState.WAIT_REMOVE_CREW, model, board, username);
     }
 
     private void checkInput(Ship ship) {
