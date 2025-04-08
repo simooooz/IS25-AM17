@@ -209,7 +209,7 @@ public class Board {
                 .forEach(p -> p.setCredits(p.getCredits() + 4));
 
         return players.stream()
-                .sorted(Comparator.comparingInt(PlayerData::getCredits))
+                .sorted(Comparator.comparingInt(PlayerData::getCredits).reversed())
                 .toList();
     }
 

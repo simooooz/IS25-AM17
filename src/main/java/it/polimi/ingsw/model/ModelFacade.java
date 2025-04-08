@@ -277,7 +277,7 @@ public class ModelFacade {
 
     public void getBoolean(String username, boolean value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        boolean finish = card.doCommandEffects(PlayerState.WAIT_INDEX, value, this, board, username);
+        boolean finish = card.doCommandEffects(PlayerState.WAIT_BOOLEAN, value, this, board, username);
         if (finish) { board.pickNewCard(this); }
     }
 

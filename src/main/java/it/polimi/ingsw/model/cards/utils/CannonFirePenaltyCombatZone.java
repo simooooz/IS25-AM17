@@ -38,8 +38,8 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
             model.setPlayerState(username, newState);
         }
-
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        else
+            throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
@@ -64,8 +64,8 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             else
                 model.setPlayerState(username, PlayerState.DONE);
         }
-
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        else
+            throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
@@ -77,7 +77,8 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             else
                 model.setPlayerState(username, PlayerState.DONE);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        else
+            throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
 }
