@@ -162,7 +162,9 @@ public class ModelFacade {
         boolean phaseDone = true;
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) { // Check if next players have to choose alien
             PlayerData player = board.getPlayers().get(playerIndex).getKey();
-            List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class);
+            List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class)
+                .stream().filter(c -> !c.getIsStarting()).toList();
+
             for (CabinComponent cabin : cabins) {
                 if (!cabin.getLinkedNeighbors(player.getShip()).stream()
                         .filter(c -> c instanceof OddComponent)
