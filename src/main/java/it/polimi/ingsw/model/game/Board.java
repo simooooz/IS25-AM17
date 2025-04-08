@@ -87,10 +87,6 @@ public class Board {
         return cardPile;
     }
 
-    public void setCardPilePos(int cardPilePos) {
-        this.cardPilePos = cardPilePos;
-    }
-
     public int getCardPilePos() {
         return cardPilePos;
     }
@@ -107,24 +103,17 @@ public class Board {
         Collections.shuffle(cardPile);
     }
 
-    public void drawCard(ModelFacade model) {
-        if (cardPilePos < cardPile.size()) {
-            Card card = cardPile.get(cardPilePos);
-            boolean finish = card.startCard(model, this);
-            if (finish) {
-                cardPilePos++;
-                if (cardPilePos == cardPile.size()) { // All cards are resolved
-                    for (PlayerData p : getPlayersByPos())
-                        model.setPlayerState(p.getUsername(), PlayerState.END);
-                }
-                else { // Change card
-                    for (PlayerData p : getPlayersByPos())
-                        model.setPlayerState(p.getUsername(), PlayerState.WAIT);
-                    model.setPlayerState(getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
-                }
-            }
+    public void pickNewCard(ModelFacade model) {
+        cardPilePos++;
+        if (cardPilePos == cardPile.size()) { // All cards are resolved
+            for (PlayerData p : getPlayersByPos())
+                model.setPlayerState(p.getUsername(), PlayerState.END);
         }
-        else throw new RuntimeException("Card index out of bound");
+        else { // Change card
+            for (PlayerData p : getPlayersByPos())
+                model.setPlayerState(p.getUsername(), PlayerState.WAIT);
+            model.setPlayerState(getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+        }
     }
 
     public void movePlayer(PlayerData playerData, int position) {

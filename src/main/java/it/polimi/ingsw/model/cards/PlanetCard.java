@@ -32,57 +32,71 @@ public class PlanetCard extends Card{
 
         for (PlayerData player: board.getPlayersByPos())
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);
-        model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_INDEX);
-        return false;
+
+        return autoCheckPlayers(model, board);
     }
 
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-
-        PlayerState actState = model.getPlayerState(username);
-
-        switch (actState) {
-            case WAIT_GOODS -> model.setPlayerState(username, PlayerState.DONE);
-            case WAIT_INDEX -> {
-                if (landedPlayers.containsKey(board.getPlayerEntityByUsername(username))) {
-                    model.setPlayerState(username, PlayerState.WAIT_GOODS);
-                }
-                else
-                    model.setPlayerState(username, PlayerState.DONE);
+    private boolean autoCheckPlayers(ModelFacade model, Board board) {
+        for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
+            if (playerIndex < board.getPlayersByPos().size() && landedPlayers.size() < planets.size()) {
+                model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
+                return false;
             }
+            else if (playerIndex < board.getPlayersByPos().size()) // Planets are finished
+                model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.DONE);
         }
 
-        playerIndex++;
-        if (playerIndex < board.getPlayersByPos().size() && landedPlayers.size() < planets.size())
-            model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
-        else if (playerIndex < board.getPlayersByPos().size()) // Planets are finished
-            model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.DONE);
-
         // Check if everyone has finished
-        boolean hasDone = true;
-        for (PlayerData player : board.getPlayersByPos())
+        boolean hasLanded = true;
+        boolean hasLandedAndSetGoods = true;
+        for (PlayerData player : board.getPlayersByPos()) {
+            if (model.getPlayerState(player.getUsername()) != PlayerState.DONE && model.getPlayerState(player.getUsername()) != PlayerState.WAIT)
+                hasLanded = false;
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
-                hasDone = false;
+                hasLandedAndSetGoods = false;
+        }
 
-        if (hasDone) {
+        if (hasLanded && !hasLandedAndSetGoods) { // First phase finished, start second one
+            for (PlayerData player : board.getPlayersByPos())
+                if (model.getPlayerState(player.getUsername()) == PlayerState.WAIT)
+                    model.setPlayerState(player.getUsername(), PlayerState.WAIT_GOODS);
+        }
+
+        if (hasLandedAndSetGoods) { // Card finished
             for (PlayerData player : board.getPlayersByPos().reversed())
                 if (landedPlayers.containsKey(player))
                     board.movePlayer(player, days * -1);
             endCard(board);
             return true;
         }
-
         return false;
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
-        PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == PlayerState.WAIT_INDEX && value != -1) {
-            if (value >= planets.size() || value < 0)
+    public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_INDEX) {
+            if (value >= planets.size() || (value < 0 && value != -1)) // Invalid index
                 throw new RuntimeException("Index not valid");
-            landedPlayers.put(player, planets.get(value));
+            else if (value == -1) // Players doesn't land
+                model.setPlayerState(username, PlayerState.DONE);
+            else { // Land
+                PlayerData player = board.getPlayerEntityByUsername(username);
+                landedPlayers.put(player, planets.get(value));
+                model.setPlayerState(username, PlayerState.WAIT);
+            }
+            playerIndex++;
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_GOODS) {
+            model.setPlayerState(username, PlayerState.DONE);
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override

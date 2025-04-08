@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class AbandonedStationCard extends Card{
 
@@ -16,7 +17,6 @@ public class AbandonedStationCard extends Card{
     private final Map<ColorType, Integer> goods;
 
     private int playerIndex;
-    private int conquerorPlayerIndex;
     private boolean shipConquered;
 
     public AbandonedStationCard(int level, boolean isLearner, int crew, int days, Map<ColorType, Integer> goods) {
@@ -29,36 +29,10 @@ public class AbandonedStationCard extends Card{
     @Override
     public boolean startCard(ModelFacade model, Board board) {
         this.playerIndex = 0;
-        this.conquerorPlayerIndex = -1;
         this.shipConquered = false;
 
         for (PlayerData player : board.getPlayersByPos())
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);
-        return autoCheckPlayers(model, board);
-    }
-
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-
-        PlayerState actState = model.getPlayerState(username);
-
-        switch (actState) {
-            case WAIT_GOODS -> {
-                PlayerData player = board.getPlayerEntityByUsername(username);
-                model.setPlayerState(username, PlayerState.DONE);
-                board.movePlayer(player, days * -1);
-            }
-            case WAIT_BOOLEAN -> {
-                if (conquerorPlayerIndex == board.getPlayersByPos().indexOf(board.getPlayerEntityByUsername(username))) {
-                    model.setPlayerState(username, PlayerState.WAIT_GOODS);
-                    shipConquered = true;
-                }
-                else
-                    model.setPlayerState(username, PlayerState.DONE);
-            }
-        }
-
-        playerIndex++;
         return autoCheckPlayers(model, board);
     }
 
@@ -91,10 +65,32 @@ public class AbandonedStationCard extends Card{
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
-        PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == PlayerState.WAIT_BOOLEAN && value)
-            conquerorPlayerIndex = board.getPlayersByPos().indexOf(player);
+    public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_BOOLEAN && value) {
+            model.setPlayerState(username, PlayerState.WAIT_GOODS);
+            shipConquered = true;
+            return false;
+        }
+        else if (commandType == PlayerState.WAIT_BOOLEAN) {
+            model.setPlayerState(username, PlayerState.DONE);
+            playerIndex++;
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_GOODS) {
+            model.setPlayerState(username, PlayerState.DONE);
+
+            PlayerData player = board.getPlayerEntityByUsername(username);
+            board.movePlayer(player, days * -1);
+
+            playerIndex++;
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override

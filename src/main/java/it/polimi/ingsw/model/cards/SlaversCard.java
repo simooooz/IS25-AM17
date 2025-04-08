@@ -19,9 +19,7 @@ public class SlaversCard extends Card {
     private final int slaversFirePower;
 
     private List<PlayerData> players;
-    private List<PlayerData> defeatedPlayers;
     private boolean slaversDefeated;
-    private double userCannonPower;
     private int playerIndex;
 
     public SlaversCard(int level, boolean isLearner, int crew, int credits, int days, int slaversFirePower) {
@@ -35,41 +33,10 @@ public class SlaversCard extends Card {
     @Override
     public boolean startCard(ModelFacade model, Board board) {
         this.playerIndex = 0;
-        this.defeatedPlayers = new ArrayList<>();
         this.players = board.getPlayersByPos();
 
         for (PlayerData player : players)
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);
-        return autoCheckPlayers(model, board);
-    }
-
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-
-        PlayerState actState = model.getPlayerState(username);
-
-        switch (actState) {
-            case WAIT_BOOLEAN -> model.setPlayerState(username, PlayerState.DONE);
-            case WAIT_CANNONS -> {
-                if (userCannonPower > slaversFirePower && !slaversDefeated) { // Ask if user wants to redeem rewards
-                    model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
-                    slaversDefeated = true;
-                }
-                else if (userCannonPower >= slaversFirePower) { // Tie or slavers already defeated
-                    model.setPlayerState(username, PlayerState.DONE);
-                }
-                else { // Player is defeated
-                    defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    model.setPlayerState(username, PlayerState.DONE);
-                }
-            }
-            case WAIT_REMOVE_CREW -> {
-                defeatedPlayers.remove(board.getPlayerEntityByUsername(username));
-                model.setPlayerState(username, PlayerState.DONE);
-            }
-        }
-
-        playerIndex++;
         return autoCheckPlayers(model, board);
     }
 
@@ -92,6 +59,7 @@ public class SlaversCard extends Card {
             else if (freeCannonsPower > slaversFirePower) { // User wins automatically
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 slaversDefeated = true;
+                return false;
             }
             else if (freeCannonsPower == slaversFirePower && doubleCannonsPower == 0)
                 model.setPlayerState(player.getUsername(), PlayerState.DONE);
@@ -100,8 +68,8 @@ public class SlaversCard extends Card {
                 return false;
             }
             else { // User loses automatically
-                defeatedPlayers.add(player);
-                model.setPlayerState(player.getUsername(), PlayerState.DONE);
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT_REMOVE_CREW);
+                return false;
             }
         }
 
@@ -111,32 +79,56 @@ public class SlaversCard extends Card {
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
-        if (hasDone && defeatedPlayers.isEmpty()) {
+        if (hasDone) {
             endCard(board);
             return true;
         }
-        else if (hasDone) {
-            for (PlayerData player : defeatedPlayers)
-                model.setPlayerState(player.getUsername(), PlayerState.WAIT_REMOVE_CREW);
-        }
-
         return false;
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Double value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_CANNONS) {
-            userCannonPower = value;
+            if (value > slaversFirePower && !slaversDefeated) { // Ask if user wants to redeem rewards
+                model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
+                slaversDefeated = true;
+            }
+            else if (value >= slaversFirePower) { // Tie or slavers already defeated
+                model.setPlayerState(username, PlayerState.DONE);
+                playerIndex++;
+                return autoCheckPlayers(model, board);
+            }
+            else // Player is defeated
+                model.setPlayerState(username, PlayerState.WAIT_REMOVE_CREW);
+
+            return false;
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
-        PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == PlayerState.WAIT_BOOLEAN && value) {
-            board.movePlayer(player, -1 * days);
-            player.setCredits(credits + player.getCredits());
+    public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_BOOLEAN) {
+            model.setPlayerState(username, PlayerState.DONE);
+            if (value) {
+                PlayerData player = board.getPlayerEntityByUsername(username);
+                board.movePlayer(player, -1 * days);
+                player.setCredits(credits + player.getCredits());
+            }
+            playerIndex++;
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_REMOVE_CREW) {
+            model.setPlayerState(username, PlayerState.DONE);
+            playerIndex++;
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override

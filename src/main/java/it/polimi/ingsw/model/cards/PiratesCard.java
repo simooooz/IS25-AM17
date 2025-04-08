@@ -22,7 +22,6 @@ public class PiratesCard extends Card{
     private List<PlayerData> players;
     private List<PlayerData> defeatedPlayers;
     private boolean piratesDefeated;
-    private double userCannonPower;
     private int playerIndex;
     private int cannonIndex;
     private int coord;
@@ -49,40 +48,6 @@ public class PiratesCard extends Card{
         return autoCheckPlayers(model, board);
     }
 
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-
-        PlayerState actState = model.getPlayerState(username);
-
-        switch (actState) {
-            case WAIT_BOOLEAN, WAIT_SHIELD -> model.setPlayerState(username, PlayerState.DONE);
-            case WAIT_CANNONS -> {
-                if (userCannonPower > piratesFirePower && !piratesDefeated) { // Ask if user wants to redeem rewards
-                    model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
-                    piratesDefeated = true;
-                }
-                else if (userCannonPower >= piratesFirePower) { // Tie or pirates already defeated
-                    model.setPlayerState(username, PlayerState.DONE);
-                }
-                else { // Player is defeated
-                    defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    model.setPlayerState(username, PlayerState.DONE);
-                }
-            }
-            case WAIT_ROLL_DICES -> {
-                for (PlayerData player : defeatedPlayers) {
-                    PlayerState newState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
-                    model.setPlayerState(player.getUsername(), newState);
-                }
-                cannonIndex++;
-            }
-        }
-
-        playerIndex++;
-        return autoCheckPlayers(model, board);
-
-    }
-
     private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < players.size(); playerIndex++) {
             PlayerData player = players.get(playerIndex);
@@ -107,6 +72,7 @@ public class PiratesCard extends Card{
             else if (freeCannonsPower > piratesFirePower) { // User wins automatically
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 piratesDefeated = true;
+                return false;
             }
             else if (freeCannonsPower == piratesFirePower && doubleCannonsPower == 0) // User draws automatically
                 model.setPlayerState(player.getUsername(), PlayerState.DONE);
@@ -145,29 +111,74 @@ public class PiratesCard extends Card{
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
-        if (commandType == PlayerState.WAIT_ROLL_DICES)
+    public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_ROLL_DICES) {
             this.coord = value;
+            for (PlayerData player : defeatedPlayers) {
+                PlayerState newState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
+                model.setPlayerState(player.getUsername(), newState);
+            }
+            cannonIndex++;
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Double value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_CANNONS) {
-            userCannonPower = value;
+            if (value > piratesFirePower && !piratesDefeated) { // Ask if user wants to redeem rewards
+                model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
+                piratesDefeated = true;
+                return false;
+            }
+            else if (value >= piratesFirePower) { // Tie or pirates already defeated
+                model.setPlayerState(username, PlayerState.DONE);
+            }
+            else { // Player is defeated
+                defeatedPlayers.add(board.getPlayerEntityByUsername(username));
+                model.setPlayerState(username, PlayerState.DONE);
+            }
+            playerIndex++;
+            return autoCheckPlayers(model,board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == PlayerState.WAIT_BOOLEAN && value) {
-            board.movePlayer(player, -1*days);
-            player.setCredits(credits + player.getCredits());
+        if (commandType == PlayerState.WAIT_BOOLEAN) {
+            model.setPlayerState(username, PlayerState.DONE);
+            if (value) {
+                board.movePlayer(player, -1*days);
+                player.setCredits(credits + player.getCredits());
+            }
+            playerIndex++;
+            return autoCheckPlayers(model, board);
         }
-        else if (commandType == PlayerState.WAIT_SHIELD && !value) {
-            Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
-            target.ifPresent(component -> component.destroyComponent(player.getShip()));
+        else if (commandType == PlayerState.WAIT_SHIELD) {
+            if (value) // Shield activated
+                model.setPlayerState(player.getUsername(), PlayerState.DONE);
+            else { // Not activated => find target and if present calc new state
+                Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
+                target.ifPresent(component -> {
+                    PlayerState newState = component.destroyComponent(player.getShip()); // DONE or WAIT_SHIP_PART
+                    model.setPlayerState(player.getUsername(), newState);
+                });
+            }
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_SHIP_PART) {
+            model.setPlayerState(username, PlayerState.DONE);
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
 }

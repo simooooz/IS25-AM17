@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.io.Console;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class MeteorSwarmCard extends Card{
@@ -33,21 +34,7 @@ public class MeteorSwarmCard extends Card{
         return false;
     }
 
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-
-        PlayerState actState = model.getPlayerState(username);
-
-        switch (actState) {
-            case WAIT_ROLL_DICES -> {
-                for(PlayerData player : board.getPlayersByPos()) {
-                    PlayerState newState = meteors.get(meteorIndex).hit(player.getShip(), coord);
-                    model.setPlayerState(player.getUsername(), newState);
-                }
-            }
-            case WAIT_SHIELD, WAIT_CANNONS -> model.setPlayerState(username, PlayerState.DONE);
-        }
-
+    private boolean autoCheckPlayers(ModelFacade model, Board board) {
         // Check if everyone has finished
         boolean hasDone = true;
         for (PlayerData player : board.getPlayersByPos())
@@ -55,13 +42,12 @@ public class MeteorSwarmCard extends Card{
                 hasDone = false;
 
         if (hasDone) {
-            meteorIndex ++;
+            meteorIndex++;
             if (meteorIndex >= meteors.size()) {
                 endCard(board);
                 return true;
             }
             else {
-
                 for (PlayerData player : board.getPlayersByPos())
                     model.setPlayerState(player.getUsername(), PlayerState.WAIT);
                 model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
@@ -94,27 +80,53 @@ public class MeteorSwarmCard extends Card{
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
-        if (commandType == PlayerState.WAIT_ROLL_DICES)
+    public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_ROLL_DICES) {
             this.coord = value;
+            for (PlayerData player : board.getPlayersByPos()) {
+                PlayerState newState = meteors.get(meteorIndex).hit(player.getShip(), coord);
+                model.setPlayerState(player.getUsername(), newState);
+            }
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Double value, ModelFacade model, Board board, String username) {
         PlayerData player = board.getPlayerEntityByUsername(username);
         if (commandType == PlayerState.WAIT_CANNONS && value == 0) {
             Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coord).stream().findFirst();
-            target.ifPresent(component -> component.destroyComponent(player.getShip()));
+            target.ifPresent(component -> {
+                PlayerState newState = component.destroyComponent(player.getShip()); // DONE or WAIT_SHIP_PART
+                model.setPlayerState(username, newState);
+            });
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
         PlayerData player = board.getPlayerEntityByUsername(username);
         if (commandType == PlayerState.WAIT_SHIELD && !value) {
             Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coord).stream().findFirst();
-            target.ifPresent(component -> component.destroyComponent(player.getShip()));
+            target.ifPresent(component -> {
+                PlayerState newState = component.destroyComponent(player.getShip()); // DONE or WAIT_SHIP_PART
+                model.setPlayerState(username, newState);
+            });
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_SHIP_PART) {
+            model.setPlayerState(username, PlayerState.DONE);
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
 }

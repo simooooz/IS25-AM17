@@ -12,7 +12,7 @@ public class RollDicesCommand implements Command {
     private final String username;
     private final Board board;
 
-    public RollDicesCommand(String username, Board board) {
+    public RollDicesCommand(ModelFacade model, Board board, String username) {
         this.model = model;
         this.username = username;
         this.board = board;

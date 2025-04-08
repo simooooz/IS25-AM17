@@ -28,17 +28,6 @@ public class OpenSpaceCard extends Card {
         return autoCheckPlayers(model, board);
     }
 
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-        PlayerState state = model.getPlayerState(username);
-
-        if (state == PlayerState.WAIT_ENGINES)
-            model.setPlayerState(username, PlayerState.DONE);
-
-        playerIndex++;
-        return autoCheckPlayers(model, board);
-    }
-
     public boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
@@ -78,11 +67,17 @@ public class OpenSpaceCard extends Card {
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Integer power, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Integer power, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_ENGINES) {
+            model.setPlayerState(username, PlayerState.DONE);
+
             PlayerData player = board.getPlayerEntityByUsername(username);
             enginesActivated.put(player, power);
+
+            playerIndex++;
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override

@@ -191,8 +191,31 @@ public class ModelFacade {
         manageChooseAlienPhase(playerIndex);
     }
 
+    public void chooseShipPart(String username, int partIndex) {
+        Ship ship = board.getPlayerEntityByUsername(username).getShip();
+        List<List<Component>> groups = ship.calcShipParts();
+
+        if (partIndex < 0 || partIndex >= groups.size()) throw new IndexOutOfBoundsException("Part index not valid");
+
+        // Remove other parts
+        for (int i = 0; i < groups.size(); i++)
+            if (i != partIndex)
+                for (Component componentToRemove : groups.get(i))
+                    componentToRemove.affectDestroy(ship);
+
+        Card card = board.getCardPile().get(board.getCardPilePos());
+        boolean finish = card.doCommandEffects(PlayerState.WAIT_SHIP_PART, this, board, username);
+        if (finish) { board.pickNewCard(this); }
+    }
+
     public void nextCard() {
-        board.drawCard(this);
+        if (board.getCardPilePos() < board.getCardPile().size()) {
+            Card card = board.getCardPile().get(board.getCardPilePos());
+            boolean finished = card.startCard(this, this.board);
+            if (finished)
+                board.pickNewCard(this);
+        }
+        else throw new RuntimeException("Card index out of bound");
     }
 
     public void activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
@@ -200,9 +223,9 @@ public class ModelFacade {
         List<CannonComponent> cannonComponents = cannonComponentsIds.stream().map(id -> (CannonComponent) board.getMapIdComponents().get(id)).toList();
 
         Card card = board.getCardPile().get(board.getCardPilePos());
-        Command command = new CannonCommand(username, board, batteries, cannonComponents);
-        command.execute(card);
-        card.changeCardState(this, board, username);
+        Command command = new CannonCommand(this, board, username, batteries, cannonComponents);
+        boolean finish = command.execute(card);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
@@ -210,17 +233,17 @@ public class ModelFacade {
         List<EngineComponent> engineComponents = engineComponentsIds.stream().map(id -> (EngineComponent) board.getMapIdComponents().get(id)).toList();
 
         Card card = board.getCardPile().get(board.getCardPilePos());
-        Command command = new EngineCommand(username, board, batteries, engineComponents);
-        command.execute(card);
-        card.changeCardState(this, board, username);
+        Command command = new EngineCommand(this, board, username, batteries, engineComponents);
+        boolean finish = command.execute(card);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void activateShield(String username, Integer batteryId) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         BatteryComponent component = batteryId == null ? null : (BatteryComponent) board.getMapIdComponents().get(batteryId);
-        Command command = new ShieldCommand(username, board, component);
-        command.execute(card);
-        card.changeCardState(this, board, username);
+        Command command = new ShieldCommand(this, board, username, component);
+        boolean finish = command.execute(card);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
@@ -229,37 +252,37 @@ public class ModelFacade {
         cargoHoldsIds.forEach((id, value) -> cargoHolds.put((SpecialCargoHoldsComponent) board.getMapIdComponents().get(id), value));
 
         Card card = board.getCardPile().get(board.getCardPilePos());
-        Command command = new GoodCommand(username, this, board, cargoHolds, batteries);
-        command.execute(card);
-        card.changeCardState(this, board, username);
+        Command command = new GoodCommand(this, board, username, cargoHolds, batteries);
+        boolean finish = command.execute(card);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void removeCrew(String username, List<Integer> cabinsIds) {
         List<CabinComponent> cabins = cabinsIds.stream().map(id -> (CabinComponent) board.getMapIdComponents().get(id)).toList();
 
         Card card = board.getCardPile().get(board.getCardPilePos());
-        Command command = new RemoveCrewCommand(username, board, cabins);
-        command.execute(card);
-        card.changeCardState(this, board, username);
+        Command command = new RemoveCrewCommand(this, board, username, cabins);
+        boolean finish = command.execute(card);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void rollDices(String username) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        Command command = new RollDicesCommand(username, board);
-        command.execute(card);
-        card.changeCardState(this, board, username);
+        Command command = new RollDicesCommand(this, board, username);
+        boolean finish = command.execute(card);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void getBoolean(String username, boolean value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        card.doCommandEffects(PlayerState.WAIT_BOOLEAN, value, username, board);
-        card.changeCardState(this, board, username);
+        boolean finish = card.doCommandEffects(PlayerState.WAIT_INDEX, value, this, board, username);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void getIndex(String username, int value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        card.doCommandEffects(PlayerState.WAIT_INDEX, value, username, board);
-        card.changeCardState(this, board, username);
+        boolean finish = card.doCommandEffects(PlayerState.WAIT_INDEX, value, this, board, username);
+        if (finish) { board.pickNewCard(this); }
     }
 
     public void endFlight(String username) {

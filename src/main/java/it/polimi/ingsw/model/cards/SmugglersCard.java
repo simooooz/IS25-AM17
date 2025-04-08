@@ -17,10 +17,7 @@ public class SmugglersCard extends Card {
     private final int days;
 
     private boolean defeated;
-    private boolean redeem;
     private int playerIndex;
-    private List<PlayerData> defeatedPlayers;
-    private double power;
 
     public SmugglersCard(int level, boolean isLearner, int smugglersFirePower, int penalty, Map<ColorType, Integer> reward, int days) {
         super(level, isLearner);
@@ -33,46 +30,11 @@ public class SmugglersCard extends Card {
     @Override
     public boolean startCard(ModelFacade model, Board board) {
         this.defeated = false;
-        this.redeem = false;
         this.playerIndex = 0;
-        this.defeatedPlayers = new ArrayList<>();
 
         board.getPlayers().forEach(player ->
                 model.setPlayerState(player.getKey().getUsername(), PlayerState.WAIT)
         );
-        return autoCheckPlayers(model, board);
-    }
-
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-        PlayerState state = model.getPlayerState(username);
-
-        switch (state) {
-            case WAIT_BOOLEAN -> {
-                if (redeem) { model.setPlayerState(username, PlayerState.WAIT_GOODS); }
-                else { model.setPlayerState(username, PlayerState.DONE); }
-            }
-            case WAIT_CANNONS -> {
-                if (power > smugglersFirePower && !defeated) {       // ask if user wants to redeem rewards
-                    model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
-                    this.defeated = true;
-                }
-                else if (power >= smugglersFirePower)                // tie or smugglers already defeated
-                    model.setPlayerState(username, PlayerState.DONE);
-                else {                                      // player is defeated
-                    defeatedPlayers.add(board.getPlayerEntityByUsername(username));
-                    model.setPlayerState(username, PlayerState.WAIT_REMOVE_GOODS);
-                }
-            }
-            case WAIT_GOODS -> model.setPlayerState(username, PlayerState.DONE);
-
-            case WAIT_REMOVE_GOODS -> {
-                defeatedPlayers.remove(board.getPlayerEntityByUsername(username));
-                model.setPlayerState(username, PlayerState.DONE);
-            }
-        }
-
-        playerIndex++;
         return autoCheckPlayers(model, board);
     }
 
@@ -101,6 +63,7 @@ public class SmugglersCard extends Card {
             else if (freeCannonsPower > smugglersFirePower) {      // user win automatically
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
                 defeated = true;
+                return false;
             }
             else if (freeCannonsPower == smugglersFirePower && doubleCannonsPower == 0)        // user draws automatically
                 model.setPlayerState(player.getUsername(), PlayerState.DONE);
@@ -109,8 +72,8 @@ public class SmugglersCard extends Card {
                 return false;
             }
             else {      // user loses automatically
-                defeatedPlayers.add(player);
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT_REMOVE_GOODS);
+                return false;
             }
         }
 
@@ -119,7 +82,7 @@ public class SmugglersCard extends Card {
             if (model.getPlayerState(p.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
-        if (hasDone && defeatedPlayers.isEmpty()) {
+        if (hasDone) {
             endCard(board);
             return true;
         }
@@ -127,21 +90,51 @@ public class SmugglersCard extends Card {
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Double power, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Double power, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_CANNONS) {
-            this.power = power;
+            if (power > smugglersFirePower && !defeated) { // ask if user wants to redeem rewards
+                model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
+                this.defeated = true;
+            }
+            else if (power >= smugglersFirePower) { // tie or smugglers already defeated
+                model.setPlayerState(username, PlayerState.DONE);
+                playerIndex++;
+                return autoCheckPlayers(model, board);
+            }
+            else // Player is defeated;
+                model.setPlayerState(username, PlayerState.WAIT_REMOVE_GOODS);
+
+            return false;
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
-        PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == PlayerState.WAIT_BOOLEAN && value) {
-            board.movePlayer(player, -1*this.days);
-            redeem = true;
+    public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_BOOLEAN) {
+            if (value) {
+                PlayerData player = board.getPlayerEntityByUsername(username);
+                board.movePlayer(player, -1 * this.days);
+                model.setPlayerState(username, PlayerState.WAIT_GOODS);
+                return false;
+            }
+            else {
+                model.setPlayerState(username, PlayerState.DONE);
+                playerIndex++;
+                return autoCheckPlayers(model, board);
+            }
         }
-        else if (!value)
-            redeem = false;
+        throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_GOODS || commandType == PlayerState.WAIT_REMOVE_GOODS) {
+            model.setPlayerState(username, PlayerState.DONE);
+            playerIndex++;
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override

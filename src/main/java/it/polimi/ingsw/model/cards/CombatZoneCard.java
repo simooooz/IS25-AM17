@@ -45,30 +45,6 @@ public class CombatZoneCard extends Card {
         }
     }
 
-    @Override
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-
-        PlayerState actState = model.getPlayerState(username);
-
-        switch (actState) {
-            case WAIT_CANNONS, WAIT_ENGINES -> model.setPlayerState(username, PlayerState.DONE);
-            case WAIT_ROLL_DICES, WAIT_SHIELD -> {
-                PlayerState newState = warLines.get(warLineIndex).getValue().resolve(model, board, board.getPlayerEntityByUsername(username));
-                model.setPlayerState(username, newState);
-                if (newState == PlayerState.DONE)
-                    worst.getKey().setValue(Optional.empty());
-            }
-            case WAIT_REMOVE_CREW, WAIT_REMOVE_GOODS -> {
-                worst.getKey().setValue(Optional.empty());
-                model.setPlayerState(username, PlayerState.DONE);
-            }
-        }
-
-        playerIndex++;
-        return autoCheckPlayers(model, board);
-
-    }
-
     private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
@@ -109,31 +85,73 @@ public class CombatZoneCard extends Card {
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
-        if (commandType == PlayerState.WAIT_ENGINES && (worst.getKey().getValue().isEmpty() || worst.getValue() > value)) {
-            PlayerData player = board.getPlayerEntityByUsername(username);
-            worst.getKey().setValue(Optional.of(player));
-            worst.setValue(value.doubleValue());
+    public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_ENGINES) {
+            model.setPlayerState(username, PlayerState.DONE);
+
+            if (worst.getKey().getValue().isEmpty() || worst.getValue() > value) { // Update worst
+                PlayerData player = board.getPlayerEntityByUsername(username);
+                worst.getKey().setValue(Optional.of(player));
+                worst.setValue(value.doubleValue());
+            }
+
+            playerIndex++;
+            return autoCheckPlayers(model, board);
         }
         else if (commandType == PlayerState.WAIT_ROLL_DICES) {
-            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value);
+            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value, model, board, username);
+
+            if (model.getPlayerState(username) == PlayerState.DONE) // If nested doCommandEffect has put state to DONE
+                worst.getKey().setValue(Optional.empty());
+
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_SHIELD) {
-            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value, username, board);
+            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value, model, board, username);
+
+            if (model.getPlayerState(username) == PlayerState.DONE) // If nested doCommandEffect has put state to DONE
+                worst.getKey().setValue(Optional.empty());
+
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override
-    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
-        PlayerData player = board.getPlayerEntityByUsername(username);
-        if (commandType == PlayerState.WAIT_CANNONS && (worst.getKey().getValue().isEmpty() || worst.getValue() > value)) {
-            worst.getKey().setValue(Optional.of(player));
-            worst.setValue(value);
+    public boolean doCommandEffects(PlayerState commandType, Double value, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_CANNONS) {
+            model.setPlayerState(username, PlayerState.DONE);
+
+            if (worst.getKey().getValue().isEmpty() || worst.getValue() > value) { // Update worst
+                PlayerData player = board.getPlayerEntityByUsername(username);
+                worst.getKey().setValue(Optional.of(player));
+                worst.setValue(value);
+            }
+
+            playerIndex++;
+            return autoCheckPlayers(model, board);
         }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
+        if (commandType == PlayerState.WAIT_REMOVE_CREW || commandType == PlayerState.WAIT_REMOVE_GOODS) {
+            worst.getKey().setValue(Optional.empty());
+            model.setPlayerState(username, PlayerState.DONE);
+
+            return autoCheckPlayers(model, board);
+        }
+        else if (commandType == PlayerState.WAIT_SHIP_PART) {
+            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, model, board, username);
+            return autoCheckPlayers(model, board);
+        }
+        throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
     @Override

@@ -37,10 +37,6 @@ abstract public class Card {
 
     public abstract boolean startCard(ModelFacade model, Board board);
 
-    protected boolean changeState(ModelFacade model, Board board, String username) {
-        throw new RuntimeException("Method not valid");
-    }
-
     protected void endCard(Board board) {
         List<PlayerData> players = board.getPlayersByPos();
 
@@ -59,22 +55,6 @@ abstract public class Card {
             if (player.hasEndedInAdvance())
                 board.moveToStartingDeck(player);
 
-    }
-
-    public void changeCardState(ModelFacade model, Board board, String username) {
-        boolean finish = changeState(model, board, username);
-        if (finish) {
-            board.setCardPilePos(board.getCardPilePos() + 1);
-            if (board.getCardPilePos() == board.getCardPile().size()) { // All cards are resolved
-                for (PlayerData player : board.getPlayersByPos())
-                    model.setPlayerState(player.getUsername(), PlayerState.END);
-            }
-            else { // Change card
-                for (PlayerData player : board.getPlayersByPos())
-                    model.setPlayerState(player.getUsername(), PlayerState.WAIT);
-                model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
-            }
-        }
     }
 
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> rewards, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
@@ -116,15 +96,19 @@ abstract public class Card {
     public void doSpecificCheck(PlayerState commandType, List<CannonComponent> cannons, String username, Board board) {
     }
 
-    public void doCommandEffects(PlayerState commandType, Integer value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
 
-    public void doCommandEffects(PlayerState commandType, Double value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Double value, ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
 
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
+    public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
+        throw new RuntimeException("Method not valid");
+    }
+
+    public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
 
