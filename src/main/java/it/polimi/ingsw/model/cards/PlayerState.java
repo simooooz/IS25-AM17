@@ -4,6 +4,7 @@ public enum PlayerState {
     BUILD,
     CHECK,
     WAIT_ALIEN,
+    WAIT_SHIP_PART,
     DRAW_CARD,
     END,
 

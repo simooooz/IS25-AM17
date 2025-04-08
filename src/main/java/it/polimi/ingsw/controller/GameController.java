@@ -112,6 +112,11 @@ public class GameController {
         model.chooseAlien(username, aliensIds);
     }
 
+    public void chooseShipPart(String username, int partIndex) {
+        if (model.getPlayerState(username) != PlayerState.WAIT_SHIP_PART) throw new IllegalStateException("State is not WAIT_SHIP_PART");
+        model.chooseShipPart(username, partIndex);
+    }
+
     public void drawCard(String username) {
         if (model.getPlayerState(username) != PlayerState.DRAW_CARD) throw new IllegalStateException("State is not DRAW_CARD");
         model.nextCard();

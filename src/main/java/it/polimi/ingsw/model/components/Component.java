@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 import it.polimi.ingsw.model.game.Board;
@@ -189,60 +190,14 @@ public class Component {
                 (ship.getDashboard(y + 1, x).isEmpty() || Component.areConnectorsCompatible(ship.getDashboard(y + 1, x).get().connectors[0], connectors[2])); // Bottom connector check
     }
 
-    public void destroyComponent(Ship ship) {
+    // Returns DONE if there is only a part, otherwise WAIT_SHIP_PART
+    public PlayerState destroyComponent(Ship ship) {
         affectDestroy(ship);
+        List<List<Component>> groups = ship.calcShipParts();
 
-        // Matrix of booleans to track visited components
-        boolean[][] visited = new boolean[ship.getDashboard().length][ship.getDashboard()[0].length];
-        List<List<Component>> groups = new ArrayList<>();
-
-        // Find connected groups
-        for (int i = 0; i < ship.getDashboard().length; i++) {
-            for (int j = 0; j < ship.getDashboard()[0].length; j++) {
-                if (ship.getDashboard(i, j).isPresent() && !visited[i][j]) {
-                    List<Component> group = new ArrayList<>();
-                    dfs(ship.getDashboard(), i, j, visited, group, Optional.empty());
-                    groups.add(group);
-                }
-            }
-        }
-
-        if (groups.size() > 1) { // TODO (or have no more cabins)
-            int toKeep = 0; // View
-            for (int i = 0; i < groups.size(); i++) {
-                if (i != toKeep) {
-                    for (Component componentToRemove : groups.get(i)) {
-                        componentToRemove.affectDestroy(ship);
-                    }
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings({"OptionalGetWithoutIsPresent", "OptionalUsedAsFieldOrParameterType"})
-    private void dfs(Optional<Component>[][] dashboard, int i, int j, boolean[][] visited, List<Component> group, Optional<Component> otherComponentOpt) {
-        if (i < 0 || i >= dashboard.length || j < 0 || j >= dashboard[0].length) return;
-        if (visited[i][j] || dashboard[i][j].isEmpty()) return;
-
-        // Skip if connectors are not linked together
-        if (otherComponentOpt.isPresent()) {
-            if (
-                    dashboard[i][j].get().x < otherComponentOpt.get().x && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||
-                            dashboard[i][j].get().x > otherComponentOpt.get().x && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[3], otherComponentOpt.get().getConnectors()[1]) ||
-                            dashboard[i][j].get().y < otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.get().getConnectors()[0]) ||
-                            dashboard[i][j].get().y > otherComponentOpt.get().y && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.get().getConnectors()[2])
-            )
-                return;
-        }
-
-        visited[i][j] = true;
-        dashboard[i][j].ifPresent(group::add);
-
-        // Check close components
-        dfs(dashboard, i - 1, j, visited, group, dashboard[i][j]);
-        dfs(dashboard, i + 1, j, visited, group, dashboard[i][j]);
-        dfs(dashboard, i, j - 1, visited, group, dashboard[i][j]);
-        dfs(dashboard, i, j + 1, visited, group, dashboard[i][j]);
+        if (groups.size() > 1)
+            return PlayerState.WAIT_SHIP_PART;
+        return PlayerState.DONE;
     }
 
     public int getX() {

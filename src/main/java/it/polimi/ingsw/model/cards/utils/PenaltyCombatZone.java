@@ -11,11 +11,15 @@ public abstract class PenaltyCombatZone {
 
     public abstract PlayerState resolve(ModelFacade model, Board board, PlayerData player);
 
-    public void doCommandEffects(PlayerState commandType, Integer value) {
+    public void doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
 
-    public void doCommandEffects(PlayerState commandType, Boolean value, String username, Board board) {
+    public void doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
+        throw new RuntimeException("Method not valid");
+    }
+
+    public void doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
 

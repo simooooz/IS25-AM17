@@ -28,8 +28,7 @@ public class CannonFire {
         if (!isBig && ship.getProtectedSides().contains(directionFrom) && ship.getBatteries() > 0) // Ask user if he wants to use a battery
             return PlayerState.WAIT_SHIELD;
 
-        target.destroyComponent(ship); // Destroy component
-        return PlayerState.DONE;
+        return target.destroyComponent(ship); // Destroy component
     }
 
     public Optional<Component> getTarget(Ship ship, int coord) {

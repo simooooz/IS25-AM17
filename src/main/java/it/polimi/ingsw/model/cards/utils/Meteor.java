@@ -53,8 +53,7 @@ public class Meteor {
             }
 
         }
-        target.destroyComponent(ship);// Destroy component
-        return PlayerState.DONE;
+        return target.destroyComponent(ship); // Destroy component
     }
 
     public List<Component> getTargets(Ship ship, int coord) {

@@ -7,7 +7,6 @@ import it.polimi.ingsw.model.properties.DirectionType;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class Ship {
     private final Optional<Component>[][] dashboard;
@@ -158,6 +157,52 @@ public class Ship {
                 if (component.isPresent() && !component.get().checkComponent(this))
                     return false;
         return true;
+    }
+
+    public List<List<Component>> calcShipParts() {
+
+        // Matrix of booleans to track visited components
+        boolean[][] visited = new boolean[dashboard.length][dashboard[0].length];
+        List<List<Component>> groups = new ArrayList<>();
+
+        // Find connected groups
+        for (int i = 0; i < dashboard.length; i++) {
+            for (int j = 0; j < dashboard[0].length; j++) {
+                if (this.getDashboard(i, j).isPresent() && !visited[i][j]) {
+                    List<Component> group = new ArrayList<>();
+                    dfs(i, j, visited, group, Optional.empty());
+                    groups.add(group);
+                }
+            }
+        }
+
+        return groups;
+    }
+
+    @SuppressWarnings({"OptionalGetWithoutIsPresent", "OptionalUsedAsFieldOrParameterType"})
+    private void dfs(int i, int j, boolean[][] visited, List<Component> group, Optional<Component> otherComponentOpt) {
+        if (i < 0 || i >= dashboard.length || j < 0 || j >= dashboard[0].length) return;
+        if (visited[i][j] || dashboard[i][j].isEmpty()) return;
+
+        // Skip if connectors are not linked together
+        if (otherComponentOpt.isPresent()) {
+            if (
+                dashboard[i][j].get().getX() < otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||
+                dashboard[i][j].get().getX() > otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[3], otherComponentOpt.get().getConnectors()[1]) ||
+                dashboard[i][j].get().getY() < otherComponentOpt.get().getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.get().getConnectors()[0]) ||
+                dashboard[i][j].get().getY() > otherComponentOpt.get().getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.get().getConnectors()[2])
+            )
+                return;
+        }
+
+        visited[i][j] = true;
+        dashboard[i][j].ifPresent(group::add);
+
+        // Check close components
+        dfs(i - 1, j, visited, group, dashboard[i][j]);
+        dfs(i + 1, j, visited, group, dashboard[i][j]);
+        dfs(i, j - 1, visited, group, dashboard[i][j]);
+        dfs(i, j + 1, visited, group, dashboard[i][j]);
     }
 
 }
