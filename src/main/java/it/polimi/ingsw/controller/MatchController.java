@@ -1,6 +1,7 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.model.exceptions.LobbyNotFoundException;
+import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
+import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.model.game.LobbyState;
 
@@ -52,9 +53,11 @@ public class MatchController implements MatchControllerInterface {
      * @param maxPlayers max allowed players
      * @param name       lobby's name
      */
-    public synchronized void createNewGame(String username, int maxPlayers, String name) {
-        Lobby lobby = new Lobby(username);
-        lobbies.put(username, lobby);
+    public synchronized void createNewGame(String username, int maxPlayers, String name) throws PlayerAlreadyInException {
+        String gameID = UUID.randomUUID().toString();
+        Lobby lobby = new Lobby(gameID, name, username, maxPlayers);
+        lobbies.put(gameID, lobby);
+        lobby.addPlayer(username); // Join in the newly created lobby
     }
 
     /**
@@ -64,10 +67,11 @@ public class MatchController implements MatchControllerInterface {
      * @param gameID   game to join
      */
     @Override
-    public synchronized void joinGame(String username, String gameID) {
+    public synchronized void joinGame(String username, String gameID) throws LobbyNotFoundException, PlayerAlreadyInException {
+        // TODO check se è già in un'altra lobby?
         Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
         Lobby lobby = lobbyOptional.filter(l -> l.getState() == LobbyState.WAITING)
-                .orElseThrow(() -> new LobbyNotFoundException("Lobby not found"));
+                .orElseThrow(() -> new LobbyNotFoundException("Lobby not found or not in WAITING state"));
 
         lobby.addPlayer(username);
     }
@@ -78,7 +82,7 @@ public class MatchController implements MatchControllerInterface {
      * @param username player's username
      */
     @Override
-    public synchronized void joinRandomGame(String username) {
+    public synchronized void joinRandomGame(String username) throws LobbyNotFoundException, PlayerAlreadyInException {
         List<Lobby> availableLobbies = this.lobbies.values().stream()
                 .filter(l -> l.getState() == LobbyState.WAITING)
                 .toList();
@@ -94,7 +98,7 @@ public class MatchController implements MatchControllerInterface {
      * @param username player's username
      */
     @Override
-    public synchronized void leaveGame(String username) {
+    public synchronized void leaveGame(String username) throws LobbyNotFoundException {
         Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
                 .filter(e -> e.getValue().hasPlayer(username))
                 .findFirst();
@@ -103,20 +107,19 @@ public class MatchController implements MatchControllerInterface {
         Lobby lobby = lobbyEntry.get().getValue();
         lobby.removePlayer(username);
         if (lobby.toDelete())
-            this.delete(lobbyEntry.get().getKey());
+            this.delete(lobby);
     }
 
     /**
      * Handles the elimination of the lobby/game
      *
-     * @param gameID id of lobby/game
+     * @param lobby to delete
      */
-    private void delete(String gameID) {
-        Lobby lobby = lobbies.get(gameID);
+    private void delete(Lobby lobby) {
         switch (lobby.getState()) {
-            case WAITING -> lobbies.remove(gameID);
+            case WAITING -> lobbies.remove(lobby.getGameID());
             case IN_GAME -> {
-                // todo: come si comporta il game controller? metodo endGame() nella lobby?
+                // todo: come si comporta il game controller? metodo endGame() nella lobby? bisogna eliminare tutti i giocatori
             }
         }
     }

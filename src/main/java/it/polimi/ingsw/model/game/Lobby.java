@@ -1,12 +1,13 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.controller.GameController;
-import it.polimi.ingsw.model.exceptions.PlayerAlreadyInException;
+import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
+import it.polimi.ingsw.network.exceptions.UserNotFoundException;
+import it.polimi.ingsw.network.socket.server.User;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 public class Lobby {
 
@@ -32,11 +33,10 @@ public class Lobby {
     private String master;
 
     public static final int MIN_PLAYERS = 2;
-    public static final int DEFAULT_MAX_PLAYERS = 4;
     /**
      * max num of players master wants to be accepted
      */
-    private int maxPlayers = DEFAULT_MAX_PLAYERS;
+    private int maxPlayers ;
     /**
      * players in the lobby
      */
@@ -45,30 +45,15 @@ public class Lobby {
     /**
      * Constructor
      *
-     * @param username player's username
-     */
-    public Lobby(String username) {
-        this.state = LobbyState.WAITING;
-        this.uuid = UUID.randomUUID().toString();
-        this.name = "game" + this.uuid;
-
-        this.master = username;
-
-        this.players = new ArrayList<>();
-    }
-
-    /**
-     * Constructor
-     *
+     * @param gameID     lobby's ID
      * @param name       lobby's name
      * @param username   player's username
      * @param maxPlayers max players allowed in lobby
      */
-    public Lobby(String name, String username, int maxPlayers) {
+    public Lobby(String gameID, String name, String username, int maxPlayers) {
         this.state = LobbyState.WAITING;
-        this.uuid = UUID.randomUUID().toString();
+        this.uuid = gameID;
         this.name = name;
-
         this.master = username;
 
         this.maxPlayers = maxPlayers;
@@ -77,6 +62,10 @@ public class Lobby {
 
     public LobbyState getState() {
         return state;
+    }
+
+    public String getGameID() {
+        return uuid;
     }
 
     /**
@@ -92,7 +81,7 @@ public class Lobby {
      * Adds a player and if the lobby is full initializes an instance of {@link GameController}
      * @param username player's username
      */
-    public void addPlayer(String username) {
+    public void addPlayer(String username) throws PlayerAlreadyInException {
         if (hasPlayer(username)) throw new PlayerAlreadyInException("Player's already in");
 
         players.add(username);
@@ -116,7 +105,7 @@ public class Lobby {
     public void removePlayer(String username) {
         players.remove(username);
         if (!players.isEmpty())
-            master = master.equals(username) ? players.get(new Random().nextInt(players.size())) : null;
+            master = master.equals(username) ? players.get(new Random().nextInt(players.size())) : master;
 
         if (this.state == LobbyState.IN_GAME) this.game.playerLeft(username);
     }
@@ -126,8 +115,16 @@ public class Lobby {
      */
     private void initGame() {
         this.state = LobbyState.IN_GAME;
-
         this.game = new GameController(players);
+
+        try {
+            for (String username : players) // Set GameController for each user
+                User.getUser(username).setGameController(game);
+        } catch (UserNotFoundException e) {
+            this.state = LobbyState.WAITING;
+            throw new RuntimeException("Error initializing game");
+        }
+
         this.game.startMatch();
     }
 
