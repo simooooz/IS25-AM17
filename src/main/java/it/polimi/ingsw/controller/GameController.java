@@ -1,6 +1,7 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
@@ -84,12 +85,12 @@ public class GameController {
         model.rotateComponent(username, componentId, num);
     }
 
-    public void lookCardPile(String username, int deckIndex) {
+    public List<Card> lookCardPile(String username, int deckIndex) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username))
             throw new RuntimeException("Player is ready"); // TODO non lo so se quando è ready può ancora guardarle
 
-        model.lookCardPile(username, deckIndex);
+        return model.lookCardPile(username, deckIndex);
     }
 
     public void moveHourglass(String username) {

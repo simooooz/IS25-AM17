@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
-import it.polimi.ingsw.model.exceptions.NoEnoughPlayerException;
+import it.polimi.ingsw.controller.exceptions.NoEnoughPlayerException;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -35,8 +35,6 @@ public class ModelFacade {
     }
 
     public void startMatch() {
-        if (this.board.getStartingDeck().size() < 2) throw new NoEnoughPlayerException("MIN players required: 2");
-
         for (String username : usernames)
             playersState.put(username, PlayerState.BUILD);
 
@@ -78,7 +76,7 @@ public class ModelFacade {
             board.getMapIdComponents().get(componentId).rotateComponent(ship);
     }
 
-    public void lookCardPile(String username, int deckIndex) {
+    public List<Card> lookCardPile(String username, int deckIndex) {
         if (deckIndex < 0 || deckIndex > 2) throw new IllegalArgumentException("Invalid deck index");
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
 
@@ -86,7 +84,7 @@ public class ModelFacade {
 
         int startingDeckIndex = deckIndex == 0 ? 0 : (deckIndex == 1 ? 3 : 6);
         int endingDeckIndex = startingDeckIndex + 3;
-        List<Card> pile = board.getCardPile().subList(startingDeckIndex, endingDeckIndex); // TODO capiamo il getter
+        return board.getCardPile().subList(startingDeckIndex, endingDeckIndex); // TODO capiamo il getter
     }
 
     public void moveHourglass(String username) {

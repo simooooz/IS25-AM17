@@ -21,8 +21,8 @@ public class UserOfClient {
         try {
             this.clientSocket.sendObject(message);
         } catch (ClientException e) {
-            System.err.println("Error: " + e.getMessage());
-            // TODO che faccio? dovrebbe aver già chiuso la connessione
+            System.err.println("[USER OF CLIENT] Error while sending message: " + e.getMessage());
+            // Everything should be closed
         }
     }
 
@@ -30,7 +30,7 @@ public class UserOfClient {
         try {
             message.execute(this);
         } catch (RuntimeException e) {
-            System.err.println("Receive method has caught a RuntimeException: " + e.getMessage());
+            System.err.println("[USER OF CLIENT] Receive method has caught a RuntimeException: " + e.getMessage());
             this.send(new ErrorMessage());
         }
     }

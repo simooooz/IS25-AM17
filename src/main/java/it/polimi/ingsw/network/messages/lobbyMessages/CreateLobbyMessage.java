@@ -21,7 +21,7 @@ public class CreateLobbyMessage extends Message {
     @Override
     public void execute(User user) {
         try {
-        MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name);
+            MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name);
             user.send(new ZeroArgMessage(MessageType.CREATE_LOBBY_OK));
         } catch (PlayerAlreadyInException e) {
             user.send(new ErrorMessage(e.getMessage()));

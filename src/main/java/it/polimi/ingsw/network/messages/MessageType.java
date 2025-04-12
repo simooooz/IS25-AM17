@@ -1,7 +1,10 @@
 package it.polimi.ingsw.network.messages;
 
+import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.network.socket.client.UserOfClient;
 import it.polimi.ingsw.network.socket.server.User;
+
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public enum MessageType {
@@ -41,6 +44,7 @@ public enum MessageType {
           public void execute(Message message, User client) {
               SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
               client.getGameController().showComponent(client.getUsername(), castedMessage.getArg1());
+              client.send(new ZeroArgMessage(SHOW_COMPONENT_RES));
           }
     },
 
@@ -51,6 +55,7 @@ public enum MessageType {
         public void execute(Message message, User client) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             client.getGameController().pickComponent(client.getUsername(), castedMessage.getArg1());
+            client.send(new ZeroArgMessage(PICK_COMPONENT_RES));
         }
     },
 
@@ -61,6 +66,7 @@ public enum MessageType {
         public void execute(Message message, User client) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             client.getGameController().releaseComponent(client.getUsername(), castedMessage.getArg1());
+            client.send(new ZeroArgMessage(RELEASE_COMPONENT_RES));
         }
     },
 
@@ -71,6 +77,7 @@ public enum MessageType {
         public void execute(Message message, User client) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             client.getGameController().reserveComponent(client.getUsername(), castedMessage.getArg1());
+            client.send(new ZeroArgMessage(RESERVE_COMPONENT_RES));
         }
     },
 
@@ -81,6 +88,7 @@ public enum MessageType {
         public void execute(Message message, User client) {
             TripleArgMessage<Integer, Integer, Integer> castedMessage = (TripleArgMessage<Integer, Integer, Integer>) message;
             client.getGameController().insertComponent(client.getUsername(), castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+            client.send(new ZeroArgMessage(INSERT_COMPONENT_RES));
         }
     },
 
@@ -91,6 +99,7 @@ public enum MessageType {
         public void execute(Message message, User client) {
             TripleArgMessage<Integer, Integer, Integer> castedMessage = (TripleArgMessage<Integer, Integer, Integer>) message;
             client.getGameController().moveComponent(client.getUsername(), castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+            client.send(new ZeroArgMessage(MOVE_COMPONENT_RES));
         }
     },
 
@@ -101,6 +110,7 @@ public enum MessageType {
         public void execute(Message message, User client) {
             DoubleArgMessage<Integer, Integer> castedMessage = (DoubleArgMessage<Integer, Integer>) message;
             client.getGameController().rotateComponent(client.getUsername(), castedMessage.getArg1(), castedMessage.getArg2());
+            client.send(new ZeroArgMessage(ROTATE_COMPONENT_RES));
         }
     },
 
@@ -110,7 +120,8 @@ public enum MessageType {
         @Override
         public void execute(Message message, User client) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            client.getGameController().lookCardPile(client.getUsername(), castedMessage.getArg1());
+            List<Card> pile = client.getGameController().lookCardPile(client.getUsername(), castedMessage.getArg1());
+            client.send(new SingleArgMessage<>(LOOK_CARD_PILE_RES, pile));
         }
     },
 

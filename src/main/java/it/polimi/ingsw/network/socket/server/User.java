@@ -60,7 +60,7 @@ public class User {
 
     public boolean setUsername(String username) {
         synchronized (users) {
-            boolean taken = users.stream().anyMatch(user -> user.getUsername().equals(username));
+            boolean taken = users.stream().anyMatch(user -> user.getUsername() != null && user.getUsername().equals(username));
             if (!taken)
                 this.username = username;
             return !taken;
@@ -80,7 +80,7 @@ public class User {
 
     public static boolean isUsernameTaken(String username) {
         synchronized (users) {
-            return users.stream().anyMatch(user -> user.getUsername().equals(username));
+            return users.stream().anyMatch(user -> user.getUsername() != null && user.getUsername().equals(username));
         }
     }
 

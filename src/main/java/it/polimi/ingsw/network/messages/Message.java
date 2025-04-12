@@ -4,7 +4,9 @@ package it.polimi.ingsw.network.messages;
 import it.polimi.ingsw.network.socket.client.UserOfClient;
 import it.polimi.ingsw.network.socket.server.User;
 
-public abstract class Message {
+import java.io.Serializable;
+
+public abstract class Message implements Serializable {
 
     private final MessageType messageType;
 

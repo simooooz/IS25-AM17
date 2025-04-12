@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.socket.client;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.Message;
 
@@ -13,44 +14,47 @@ public class ClientSocket {
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
-    private UserOfClient user;
+    private final UserOfClient user;
 
     private HeartbeatThread heartbeatThread;
     private ListenLoopOfClient listenLoop;
 
-    public ClientSocket() {
-        this.connect("127.0.0.1", 0);
-
+    public ClientSocket(String host, int port) {
+        this.connect(host, port);
         this.user = new UserOfClient(this);
 
-        // TODO heartbeat interval
-        heartbeatThread = new HeartbeatThread(this, 0);
+        heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
 
         listenLoop = new ListenLoopOfClient(this, user);
         listenLoop.start();
     }
 
-    public void connect(String ip, int port) {
+    private void connect(String ip, int port) {
         try {
             this.socket = new Socket(ip, port);
             this.output = new ObjectOutputStream(socket.getOutputStream());
             this.input = new ObjectInputStream(socket.getInputStream());
+            this.socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
         } catch (IOException e) {
+            System.out.println("Could not connect to " + ip + ":" + port);
+            System.exit(-1);
             // TODO capiamo forse system exit dopo un po' di retry
         }
     }
 
     public void close() {
+        if (this.socket == null) return; // Already closed
+
         if (this.listenLoop.isAlive()) {
             this.listenLoop.interrupt();
+            this.listenLoop = null;
         }
-        this.listenLoop = null;
 
         if (this.heartbeatThread.isAlive()) {
             this.heartbeatThread.interrupt();
+            this.heartbeatThread = null;
         }
-        this.heartbeatThread = null;
 
         try {
             this.input.close();
@@ -73,14 +77,15 @@ public class ClientSocket {
             this.socket = null;
         }
 
-        this.user = null;
+        System.out.println("\nClosing connection...");
+        // System.exit(-1);
     }
 
     public Object readObject() throws ClientException {
         try {
             Object obj = this.input.readObject();
             if (obj == null)
-                throw new ClientException("Empty object");
+                throw new ClientException();
             return obj;
         } catch (IOException | ClassNotFoundException | ClientException e) {
             this.close();
@@ -98,4 +103,7 @@ public class ClientSocket {
         }
     }
 
+    public UserOfClient getUser() {
+        return user;
+    }
 }

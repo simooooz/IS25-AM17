@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.socket.client;
 
 import it.polimi.ingsw.network.exceptions.ClientException;
+import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.socket.Sense;
 
@@ -16,7 +17,7 @@ public class ListenLoopOfClient extends Thread {
 
     @Override
     public void run() {
-        while (isAlive()) {
+        while (!Thread.interrupted()) {
             try {
                 Object read = this.clientSocket.readObject();
 
@@ -29,6 +30,8 @@ public class ListenLoopOfClient extends Thread {
             } catch (ClientException e) {
                 // Connection is already closed by ClientSocket
                 // This Thread will be interrupted by ClientSocket
+            } catch (ClassCastException e) {
+                this.user.send(new ErrorMessage());
             }
         }
     }

@@ -18,7 +18,7 @@ public class ListenLoop extends Thread {
 
     @Override
     public void run() {
-        while (isAlive()) {
+        while (!Thread.interrupted()) {
             try {
                 Object read = Server.getInstance().receiveObject(this.code);
 
@@ -36,8 +36,7 @@ public class ListenLoop extends Thread {
                 // Connection is already closed by Server
                 // This Thread will be interrupted by ClientConnection
             } catch (ClassCastException e) {
-                // TODO serve? farla anche lato client
-                user.send(new ErrorMessage());
+                this.user.send(new ErrorMessage());
             }
         }
     }

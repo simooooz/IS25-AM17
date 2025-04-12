@@ -12,7 +12,7 @@ public class ClientConnection {
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
-    private User user;
+    private final User user;
     private ListenLoop listenLoop;
 
     public ClientConnection(String connectionCode, Socket socket) throws IOException {
@@ -45,9 +45,13 @@ public class ClientConnection {
     }
 
     public void close() {
-        this.listenLoop.interrupt();
-        this.listenLoop = null;
-        this.user = null;
+
+        if (this.socket == null) return; // Already closed
+
+        if (this.listenLoop.isAlive()) {
+            this.listenLoop.interrupt();
+            this.listenLoop = null;
+        }
 
         try {
             this.input.close();

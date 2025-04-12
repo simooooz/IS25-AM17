@@ -1,4 +1,6 @@
 package it.polimi.ingsw.network.socket;
 
-public class Heartbeat {
+import java.io.Serializable;
+
+public class Heartbeat implements Serializable {
 }

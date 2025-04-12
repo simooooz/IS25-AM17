@@ -54,6 +54,7 @@ public class MatchController implements MatchControllerInterface {
      * @param name       lobby's name
      */
     public synchronized void createNewGame(String username, int maxPlayers, String name) throws PlayerAlreadyInException {
+        if (maxPlayers <= 0 || maxPlayers > 4) throw new IllegalArgumentException("maxPlayers must be between 1 and 4");
         String gameID = UUID.randomUUID().toString();
         Lobby lobby = new Lobby(gameID, name, username, maxPlayers);
         lobbies.put(gameID, lobby);

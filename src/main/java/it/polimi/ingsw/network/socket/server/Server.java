@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.socket.server;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.exceptions.ServerException;
 
 import java.io.IOException;
@@ -27,6 +28,8 @@ public class Server extends Thread {
         } catch (IOException e) {
             throw new ServerException("Server cannot be started");
         }
+
+        this.start();
     }
 
     public static Server getInstance() throws ServerException {
@@ -54,7 +57,7 @@ public class Server extends Thread {
         // TODO forse mi devo sincronizzare a serverSocket
         try {
             Socket socket = serverSocket.accept();
-            // TODO capiamo socket.setSoTimeout();
+            socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
             ClientConnection clientConnection = new ClientConnection(connectionCode, socket);
 
             synchronized (this.connections) {
@@ -80,6 +83,7 @@ public class Server extends Thread {
                 this.connections.remove(connectionCode);
             }
         }
+        System.out.println("[SERVER] Closing connection " + connectionCode + "...");
     }
 
     public void sendObject(String connectionCode, Object data) throws ServerException {
@@ -116,14 +120,13 @@ public class Server extends Thread {
         }
     }
 
-    // TODO check if username is taken method?
-
     @Override
     public void run() {
-        while (isAlive()) {
+        while (!Thread.interrupted()) {
 
             try {
                 String connectionCode = this.openConnection();
+                System.out.println("[SERVER] Connection " + connectionCode + " opened");
             } catch (ServerException e) {
                 System.err.println("[SERVER] Error while opening a new connection: " + e.getMessage());
             }
