@@ -1,12 +1,10 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.cards.utils.CannonFire;
 import it.polimi.ingsw.model.components.*;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.properties.DirectionType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,75 +19,43 @@ class PiratesCardTest {
     private PlayerData p1;
     private PlayerData p2;
     private PlayerData p3;
-    private ModelFacade modelFacade;
+    private GameController controller;
     private Board board;
-    private ConnectorType[] connectors;
-    private CabinComponent cabin1;
-    private CabinComponent cabin2;
-    private CabinComponent cabin3;
-    private CannonComponent cannon1;
-    private CannonComponent cannon2;
-    private CannonComponent cannon3;
-    private CannonComponent cannon4;
-    private CannonComponent cannon5;
-    private ShieldComponent shield1;
-    private BatteryComponent battery1;
-    private BatteryComponent battery2;
     private List<CannonFire> cannonFires;
 
 
     @BeforeEach
-    void setUp() {;
-        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
+    void setUp() {
 
         usernames = new ArrayList<>();
         usernames.add("Simone");
         usernames.add("Davide");
         usernames.add("Tommaso");
 
-        p1 = new PlayerData(usernames.get(0));
-        p2 = new PlayerData(usernames.get(1));
-        p3 = new PlayerData(usernames.get(2));
+        controller = new GameController(usernames, false);
+        controller.startMatch();
+
+        board = controller.getModel().getBoard();
+        p1 = board.getPlayerEntityByUsername("Simone");
+        p2 = board.getPlayerEntityByUsername("Davide");
+        p3 = board.getPlayerEntityByUsername("Tommaso");
 
         p1.setCredits(50);
         p2.setCredits(40);
         p3.setCredits(30);
 
-        modelFacade = new ModelFacade(usernames);
-        board = modelFacade.getBoard();
 
-        board.moveToBoard(p1);
-        board.movePlayer(p1, 9);
-        board.moveToBoard(p2);
-        board.movePlayer(p2, 9);
-        board.moveToBoard(p3);
-        board.movePlayer(p3, 10);
+        controller.showComponent("Simone", 32);
+        controller.pickComponent("Simone", 32);
+        controller.insertComponent("Simone", 32, 2, 3);
 
-        cabin1 = new CabinComponent(connectors, false);
-        board.getCommonComponents().add(cabin1);
+        controller.showComponent("Davide", 33);
+        controller.pickComponent("Davide", 33);
+        controller.insertComponent("Davide", 33, 2, 3);
 
-        cabin1.showComponent();
-        cabin1.pickComponent(board, p1.getShip());
-        cabin1.insertComponent(p1.getShip(), 2, 1);
-        cabin1.weldComponent();
-
-        cabin2 = new CabinComponent(connectors, false);
-        board.getCommonComponents().add(cabin2);
-
-        cabin2.showComponent();
-        cabin2.pickComponent(board, p2.getShip());
-        cabin2.insertComponent(p2.getShip(), 1, 2);
-        cabin2.weldComponent();
-
-        cabin3 = new CabinComponent(connectors, false);
-        board.getCommonComponents().add(cabin3);
-
-        cabin3.showComponent();
-        cabin3.pickComponent(board, p3.getShip());
-        cabin3.insertComponent(p3.getShip(), 1, 2);
-        cabin3.weldComponent();
-
-        cannonFires = new ArrayList<>();
+        controller.showComponent("Tommaso", 34);
+        controller.pickComponent("Tommaso", 34);
+        controller.insertComponent("Tommaso", 34, 2, 3);
 
     }
 
@@ -99,135 +65,170 @@ class PiratesCardTest {
     }
 
     @Test
-    void testShouldCheckThatP1DrawAutomaticallyP2DrawandP3WinButNotReedemReward() {
+    void testShouldCheckThatP1DrawAutomaticallyP2DrawAndP3WinButNotRedeemReward() {
+
+        controller.showComponent("Simone", 155);
+        controller.pickComponent("Simone", 155);
+        controller.insertComponent("Simone", 155, 2, 4);
+
+
+        controller.showComponent("Davide", 132);
+        controller.pickComponent("Davide", 132);
+        controller.insertComponent("Davide", 132, 1, 3);
+
+        controller.showComponent("Davide", 121);
+        controller.pickComponent("Davide", 121);
+        controller.insertComponent("Davide", 121, 1, 4);
+
+        controller.showComponent("Davide", 9);
+        controller.pickComponent("Davide", 9);
+        controller.insertComponent("Davide", 9, 2, 2);
+
+
+        controller.showComponent("Tommaso", 107);
+        controller.pickComponent("Tommaso", 107);
+        controller.insertComponent("Tommaso", 107, 2, 2);
+
+        controller.showComponent("Tommaso", 119);
+        controller.pickComponent("Tommaso", 119);
+        controller.insertComponent("Tommaso", 119, 2, 4);
+
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
         PiratesCard piratesCard = new PiratesCard(2, false, 1, 4, 3, cannonFires);
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
 
-        cannon1 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon1);
 
-        cannon2 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon2);
+        controller.drawCard("Simone");
 
-        cannon3 = new CannonComponent(connectors, NORTH, true);
-        board.getCommonComponents().add(cannon3);
+        controller.activateCannons("Davide", new ArrayList<>(), new ArrayList<>());
 
-        cannon4 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon4);
+        controller.getBoolean("Tommaso", false);
 
-        cannon5 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon5);
-
-        cannon1.showComponent();
-        cannon1.pickComponent(board, p1.getShip());
-        cannon1.insertComponent(p1.getShip(), 1, 3);
-        cannon1.weldComponent();
-
-        cannon2.showComponent();
-        cannon2.pickComponent(board, p2.getShip());
-        cannon2.insertComponent(p2.getShip(), 1, 3);
-        cannon2.weldComponent();
-
-        cannon3.showComponent();
-        cannon3.pickComponent(board, p2.getShip());
-        cannon3.insertComponent(p2.getShip(), 1, 4);
-        cannon3.weldComponent();
-
-        cannon4.showComponent();
-        cannon4.pickComponent(board, p3.getShip());
-        cannon4.insertComponent(p3.getShip(), 1, 3);
-        cannon4.weldComponent();
-
-        cannon5.showComponent();
-        cannon5.pickComponent(board, p3.getShip());
-        cannon5.insertComponent(p3.getShip(), 1, 4);
-        cannon5.weldComponent();
-
-        battery1 = new BatteryComponent(connectors, false);
-        board.getCommonComponents().add(battery1);
-
-        battery1.showComponent();
-        battery1.pickComponent(board, p2.getShip());
-        battery1.insertComponent(p2.getShip(), 2, 4);
-        battery1.weldComponent();
-
-        List<BatteryComponent> batteries = new ArrayList<>();
-        List<CannonComponent> cannons = new ArrayList<>();
-
-        modelFacade.nextCard(p1.getUsername());
-
-        modelFacade.activateCannons(p2.getUsername(), batteries, cannons);
-
-        modelFacade.getBoolean(p3.getUsername(), false);
-
-        assertEquals(11, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p3)).findFirst().get().getValue());
+        assertEquals(11, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p3)).findFirst().orElseThrow().getValue());
         assertEquals(2, p2.getShip().getComponentByType(BatteryComponent.class).getFirst().getBatteries());
     }
 
     @Test
-    void testShouldCheckThatP1WinsandReedemRewards() {
+    void testShouldCheckThatP1WinsAndRedeemRewards() {
+
+        controller.showComponent("Simone", 121);
+        controller.pickComponent("Simone", 121);
+        controller.insertComponent("Simone", 121, 1, 4);
+
+        controller.showComponent("Simone", 15);
+        controller.pickComponent("Simone", 15);
+        controller.insertComponent("Simone", 15, 1, 3);
+
+        controller.showComponent("Simone", 132);
+        controller.pickComponent("Simone", 132);
+        controller.rotateComponent("Simone", 132, 1);
+        controller.insertComponent("Simone", 132, 1, 5);
+
+        controller.showComponent("Simone", 126);
+        controller.pickComponent("Simone", 126);
+        controller.rotateComponent("Simone", 126, 3);
+        controller.insertComponent("Simone", 126, 2, 2);
+
+        controller.showComponent("Simone", 122);
+        controller.pickComponent("Simone", 122);
+        controller.rotateComponent("Simone", 122, 2);
+        controller.insertComponent("Simone", 122, 2, 4);
+
+
+        controller.showComponent("Davide", 144);
+        controller.pickComponent("Davide", 144);
+        controller.insertComponent("Davide", 144, 2, 4);
+
+
+        controller.showComponent("Tommaso", 74);
+        controller.pickComponent("Tommaso", 74);
+        controller.insertComponent("Tommaso", 74, 3, 3);
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
         PiratesCard piratesCard = new PiratesCard(2, false, 3, 5, 3, cannonFires);
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
 
-        cannon1 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon1);
+        controller.drawCard("Simone");
 
-        cannon2 = new CannonComponent(connectors, WEST, true);
-        board.getCommonComponents().add(cannon2);
+        controller.activateCannons("Simone", new ArrayList<>(List.of(15, 15)), new ArrayList<>(List.of(126, 132)));
 
-        cannon3 = new CannonComponent(connectors, EAST, true);
-        board.getCommonComponents().add(cannon3);
-
-        cannon4 = new CannonComponent(connectors, SOUTH, false);
-        board.getCommonComponents().add(cannon4);
-
-        cannon1.showComponent();
-        cannon1.pickComponent(board, p1.getShip());
-        cannon1.insertComponent(p1.getShip(), 3, 2);
-        cannon1.weldComponent();
-
-        cannon2.showComponent();
-        cannon2.pickComponent(board, p1.getShip());
-        cannon2.insertComponent(p1.getShip(), 2, 2);
-        cannon2.weldComponent();
-
-        cannon3.showComponent();
-        cannon3.pickComponent(board, p1.getShip());
-        cannon3.insertComponent(p1.getShip(), 2, 3);
-        cannon3.weldComponent();
-
-        cannon4.showComponent();
-        cannon4.pickComponent(board, p1.getShip());
-        cannon4.insertComponent(p1.getShip(), 2, 4);
-        cannon4.weldComponent();
-
-        battery1 = new BatteryComponent(connectors, true);
-        board.getCommonComponents().add(battery1);
-
-        battery1.showComponent();
-        battery1.pickComponent(board, p1.getShip());
-        battery1.insertComponent(p1.getShip(), 3, 4);
-        battery1.weldComponent();
-
-        List<BatteryComponent> batteries = new ArrayList<>(List.of(battery1, battery1));
-        List<CannonComponent> cannons = new ArrayList<>(List.of(cannon2, cannon3));
-
-        modelFacade.nextCard(p1.getUsername());
-
-        modelFacade.activateCannons(p1.getUsername(), batteries, cannons);
-
-        modelFacade.getBoolean(p1.getUsername(), true);
+        controller.getBoolean("Simone", true);
 
         assertEquals(1, p1.getShip().getComponentByType(BatteryComponent.class).getFirst().getBatteries());
-        assertEquals(10, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+        assertEquals(10, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
         assertEquals(55, p1.getCredits());
-        assertEquals(12, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().get().getValue());
+        assertEquals(12, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().orElseThrow().getValue());
     }
 
     @Test
-    void testShouldCheckThatP1andP2LoseandP3Wins() {
+    void testShouldCheckThatP1andP2LoseAndP3Wins() {
+
+        controller.showComponent("Simone", 15);
+        controller.pickComponent("Simone", 15);
+        controller.rotateComponent("Simone", 15, 2);
+        controller.insertComponent("Simone", 15, 1, 4);
+
+        controller.showComponent("Simone", 132);
+        controller.pickComponent("Simone", 132);
+        controller.insertComponent("Simone", 132, 1, 3);
+
+        controller.showComponent("Simone", 155);
+        controller.pickComponent("Simone", 155);
+        controller.rotateComponent("Simone", 155, 3);
+        controller.insertComponent("Simone", 155, 2, 2);
+
+        controller.showComponent("Simone", 150);
+        controller.pickComponent("Simone", 150);
+        controller.rotateComponent("Simone", 150, 3);
+        controller.insertComponent("Simone", 150, 3, 2);
+
+
+        controller.showComponent("Davide", 74);
+        controller.pickComponent("Davide", 74);
+        controller.insertComponent("Davide", 74, 3, 3);
+
+
+        controller.showComponent("Tommaso", 9);
+        controller.pickComponent("Tommaso", 9);
+        controller.insertComponent("Tommaso", 9, 2, 2);
+
+        controller.showComponent("Tommaso", 121);
+        controller.pickComponent("Tommaso", 121);
+        controller.insertComponent("Tommaso", 121, 1, 3);
+
+        controller.showComponent("Tommaso", 126);
+        controller.pickComponent("Tommaso", 126);
+        controller.rotateComponent("Tommaso", 126, 1);
+        controller.insertComponent("Tommaso", 126, 1, 4);
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
         CannonFire c1 = new CannonFire(false, NORTH);
         CannonFire c2 = new CannonFire(true, EAST);
         cannonFires = new ArrayList<>(List.of(c1, c2));
@@ -235,93 +236,29 @@ class PiratesCardTest {
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
 
-        cannon1 = new CannonComponent(connectors, WEST, false);
-        board.getCommonComponents().add(cannon1);
 
-        cannon2 = new CannonComponent(connectors, NORTH, true);
-        board.getCommonComponents().add(cannon2);
+        controller.drawCard("Simone");
 
-        cannon3 = new CannonComponent(connectors, EAST, true);
-        board.getCommonComponents().add(cannon3);
+        controller.activateCannons("Simone", new ArrayList<>(), new ArrayList<>());
 
-        cannon4 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon4);
+        controller.activateCannons("Tommaso", new ArrayList<>(List.of(9)), new ArrayList<>(List.of(126)));
 
-        cannon1.showComponent();
-        cannon1.pickComponent(board, p1.getShip());
-        cannon1.insertComponent(p1.getShip(), 3, 2);
-        cannon1.weldComponent();
+        controller.getBoolean("Tommaso", false);
 
-        cannon2.showComponent();
-        cannon2.pickComponent(board, p1.getShip());
-        cannon2.insertComponent(p1.getShip(), 2, 2);
-        cannon2.weldComponent();
 
-        cannon3.showComponent();
-        cannon3.pickComponent(board, p3.getShip());
-        cannon3.insertComponent(p3.getShip(), 2, 3);
-        cannon3.weldComponent();
 
-        cannon4.showComponent();
-        cannon4.pickComponent(board, p3.getShip());
-        cannon4.insertComponent(p3.getShip(), 2, 4);
-        cannon4.weldComponent();
+        boolean finish = piratesCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        battery1 = new BatteryComponent(connectors, true);
-        board.getCommonComponents().add(battery1);
+        controller.activateShield("Simone", 15);
 
-        battery1.showComponent();
-        battery1.pickComponent(board, p3.getShip());
-        battery1.insertComponent(p3.getShip(), 3, 4);
-        battery1.weldComponent();
+        finish = piratesCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 8, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        battery2 = new BatteryComponent(connectors, true);
-        board.getCommonComponents().add(battery2);
-
-        battery2.showComponent();
-        battery2.pickComponent(board, p1.getShip());
-        battery2.insertComponent(p1.getShip(), 3, 3);
-        battery2.weldComponent();
-
-        shield1 = new ShieldComponent(connectors, new DirectionType[]{NORTH, WEST});
-        board.getCommonComponents().add(shield1);
-
-        shield1.showComponent();
-        shield1.pickComponent(board, p1.getShip());
-        shield1.insertComponent(p1.getShip(), 3, 4);
-        shield1.weldComponent();
-
-        List<BatteryComponent> batteriesp1 = new ArrayList<>();
-        List<CannonComponent> cannonsp1 = new ArrayList<>();
-
-        List<BatteryComponent> batteriesp3 = new ArrayList<>();
-        batteriesp3.add(battery1);
-        List<CannonComponent> cannonsp3 = new ArrayList<>();
-        cannonsp3.add(cannon3);
-
-        modelFacade.nextCard(p1.getUsername());
-
-        modelFacade.activateCannons(p1.getUsername(), batteriesp1, cannonsp1);
-
-        modelFacade.activateCannons(p3.getUsername(), batteriesp3, cannonsp3);
-
-        modelFacade.getBoolean(p3.getUsername(), false);
-
-        // set dices value manually
-        piratesCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, p1.getUsername(), board);
-        modelFacade.setState(piratesCard.changeCardState(board, p1.getUsername()));
-
-        modelFacade.activateShield(p1.getUsername(), battery2);
-
-        piratesCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 8, p1.getUsername(), board);
-        modelFacade.setState(piratesCard.changeCardState(board, p1.getUsername()));
-
-        assertEquals(Optional.of(cannon2), p1.getShip().getDashboard(2, 2));
         assertEquals(Optional.empty(), p1.getShip().getDashboard(3, 4));
-        assertTrue(p1.getShip().getDiscards().contains(shield1));
-        assertEquals(2, p3.getShip().getComponentByType(BatteryComponent.class).getFirst().getBatteries());
+        assertEquals(1, p3.getShip().getComponentByType(BatteryComponent.class).getFirst().getBatteries());
         assertEquals(30, p3.getCredits());
-        assertEquals(11, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p3)).findFirst().get().getValue());
+        assertEquals(11, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p3)).findFirst().orElseThrow().getValue());
     }
 
 }

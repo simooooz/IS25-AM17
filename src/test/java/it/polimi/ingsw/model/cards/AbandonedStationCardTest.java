@@ -1,9 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.model.ModelFacade;
-import it.polimi.ingsw.model.components.CabinComponent;
+import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.components.SpecialCargoHoldsComponent;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -20,90 +18,75 @@ class AbandonedStationCardTest {
     private List<String> usernames;
     private PlayerData p1;
     private PlayerData p2;
-    private PlayerData p3;
-    private ModelFacade modelFacade;
+    private GameController controller;
     private Board board;
-    private ConnectorType[] connectors;
-
-    private SpecialCargoHoldsComponent cargo1;
-    private SpecialCargoHoldsComponent cargo2;
-    private SpecialCargoHoldsComponent cargo3;
     private Map<ColorType, Integer> cardGoods;
 
-    private CabinComponent cabin1;
-    private CabinComponent cabin2;
-
-    private int battery;
 
     @BeforeEach
     void setUp() {
-        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
 
         usernames = new ArrayList<>();
         usernames.add("Simone");
         usernames.add("Davide");
-        usernames.add("Tommaso");
 
-        p1 = new PlayerData(usernames.get(0));
-        p2 = new PlayerData(usernames.get(1));
-        p3 = new PlayerData(usernames.get(2));
+        controller = new GameController(usernames, false);
+        controller.startMatch();
 
-        modelFacade = new ModelFacade(usernames);
-        board = modelFacade.getBoard();
+        board = controller.getModel().getBoard();
+        p1 = board.getPlayerEntityByUsername("Simone");
+        p2 = board.getPlayerEntityByUsername("Davide");
 
-        board.moveToBoard(p1);
+
+        controller.showComponent("Simone", 69);
+        controller.pickComponent("Simone", 69);
+        controller.rotateComponent("Simone", 69, 3);
+        controller.insertComponent("Simone", 69, 1, 4);
+
+        ((SpecialCargoHoldsComponent) p1.getShip().getDashboard(1,4).orElseThrow()).loadGood(ColorType.BLUE, p1.getShip());
+        ((SpecialCargoHoldsComponent) p1.getShip().getDashboard(1,4).orElseThrow()).loadGood(ColorType.RED, p1.getShip());
+
+        controller.showComponent("Simone", 44);
+        controller.pickComponent("Simone", 44);
+        controller.rotateComponent("Simone", 44, 1);
+        controller.insertComponent("Simone", 44, 2, 4);
+
+        controller.showComponent("Simone", 67);
+        controller.pickComponent("Simone", 67);
+        controller.rotateComponent("Simone", 67, 1);
+        controller.insertComponent("Simone", 67, 3, 4);
+
+        controller.showComponent("Simone", 32);
+        controller.pickComponent("Simone", 32);
+        controller.insertComponent("Simone", 32, 2, 3);
+
+
+        controller.showComponent("Davide", 39);
+        controller.pickComponent("Davide", 39);
+        controller.rotateComponent("Davide", 39, 3);
+        controller.insertComponent("Davide", 39, 2, 4);
+
+        controller.showComponent("Davide", 68);
+        controller.pickComponent("Davide", 68);
+        controller.rotateComponent("Davide", 68, 1);
+        controller.insertComponent("Davide", 68, 3, 4);
+
+        controller.showComponent("Davide", 33);
+        controller.pickComponent("Davide", 33);
+        controller.insertComponent("Davide", 33, 2, 3);
+
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+
         board.movePlayer(p1, 9);
-        board.moveToBoard(p2);
         board.movePlayer(p2, 9);
-        board.moveToBoard(p3);
-        board.movePlayer(p3, 10);
+
 
         cardGoods = new HashMap<>();
         cardGoods.put(ColorType.RED, 2);
         cardGoods.put(ColorType.GREEN, 1);
 
-        cargo1 = new SpecialCargoHoldsComponent(connectors, 3);
-        board.getCommonComponents().add(cargo1);
-
-        cargo2 = new SpecialCargoHoldsComponent(connectors, 3);
-        board.getCommonComponents().add(cargo2);
-
-        cargo3 = new SpecialCargoHoldsComponent(connectors, 3);
-        board.getCommonComponents().add(cargo3);
-
-        cargo1.showComponent();
-        cargo1.pickComponent(board, p1.getShip());
-        cargo1.insertComponent(p1.getShip(), 1, 1);
-        cargo1.weldComponent();
-
-        cargo1.loadGood(ColorType.BLUE, p1.getShip());
-        cargo1.loadGood(ColorType.RED, p1.getShip());
-
-        cargo2.showComponent();
-        cargo2.pickComponent(board, p1.getShip());
-        cargo2.insertComponent(p1.getShip(), 2, 1);
-        cargo2.weldComponent();
-
-        cargo3.showComponent();
-        cargo3.pickComponent(board, p2.getShip());
-        cargo3.insertComponent(p2.getShip(), 2, 1);
-        cargo3.weldComponent();
-
-        cabin1 = new CabinComponent(connectors, false);
-        board.getCommonComponents().add(cabin1);
-
-        cabin1.showComponent();
-        cabin1.pickComponent(board, p1.getShip());
-        cabin1.insertComponent(p1.getShip(), 1, 2);
-        cabin1.weldComponent();
-
-        cabin2 = new CabinComponent(connectors, false);
-        board.getCommonComponents().add(cabin2);
-
-        cabin2.showComponent();
-        cabin2.pickComponent(board, p2.getShip());
-        cabin2.insertComponent(p2.getShip(), 1, 2);
-        cabin2.weldComponent();
     }
 
     @AfterEach
@@ -117,10 +100,10 @@ class AbandonedStationCardTest {
         board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
-        modelFacade.nextCard(p1.getUsername());
+        controller.drawCard("Simone");
 
         assertEquals(2, p1.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
-        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
     }
 
     @Test
@@ -129,37 +112,38 @@ class AbandonedStationCardTest {
         board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
-        modelFacade.nextCard(p1.getUsername());
+        controller.drawCard("Simone");
 
-        modelFacade.getBoolean(p1.getUsername(), true);
+        controller.getBoolean("Simone", true);
 
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap = new HashMap<>();
-        cargoMap.put(cargo2, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+        Map<Integer, List<ColorType>> cargoMap = new HashMap<>();
+        cargoMap.put(67, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+        cargoMap.put(69, new ArrayList<>(List.of(ColorType.BLUE, ColorType.RED)));
 
-        modelFacade.updateGoods(p1.getUsername(), cargoMap, new ArrayList<>());
+        controller.updateGoods("Simone", cargoMap, new ArrayList<>());
 
         assertEquals(4, p1.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
-        assertEquals(8, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+        assertEquals(9, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
     }
 
     @Test
-    void testShouldCheckIfTheCardIsUsedBySecondPlayer() throws Exception{
+    void testShouldCheckIfTheCardIsUsedBySecondPlayer() {
         AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 2, 2, cardGoods);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
-        modelFacade.nextCard(p1.getUsername());
-        modelFacade.getBoolean(p1.getUsername(), false);
-        modelFacade.getBoolean(p2.getUsername(), true);
+        controller.drawCard("Simone");
+        controller.getBoolean("Simone", false);
+        controller.getBoolean("Davide", true);
 
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap = new HashMap<>();
-        cargoMap.put(cargo3, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+        Map<Integer, List<ColorType>> cargoMap = new HashMap<>();
+        cargoMap.put(68, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
 
-        modelFacade.updateGoods(p2.getUsername(), cargoMap, new ArrayList<>());
+        controller.updateGoods(p2.getUsername(), cargoMap, new ArrayList<>());
 
         assertEquals(2, p1.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
         assertEquals(2, p2.getShip().getGoods().values().stream().mapToInt(Integer::intValue).sum());
-        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
-        assertEquals(9, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().get().getValue());
+        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
+        assertEquals(10, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().orElseThrow().getValue());
     }
 }

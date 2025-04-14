@@ -1,10 +1,8 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.components.*;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import org.junit.jupiter.api.AfterEach;
@@ -16,108 +14,76 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static it.polimi.ingsw.model.properties.DirectionType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SmugglersCardTest {
     private List<String> usernames;
     private PlayerData p1;
     private PlayerData p2;
-    private PlayerData p3;
-    private ModelFacade modelFacade;
+    private GameController controller;
     private Board board;
-    private ConnectorType[] connectors;
-    private CabinComponent cabin1;
-    private CabinComponent cabin2;
-    private OddComponent odd1;
-    private CannonComponent cannon1;
-    private CannonComponent cannon2;
-    private CannonComponent cannon3;
-    private BatteryComponent battery1;
-    private SpecialCargoHoldsComponent cargo1;
-    private SpecialCargoHoldsComponent cargo2;
-    private SpecialCargoHoldsComponent cargo3;
-    private Map<ColorType, Integer> rewards1;
+    private Map<ColorType, Integer> rewards;
 
 
     @BeforeEach
-    void setUp() {;
-        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
+    void setUp() {
 
         usernames = new ArrayList<>();
         usernames.add("Simone");
         usernames.add("Davide");
-        usernames.add("Tommaso");
 
-        p1 = new PlayerData(usernames.get(0));
-        p2 = new PlayerData(usernames.get(1));
-        p3 = new PlayerData(usernames.get(2));
+        controller = new GameController(usernames, false);
+        controller.startMatch();
+
+        board = controller.getModel().getBoard();
+        p1 = board.getPlayerEntityByUsername("Simone");
+        p2 = board.getPlayerEntityByUsername("Davide");
 
         p1.setCredits(50);
         p2.setCredits(40);
-        p3.setCredits(30);
 
-        modelFacade = new ModelFacade(usernames);
-        board = modelFacade.getBoard();
 
-        board.moveToBoard(p1);
-        board.movePlayer(p1, 9);
-        board.moveToBoard(p2);
-        board.movePlayer(p2, 9);
-        board.moveToBoard(p3);
-        board.movePlayer(p3, 10);
+        controller.showComponent("Simone", 52);
+        controller.pickComponent("Simone", 52);
+        controller.rotateComponent("Simone", 52, 1);
+        controller.insertComponent("Simone", 52, 2, 2);
 
-        cabin1 = new CabinComponent(connectors, false);
-        board.getCommonComponents().add(cabin1);
+        controller.showComponent("Simone", 69);
+        controller.pickComponent("Simone", 69);
+        controller.rotateComponent("Simone", 69, 1);
+        controller.insertComponent("Simone", 69, 3, 2);
 
-        cabin1.showComponent();
-        cabin1.pickComponent(board, p1.getShip());
-        cabin1.insertComponent(p1.getShip(), 1, 2);
-        cabin1.weldComponent();
+        controller.showComponent("Simone", 17);
+        controller.pickComponent("Simone", 17);
+        controller.insertComponent("Simone", 17, 1, 2);
 
-        cabin2 = new CabinComponent(connectors, false);
-        board.getCommonComponents().add(cabin2);
+        controller.showComponent("Simone", 32);
+        controller.pickComponent("Simone", 32);
+        controller.insertComponent("Simone", 32, 2, 3);
 
-        cabin2.showComponent();
-        cabin2.pickComponent(board, p2.getShip());
-        cabin2.insertComponent(p2.getShip(), 1, 2);
-        cabin2.weldComponent();
 
-        odd1 = new OddComponent(connectors, AlienType.ENGINE);
-        board.getCommonComponents().add(odd1);
+        controller.showComponent("Davide", 38);
+        controller.pickComponent("Davide", 38);
+        controller.rotateComponent("Davide", 38, 2);
+        controller.insertComponent("Davide", 38, 1, 2);
 
-        odd1.showComponent();
-        odd1.pickComponent(board, p1.getShip());
-        odd1.insertComponent(p1.getShip(), 2, 1);
-        odd1.weldComponent();
+        controller.showComponent("Davide", 68);
+        controller.pickComponent("Davide", 68);
+        controller.rotateComponent("Davide", 68, 1);
+        controller.insertComponent("Davide", 68, 0, 2);
 
-        rewards1 = new HashMap<>();
-        rewards1.put(ColorType.RED, 2);
-        rewards1.put(ColorType.GREEN, 1);
+        controller.showComponent("Davide", 53);
+        controller.pickComponent("Davide", 53);
+        controller.rotateComponent("Davide", 53, 1);
+        controller.insertComponent("Davide", 53, 2, 2);
 
-        cargo1 = new SpecialCargoHoldsComponent(connectors, 2);
-        board.getCommonComponents().add(cargo1);
+        controller.showComponent("Davide", 33);
+        controller.pickComponent("Davide", 33);
+        controller.insertComponent("Davide", 33, 2, 3);
 
-        cargo1.showComponent();
-        cargo1.pickComponent(board, p1.getShip());
-        cargo1.insertComponent(p1.getShip(), 1, 3);
-        cargo1.weldComponent();
-
-        cargo2 = new SpecialCargoHoldsComponent(connectors, 2);
-        board.getCommonComponents().add(cargo2);
-
-        cargo2.showComponent();
-        cargo2.pickComponent(board, p2.getShip());
-        cargo2.insertComponent(p2.getShip(), 1, 3);
-        cargo2.weldComponent();
-
-        cargo3 = new SpecialCargoHoldsComponent(connectors, 2);
-        board.getCommonComponents().add(cargo3);
-
-        cargo3.showComponent();
-        cargo3.pickComponent(board, p1.getShip());
-        cargo3.insertComponent(p1.getShip(), 2, 3);
-        cargo3.weldComponent();
+        rewards = new HashMap<>();
+        rewards.put(ColorType.RED, 2);
+        rewards.put(ColorType.GREEN, 1);
     }
 
     @AfterEach
@@ -127,121 +93,100 @@ class SmugglersCardTest {
 
     @Test
     void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() {
-        SmugglersCard smugglersCard = new SmugglersCard(2, false, 1, 5, rewards1, 1);
+
+        controller.showComponent("Simone", 129);
+        controller.pickComponent("Simone", 129);
+        controller.insertComponent("Simone", 129, 0, 2);
+
+        controller.showComponent("Simone", 115);
+        controller.pickComponent("Simone", 115);
+        controller.insertComponent("Simone", 115, 1, 3);
+
+        controller.showComponent("Simone", 15);
+        controller.pickComponent("Simone", 15);
+        controller.rotateComponent("Simone", 15, 2);
+        controller.insertComponent("Simone", 15, 1, 4);
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+
+        SmugglersCard smugglersCard = new SmugglersCard(2, false, 1, 5, rewards, 1);
         board.getCardPile().clear();
         board.getCardPile().add(smugglersCard);
 
-        cannon1 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon1);
+        controller.drawCard("Simone");
 
-        cannon2 = new CannonComponent(connectors, NORTH, true);
-        board.getCommonComponents().add(cannon2);
+        controller.activateCannons("Simone", new ArrayList<>(List.of(15)), new ArrayList<>(List.of(129)));
 
-        cannon1.showComponent();
-        cannon1.pickComponent(board, p1.getShip());
-        cannon1.insertComponent(p1.getShip(), 3, 2);
-        cannon1.weldComponent();
+        controller.getBoolean("Simone", true);
 
-        cannon2.showComponent();
-        cannon2.pickComponent(board, p1.getShip());
-        cannon2.insertComponent(p1.getShip(), 2, 2);
-        cannon2.weldComponent();
-
-        battery1 = new BatteryComponent(connectors, false);
-        board.getCommonComponents().add(battery1);
-
-        battery1.showComponent();
-        battery1.pickComponent(board, p1.getShip());
-        battery1.insertComponent(p1.getShip(), 3, 4);
-        battery1.weldComponent();
-
-        List<BatteryComponent> batteries = new ArrayList<>();
-        batteries.add(battery1);
-        List<CannonComponent> cannons = new ArrayList<>();
-        cannons.add(cannon2);
-
-        modelFacade.nextCard(p1.getUsername());
-        modelFacade.activateCannons(p1.getUsername(), batteries, cannons);
-        modelFacade.getBoolean(p1.getUsername(), true);
-
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap = new HashMap<>();
-        cargoMap.put(cargo1, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
-
-        modelFacade.updateGoods(p1.getUsername(), cargoMap, new ArrayList<>());
+        controller.updateGoods(p1.getUsername(), new HashMap<>(Map.of(69, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)))), new ArrayList<>());
 
         assertEquals(1, p1.getShip().getGoods().get(ColorType.RED));
         assertEquals(1, p1.getShip().getGoods().get(ColorType.GREEN));
-        assertEquals(14, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+        assertEquals(14, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
     }
 
     @Test
     void testShouldCheckThatCardIsUsedBySecondPLayer() {
-        SmugglersCard smugglersCard = new SmugglersCard(2, false, 2, 2, rewards1, 1);
+
+        controller.showComponent("Davide", 102);
+        controller.pickComponent("Davide", 102);
+        controller.rotateComponent("Davide", 102, 3);
+        controller.insertComponent("Davide", 102, 1, 1);
+
+        controller.showComponent("Davide", 114);
+        controller.pickComponent("Davide", 114);
+        controller.insertComponent("Davide", 114, 1, 3);
+
+        controller.showComponent("Davide", 134);
+        controller.pickComponent("Davide", 134);
+        controller.rotateComponent("Davide", 134, 2);
+        controller.insertComponent("Davide", 134, 3, 2);
+
+        controller.showComponent("Davide", 5);
+        controller.pickComponent("Davide", 5);
+        controller.insertComponent("Davide", 5, 3, 3);
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+
+        SmugglersCard smugglersCard = new SmugglersCard(2, false, 2, 2, rewards, 1);
         board.getCardPile().clear();
         board.getCardPile().add(smugglersCard);
 
-        cannon1 = new CannonComponent(connectors, NORTH, false);
-        board.getCommonComponents().add(cannon1);
+        ((SpecialCargoHoldsComponent) p1.getShip().getDashboard(3,2).orElseThrow()).loadGood(ColorType.BLUE, p1.getShip());
+        ((SpecialCargoHoldsComponent) p1.getShip().getDashboard(3,2).orElseThrow()).loadGood(ColorType.GREEN, p1.getShip());
+        ((SpecialCargoHoldsComponent) p1.getShip().getDashboard(1,2).orElseThrow()).loadGood(ColorType.YELLOW, p1.getShip());
 
-        cannon2 = new CannonComponent(connectors, SOUTH, true);
-        board.getCommonComponents().add(cannon2);
+        controller.drawCard("Simone");
 
-        cannon3 = new CannonComponent(connectors, WEST, false);
-        board.getCommonComponents().add(cannon3);
+        Map<Integer, List<ColorType>> cargoMap1 = new HashMap<>();
+        cargoMap1.put(69, new ArrayList<>(List.of(ColorType.BLUE)));
+        cargoMap1.put(17, new ArrayList<>());
 
-        battery1 = new BatteryComponent(connectors, false);
-        board.getCommonComponents().add(battery1);
+        controller.updateGoods("Simone", cargoMap1, new ArrayList<>());
 
-        cannon1.showComponent();
-        cannon1.pickComponent(board, p2.getShip());
-        cannon1.insertComponent(p2.getShip(), 3, 2);
-        cannon1.weldComponent();
+        controller.activateCannons("Davide", new ArrayList<>(List.of(5)), new ArrayList<>(List.of(134)));
+        controller.getBoolean(p2.getUsername(), true);
 
-        cannon2.showComponent();
-        cannon2.pickComponent(board, p2.getShip());
-        cannon2.insertComponent(p2.getShip(), 2, 2);
-        cannon2.weldComponent();
+        Map<Integer, List<ColorType>> cargoMap2 = new HashMap<>();
+        cargoMap2.put(68, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
 
-        cannon3.showComponent();
-        cannon3.pickComponent(board, p2.getShip());
-        cannon3.insertComponent(p2.getShip(), 2, 3);
-        cannon3.weldComponent();
-
-        battery1.showComponent();
-        battery1.pickComponent(board, p2.getShip());
-        battery1.insertComponent(p2.getShip(), 3, 4);
-        battery1.weldComponent();
-
-        cargo1.loadGood(ColorType.BLUE, p1.getShip());
-        cargo1.loadGood(ColorType.GREEN, p1.getShip());
-        cargo3.loadGood(ColorType.YELLOW, p1.getShip());
-
-        List<BatteryComponent> batteries = new ArrayList<>();
-        batteries.add(battery1);
-        List<CannonComponent> cannons = new ArrayList<>();
-        cannons.add(cannon2);
-
-        modelFacade.nextCard(p1.getUsername());
-
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap1 = new HashMap<>();
-        cargoMap1.put(cargo1, new ArrayList<>(List.of(ColorType.BLUE)));
-        cargoMap1.put(cargo3, new ArrayList<>());
-
-        modelFacade.activateCannons(p2.getUsername(), batteries, cannons);
-        modelFacade.getBoolean(p2.getUsername(), true);
-
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap2 = new HashMap<>();
-        cargoMap2.put(cargo2, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
-
-        modelFacade.updateGoods(p1.getUsername(), cargoMap1, new ArrayList<>());
-        modelFacade.updateGoods(p2.getUsername(), cargoMap2, new ArrayList<>());
+        controller.updateGoods("Davide", cargoMap2, new ArrayList<>());
 
         assertEquals(0, p1.getShip().getGoods().get(ColorType.YELLOW));
         assertEquals(0, p1.getShip().getGoods().get(ColorType.GREEN));
         assertEquals(1, p1.getShip().getGoods().get(ColorType.BLUE));
-        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().get().getValue());
+        assertEquals(15, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
         assertEquals(1, p2.getShip().getGoods().get(ColorType.RED));
         assertEquals(1, p2.getShip().getGoods().get(ColorType.GREEN));
-        assertEquals(10, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().get().getValue());
+        assertEquals(11, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().orElseThrow().getValue());
     }
 }

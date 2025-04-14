@@ -1,14 +1,11 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.controller.GameState;
-import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.cards.utils.Planet;
 import it.polimi.ingsw.model.components.*;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.properties.DirectionType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,74 +16,51 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlanetCardTest {
 
-    private Map<ColorType, Integer> goods;
-    private List<DirectionType> directions;
     private List<String> usernames;
     private PlayerData p1;
     private PlayerData p2;
     private PlayerData p3;
-    private Board board;
-    private PlanetCard planetCard;
-    private ConnectorType[] connectors;
-    private SpecialCargoHoldsComponent cargo1;
-    private SpecialCargoHoldsComponent cargo2;
-    private SpecialCargoHoldsComponent cargo3;
-    private SpecialCargoHoldsComponent cargo4;
-    private SpecialCargoHoldsComponent cargo5;
-    private List<Planet> planetList;
-    private Planet planet1;
-    private Planet planet2;
-    private Planet planet3;
-    private Map<ColorType, Integer> rewards1;
-    private Map<ColorType, Integer> rewards2;
-    private Map<ColorType, Integer> rewards3;
-    private ModelFacade modelFacade;
+    private GameController controller;
 
 
     @BeforeEach
     void setUp() {
-        // inizializzazione delle variabili comuni ai test
 
-        connectors = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
         usernames = new ArrayList<>();
         usernames.add("Simone");
         usernames.add("Davide");
         usernames.add("Tommaso");
-        p1 = new PlayerData(usernames.get(0));
-        p2 = new PlayerData(usernames.get(1));
-        p3 = new PlayerData(usernames.get(2));
-        modelFacade = new ModelFacade(usernames);
-        board = modelFacade.getBoard();
-        board.getPlayers().add(new AbstractMap.SimpleEntry<>(p1, 15));
-        board.getPlayers().add(new AbstractMap.SimpleEntry<>(p2, 12));
-        board.getPlayers().add(new AbstractMap.SimpleEntry<>(p3, 11));
-        cargo1 = new SpecialCargoHoldsComponent(connectors, 2);
-        board.getCommonComponents().add(cargo1);
-        cargo2 = new CargoHoldsComponent(connectors, 3);
-        board.getCommonComponents().add(cargo2);
-        cargo3 = new SpecialCargoHoldsComponent(connectors, 2);
-        board.getCommonComponents().add(cargo3);
-        cargo4 = new CargoHoldsComponent(connectors, 2);
-        board.getCommonComponents().add(cargo4);
-        cargo5 = new CargoHoldsComponent(connectors, 3);
-        board.getCommonComponents().add(cargo5);
-        rewards1 = new HashMap<>();
+
+        controller = new GameController(usernames, false);
+        controller.startMatch();
+
+        Board board = controller.getModel().getBoard();
+        p1 = board.getPlayerEntityByUsername("Simone");
+        p2 = board.getPlayerEntityByUsername("Davide");
+        p3 = board.getPlayerEntityByUsername("Tommaso");
+
+        controller.showComponent("Simone", 32);
+        controller.pickComponent("Simone", 32);
+        controller.insertComponent("Simone", 32, 2, 3);
+
+        controller.showComponent("Davide", 33);
+        controller.pickComponent("Davide", 33);
+        controller.insertComponent("Davide", 33, 2, 3);
+
+        controller.showComponent("Tommaso", 34);
+        controller.pickComponent("Tommaso", 34);
+        controller.insertComponent("Tommaso", 34, 2, 3);
+
+
+        Map<ColorType, Integer> rewards1 = new HashMap<>();
         rewards1.put(ColorType.RED, 2);
         rewards1.put(ColorType.GREEN, 1);
-        rewards2 = new HashMap<>();
+        Map<ColorType, Integer> rewards2 = new HashMap<>();
         rewards2.put(ColorType.RED, 2);
         rewards2.put(ColorType.YELLOW, 1);
-        rewards3 = new HashMap<>();
-        rewards3.put(ColorType.BLUE, 1);
-        rewards3.put(ColorType.YELLOW, 2);
-        planet1 = new Planet(rewards1);
-        planet2 = new Planet(rewards2);
-        planet3 = new Planet(rewards1);
-        planetList = new ArrayList<>();
-        planetList.add(planet1);
-        planetList.add(planet2);
-        planetList.add(planet3);
-        planetCard = new PlanetCard(2, true, planetList, 3);
+        List<Planet> planetList = new ArrayList<>(List.of(new Planet(rewards1), new Planet(rewards2), new Planet(rewards1)));
+
+        PlanetCard planetCard = new PlanetCard(2, true, planetList, 3);
         board.getCardPile().clear();
         board.getCardPile().add(planetCard);
 
@@ -98,89 +72,99 @@ class PlanetCardTest {
     }
 
     @Test
-    void testShouldLandonPlanetP1() throws Exception {
+    void testShouldLandonPlanetP1() {
 
-        cargo1.showComponent();
-        cargo1.pickComponent(board, p1.getShip());
-        cargo1.insertComponent(p1.getShip(), 1, 2);
-        cargo1.weldComponent();
+        controller.showComponent("Simone", 31);
+        controller.pickComponent("Simone", 31);
+        controller.insertComponent("Simone", 31, 1, 3);
 
-        cargo2.showComponent();
-        cargo2.pickComponent(board, p1.getShip());
-        cargo2.insertComponent(p1.getShip(), 2, 2);
-        cargo2.weldComponent();
+        controller.showComponent("Simone", 68);
+        controller.pickComponent("Simone", 68);
+        controller.insertComponent("Simone", 68, 2, 2);
 
-        cargo3.showComponent();
-        cargo3.pickComponent(board, p3.getShip());
-        cargo3.insertComponent(p3.getShip(), 1, 2);
-        cargo3.weldComponent();
 
-        modelFacade.nextCard(p1.getUsername());
+        controller.showComponent("Davide", 51);
+        controller.pickComponent("Davide", 51);
+        controller.insertComponent("Davide", 51, 2, 4);
+
+
+        controller.showComponent("Tommaso", 69);
+        controller.pickComponent("Tommaso", 69);
+        controller.insertComponent("Tommaso", 69, 2, 4);
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        controller.drawCard("Simone");
+
         // player1 lands on first planet
-        modelFacade.getIndex(p1.getUsername(), 0);
+        controller.getIndex("Simone", 0);
 
-        modelFacade.getIndex(p2.getUsername(), -1);
+        controller.getIndex("Davide", -1);
 
-        modelFacade.getIndex(p3.getUsername(), -1);
+        controller.getIndex("Tommaso", -1);
 
         //P1 response
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap = new HashMap<>();
-        cargoMap.put(cargo1, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+        Map<Integer, List<ColorType>> cargoMap = new HashMap<>();
+        cargoMap.put(68, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+        //cargoMap.put(31, new ArrayList<>());
 
-        modelFacade.updateGoods(p1.getUsername(), cargoMap, new ArrayList<>());
-
+        controller.updateGoods("Simone", cargoMap, new ArrayList<>());
 
         assertEquals(1, p1.getShip().getGoods().get(ColorType.RED));
         assertEquals(1, p1.getShip().getGoods().get(ColorType.GREEN));
         assertEquals(0, p2.getShip().getGoods().get(ColorType.RED));
-        assertEquals(GameState.END, modelFacade.getState());
 
     }
 
     @Test
-    void testShouldLandOnPlanetAllthePlayers() throws Exception {
+    void testShouldLandOnPlanetAllThePlayers() {
 
-        cargo1.showComponent();
-        cargo1.pickComponent(board, p1.getShip());
-        cargo1.insertComponent(p1.getShip(), 1, 2);
-        cargo1.weldComponent();
+        controller.showComponent("Simone", 68);
+        controller.pickComponent("Simone", 68);
+        controller.insertComponent("Simone", 68, 2, 2);
 
-        cargo2.showComponent();
-        cargo2.pickComponent(board, p2.getShip());
-        cargo2.insertComponent(p2.getShip(), 2, 2);
-        cargo2.weldComponent();
 
-        cargo3.showComponent();
-        cargo3.pickComponent(board, p3.getShip());
-        cargo3.insertComponent(p3.getShip(), 1, 2);
-        cargo3.weldComponent();
+        controller.showComponent("Davide", 31);
+        controller.pickComponent("Davide", 31);
+        controller.insertComponent("Davide", 31, 2, 4);
 
-        modelFacade.nextCard(p1.getUsername());
-        // player1 lands on first planet
-        modelFacade.getIndex(p1.getUsername(), 0);
 
-        modelFacade.getIndex(p2.getUsername(), 1);
+        controller.showComponent("Tommaso", 69);
+        controller.pickComponent("Tommaso", 69);
+        controller.insertComponent("Tommaso", 69, 2, 4);
 
-        modelFacade.getIndex(p3.getUsername(), 2);
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        controller.drawCard("Simone");
+
+        controller.getIndex("Simone", 0);
+
+        controller.getIndex("Davide", 1);
+
+        controller.getIndex("Tommaso", 2);
 
 
         //P1 response
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap1 = new HashMap<>();
-        cargoMap1.put(cargo1, new ArrayList<>(List.of(ColorType.RED, ColorType.RED)));
+        Map<Integer, List<ColorType>> cargoMap1 = new HashMap<>();
+        cargoMap1.put(68, new ArrayList<>(List.of(ColorType.RED, ColorType.RED)));
 
-        modelFacade.updateGoods(p1.getUsername(), cargoMap1, new ArrayList<>());
+        controller.updateGoods(p1.getUsername(), cargoMap1, new ArrayList<>());
 
         //P2 response
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap2 = new HashMap<>();
-        cargoMap2.put(cargo2, new ArrayList<>(List.of(ColorType.YELLOW)));
+        Map<Integer, List<ColorType>> cargoMap2 = new HashMap<>();
+        cargoMap2.put(31, new ArrayList<>(List.of(ColorType.YELLOW)));
 
-        modelFacade.updateGoods(p2.getUsername(), cargoMap2, new ArrayList<>());
+        controller.updateGoods(p2.getUsername(), cargoMap2, new ArrayList<>());
 
         //P3 response
-        Map<SpecialCargoHoldsComponent, List<ColorType>> cargoMap3 = new HashMap<>();
-        cargoMap3.put(cargo3, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
+        Map<Integer, List<ColorType>> cargoMap3 = new HashMap<>();
+        cargoMap3.put(69, new ArrayList<>(List.of(ColorType.RED, ColorType.GREEN)));
 
-        modelFacade.updateGoods(p3.getUsername(), cargoMap3, new ArrayList<>());
+        controller.updateGoods(p3.getUsername(), cargoMap3, new ArrayList<>());
 
         assertEquals(2, p1.getShip().getGoods().get(ColorType.RED));
         assertEquals(0, p1.getShip().getGoods().get(ColorType.GREEN));
@@ -188,9 +172,7 @@ class PlanetCardTest {
         assertEquals(1, p2.getShip().getGoods().get(ColorType.YELLOW));
         assertEquals(1, p3.getShip().getGoods().get(ColorType.RED));
         assertEquals(0, p3.getShip().getGoods().get(ColorType.YELLOW));
-        assertEquals(2, cargo1.getGoods().stream().filter(color -> color == ColorType.RED).count());
-
-        assertEquals(GameState.END, modelFacade.getState());
+        assertEquals(2, ((SpecialCargoHoldsComponent)p1.getShip().getDashboard(2, 2).orElseThrow()).getGoods().stream().filter(color -> color == ColorType.RED).count());
 
     }
 

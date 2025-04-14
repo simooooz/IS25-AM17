@@ -1,9 +1,8 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.cards.utils.Meteor;
 import it.polimi.ingsw.model.components.*;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 
 import it.polimi.ingsw.model.player.PlayerData;
@@ -23,88 +22,67 @@ class MeteorSwarmCardTest {
     private PlayerData p1;
     private PlayerData p2;
     private PlayerData p3;
-    private ModelFacade modelFacade;
+    private GameController controller;
     private Board board;
-    private ConnectorType[] connectors1;
-    private ConnectorType[] connectors2;
-    private ConnectorType[] connectors3;
-    private ConnectorType[] connectors4;
 
-    private CabinComponent cabin1;
-    private CabinComponent cabin2;
-    private CabinComponent cabin3;
-
-    private DirectionType[] directions1;
-    private ShieldComponent shield1;
-    private ShieldComponent shield2;
-    private ShieldComponent shield3;
-
-    private BatteryComponent battery1;
-    private BatteryComponent battery2;
-    private BatteryComponent battery3;
-
-    private CannonComponent cannon1;
-    private CannonComponent cannon2;
-    private CannonComponent cannon3;
 
     @BeforeEach
     void setUp() {
-        connectors1 = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.EMPTY, ConnectorType.EMPTY};
-        connectors2 = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
-        connectors3 = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.EMPTY, ConnectorType.UNIVERSAL, ConnectorType.UNIVERSAL};
-        connectors4 = new ConnectorType[]{ConnectorType.UNIVERSAL, ConnectorType.EMPTY, ConnectorType.EMPTY, ConnectorType.UNIVERSAL};
 
         usernames = new ArrayList<>();
         usernames.add("Simone");
         usernames.add("Davide");
         usernames.add("Tommaso");
 
-        p1 = new PlayerData(usernames.get(0));
-        p2 = new PlayerData(usernames.get(1));
-        p3 = new PlayerData(usernames.get(2));
+        controller = new GameController(usernames, false);
+        controller.startMatch();
 
-        modelFacade = new ModelFacade(usernames);
-        board = modelFacade.getBoard();
+        board = controller.getModel().getBoard();
+        p1 = board.getPlayerEntityByUsername("Simone");
+        p2 = board.getPlayerEntityByUsername("Davide");
+        p3 = board.getPlayerEntityByUsername("Tommaso");
 
-        board.moveToBoard(p1);
-        board.movePlayer(p1, 9);
-        board.moveToBoard(p2);
-        board.movePlayer(p2, 9);
-        board.moveToBoard(p3);
-        board.movePlayer(p3, 10);
+        controller.showComponent("Simone", 32);
+        controller.pickComponent("Simone", 32);
+        controller.insertComponent("Simone", 32, 2, 3);
 
-        cabin1 = new CabinComponent(connectors1, true);
-        board.getCommonComponents().add(cabin1);
+        controller.showComponent("Simone", 132);
+        controller.pickComponent("Simone", 132);
+        controller.insertComponent("Simone", 132, 1, 1);
 
-        cabin1.showComponent();
-        cabin1.pickComponent(board, p1.getShip());
-        cabin1.insertComponent(p1.getShip(), 2, 1);
-        cabin1.weldComponent();
+        controller.showComponent("Simone", 15);
+        controller.pickComponent("Simone", 15);
+        controller.rotateComponent("Simone", 15, 2);
+        controller.insertComponent("Simone", 15, 1, 2);
 
-        directions1 = new DirectionType[]{DirectionType.NORTH, DirectionType.EAST};
-        shield1 = new ShieldComponent(connectors4, directions1);
-        board.getCommonComponents().add(shield1);
+        controller.showComponent("Simone", 36);
+        controller.pickComponent("Simone", 36);
+        controller.rotateComponent("Simone", 36, 2);
+        controller.insertComponent("Simone", 36, 2, 1);
 
-        shield1.showComponent();
-        shield1.pickComponent(board, p1.getShip());
-        shield1.insertComponent(p1.getShip(), 2, 2);
-        shield1.weldComponent();
+        controller.showComponent("Simone", 148);
+        controller.pickComponent("Simone", 148);
+        controller.insertComponent("Simone", 148, 2, 2);
 
-        battery1 = new BatteryComponent(connectors3, true);
-        board.getCommonComponents().add(battery1);
 
-        battery1.showComponent();
-        battery1.pickComponent(board, p1.getShip());
-        battery1.insertComponent(p1.getShip(), 1, 2);
-        battery1.weldComponent();
+        controller.showComponent("Davide", 33);
+        controller.pickComponent("Davide", 33);
+        controller.insertComponent("Davide", 33, 2, 3);
 
-        cannon1 = new CannonComponent(connectors2, DirectionType.NORTH, true);
-        board.getCommonComponents().add(cannon1);
+        controller.showComponent("Davide", 28);
+        controller.pickComponent("Davide", 28);
+        controller.insertComponent("Davide", 28, 2, 4);
 
-        cannon1.showComponent();
-        cannon1.pickComponent(board, p1.getShip());
-        cannon1.insertComponent(p1.getShip(), 1, 1);
-        cannon1.weldComponent();
+
+        controller.showComponent("Tommaso", 34);
+        controller.pickComponent("Tommaso", 34);
+        controller.insertComponent("Tommaso", 34, 2, 3);
+
+        controller.showComponent("Tommaso", 22);
+        controller.pickComponent("Tommaso", 22);
+        controller.insertComponent("Tommaso", 22, 2, 4);
+
+
     }
 
     @AfterEach
@@ -114,19 +92,29 @@ class MeteorSwarmCardTest {
 
     @Test
     void testShouldCheckSmallMeteorsDoesNothingIfGoodAssembledShip() {
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
         List<Meteor> meteors = new ArrayList<>();
         Meteor meteor1 = new Meteor(false, DirectionType.EAST);
         meteors.add(meteor1);
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
-        modelFacade.nextCard(p1.getUsername());
+        controller.drawCard("Simone");
         // set dice manually
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
+        boolean finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        assertEquals(1, p1.getShip().getComponentByType(CabinComponent.class).size());
+        assertEquals(2, p1.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(CannonComponent.class).size());
@@ -134,59 +122,94 @@ class MeteorSwarmCardTest {
 
     @Test
     void testShouldCheckSmallMeteorsBreakShipIfExposedConnectors() {
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
         List<Meteor> meteors = new ArrayList<>();
         Meteor meteor1 = new Meteor(false, DirectionType.WEST);
         meteors.add(meteor1);
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
-        modelFacade.nextCard(p1.getUsername());
+        controller.drawCard("Simone");
         // set dice manually
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
+        boolean finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        assertEquals(1, p1.getShip().getComponentByType(CabinComponent.class).size());
+        assertEquals(2, p1.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(0, p1.getShip().getComponentByType(CannonComponent.class).size());
     }
 
     @Test
-    void testShouldCheckSmallMeteorsDoesNothingIfShielIsUsed() {
+    void testShouldCheckSmallMeteorsDoesNothingIfShieldIsUsed() {
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
         List<Meteor> meteors = new ArrayList<>();
         Meteor meteor1 = new Meteor(false, DirectionType.NORTH);
         meteors.add(meteor1);
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
-        modelFacade.nextCard(p1.getUsername());
+        controller.drawCard("Simone");
         // set dice manually
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
-        modelFacade.activateShield(p1.getUsername(), battery1);
+        boolean finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        assertEquals(1, p1.getShip().getComponentByType(CabinComponent.class).size());
+        controller.activateShield("Simone", 15);
+
+        assertEquals(2, p1.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(CannonComponent.class).size());
     }
 
     @Test
-    void testShouldCheckBigMeteorsBreackShifIfCannonIsNotUsed() {
+    void testShouldCheckBigMeteorsBreakShipIfCannonIsNotUsed() {
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
         List<Meteor> meteors = new ArrayList<>();
         Meteor meteor1 = new Meteor(true, DirectionType.EAST);
         meteors.add(meteor1);
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
-        modelFacade.nextCard(p1.getUsername());
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
+        controller.drawCard("Simone");
 
-        assertEquals(1, p1.getShip().getComponentByType(CabinComponent.class).size());
+        boolean finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        assertEquals(2, p1.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(0, p1.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(CannonComponent.class).size());
@@ -194,24 +217,32 @@ class MeteorSwarmCardTest {
 
     @Test
     void testShouldCheckBigMeteorsDoesNothingIfCannonIsUsed() {
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
         List<Meteor> meteors = new ArrayList<>();
         Meteor meteor1 = new Meteor(true, DirectionType.NORTH);
         meteors.add(meteor1);
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
-        modelFacade.nextCard(p1.getUsername());
+        controller.drawCard("Simone");
         // set dice manually
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 5, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
-        List<BatteryComponent> battery = new ArrayList<>();
-        battery.add(battery1);
-        List<CannonComponent> cannon = new ArrayList<>();
-        cannon.add(cannon1);
-        modelFacade.activateCannons(p1.getUsername(), battery, cannon);
+        boolean finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 5, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        assertEquals(1, p1.getShip().getComponentByType(CabinComponent.class).size());
+        controller.activateCannons(p1.getUsername(), new ArrayList<>(List.of(15)), new ArrayList<>(List.of(132)));
+
+        assertEquals(2, p1.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(CannonComponent.class).size());
@@ -219,6 +250,52 @@ class MeteorSwarmCardTest {
 
     @Test
     void testShouldCheckMeteorHitEveryPlayer() {
+
+        controller.showComponent("Davide", 43);
+        controller.pickComponent("Davide", 43);
+        controller.insertComponent("Davide", 43, 2, 1);
+
+        controller.showComponent("Davide", 126);
+        controller.pickComponent("Davide", 126);
+        controller.insertComponent("Davide", 126, 1, 1);
+
+        controller.showComponent("Davide", 12);
+        controller.pickComponent("Davide", 12);
+        controller.rotateComponent("Davide", 12, 2);
+        controller.insertComponent("Davide", 12, 1, 2);
+
+        controller.showComponent("Davide", 151);
+        controller.pickComponent("Davide", 151);
+        controller.insertComponent("Davide", 151, 2, 2);
+
+
+        controller.showComponent("Tommaso", 128);
+        controller.pickComponent("Tommaso", 128);
+        controller.insertComponent("Tommaso", 128, 1, 1);
+
+        controller.showComponent("Tommaso", 14);
+        controller.pickComponent("Tommaso", 14);
+        controller.rotateComponent("Tommaso", 14, 3);
+        controller.insertComponent("Tommaso", 14, 1, 2);
+
+        controller.showComponent("Tommaso", 38);
+        controller.pickComponent("Tommaso", 38);
+        controller.rotateComponent("Tommaso", 38, 3);
+        controller.insertComponent("Tommaso", 38, 2, 1);
+
+        controller.showComponent("Tommaso", 150);
+        controller.pickComponent("Tommaso", 150);
+        controller.insertComponent("Tommaso", 150, 2, 2);
+
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
         List<Meteor> meteors = new ArrayList<>();
         Meteor meteor1 = new Meteor(false, DirectionType.EAST);
         Meteor meteor2 = new Meteor(false, DirectionType.NORTH);
@@ -229,119 +306,87 @@ class MeteorSwarmCardTest {
         meteors.add(meteor3);
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
-        cabin2 = new CabinComponent(connectors1, true);
-        board.getCommonComponents().add(cabin2);
 
-        cabin2.showComponent();
-        cabin2.pickComponent(board, p2.getShip());
-        cabin2.insertComponent(p2.getShip(), 2, 1);
-        cabin2.weldComponent();
-
-        shield2 = new ShieldComponent(connectors4, directions1);
-        board.getCommonComponents().add(shield2);
-
-        directions1 = new DirectionType[]{DirectionType.NORTH, DirectionType.EAST};
-        shield2.showComponent();
-        shield2.pickComponent(board, p2.getShip());
-        shield2.insertComponent(p2.getShip(), 2, 2);
-        shield2.weldComponent();
-
-        battery2 = new BatteryComponent(connectors3, true);
-        board.getCommonComponents().add(battery2);
-
-        battery2.showComponent();
-        battery2.pickComponent(board, p2.getShip());
-        battery2.insertComponent(p2.getShip(), 1, 2);
-        battery2.weldComponent();
-
-        cannon2 = new CannonComponent(connectors2, DirectionType.NORTH, true);
-        board.getCommonComponents().add(cannon2);
-
-        cannon2.showComponent();
-        cannon2.pickComponent(board, p2.getShip());
-        cannon2.insertComponent(p2.getShip(), 1, 1);
-        cannon2.weldComponent();
-
-        cabin3 = new CabinComponent(connectors1, true);
-        board.getCommonComponents().add(cabin3);
-
-        cabin3.showComponent();
-        cabin3.pickComponent(board, p3.getShip());
-        cabin3.insertComponent(p3.getShip(), 2, 1);
-        cabin3.weldComponent();
-
-        directions1 = new DirectionType[]{DirectionType.NORTH, DirectionType.EAST};
-        shield3 = new ShieldComponent(connectors4, directions1);
-        board.getCommonComponents().add(shield3);
-
-        shield3.showComponent();
-        shield3.pickComponent(board, p3.getShip());
-        shield3.insertComponent(p3.getShip(), 2, 2);
-        shield3.weldComponent();
-
-        battery3 = new BatteryComponent(connectors3, true);
-        board.getCommonComponents().add(battery3);
-
-        battery3.showComponent();
-        battery3.pickComponent(board, p3.getShip());
-        battery3.insertComponent(p3.getShip(), 1, 2);
-        battery3.weldComponent();
-
-        cannon3 = new CannonComponent(connectors2, DirectionType.NORTH, true);
-        board.getCommonComponents().add(cannon3);
-
-        cannon3.showComponent();
-        cannon3.pickComponent(board, p3.getShip());
-        cannon3.insertComponent(p3.getShip(), 1, 1);
-        cannon3.weldComponent();
-
-        modelFacade.nextCard(p1.getUsername());
+        controller.drawCard("Simone");
         // set dice manually
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
+        boolean finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
+        finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        modelFacade.activateShield(p1.getUsername(), battery1);
-        modelFacade.activateShield(p2.getUsername(), battery2);
-        modelFacade.activateShield(p3.getUsername(), battery3);
+        controller.activateShield("Simone", 15);
 
-        meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 5, p1.getUsername(), board);
-        modelFacade.setState(meteorSwarmCard.changeCardState(board, p1.getUsername()));
+        controller.activateShield("Davide", 12);
 
-        List<BatteryComponent> batteryp1 = new ArrayList<>();
-        batteryp1.add(battery1);
-        List<CannonComponent> cannonp1 = new ArrayList<>();
-        cannonp1.add(cannon1);
-        modelFacade.activateCannons(p1.getUsername(), batteryp1, cannonp1);
-        List<BatteryComponent> batteryp2 = new ArrayList<>();
-        batteryp2.add(battery2);
-        List<CannonComponent> cannonp2 = new ArrayList<>();
-        cannonp2.add(cannon2);
-        modelFacade.activateCannons(p2.getUsername(), batteryp2, cannonp2);
-        List<BatteryComponent> batteryp3 = new ArrayList<>();
-        batteryp3.add(battery3);
-        List<CannonComponent> cannonp3 = new ArrayList<>();
-        cannonp3.add(cannon3);
-        modelFacade.activateCannons(p3.getUsername(), batteryp3, cannonp3);
+        controller.activateShield("Tommaso", 14);
 
-        assertEquals(1, p1.getShip().getComponentByType(CabinComponent.class).size());
+        finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 5, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        controller.activateCannons("Simone", new ArrayList<>(List.of(15)), new ArrayList<>(List.of(132)));
+
+        controller.activateCannons("Davide", new ArrayList<>(List.of(12)), new ArrayList<>(List.of(126)));
+
+        controller.activateCannons("Tommaso", new ArrayList<>(List.of(14)), new ArrayList<>(List.of(128)));
+
+
+        assertEquals(2, p1.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(1, p1.getShip().getComponentByType(CannonComponent.class).size());
-        assertEquals(1, p2.getShip().getComponentByType(CabinComponent.class).size());
+        assertEquals(2, p2.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(1, p2.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p2.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(1, p2.getShip().getComponentByType(CannonComponent.class).size());
-        assertEquals(1, p3.getShip().getComponentByType(CabinComponent.class).size());
+        assertEquals(1, p2.getShip().getComponentByType(CargoHoldsComponent.class).size());
+        assertEquals(2, p3.getShip().getComponentByType(CabinComponent.class).size());
         assertEquals(1, p3.getShip().getComponentByType(BatteryComponent.class).size());
         assertEquals(1, p3.getShip().getComponentByType(ShieldComponent.class).size());
         assertEquals(1, p3.getShip().getComponentByType(CannonComponent.class).size());
+        assertEquals(1, p3.getShip().getComponentByType(CargoHoldsComponent.class).size());
+
     }
 
-    // TODO impements test to check if the user can choose which part of the ship after destory
+    @Test
+    void testShouldCheckBigMeteorsDestroysShipAndUserChooseShipPart() {
+
+        controller.setReady("Simone");
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+
+        board.movePlayer(p1, 9);
+        board.movePlayer(p2, 9);
+        board.movePlayer(p3, 10);
+
+
+        List<Meteor> meteors = new ArrayList<>();
+        Meteor meteor1 = new Meteor(true, DirectionType.NORTH);
+        meteors.add(meteor1);
+        meteors.add(meteor1);
+
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        board.getCardPile().clear();
+        board.getCardPile().add(meteorSwarmCard);
+
+        controller.drawCard("Simone");
+        // set dice manually
+        boolean finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        finish = meteorSwarmCard.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        controller.chooseShipPart("Simone", 0);
+
+
+        assertEquals(1, p1.getShip().getComponentByType(CabinComponent.class).size());
+        assertEquals(0, p1.getShip().getComponentByType(BatteryComponent.class).size());
+        assertEquals(0, p1.getShip().getComponentByType(ShieldComponent.class).size());
+        assertEquals(1, p1.getShip().getComponentByType(CannonComponent.class).size());
+    }
 
 }
