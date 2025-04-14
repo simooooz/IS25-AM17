@@ -22,34 +22,59 @@ public class Main {
 
             Scanner scanner = new Scanner(System.in);
             String input;
+            boolean usernameSet = false;  // Flag to track if username has been set
+
+            System.out.println("Please set your username using 'set-user <username>' before using other commands.");
 
             while (true) {
                 input = scanner.nextLine();
                 String[] params = input.split(" ");
 
-                Message message = null;
+                // Check if command is set-user or not
+                if (params[0].equals("set-user") && params.length > 1) {
+                    Message message = new SingleArgMessage<>(MessageType.SET_USERNAME, params[1]);
+                    client.getUser().send(message);
+                    usernameSet = true;  // Mark username as set
+                    System.out.println("Username set successfully. You can now use other commands.");
+                    continue;
+                }
+
+                // If username is not set and command is not set-user, deny access
+                if (!usernameSet) {
+                    System.out.println("You must set your username first using 'set-user <username>'");
+                    continue;
+                }
+
+                // Username is set, process other commands
+                Message message;
                 switch (params[0]) {
-                    case "set-user":
-                        message = new SingleArgMessage<>(MessageType.SET_USERNAME, params[1]);
-                        break;
                     case "create-lobby":
-                        message = new CreateLobbyMessage(
-                                params[1],
-                                Integer.parseInt(params[2]),
-                                Boolean.getBoolean(params[3])
-                        );
+                        if (params.length >= 4) {
+                            message = new CreateLobbyMessage(
+                                    params[1],
+                                    Integer.parseInt(params[2]),
+                                    Boolean.getBoolean(params[3])
+                            );
+                            client.getUser().send(message);
+                        } else {
+                            System.out.println("Invalid format. Use: create-lobby <name> <maxPlayers> <timeout>");
+                        }
                         break;
                     case "join-lobby":
-                        message = new JoinLobbyMessage(params[1]);
+                        if (params.length >= 2) {
+                            message = new JoinLobbyMessage(params[1]);
+                            client.getUser().send(message);
+                        } else {
+                            System.out.println("Invalid format. Use: join-lobby <lobbyName>");
+                        }
                         break;
                     case "exit":
                         System.exit(0);
-                        break;
+                        break;// Exit the program
                     default:
-                        continue;
+                        System.out.println("Unknown command. Available commands: create-lobby, join-lobby, exit");
+                        break;
                 }
-
-                client.getUser().send(message);
             }
 
         } else if (args[0].equals("server")) {
@@ -60,9 +85,7 @@ public class Main {
             } catch (ServerException _) {
                 System.exit(-1);
             }
-
         }
-
     }
 
 }
