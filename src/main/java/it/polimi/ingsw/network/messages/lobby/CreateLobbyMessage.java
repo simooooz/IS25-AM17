@@ -1,9 +1,11 @@
-package it.polimi.ingsw.network.messages.lobbyMessages;
+package it.polimi.ingsw.network.messages.lobby;
 
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.network.messages.*;
-import it.polimi.ingsw.network.socket.server.User;
+import it.polimi.ingsw.network.socket.server.RefToUser;
+
+import java.util.concurrent.CompletableFuture;
 
 public class CreateLobbyMessage extends Message {
 
@@ -19,13 +21,15 @@ public class CreateLobbyMessage extends Message {
     }
 
     @Override
-    public void execute(User user) {
+    public void execute(RefToUser user) {
+
         try {
             MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name);
-            user.send(new ZeroArgMessage(MessageType.CREATE_LOBBY_OK));
         } catch (PlayerAlreadyInException e) {
-            user.send(new ErrorMessage(e.getMessage()));
+            throw new RuntimeException(e);
         }
+        user.send(new ZeroArgMessage(MessageType.CREATE_LOBBY_OK), new CompletableFuture<>());
+
     }
 
 }

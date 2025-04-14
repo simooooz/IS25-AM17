@@ -1,7 +1,7 @@
 package it.polimi.ingsw.network.messages;
 
-import it.polimi.ingsw.network.socket.client.UserOfClient;
-import it.polimi.ingsw.network.socket.server.User;
+import it.polimi.ingsw.network.socket.client.User;
+import it.polimi.ingsw.network.socket.server.RefToUser;
 
 public class SingleArgMessage<T> extends Message {
 
@@ -17,12 +17,12 @@ public class SingleArgMessage<T> extends Message {
     }
 
     @Override
-    public void execute(User user) {
+    public void execute(RefToUser user) {
         getMessageType().execute(this, user);
     }
 
     @Override
-    public void execute(UserOfClient user) {
+    public void execute(User user) {
         getMessageType().execute(this, user);
     }
 

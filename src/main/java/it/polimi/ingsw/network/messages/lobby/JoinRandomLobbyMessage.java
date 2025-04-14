@@ -1,4 +1,4 @@
-package it.polimi.ingsw.network.messages.lobbyMessages;
+package it.polimi.ingsw.network.messages.lobby;
 
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
@@ -7,7 +7,9 @@ import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.messages.ZeroArgMessage;
-import it.polimi.ingsw.network.socket.server.User;
+import it.polimi.ingsw.network.socket.server.RefToUser;
+
+import java.util.concurrent.CompletableFuture;
 
 public class JoinRandomLobbyMessage extends Message {
 
@@ -16,12 +18,12 @@ public class JoinRandomLobbyMessage extends Message {
     }
 
     @Override
-    public void execute(User user) {
+    public void execute(RefToUser user) {
         try {
             MatchController.getInstance().joinRandomGame(user.getUsername());
-            user.send(new ZeroArgMessage(MessageType.JOIN_RANDOM_LOBBY_OK));
+            user.send(new ZeroArgMessage(MessageType.JOIN_RANDOM_LOBBY_OK), new CompletableFuture<>());
         } catch (LobbyNotFoundException | PlayerAlreadyInException e) {
-            user.send(new ErrorMessage(e.getMessage()));
+            user.send(new ErrorMessage(e.getMessage()), new CompletableFuture<>());
         }
     }
 
