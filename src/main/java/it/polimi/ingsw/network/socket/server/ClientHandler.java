@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Manages (server point of view) the connection between a client and the server via socket.
@@ -19,7 +18,7 @@ public class ClientHandler {
     private ObjectOutputStream output;
     private ObjectInputStream input;
 
-    private final RefToUser user;
+    private final User user;
 
     private ListenLoop listenLoop;
 
@@ -34,21 +33,20 @@ public class ClientHandler {
         this.socket = socket;
         this.output = new ObjectOutputStream(socket.getOutputStream());
         this.input = new ObjectInputStream(socket.getInputStream());
-        this.user = new RefToUser(connectionCode);
+        this.user = new User(connectionCode);
         this.listenLoop = new ListenLoop(connectionCode, user);
     }
 
-    public void send(Object data, CompletableFuture<Void> completion) throws ServerException {
+    public void sendObject(Object data) throws ServerException {
         try {
             this.output.writeObject(data);
             this.output.flush();
-            completion.complete(null);
         } catch (IOException e) {
             throw new ServerException("[CLIENT CONNECTION] Error while sending object");
         }
     }
 
-    public Object read() throws ServerException {
+    public Object readObject() throws ServerException {
         try {
             Object obj = input.readObject();
             if (obj == null)

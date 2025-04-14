@@ -13,16 +13,16 @@ import java.net.Socket;
  * It encapsulates two-way communication of serialized objects,
  * connection monitoring via heartbeat, and asynchronous listening for incoming messages from the client.
  */
-public class ServerHandler {
+public class ClientSocket {
 
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
 
-    private final User user;
+    private final UserOfClient user;
 
     private HeartbeatThread heartbeatThread;
-    private ListenLoop listenLoop;
+    private ListenLoopOfClient listenLoop;
 
     /**
      * Constructor
@@ -30,15 +30,14 @@ public class ServerHandler {
      * @param host
      * @param port
      */
-    public ServerHandler(String host, int port) {
+    public ClientSocket(String host, int port) {
         this.connect(host, port);
-        this.user = new User(this);
+        this.user = new UserOfClient(this);
 
         heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
 
-        listenLoop = new ListenLoop(this, user);
-        listenLoop.start();
+        listenLoop = new ListenLoopOfClient(this, user);
     }
 
     private void connect(String ip, int port) {
@@ -89,32 +88,32 @@ public class ServerHandler {
         }
 
         System.out.println("\nClosing connection...");
-        System.exit(0);
+        // System.exit(0);
     }
 
-    public Object read() throws ClientException {
+    public Object readObject() throws ClientException {
         try {
             Object obj = this.input.readObject();
             if (obj == null)
                 throw new ClientException();
             return obj;
         } catch (IOException | ClassNotFoundException | ClientException e) {
-//            this.close();
+            this.close();
             throw new ClientException("[CLIENT SOCKET] Object is null or could not be read");
         }
     }
 
-    public void send(Object data) throws ClientException {
+    public void sendObject(Object data) throws ClientException {
         try {
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {
-//            this.close();
+            this.close();
             throw new ClientException("[CLIENT SOCKET] Error while writing object");
         }
     }
 
-    public User getUser() {
+    public UserOfClient getUser() {
         return user;
     }
 }

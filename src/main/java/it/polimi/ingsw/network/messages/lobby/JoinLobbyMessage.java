@@ -7,9 +7,7 @@ import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.messages.ZeroArgMessage;
-import it.polimi.ingsw.network.socket.server.RefToUser;
-
-import java.util.concurrent.CompletableFuture;
+import it.polimi.ingsw.network.socket.server.User;
 
 public class JoinLobbyMessage extends Message {
 
@@ -21,13 +19,13 @@ public class JoinLobbyMessage extends Message {
     }
 
     @Override
-    public void execute(RefToUser user) {
+    public void execute(User user) {
         // TODO capiamo se fare recconect player
         try {
             MatchController.getInstance().joinGame(user.getUsername(), name);
-            user.send(new ZeroArgMessage(MessageType.JOIN_LOBBY_OK), new CompletableFuture<>());
+            user.send(new ZeroArgMessage(MessageType.JOIN_LOBBY_OK));
         } catch (LobbyNotFoundException | PlayerAlreadyInException e) {
-            user.send(new ErrorMessage(e.getMessage()), new CompletableFuture<>());
+            user.send(new ErrorMessage(e.getMessage()));
         }
     }
 

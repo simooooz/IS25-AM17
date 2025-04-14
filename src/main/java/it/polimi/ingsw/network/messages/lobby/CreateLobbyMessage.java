@@ -3,7 +3,7 @@ package it.polimi.ingsw.network.messages.lobby;
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.network.messages.*;
-import it.polimi.ingsw.network.socket.server.RefToUser;
+import it.polimi.ingsw.network.socket.server.User;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -11,24 +11,24 @@ public class CreateLobbyMessage extends Message {
 
     private final String name;
     private final Integer maxPlayers;
-    private final Integer gameType;
+    private final Boolean learnerMode;
 
-    public CreateLobbyMessage(String name, Integer maxPlayers, Integer gameType) {
+    public CreateLobbyMessage(String name, Integer maxPlayers, Boolean learnerMode) {
         super(MessageType.CREATE_LOBBY);
         this.name = name;
         this.maxPlayers = maxPlayers;
-        this.gameType = gameType;
+        this.learnerMode = learnerMode;
     }
 
     @Override
-    public void execute(RefToUser user) {
+    public void execute(User user) {
 
         try {
-            MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name);
+            MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
+            user.send(new ZeroArgMessage(MessageType.CREATE_LOBBY_OK));
         } catch (PlayerAlreadyInException e) {
-            throw new RuntimeException(e);
+            user.send(new ErrorMessage(e.getMessage()));
         }
-        user.send(new ZeroArgMessage(MessageType.CREATE_LOBBY_OK), new CompletableFuture<>());
 
     }
 

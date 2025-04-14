@@ -53,26 +53,15 @@ public class MatchController {
      *
      * @param username   player's username
      * @param maxPlayers max number of allowed players
-     * @param lobbyName  lobby's name
+     * @param name       lobby's name
      */
-    public synchronized void createNewGame(String username, int maxPlayers, String lobbyName) throws PlayerAlreadyInException {
-        if (maxPlayers < 2 || maxPlayers > 4)
-            throw new IllegalArgumentException("Max number of allowed players must be between 2 and 4");
-
-        // checks if the player who is creating the lobby is already in another one
-        if (
-                lobbies.values().stream()
-                        .anyMatch(l -> l.getPlayers().contains(username))
-        ) throw new PlayerAlreadyInException("[createLobby] Player is already in a lobby!");
-
+    public synchronized void createNewGame(String username, int maxPlayers, String name, boolean learnerMode) throws PlayerAlreadyInException {
+        if (maxPlayers < 2 || maxPlayers > 4) throw new IllegalArgumentException("Max number of allowed players must be between 2 and 4");
         String gameID = UUID.randomUUID().toString();
-        Lobby lobby = new Lobby(gameID, lobbyName, username, maxPlayers);
+        Lobby lobby = new Lobby(gameID, name, username, maxPlayers, learnerMode);
         lobbies.put(gameID, lobby);
-
-        lobby.addPlayer(username);
-
-        // todo for test
-        System.out.println(gameID);
+        System.out.println(gameID + " created");
+        lobby.addPlayer(username); // Join in the newly created lobby
     }
 
     /**
@@ -82,11 +71,7 @@ public class MatchController {
      * @param gameID   game to join
      */
     public synchronized void joinGame(String username, String gameID) throws LobbyNotFoundException, PlayerAlreadyInException {
-        if (
-                lobbies.values().stream()
-                        .anyMatch(l -> l.getPlayers().contains(username))
-        ) throw new PlayerAlreadyInException("[joinGame] Player is already in a lobby!");
-
+        // TODO check se è già in un'altra lobby?
         Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
         Lobby lobby = lobbyOptional.filter(l -> l.getState() == LobbyState.WAITING)
                 .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));

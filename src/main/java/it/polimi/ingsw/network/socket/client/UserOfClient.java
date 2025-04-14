@@ -5,15 +5,13 @@ import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
 
-import java.net.Socket;
+public class UserOfClient {
 
-public class User {
-
-    private final ServerHandler clientSocket;
+    private final ClientSocket clientSocket;
     private String username;
     private GameController gameController;
 
-    public User(ServerHandler clientSocket) {
+    public UserOfClient(ClientSocket clientSocket) {
         this.clientSocket = clientSocket;
         this.username = null;
         this.gameController = null;
@@ -21,9 +19,9 @@ public class User {
 
     public void send(Message message) {
         try {
-            this.clientSocket.send(message);
+            this.clientSocket.sendObject(message);
         } catch (ClientException e) {
-            System.err.println("[CLIENT] Error while sending message: " + e.getMessage());
+            System.err.println("[USER OF CLIENT] Error while sending message: " + e.getMessage());
             // Everything should be closed
         }
     }
@@ -32,7 +30,7 @@ public class User {
         try {
             message.execute(this);
         } catch (RuntimeException e) {
-            System.err.println("[CLIENT] Receive method has caught a RuntimeException: " + e.getMessage());
+            System.err.println("[USER OF CLIENT] Receive method has caught a RuntimeException: " + e.getMessage());
             this.send(new ErrorMessage());
         }
     }
@@ -54,7 +52,7 @@ public class User {
     }
 
     // todo è sicuro/devo fare una get della socket?
-    public ServerHandler getSocket() {
+    public ClientSocket getSocket() {
         return this.clientSocket;
     }
 

@@ -13,15 +13,15 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Server's point of view of the client. This class handles connected users
  */
-public class RefToUser {
+public class User {
 
-    private final static List<RefToUser> users = new ArrayList<>();
+    private final static List<User> users = new ArrayList<>();
 
     private final String connectionCode;
     private String username;
     private GameController gameController;
 
-    public RefToUser(String connectionCode) {
+    public User(String connectionCode) {
         this.connectionCode = connectionCode;
         this.username = null;
         this.gameController = null;
@@ -31,9 +31,9 @@ public class RefToUser {
         }
     }
 
-    public void send(Message message, CompletableFuture<Void> completion) {
+    public void send(Message message) {
         try {
-            Server.getInstance().send(connectionCode, message, completion);
+            Server.getInstance().sendObject(connectionCode, message);
         } catch (ServerException e) {
             System.err.println("[USER] Error while sending message: " + e.getMessage());
             // Everything should be closed
@@ -41,7 +41,12 @@ public class RefToUser {
     }
 
     public void receive(Message message) {
-        message.execute(this);
+        try {
+            message.execute(this);
+        } catch (RuntimeException e) {
+            System.err.println("[USER] Receive method has caught a RuntimeException: " + e.getMessage());
+            this.send(new ErrorMessage());
+        }
     }
 
     public GameController getGameController() {
@@ -65,8 +70,8 @@ public class RefToUser {
         }
     }
 
-    public static RefToUser getUser(String username) throws UserNotFoundException {
-        List<RefToUser> temp;
+    public static User getUser(String username) throws UserNotFoundException {
+        List<User> temp;
         synchronized (users) {
             temp = new ArrayList<>(users);
         }

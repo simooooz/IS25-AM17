@@ -6,14 +6,12 @@ import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.socket.Heartbeat;
 import it.polimi.ingsw.network.socket.Sense;
 
-import java.util.concurrent.CompletableFuture;
-
 public class ListenLoop extends Thread {
 
     private final String connectionCode;
-    private final RefToUser user;
+    private final User user;
 
-    public ListenLoop(String connectionCode, RefToUser user) {
+    public ListenLoop(String connectionCode, User user) {
         this.connectionCode = connectionCode;
         this.user = user;
         this.start();
@@ -24,7 +22,7 @@ public class ListenLoop extends Thread {
         while (!Thread.interrupted()) {
 
             try {
-                Object read = Server.getInstance().receive(this.connectionCode);
+                Object read = Server.getInstance().receiveObject(this.connectionCode);
 
                 if (!(read instanceof Heartbeat)) {
                     // then input is a message
@@ -41,7 +39,7 @@ public class ListenLoop extends Thread {
                 // Connection is already closed by Server
                 // This Thread will be interrupted by ClientConnection
             } catch (ClassCastException e) {
-                this.user.send(new ErrorMessage(), new CompletableFuture<>());
+                this.user.send(new ErrorMessage());
             }
 
         }

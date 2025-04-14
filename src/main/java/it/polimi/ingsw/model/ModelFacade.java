@@ -20,7 +20,7 @@ public class ModelFacade {
     private final List<String> usernames;
     private final Map<String, PlayerState> playersState;
 
-    public ModelFacade(List<String> usernames) {
+    public ModelFacade(List<String> usernames, boolean learnerMode) {
         this.usernames = usernames;
         this.board = new Board(usernames);
         this.playersState = new HashMap<>();

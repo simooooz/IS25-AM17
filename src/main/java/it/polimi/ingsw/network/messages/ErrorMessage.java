@@ -1,6 +1,6 @@
 package it.polimi.ingsw.network.messages;
 
-import it.polimi.ingsw.network.socket.server.RefToUser;
+import it.polimi.ingsw.network.socket.server.User;
 
 public class ErrorMessage extends Message {
 
@@ -18,11 +18,11 @@ public class ErrorMessage extends Message {
 
     // TODO è necessario?
     public String getMessage() {
-        return message != null ? message : "";
+        return message != null ? message : "Empty message";
     }
 
     @Override
-    public void execute(RefToUser user) {
+    public void execute(User user) {
         // TODO non ha un metodo execute perché è server -> client
     }
 

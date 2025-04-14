@@ -3,7 +3,7 @@ package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
-import it.polimi.ingsw.network.socket.server.RefToUser;
+import it.polimi.ingsw.network.socket.server.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,10 @@ public class Lobby {
      */
     private final String name;
     /**
+     * learner flag
+     */
+    private final boolean learnerMode;
+    /**
      * player's username who created the lobby
      */
     private String master;
@@ -49,12 +53,14 @@ public class Lobby {
      * @param name       lobby's name
      * @param username   player's username
      * @param maxPlayers max players allowed in lobby
+     * @param learnerMode true if is a test flight
      */
-    public Lobby(String gameID, String name, String username, int maxPlayers) {
+    public Lobby(String gameID, String name, String username, int maxPlayers, boolean learnerMode) {
         this.state = LobbyState.WAITING;
         this.uuid = gameID;
         this.name = name;
         this.master = username;
+        this.learnerMode = learnerMode;
 
         this.maxPlayers = maxPlayers;
         this.players = new ArrayList<>();
@@ -86,11 +92,9 @@ public class Lobby {
      * @param username player's username
      */
     public void addPlayer(String username) throws PlayerAlreadyInException {
-//        if (this.players.contains(username)) throw new PlayerAlreadyInException("Player's already in");
+        if (hasPlayer(username)) throw new PlayerAlreadyInException("Player's already in");
 
         players.add(username);
-        System.out.println("Player " + username + " joined!");
-        System.out.println(players.size());
         if (players.size() == maxPlayers)
             this.initGame();
     }
@@ -121,11 +125,11 @@ public class Lobby {
      */
     private void initGame() {
         this.state = LobbyState.IN_GAME;
-        this.game = new GameController(players);
+        this.game = new GameController(players, learnerMode);
 
         try {
             for (String username : players) // Set GameController for each user
-                RefToUser.getUser(username).setGameController(game);
+                User.getUser(username).setGameController(game);
         } catch (UserNotFoundException e) {
             this.state = LobbyState.WAITING;
             throw new RuntimeException("Error initializing game");
@@ -134,7 +138,6 @@ public class Lobby {
         this.game.startMatch();
     }
 
-    // TODO
     public void endGame() {
         // todo
     }

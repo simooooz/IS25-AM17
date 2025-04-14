@@ -28,8 +28,8 @@ public class GameController {
      *
      * @param usernames players' usernames in the game
      */
-    public GameController(List<String> usernames) {
-        this.model = new ModelFacade(usernames);
+    public GameController(List<String> usernames, boolean learnerMode) {
+        this.model = new ModelFacade(usernames, learnerMode);
     }
 
     public void startMatch() {

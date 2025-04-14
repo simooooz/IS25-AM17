@@ -5,10 +5,10 @@ import it.polimi.ingsw.network.socket.Heartbeat;
 
 public class HeartbeatThread extends Thread {
 
-    private final ServerHandler clientSocket;
+    private final ClientSocket clientSocket;
     private final int heartbeatMsInterval;
 
-    public HeartbeatThread(ServerHandler clientSocket, int heartbeatMsInterval) {
+    public HeartbeatThread(ClientSocket clientSocket, int heartbeatMsInterval) {
         this.clientSocket = clientSocket;
         this.heartbeatMsInterval = heartbeatMsInterval;
     }
@@ -18,7 +18,7 @@ public class HeartbeatThread extends Thread {
         while(!Thread.interrupted()) {
 
             try {
-                clientSocket.send(new Heartbeat());
+                clientSocket.sendObject(new Heartbeat());
                 Thread.sleep(heartbeatMsInterval);
             } catch (ClientException _) {
                 // Something went wrong...

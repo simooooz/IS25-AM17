@@ -6,16 +6,15 @@ import it.polimi.ingsw.network.exceptions.ServerException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Server extends Thread {
 
     private static Server instance;
 
-    private final ServerSocket listenSocket;
-    private final ConcurrentHashMap<String, ClientHandler> connections;
+    private final ServerSocket serverSocket;
+    private final HashMap<String, ClientHandler> connections;
 
     /**
      * Constructor
@@ -27,13 +26,13 @@ public class Server extends Thread {
         if (port < 0 || port > 65535)
             throw new ServerException("Port is not valid");
 
-        connections = new ConcurrentHashMap<>();
+        connections = new HashMap<>();
 
         try {
-            this.listenSocket = new ServerSocket(port);
-            System.out.println("Server started on port " + port);
+            this.serverSocket = new ServerSocket(port);
+            System.out.println("[SERVER] Server started on port " + port);
         } catch (IOException e) {
-            throw new ServerException("Server cannot be started " + e.getMessage());
+            throw new ServerException("[SERVER] Server cannot be started: " + e.getMessage());
         }
 
         this.start();
@@ -73,22 +72,26 @@ public class Server extends Thread {
      * @throws ServerException if there's an error accepting the client connection
      */
     private String openConnection() throws ServerException {
+        String connectionCode = UUID.randomUUID().toString();
+
+        synchronized (this.connections) {
+            if (this.connections.containsKey(connectionCode))
+                throw new ServerException("Connection codes must be unique");
+        }
+
         try {
-
-            Socket socket = listenSocket.accept();
+            Socket socket = serverSocket.accept();
             socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
+            ClientHandler connection = new ClientHandler(connectionCode, socket);
 
-            String connectionCode;
             synchronized (this.connections) {
-                do {
-                    connectionCode = UUID.randomUUID().toString();
-                } while (this.connections.containsKey(connectionCode));
-
-                ClientHandler connection = new ClientHandler(connectionCode, socket);
+                if (this.connections.containsKey(connectionCode)) {
+                    connection.close(); // Close the connection
+                    throw new ServerException("[SERVER] Created a none unique connection");
+                }
                 this.connections.put(connectionCode, connection);
             }
             return connectionCode;
-
         } catch (IOException e) {
             throw new ServerException("[SERVER] Error accepting client connection: " + e.getMessage());
         }
@@ -112,17 +115,17 @@ public class Server extends Thread {
      * @param data           the object to send
      * @throws ServerException if the connection doesn't exist or there's an error sending the data
      */
-    public void send(String connectionCode, Object data, CompletableFuture<Void> completion) throws ServerException {
+    public void sendObject(String connectionCode, Object data) throws ServerException {
         ClientHandler conn;
         synchronized (this.connections) {
             conn = this.connections.get(connectionCode);
         }
 
         if (conn == null)
-            throw new ServerException("[SERVER] connection " + connectionCode + " not found");
+            throw new ServerException("[SERVER] Connection " + connectionCode + " not found");
 
         try {
-            conn.send(data, completion);
+            conn.sendObject(data);
         } catch (ServerException e) {
             this.closeConnection(connectionCode);
             throw e;
@@ -136,17 +139,17 @@ public class Server extends Thread {
      * @return the received object
      * @throws ServerException if the connection doesn't exist or there's an error receiving the data
      */
-    public Object receive(String connectionCode) throws ServerException {
+    public Object receiveObject(String connectionCode) throws ServerException {
         ClientHandler conn;
         synchronized (this.connections) {
             conn = this.connections.get(connectionCode);
         }
 
         if (conn == null)
-            throw new ServerException("[SERVER] connection " + connectionCode + " not found");
+            throw new ServerException("[SERVER] Connection " + connectionCode + " not found");
 
         try {
-            return conn.read();
+            return conn.readObject();
         } catch (ServerException e) {
             this.closeConnection(connectionCode);
             throw e;
@@ -167,7 +170,7 @@ public class Server extends Thread {
         }
 
         try {
-            listenSocket.close();
+            serverSocket.close();
         } catch (IOException e) {
             throw new RuntimeException("[SERVER] Error while closing server");
         }
