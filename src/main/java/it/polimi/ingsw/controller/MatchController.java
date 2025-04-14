@@ -13,7 +13,7 @@ import java.util.*;
  * and relative games that are running {@link GameController}<br>
  * Allowing players to create, join, reconnect, leave and delete games
  */
-public class MatchController implements MatchControllerInterface {
+public class MatchController {
 
     /**
      * Singleton Pattern, instance of the class
@@ -25,6 +25,7 @@ public class MatchController implements MatchControllerInterface {
      * For implementing AF: "multiple games"
      */
     private final Map<String, Lobby> lobbies;
+
 
     /**
      * Init an empty List of GameController
@@ -46,19 +47,32 @@ public class MatchController implements MatchControllerInterface {
         return instance;
     }
 
+
     /**
      * It creates a new lobby, and then if {@link LobbyState} is READY ==> init a {@link GameController}
      *
      * @param username   player's username
-     * @param maxPlayers max allowed players
-     * @param name       lobby's name
+     * @param maxPlayers max number of allowed players
+     * @param lobbyName  lobby's name
      */
-    public synchronized void createNewGame(String username, int maxPlayers, String name) throws PlayerAlreadyInException {
-        if (maxPlayers <= 0 || maxPlayers > 4) throw new IllegalArgumentException("maxPlayers must be between 1 and 4");
+    public synchronized void createNewGame(String username, int maxPlayers, String lobbyName) throws PlayerAlreadyInException {
+        if (maxPlayers < 2 || maxPlayers > 4)
+            throw new IllegalArgumentException("Max number of allowed players must be between 2 and 4");
+
+        // checks if the player who is creating the lobby is already in another one
+        if (
+                lobbies.values().stream()
+                        .anyMatch(l -> l.getPlayers().contains(username))
+        ) throw new PlayerAlreadyInException("[createLobby] Player is already in a lobby!");
+
         String gameID = UUID.randomUUID().toString();
-        Lobby lobby = new Lobby(gameID, name, username, maxPlayers);
+        Lobby lobby = new Lobby(gameID, lobbyName, username, maxPlayers);
         lobbies.put(gameID, lobby);
-        lobby.addPlayer(username); // Join in the newly created lobby
+
+        lobby.addPlayer(username);
+
+        // todo for test
+        System.out.println(gameID);
     }
 
     /**
@@ -67,12 +81,15 @@ public class MatchController implements MatchControllerInterface {
      * @param username player's username
      * @param gameID   game to join
      */
-    @Override
     public synchronized void joinGame(String username, String gameID) throws LobbyNotFoundException, PlayerAlreadyInException {
-        // TODO check se è già in un'altra lobby?
+        if (
+                lobbies.values().stream()
+                        .anyMatch(l -> l.getPlayers().contains(username))
+        ) throw new PlayerAlreadyInException("[joinGame] Player is already in a lobby!");
+
         Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
         Lobby lobby = lobbyOptional.filter(l -> l.getState() == LobbyState.WAITING)
-                .orElseThrow(() -> new LobbyNotFoundException("Lobby not found or not in WAITING state"));
+                .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
 
         lobby.addPlayer(username);
     }
@@ -82,7 +99,6 @@ public class MatchController implements MatchControllerInterface {
      *
      * @param username player's username
      */
-    @Override
     public synchronized void joinRandomGame(String username) throws LobbyNotFoundException, PlayerAlreadyInException {
         List<Lobby> availableLobbies = this.lobbies.values().stream()
                 .filter(l -> l.getState() == LobbyState.WAITING)
@@ -98,7 +114,6 @@ public class MatchController implements MatchControllerInterface {
      *
      * @param username player's username
      */
-    @Override
     public synchronized void leaveGame(String username) throws LobbyNotFoundException {
         Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
                 .filter(e -> e.getValue().hasPlayer(username))
@@ -131,7 +146,6 @@ public class MatchController implements MatchControllerInterface {
      * @param username player's username
      * @param gameID   id of lobby/game
      */
-    @Override
     public void reconnectToGame(String username, int gameID) {
         // todo
     }

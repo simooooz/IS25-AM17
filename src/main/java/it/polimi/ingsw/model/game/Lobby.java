@@ -3,7 +3,7 @@ package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
-import it.polimi.ingsw.network.socket.server.User;
+import it.polimi.ingsw.network.socket.server.RefToUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +68,10 @@ public class Lobby {
         return uuid;
     }
 
+    public List<String> getPlayers() {
+        return players;
+    }
+
     /**
      * Check whether there are conditions to eliminate the lobby
      */
@@ -82,9 +86,11 @@ public class Lobby {
      * @param username player's username
      */
     public void addPlayer(String username) throws PlayerAlreadyInException {
-        if (hasPlayer(username)) throw new PlayerAlreadyInException("Player's already in");
+//        if (this.players.contains(username)) throw new PlayerAlreadyInException("Player's already in");
 
         players.add(username);
+        System.out.println("Player " + username + " joined!");
+        System.out.println(players.size());
         if (players.size() == maxPlayers)
             this.initGame();
     }
@@ -119,7 +125,7 @@ public class Lobby {
 
         try {
             for (String username : players) // Set GameController for each user
-                User.getUser(username).setGameController(game);
+                RefToUser.getUser(username).setGameController(game);
         } catch (UserNotFoundException e) {
             this.state = LobbyState.WAITING;
             throw new RuntimeException("Error initializing game");
@@ -128,6 +134,7 @@ public class Lobby {
         this.game.startMatch();
     }
 
+    // TODO
     public void endGame() {
         // todo
     }
