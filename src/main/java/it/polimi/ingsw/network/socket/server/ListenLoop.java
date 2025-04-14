@@ -6,29 +6,34 @@ import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.socket.Heartbeat;
 import it.polimi.ingsw.network.socket.Sense;
 
+import java.util.concurrent.CompletableFuture;
+
 public class ListenLoop extends Thread {
 
-    private final String code;
-    private final User user;
+    private final String connectionCode;
+    private final RefToUser user;
 
-    public ListenLoop(String connectionCode, User user) {
-        this.code = connectionCode;
+    public ListenLoop(String connectionCode, RefToUser user) {
+        this.connectionCode = connectionCode;
         this.user = user;
+        this.start();
     }
 
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            try {
-                Object read = Server.getInstance().receiveObject(this.code);
 
-                if (!(read instanceof Heartbeat)) { // Input from client is a message
+            try {
+                Object read = Server.getInstance().receive(this.connectionCode);
+
+                if (!(read instanceof Heartbeat)) {
+                    // then input is a message
                     Message message = (Message) read;
                     System.out.println("[SERVER LISTEN LOOP] Received message: " + message.getMessageType());
                     user.receive(message);
-                }
-                else // Input from client is a heartbeat
-                    Sense.sendSense(this.code);
+                } else
+                    // then input is an heartbeat
+                    Sense.sendSense(this.connectionCode);
 
                 // TODO delayer?
 
@@ -36,10 +41,10 @@ public class ListenLoop extends Thread {
                 // Connection is already closed by Server
                 // This Thread will be interrupted by ClientConnection
             } catch (ClassCastException e) {
-                this.user.send(new ErrorMessage());
+                this.user.send(new ErrorMessage(), new CompletableFuture<>());
             }
+
         }
     }
-
 
 }

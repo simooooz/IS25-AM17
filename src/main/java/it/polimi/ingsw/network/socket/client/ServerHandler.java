@@ -2,31 +2,42 @@ package it.polimi.ingsw.network.socket.client;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.exceptions.ClientException;
-import it.polimi.ingsw.network.messages.Message;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class ClientSocket {
+/**
+ * Manages (client point of view) the connection between a client and the server via socket.
+ * It encapsulates two-way communication of serialized objects,
+ * connection monitoring via heartbeat, and asynchronous listening for incoming messages from the client.
+ */
+public class ServerHandler {
 
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
-    private final UserOfClient user;
+
+    private final User user;
 
     private HeartbeatThread heartbeatThread;
-    private ListenLoopOfClient listenLoop;
+    private ListenLoop listenLoop;
 
-    public ClientSocket(String host, int port) {
+    /**
+     * Constructor
+     *
+     * @param host
+     * @param port
+     */
+    public ServerHandler(String host, int port) {
         this.connect(host, port);
-        this.user = new UserOfClient(this);
+        this.user = new User(this);
 
         heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
 
-        listenLoop = new ListenLoopOfClient(this, user);
+        listenLoop = new ListenLoop(this, user);
         listenLoop.start();
     }
 
@@ -58,52 +69,52 @@ public class ClientSocket {
 
         try {
             this.input.close();
-        } catch (IOException _) {}
-        finally {
+        } catch (IOException _) {
+        } finally {
             this.input = null;
         }
 
         try {
             this.output.close();
-        } catch (IOException _) {}
-        finally {
+        } catch (IOException _) {
+        } finally {
             this.output = null;
         }
 
         try {
             this.socket.close();
-        } catch (IOException _) {}
-        finally {
+        } catch (IOException _) {
+        } finally {
             this.socket = null;
         }
 
         System.out.println("\nClosing connection...");
-        // System.exit(-1);
+        System.exit(0);
     }
 
-    public Object readObject() throws ClientException {
+    public Object read() throws ClientException {
         try {
             Object obj = this.input.readObject();
             if (obj == null)
                 throw new ClientException();
             return obj;
         } catch (IOException | ClassNotFoundException | ClientException e) {
-            this.close();
+//            this.close();
             throw new ClientException("[CLIENT SOCKET] Object is null or could not be read");
         }
     }
 
-    public void sendObject(Object data) throws ClientException {
+    public void send(Object data) throws ClientException {
         try {
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {
-            this.close();
+//            this.close();
             throw new ClientException("[CLIENT SOCKET] Error while writing object");
         }
     }
 
-    public UserOfClient getUser() {
+    public User getUser() {
         return user;
     }
 }

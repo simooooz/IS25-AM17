@@ -8,16 +8,20 @@ import it.polimi.ingsw.network.messages.Message;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-public class User {
+/**
+ * Server's point of view of the client. This class handles connected users
+ */
+public class RefToUser {
 
-    private final static List<User> users = new ArrayList<>();
+    private final static List<RefToUser> users = new ArrayList<>();
 
     private final String connectionCode;
     private String username;
     private GameController gameController;
 
-    public User(String connectionCode) {
+    public RefToUser(String connectionCode) {
         this.connectionCode = connectionCode;
         this.username = null;
         this.gameController = null;
@@ -25,12 +29,11 @@ public class User {
         synchronized (users) {
             users.add(this);
         }
-
     }
 
-    public void send(Message message) {
+    public void send(Message message, CompletableFuture<Void> completion) {
         try {
-            Server.getInstance().sendObject(connectionCode, message);
+            Server.getInstance().send(connectionCode, message, completion);
         } catch (ServerException e) {
             System.err.println("[USER] Error while sending message: " + e.getMessage());
             // Everything should be closed
@@ -38,12 +41,7 @@ public class User {
     }
 
     public void receive(Message message) {
-        try {
-            message.execute(this);
-        } catch (RuntimeException e) {
-            System.err.println("[USER] Receive method has caught a RuntimeException: " + e.getMessage());
-            this.send(new ErrorMessage());
-        }
+        message.execute(this);
     }
 
     public GameController getGameController() {
@@ -67,15 +65,15 @@ public class User {
         }
     }
 
-    public static User getUser(String username) throws UserNotFoundException {
-        List <User> temp;
+    public static RefToUser getUser(String username) throws UserNotFoundException {
+        List<RefToUser> temp;
         synchronized (users) {
             temp = new ArrayList<>(users);
         }
         return temp.stream()
-            .filter(user -> user.getUsername().equals(username))
-            .findFirst()
-            .orElseThrow(UserNotFoundException::new);
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst()
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public static boolean isUsernameTaken(String username) {
@@ -84,4 +82,8 @@ public class User {
         }
     }
 
+    // todo è sicuro/devo fare una get del connectionCode?
+    public String getConnectionCode() {
+        return connectionCode;
+    }
 }

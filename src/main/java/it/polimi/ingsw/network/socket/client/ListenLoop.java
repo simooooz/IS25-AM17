@@ -5,12 +5,12 @@ import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.socket.Sense;
 
-public class ListenLoopOfClient extends Thread {
+public class ListenLoop extends Thread {
 
-    private final ClientSocket clientSocket;
-    private final UserOfClient user;
+    private final ServerHandler clientSocket;
+    private final User user;
 
-    public ListenLoopOfClient(ClientSocket clientSocket, UserOfClient user) {
+    public ListenLoop(ServerHandler clientSocket, User user) {
         this.clientSocket = clientSocket;
         this.user = user;
     }
@@ -19,7 +19,7 @@ public class ListenLoopOfClient extends Thread {
     public void run() {
         while (!Thread.interrupted()) {
             try {
-                Object read = this.clientSocket.readObject();
+                Object read = this.clientSocket.read();
 
                 if (!(read instanceof Sense)) {
                     Message message = (Message) read;
