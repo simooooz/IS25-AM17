@@ -29,17 +29,16 @@ Alongside the core gameplay mechanics, the project also integrates several of th
 | Feature                     | Status |
 |-----------------------------|--------|
 | Base game rules             | ✅      |
-| Full ruleset                | ⬜      |
-| Socket-based networking     | ⬜      |
-| RMI networking              | ⬜      |
-| CLI                         | ⬜      |
-| GUI                         | ⬜      |
-| Support for multiple games  | ⬜      |
-| Game state persistence (*)  | ⬜      |
-| Resilience & recovery       | ⬜      |
-| In-game chat                | ⬜      |
+| Full ruleset                | ✅      |
+| Socket-based networking     | 🟠      |
+| RMI networking              | 🟠      |
+| CLI                         | 🟠      |
+| GUI                         | ❌      |
+| Support for multiple games  | 🟠      |
+| Learning flight             | ❌      |
+| Resilience & recovery       | ❌      |
 
-> (*) Persistence refers to the ability to save and restore game sessions.
+> (*) Advanced Function
 
 ---
 
