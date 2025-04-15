@@ -66,7 +66,8 @@ public class PlanetCard extends Card{
             for (PlayerData player : board.getPlayersByPos().reversed())
                 if (landedPlayers.containsKey(player))
                     board.movePlayer(player, days * -1);
-            endCard(board);
+            if (!model.isLearnerMode())
+                endCard(board);
             return true;
         }
         return false;

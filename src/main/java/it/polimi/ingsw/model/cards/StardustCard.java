@@ -17,7 +17,8 @@ public class StardustCard extends Card {
             board.movePlayer(player, -1 * ship.countExposedConnectors());
         });
 
-        endCard(board);
+        if (!model.isLearnerMode())
+            endCard(board);
         return true;
     }
 

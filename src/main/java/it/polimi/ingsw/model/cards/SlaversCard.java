@@ -1,10 +1,8 @@
 package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.model.ModelFacade;
-import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.components.CannonComponent;
-import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.properties.DirectionType;
@@ -80,7 +78,8 @@ public class SlaversCard extends Card {
                 hasDone = false;
 
         if (hasDone) {
-            endCard(board);
+            if (!model.isLearnerMode())
+                endCard(board);
             return true;
         }
         return false;

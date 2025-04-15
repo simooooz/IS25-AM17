@@ -60,7 +60,8 @@ public class OpenSpaceCard extends Card {
             for (PlayerData player : board.getPlayersByPos())
                 board.movePlayer(player, enginesActivated.get(player));
 
-            endCard(board);
+            if (!model.isLearnerMode())
+                endCard(board);
             return true;
         }
         return false;

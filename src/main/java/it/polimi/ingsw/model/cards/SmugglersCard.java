@@ -83,7 +83,8 @@ public class SmugglersCard extends Card {
                 hasDone = false;
 
         if (hasDone) {
-            endCard(board);
+            if (!model.isLearnerMode())
+                endCard(board);
             return true;
         }
         return false;

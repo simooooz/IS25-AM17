@@ -3,11 +3,9 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
-import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +20,7 @@ public class GameController {
      * {@link ModelFacade} ref: exposed methods for interacting with the model
      */
     private final ModelFacade model;
+    private final boolean learnerMode;
 
     /**
      * Constructor
@@ -30,6 +29,7 @@ public class GameController {
      */
     public GameController(List<String> usernames, boolean learnerMode) {
         this.model = new ModelFacade(usernames, learnerMode);
+        this.learnerMode = learnerMode;
     }
 
     public void startMatch() {
@@ -67,6 +67,7 @@ public class GameController {
     public void insertComponent(String username, int componentId, int row, int col) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
 
         model.insertComponent(username, componentId, row, col);
     }
@@ -95,6 +96,7 @@ public class GameController {
 
     public void moveHourglass(String username) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
         model.moveHourglass(username);
     }
 
@@ -164,6 +166,7 @@ public class GameController {
     }
 
     public void endFlight(String username) {;
+        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
         model.endFlight(username);
     }
 

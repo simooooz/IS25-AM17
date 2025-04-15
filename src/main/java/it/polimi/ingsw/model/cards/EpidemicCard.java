@@ -45,7 +45,8 @@ public class EpidemicCard extends Card {
 
         }
 
-        endCard(board);
+        if (!model.isLearnerMode())
+            endCard(board);
         return true;
     }
 

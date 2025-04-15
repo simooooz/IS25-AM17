@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class CardFactory {
@@ -31,7 +32,7 @@ public class CardFactory {
     private final List<Card> cards;
 
 
-    public CardFactory() {
+    public CardFactory(boolean learnerMode) {
         // Costruttore che genera il mazzo dalle carte nel JSON
         this.cards = new ArrayList<>();
         List<Card> level1Cards = new ArrayList<>();
@@ -50,14 +51,17 @@ public class CardFactory {
         }
         Collections.shuffle(level1Cards);
         Collections.shuffle(level2Cards);
-
-        for (int i = 0; i < 12; i++){
-            if ((i+1) % 3 == 0)
-                cards.add(level1Cards.get(i));
-            else
-                cards.add(level2Cards.get(i));
+        if(!learnerMode) {
+            for (int i = 0; i < 12; i++) {
+                if ((i + 1) % 3 == 0)
+                    cards.add(level1Cards.get(i));
+                else
+                    cards.add(level2Cards.get(i));
+            }
         }
-
+        else {
+            cards.addAll(level1Cards.stream().filter(Card::getIsLearner).toList());
+        }
     }
 
     // Metodo per ottenere la lista di carte

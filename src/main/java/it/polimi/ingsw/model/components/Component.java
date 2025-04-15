@@ -64,7 +64,9 @@ public class Component {
         return areConnectorsCompatible(conn1, conn2) && conn1 != ConnectorType.EMPTY && conn2 != ConnectorType.EMPTY;
     }
 
-    public static boolean validPositions(int row, int col) {
+    public static boolean validPositions(int row, int col, boolean learnerMode) {
+        if (learnerMode)
+            return !((col < 1 || col > 5) || (row < 0 || row > 5) || (row == 0 && col == 1) || (row == 0 && col == 2) || (row == 0 && col == 4) || (row == 0 && col == 5) || (row == 1 && col == 1) || (row == 1 && col == 5) || (row == 4 && col == 3));
         return !((col < 0 || col > 6) || (row < 0 || row > 5) || (row == 0 && col == 0) || (row == 0 && col == 1) || (row == 0 && col == 3) || (row == 0 && col == 5) || (row == 0 && col == 6) || (row == 1 && col == 0) || (row == 1 && col == 6) || (row == 4 && col == 3));
     }
 
@@ -128,8 +130,8 @@ public class Component {
         ship.getReserves().add(this);
     }
 
-    public void insertComponent(Ship ship, int row, int col) {
-        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
+    public void insertComponent(Ship ship, int row, int col, boolean learnerMode) {
+        if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
         else if (!shown) throw new ComponentNotValidException("Hidden tile");
 
@@ -153,11 +155,11 @@ public class Component {
         inserted = true;
     }
 
-    public void moveComponent(Ship ship, int row, int col) {
+    public void moveComponent(Ship ship, int row, int col, boolean learnerMode) {
         if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
             throw new ComponentNotValidException("Tile not valid");
         if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
-        if (!Component.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
+        if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
 
         ship.getDashboard()[y][x] = Optional.empty();
