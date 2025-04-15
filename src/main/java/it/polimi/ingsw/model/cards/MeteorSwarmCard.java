@@ -8,9 +8,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.properties.DirectionType;
 
-import java.io.Console;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class MeteorSwarmCard extends Card{
@@ -44,7 +42,8 @@ public class MeteorSwarmCard extends Card{
         if (hasDone) {
             meteorIndex++;
             if (meteorIndex >= meteors.size()) {
-                endCard(board);
+                if (!model.isLearnerMode())
+                    endCard(board);
                 return true;
             }
             else {

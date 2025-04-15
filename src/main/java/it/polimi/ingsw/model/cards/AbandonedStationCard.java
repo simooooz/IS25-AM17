@@ -8,7 +8,6 @@ import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class AbandonedStationCard extends Card{
 
@@ -57,7 +56,8 @@ public class AbandonedStationCard extends Card{
                 hasDone = false;
 
         if (hasDone) {
-            endCard(board);
+            if (!model.isLearnerMode())
+                endCard(board);
             return true;
         }
 

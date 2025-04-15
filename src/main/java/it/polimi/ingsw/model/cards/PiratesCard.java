@@ -93,12 +93,14 @@ public class PiratesCard extends Card{
                 hasDone = false;
 
         if (hasDone && defeatedPlayers.isEmpty()) {
-            endCard(board);
+            if (!model.isLearnerMode())
+                endCard(board);
             return true;
         }
         else if (hasDone) {
             if (cannonIndex >= cannonFires.size()) {
-                endCard(board);
+                if (!model.isLearnerMode())
+                    endCard(board);
                 return true;
             }
             else {

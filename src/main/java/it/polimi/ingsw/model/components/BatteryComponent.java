@@ -30,8 +30,8 @@ public class BatteryComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col) {
-        super.insertComponent(ship, row, col);
+    public void insertComponent(Ship ship, int row, int col, boolean learnerMode) {
+        super.insertComponent(ship, row, col, learnerMode);
         if (isTriple) { ship.setBatteries(ship.getBatteries() + 3); }
         else { ship.setBatteries(ship.getBatteries() + 2); }
     }

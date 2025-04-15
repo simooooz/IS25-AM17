@@ -30,7 +30,7 @@ public class Board {
     private final Map<Integer, Component> mapIdComponents;
     private final Map<ColorType, Integer> availableGoods;
 
-    public Board(List<String> usernames) {
+    public Board(List<String> usernames, boolean learnerMode) {
         this.startingDeck = new ArrayList<>();
         for (String username : usernames)
             this.startingDeck.add(new PlayerData(username));
@@ -40,10 +40,14 @@ public class Board {
         ComponentFactory componentFactory = new ComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
         this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
-        this.cardPile = new ArrayList<>(new CardFactory().getCards());
+        this.cardPile = new ArrayList<>(new CardFactory(learnerMode).getCards());
         this.cardPilePos = 0;
-        this.timeManagement = new Time();
         this.availableGoods = new HashMap<>();
+
+        if (!learnerMode)
+            this.timeManagement = new Time();
+        else
+            timeManagement = null;
     }
 
     public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
@@ -99,8 +103,10 @@ public class Board {
         return availableGoods;
     }
 
-    public void shuffleCards() {
-        Collections.shuffle(cardPile);
+    public void shuffleCards(boolean learnerMode) {
+        do {
+            Collections.shuffle(cardPile);
+        } while (cardPile.getFirst().getLevel() == 2 && !learnerMode);
     }
 
     public void pickNewCard(ModelFacade model) {

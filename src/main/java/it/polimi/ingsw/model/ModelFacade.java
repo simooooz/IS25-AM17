@@ -5,7 +5,6 @@ import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
-import it.polimi.ingsw.controller.exceptions.NoEnoughPlayerException;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -19,10 +18,12 @@ public class ModelFacade {
     private final Board board;
     private final List<String> usernames;
     private final Map<String, PlayerState> playersState;
+    private final boolean learnerMode;
 
     public ModelFacade(List<String> usernames, boolean learnerMode) {
         this.usernames = usernames;
-        this.board = new Board(usernames);
+        this.learnerMode = learnerMode;
+        this.board = new Board(usernames, learnerMode);
         this.playersState = new HashMap<>();
     }
 
@@ -38,7 +39,8 @@ public class ModelFacade {
         for (String username : usernames)
             playersState.put(username, PlayerState.BUILD);
 
-        board.getTimeManagement().startTimer(this);
+        if (!learnerMode)
+            board.getTimeManagement().startTimer(this);
     }
 
     public void showComponent(int componentId) {
@@ -62,12 +64,12 @@ public class ModelFacade {
 
     public void insertComponent(String username,  int componentId, int row, int col) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).insertComponent(ship, row, col);
+        board.getMapIdComponents().get(componentId).insertComponent(ship, row, col, learnerMode);
     }
 
     public void moveComponent(String username, int componentId, int row, int col) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).moveComponent(ship, row, col);
+        board.getMapIdComponents().get(componentId).moveComponent(ship, row, col, learnerMode);
     }
 
     public void rotateComponent(String username, int componentId, int num) {
@@ -125,15 +127,27 @@ public class ModelFacade {
 
     public void moveStateAfterBuilding() {
         for (PlayerData player : board.getPlayersByPos())
-            if (!player.getShip().checkShip())
+            if (!player.getShip().checkShip()) {
                 playersState.put(player.getUsername(), PlayerState.CHECK);
+                board.moveToStartingDeck(player);
+            }
             else
                 playersState.put(player.getUsername(), PlayerState.WAIT);
 
-        board.shuffleCards();
+        for (PlayerData player : board.getPlayersByPos())
+            if (board.getPlayersByPos().get(0).equals(player))
+                board.movePlayer(player, 6 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+            else if (board.getPlayersByPos().get(1).equals(player))
+                board.movePlayer(player, 3 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+            else if (board.getPlayersByPos().get(2).equals(player))
+                board.movePlayer(player, 1 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
 
-        if (areShipsReady())
+        board.shuffleCards(learnerMode);
+
+        if (areShipsReady() && !learnerMode)
             manageChooseAlienPhase(0);
+        else if (areShipsReady())
+            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
     }
 
     public void checkShip(String username, List<Integer> toRemove) {
@@ -142,11 +156,14 @@ public class ModelFacade {
         for (int componentId : toRemove)
             board.getMapIdComponents().get(componentId).affectDestroy(ship);
 
-        if (ship.checkShip()) // If now ship is ready
+        if (ship.checkShip()) {// If now ship is ready
             playersState.put(username, PlayerState.WAIT);
-
-        if (areShipsReady())
+            board.moveToBoard(board.getPlayerEntityByUsername(username));
+        }
+        if (areShipsReady() && !learnerMode)
             manageChooseAlienPhase(0);
+        else if (areShipsReady())
+            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
     }
 
     private boolean areShipsReady() {
@@ -297,6 +314,10 @@ public class ModelFacade {
         if (isDrawPhase) {
             board.moveToStartingDeck(player);
         }
+    }
+
+    public boolean isLearnerMode() {
+        return learnerMode;
     }
 
     /**

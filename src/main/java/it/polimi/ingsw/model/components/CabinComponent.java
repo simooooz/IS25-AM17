@@ -74,8 +74,8 @@ public class CabinComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col) {
-        super.insertComponent(ship, row, col);
+    public void insertComponent(Ship ship, int row, int col, boolean learnerMode) {
+        super.insertComponent(ship, row, col, learnerMode);
         setHumans(2, ship);
     }
 
