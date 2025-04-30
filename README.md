@@ -1,6 +1,6 @@
 # IS25-AM17 – Galaxy Truckers
 
-**Software Engineering Project – Politecnico di Milano (2023–2024)**  
+**Software Engineering Project – Politecnico di Milano (2024–2025)**  
 **Team:** Davide Cutrupi • Tommaso D'Alessio • Simone De Carlo • Davide Di Tanna
 
 ---

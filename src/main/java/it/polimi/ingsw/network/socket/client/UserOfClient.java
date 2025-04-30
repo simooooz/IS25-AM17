@@ -5,11 +5,15 @@ import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserOfClient {
 
     private final ClientSocket clientSocket;
     private String username;
     private GameController gameController;
+    private final List<NetworkEventListener> listeners = new ArrayList<>();
 
     public UserOfClient(ClientSocket clientSocket) {
         this.clientSocket = clientSocket;
@@ -17,21 +21,42 @@ public class UserOfClient {
         this.gameController = null;
     }
 
+    public void addNetworkEventListener(NetworkEventListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeNetworkEventListener(NetworkEventListener listener) {
+        listeners.remove(listener);
+    }
+
     public void send(Message message) {
         try {
             this.clientSocket.sendObject(message);
         } catch (ClientException e) {
             System.err.println("[USER OF CLIENT] Error while sending message: " + e.getMessage());
-            // Everything should be closed
+            notifyListenersConnectionClosed(e.getMessage());
         }
     }
 
     public void receive(Message message) {
         try {
+            notifyListenersMessageReceived(message);
             message.execute(this);
         } catch (RuntimeException e) {
             System.err.println("[USER OF CLIENT] Receive method has caught a RuntimeException: " + e.getMessage());
             this.send(new ErrorMessage());
+        }
+    }
+
+    private void notifyListenersMessageReceived(Message message) {
+        for (NetworkEventListener listener : listeners) {
+            listener.onMessageReceived(message);
+        }
+    }
+
+    private void notifyListenersConnectionClosed(String reason) {
+        for (NetworkEventListener listener : listeners) {
+            listener.onConnectionClosed(reason);
         }
     }
 
@@ -51,9 +76,7 @@ public class UserOfClient {
         this.username = username;
     }
 
-    // todo è sicuro/devo fare una get della socket?
     public ClientSocket getSocket() {
         return this.clientSocket;
     }
-
 }
