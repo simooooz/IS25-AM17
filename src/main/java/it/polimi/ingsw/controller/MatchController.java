@@ -125,6 +125,12 @@ public class MatchController {
         }
     }
 
+    public synchronized Optional<Map.Entry<String, Lobby>> getLobbyByPlayer(String username) {
+        return lobbies.entrySet().stream()
+                .filter(e -> e.getValue().hasPlayer(username))
+                .findFirst();
+    }
+
     /**
      * Allows a player who was previously joined the game to reconnect
      *

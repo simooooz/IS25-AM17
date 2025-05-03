@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.messages.SingleArgMessage;
+import it.polimi.ingsw.network.messages.ZeroArgMessage;
 import it.polimi.ingsw.network.messages.lobby.CreateLobbyMessage;
 import it.polimi.ingsw.network.messages.lobby.JoinLobbyMessage;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
@@ -25,6 +26,7 @@ public class ViewTui implements NetworkEventListener {
     private boolean waitingForResponse;
 
     private Lobby lobby;
+    private boolean inWaitingRoom = false;
 
     /**
      * Constructs a new ViewTui with the given client socket.
@@ -54,7 +56,15 @@ public class ViewTui implements NetworkEventListener {
         } else if (type == MessageType.USERNAME_ALREADY_TAKEN) {
             System.out.println("Username already taken. Please try again.");
             currentState = UIState.USERNAME;
+        } else if (type == MessageType.START_GAME_OK) {
+            System.out.println("Starting game...");
+            currentState = UIState.IN_GAME;
+            inWaitingRoom = false;
+        } else if (type == MessageType.LEAVE_GAME_OK) {
+            currentState = UIState.LOBBY_SELECTION;
+            inWaitingRoom = false;
         }
+
 
         // Unblock waiting methods if needed
         if (waitingForResponse && responseLatch != null) {
@@ -235,6 +245,7 @@ public class ViewTui implements NetworkEventListener {
             currentState = UIState.LOBBY_SELECTION;
         }
     }
+
     /**
      * Handles the lobby selection state.
      */
@@ -266,11 +277,48 @@ public class ViewTui implements NetworkEventListener {
     }
 
     /**
+     * Handles the waiting room state, displaying a message while waiting for the game to start.
+     */
+    private void handleWaitingRoom() {
+        clear();
+        System.out.println("\n=== WAITING ROOM ===");
+        System.out.println("Waiting for the game to start...");
+        System.out.println("All players are getting ready!");
+        System.out.println("\nPress 'q' to quit waiting and return to lobby (or wait for the game to start):");
+
+        while (inWaitingRoom) {
+            try {
+                if (System.in.available() > 0) {
+                    String input = scanner.nextLine().trim();
+                    if (input.equalsIgnoreCase("q")) {
+                        inWaitingRoom = false;
+                        System.out.println("Returning to lobby menu...");
+                        return;
+                    }
+                }
+                Thread.sleep(200);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    /**
      * Handles the in-lobby state, waiting for all players to join and game to start.
      */
     private void handleInLobbyState() {
+        if (inWaitingRoom) {
+            handleWaitingRoom();
+            return;
+        }
+
+        clear();
         System.out.println("\n=== WAITING IN THE LOBBY ===");
-        System.out.println("Players");
+        System.out.println("Players:");
+
+        // TODO: richiedere e visualizzare la lista dei giocatori dal server
 
         System.out.println("\n1. Start the game");
         System.out.println("2. Quit the lobby");
@@ -280,12 +328,38 @@ public class ViewTui implements NetworkEventListener {
 
         switch (choice) {
             case "1":
-                System.out.println("Starting the game...");
-                currentState = UIState.IN_GAME;
+                System.out.println("Requesting to start the game...");
+
+                // Invia il messaggio al server per iniziare la partita
+                Message startGameMessage = new ZeroArgMessage(MessageType.START_GAME);
+                client.getUser().send(startGameMessage);
+
+                // Attendi la risposta dal server
+                if (waitForResponse(5000)) {
+                    if (lastReceivedMessage.getMessageType() == MessageType.START_GAME_OK) {
+                        System.out.println("Game is starting!");
+                        inWaitingRoom = true;
+                        // Lo stato verrà aggiornato automaticamente in onMessageReceived quando il gioco inizia effettivamente
+                    } else if (lastReceivedMessage.getMessageType() == MessageType.START_GAME_NOT_ENOUGH_PLAYERS) {
+                        System.out.println("Not enough players to start the game.");
+                        // Entra nella waiting room
+                        inWaitingRoom = true;
+                    }
+                } else {
+                    System.out.println("Server did not respond. Please try again.");
+                }
                 break;
             case "2":
                 System.out.println("Quitting the lobby...");
-                currentState = UIState.LOBBY_SELECTION;
+                // Implementa l'invio del messaggio per uscire dalla lobby
+                Message leaveLobbyMessage = new ZeroArgMessage(MessageType.LEAVE_GAME);
+                client.getUser().send(leaveLobbyMessage);
+
+                if (waitForResponse(5000) && lastReceivedMessage.getMessageType() == MessageType.LEAVE_GAME_OK) {
+                    currentState = UIState.LOBBY_SELECTION;
+                } else {
+                    System.out.println("Error leaving the lobby. Please try again.");
+                }
                 break;
             default:
                 System.out.println("Option not valid. Please try again.");

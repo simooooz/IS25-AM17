@@ -123,7 +123,7 @@ public class Lobby {
     /**
      * Init the {@link GameController} associated with the lobby
      */
-    private void initGame() {
+    public void initGame() {
         this.state = LobbyState.IN_GAME;
         this.game = new GameController(players, learnerMode);
 

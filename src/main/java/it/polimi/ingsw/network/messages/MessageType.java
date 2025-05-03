@@ -1,10 +1,15 @@
 package it.polimi.ingsw.network.messages;
 
+import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 import it.polimi.ingsw.network.socket.client.UserOfClient;
 import it.polimi.ingsw.network.socket.server.User;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings("unchecked")
 public enum MessageType {
@@ -36,6 +41,47 @@ public enum MessageType {
     JOIN_RANDOM_LOBBY_OK,
     JOIN_LOBBY,
     JOIN_LOBBY_OK,
+    START_GAME {
+        @Override
+        public void execute(Message message, User user) {
+            // Ottieni la lobby del giocatore
+            try {
+                Optional<Map.Entry<String, Lobby>> lobbyEntry = MatchController.getInstance().getLobbyByPlayer(user.getUsername());
+                if (lobbyEntry.isEmpty()) {
+                    user.send(new ZeroArgMessage(MessageType.START_GAME_ERROR));
+                    return;
+                }
+
+                Lobby lobby = lobbyEntry.get().getValue();
+
+                // Verifica se ci sono abbastanza giocatori
+                if (lobby.getPlayers().size() < Lobby.MIN_PLAYERS) {
+                    user.send(new ZeroArgMessage(MessageType.START_GAME_NOT_ENOUGH_PLAYERS));
+                    return;
+                }
+
+                // Avvia la partita
+                lobby.initGame();
+
+                // Invia conferma a tutti i giocatori
+                for (String player : lobby.getPlayers()) {
+                    try {
+                        User playerUser = User.getUser(player);
+                        playerUser.send(new ZeroArgMessage(MessageType.START_GAME_OK));
+                    } catch (UserNotFoundException e) {
+                        System.err.println("[START_GAME] User not found: " + player);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("[START_GAME] Error: " + e.getMessage());
+                user.send(new ZeroArgMessage(MessageType.START_GAME_ERROR));
+            }
+        }
+    },
+    START_GAME_OK,
+    START_GAME_ERROR,
+    START_GAME_NOT_ENOUGH_PLAYERS,
+
     LEAVE_GAME,
     LEAVE_GAME_OK,
 
