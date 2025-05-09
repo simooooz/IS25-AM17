@@ -55,13 +55,16 @@ public class MatchController {
      * @param maxPlayers max number of allowed players
      * @param name       lobby's name
      */
-    public synchronized void createNewGame(String username, int maxPlayers, String name, boolean learnerMode) throws PlayerAlreadyInException {
+    public synchronized Lobby createNewGame(String username, int maxPlayers, String name, boolean learnerMode) throws PlayerAlreadyInException {
         if (maxPlayers < 2 || maxPlayers > 4) throw new IllegalArgumentException("Max number of allowed players must be between 2 and 4");
+
         String gameID = UUID.randomUUID().toString();
         Lobby lobby = new Lobby(gameID, name, username, maxPlayers, learnerMode);
         lobbies.put(gameID, lobby);
-        System.out.println(gameID + " created");
-        lobby.addPlayer(username); // Join in the newly created lobby
+
+        // adding master
+        lobby.addPlayer(username);
+        return lobby;
     }
 
     /**
@@ -70,13 +73,14 @@ public class MatchController {
      * @param username player's username
      * @param gameID   game to join
      */
-    public synchronized void joinGame(String username, String gameID) throws LobbyNotFoundException, PlayerAlreadyInException {
+    public synchronized Lobby joinGame(String username, String gameID) throws LobbyNotFoundException, PlayerAlreadyInException {
         // TODO check se è già in un'altra lobby?
         Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
         Lobby lobby = lobbyOptional.filter(l -> l.getState() == LobbyState.WAITING)
                 .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
 
         lobby.addPlayer(username);
+        return lobby;
     }
 
     /**
@@ -101,7 +105,7 @@ public class MatchController {
      */
     public synchronized void leaveGame(String username) throws LobbyNotFoundException {
         Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
-                .filter(e -> e.getValue().hasPlayer(username))
+                .filter(e -> e.getValue().getPlayers().contains(username))
                 .findFirst();
         if (lobbyEntry.isEmpty()) throw new LobbyNotFoundException("Lobby not found");
 
@@ -127,7 +131,7 @@ public class MatchController {
 
     public synchronized Optional<Map.Entry<String, Lobby>> getLobbyByPlayer(String username) {
         return lobbies.entrySet().stream()
-                .filter(e -> e.getValue().hasPlayer(username))
+                .filter(e -> e.getValue().getPlayers().contains(username))
                 .findFirst();
     }
 

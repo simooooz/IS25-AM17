@@ -5,11 +5,13 @@ import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 import it.polimi.ingsw.network.socket.server.User;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Lobby {
+public class Lobby implements Serializable {
 
     /**
      * {@link GameController} reference, null if game not started
@@ -40,7 +42,7 @@ public class Lobby {
     /**
      * max num of players master wants to be accepted
      */
-    private int maxPlayers ;
+    private final int maxPlayers;
     /**
      * players in the lobby
      */
@@ -49,17 +51,17 @@ public class Lobby {
     /**
      * Constructor
      *
-     * @param gameID     lobby's ID
-     * @param name       lobby's name
-     * @param username   player's username
-     * @param maxPlayers max players allowed in lobby
+     * @param gameID      lobby's ID
+     * @param name        lobby's name
+     * @param master      master's username
+     * @param maxPlayers  max players allowed in a lobby
      * @param learnerMode true if is a test flight
      */
-    public Lobby(String gameID, String name, String username, int maxPlayers, boolean learnerMode) {
+    public Lobby(String gameID, String name, String master, int maxPlayers, boolean learnerMode) {
         this.state = LobbyState.WAITING;
         this.uuid = gameID;
         this.name = name;
-        this.master = username;
+        this.master = master;
         this.learnerMode = learnerMode;
 
         this.maxPlayers = maxPlayers;
@@ -74,9 +76,6 @@ public class Lobby {
         return uuid;
     }
 
-    public List<String> getPlayers() {
-        return players;
-    }
 
     /**
      * Check whether there are conditions to eliminate the lobby
@@ -87,24 +86,22 @@ public class Lobby {
         return (state == LobbyState.IN_GAME) && (players.size() < MIN_PLAYERS);
     }
 
+
+    public List<String> getPlayers() {
+        return new ArrayList<>(players);    // safe copy of the list (read-only)
+    }
+
     /**
      * Adds a player and if the lobby is full initializes an instance of {@link GameController}
+     *
      * @param username player's username
      */
     public void addPlayer(String username) throws PlayerAlreadyInException {
-        if (hasPlayer(username)) throw new PlayerAlreadyInException("Player's already in");
+        if (players.contains(username)) throw new PlayerAlreadyInException("Player's already in");
 
         players.add(username);
         if (players.size() == maxPlayers)
             this.initGame();
-    }
-
-    /**
-     * Checks if the player is in the lobby
-     * @param username player's username
-     */
-    public boolean hasPlayer(String username) {
-        return players.contains(username);
     }
 
     /**
@@ -119,6 +116,7 @@ public class Lobby {
 
         if (this.state == LobbyState.IN_GAME) this.game.playerLeft(username);
     }
+
 
     /**
      * Init the {@link GameController} associated with the lobby
