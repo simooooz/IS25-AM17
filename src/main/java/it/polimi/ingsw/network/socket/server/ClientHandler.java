@@ -37,6 +37,11 @@ public class ClientHandler {
         this.listenLoop = new ListenLoop(connectionCode, user);
     }
 
+    // todo: is necessary or can be here?
+    public User getUser() {
+        return user;
+    }
+
     public void sendObject(Object data) throws ServerException {
         try {
             this.output.writeObject(data);

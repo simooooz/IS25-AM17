@@ -1,12 +1,16 @@
 package it.polimi.ingsw.network.messages;
 
 import it.polimi.ingsw.controller.MatchController;
+import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
+import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.client.UserOfClient;
 import it.polimi.ingsw.network.socket.server.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,8 +18,15 @@ import java.util.Optional;
 @SuppressWarnings("unchecked")
 public enum MessageType {
 
-    // network
     ERROR,
+    DISCONNECT {
+        @Override
+        public void execute(Message message, User user) {
+            user.send(new ZeroArgMessage(DISCONNECT_OK));
+            user.deleteUser();
+        }
+    },
+    DISCONNECT_OK,
 
     SET_USERNAME {
         @Override
@@ -35,6 +46,7 @@ public enum MessageType {
     USERNAME_OK,
     USERNAME_ALREADY_TAKEN,
 
+    LOBBY_UPDATE_OK,
     CREATE_LOBBY,
     CREATE_LOBBY_OK,
     JOIN_RANDOM_LOBBY,
@@ -82,7 +94,17 @@ public enum MessageType {
     START_GAME_ERROR,
     START_GAME_NOT_ENOUGH_PLAYERS,
 
-    LEAVE_GAME,
+    LEAVE_GAME {
+        @Override
+        public void execute(Message message, User user) {
+            try {
+                MatchController.getInstance().leaveGame(user.getUsername());
+                user.send(new ZeroArgMessage(MessageType.LEAVE_GAME_OK));
+            } catch (LobbyNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    },
     LEAVE_GAME_OK,
 
     SHOW_COMPONENT {
@@ -193,7 +215,7 @@ public enum MessageType {
 
     CHECK_SHIP {
         @Override
-        public void execute(Message message, UserOfClient client) {
+        public void execute(Message message, User client) {
             SingleArgMessage<List<Integer>> castedMessage = (SingleArgMessage<List<Integer>>) message;
             client.getGameController().checkShip(client.getUsername(), castedMessage.getArg1());
         }

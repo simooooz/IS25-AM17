@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network.socket.server;
 
 import it.polimi.ingsw.controller.GameController;
+import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 import it.polimi.ingsw.network.messages.ErrorMessage;
@@ -16,9 +17,14 @@ import java.util.concurrent.CompletableFuture;
 public class User {
 
     private final static List<User> users = new ArrayList<>();
+    public List<User> getUsers() {
+        return users;
+    }
 
     private final String connectionCode;
+
     private String username;
+    private Lobby lobby;
     private GameController gameController;
 
     public User(String connectionCode) {
@@ -28,6 +34,12 @@ public class User {
 
         synchronized (users) {
             users.add(this);
+        }
+    }
+
+    public void deleteUser() {
+        synchronized (users) {
+            users.remove(this);
         }
     }
 
@@ -47,6 +59,14 @@ public class User {
             System.err.println("[USER] Receive method has caught a RuntimeException: " + e.getMessage());
             this.send(new ErrorMessage());
         }
+    }
+
+    public Lobby getLobby() {
+        return lobby;
+    }
+
+    public void setLobby(Lobby lobby) {
+        this.lobby = lobby;
     }
 
     public GameController getGameController() {
@@ -91,4 +111,5 @@ public class User {
     public String getConnectionCode() {
         return connectionCode;
     }
+
 }

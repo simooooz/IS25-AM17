@@ -65,6 +65,12 @@ public class Server extends Thread {
         return instance;
     }
 
+    public HashMap<String, ClientHandler> getConnections() {
+        synchronized (this.connections) {
+            return connections;
+        }
+    }
+
     /**
      * Opens a connection with a client
      *

@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.messages.lobby;
 
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
+import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.messages.*;
 import it.polimi.ingsw.network.socket.server.User;
 
@@ -24,8 +25,9 @@ public class CreateLobbyMessage extends Message {
     public void execute(User user) {
 
         try {
-            MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
-            user.send(new ZeroArgMessage(MessageType.CREATE_LOBBY_OK));
+            Lobby newLobby = MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
+            user.setLobby(newLobby);
+            user.send(new SingleArgMessage<>(MessageType.CREATE_LOBBY_OK, newLobby));
         } catch (PlayerAlreadyInException e) {
             user.send(new ErrorMessage(e.getMessage()));
         }
