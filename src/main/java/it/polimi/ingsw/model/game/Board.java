@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;

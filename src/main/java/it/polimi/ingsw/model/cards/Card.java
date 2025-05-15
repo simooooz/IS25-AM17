@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;

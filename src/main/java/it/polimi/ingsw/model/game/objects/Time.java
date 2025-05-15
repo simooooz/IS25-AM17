@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.game.objects;
 
-import it.polimi.ingsw.controller.GameState;
 import it.polimi.ingsw.model.ModelFacade;
 
 import java.util.Timer;
