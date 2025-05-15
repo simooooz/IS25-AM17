@@ -1,7 +1,11 @@
 package it.polimi.ingsw.network.socket.client;
 
 import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.exceptions.ClientException;
+import it.polimi.ingsw.network.messages.ErrorMessage;
+import it.polimi.ingsw.network.messages.Message;
+import it.polimi.ingsw.network.messages.MessageType;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,13 +17,11 @@ import java.net.Socket;
  * It encapsulates two-way communication of serialized objects,
  * connection monitoring via heartbeat, and asynchronous listening for incoming messages from the client.
  */
-public class ClientSocket {
+public class ClientSocket extends Client {
 
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
-
-    private final UserOfClient user;
 
     private HeartbeatThread heartbeatThread;
     private ListenLoopOfClient listenLoop;
@@ -32,12 +34,12 @@ public class ClientSocket {
      */
     public ClientSocket(String host, int port) {
         this.connect(host, port);
-        this.user = new UserOfClient(this);
 
         heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
 
-        listenLoop = new ListenLoopOfClient(this, user);
+        listenLoop = new ListenLoopOfClient(this);
+        this.viewTui.start();
     }
 
     private void connect(String ip, int port) {
@@ -53,7 +55,8 @@ public class ClientSocket {
         }
     }
 
-    public void close() {
+    @Override
+    public void closeConnection() {
         if (this.socket == null) return; // Already closed
 
         if (this.listenLoop.isAlive()) {
@@ -88,7 +91,6 @@ public class ClientSocket {
         }
 
         System.out.println("\nClosing connection...");
-        // System.exit(0);
     }
 
     public Object readObject() throws ClientException {
@@ -98,8 +100,8 @@ public class ClientSocket {
                 throw new ClientException();
             return obj;
         } catch (IOException | ClassNotFoundException | ClientException e) {
-            this.close();
-            throw new ClientException("[CLIENT SOCKET] Object is null or could not be read");
+            this.closeConnection();
+            throw new ClientException(e.getMessage());
         }
     }
 
@@ -108,12 +110,29 @@ public class ClientSocket {
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {
-            this.close();
-            throw new ClientException("[CLIENT SOCKET] Error while writing object");
+            this.closeConnection();
+            throw new ClientException(e.getMessage());
         }
     }
 
-    public UserOfClient getUser() {
-        return user;
+    @Override
+    public void send(MessageType messageType, Object... args) {
+        try {
+            Message message = Constants.createMessage(messageType, args);
+            this.sendObject(message);
+        } catch (ClientException e) {
+            System.err.println("[CLIENT SOCKET] Error while sending message: " + e.getMessage());
+            // Everything should be closed
+        }
     }
+
+    public void receive(Message message) {
+        try {
+            message.execute(this);
+        } catch (RuntimeException e) {
+            System.err.println("[CLIENT SOCKET] Receive method has caught a RuntimeException: " + e.getMessage());
+            // TODO view.handleError()
+        }
+    }
+
 }

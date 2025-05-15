@@ -1,6 +1,9 @@
 package it.polimi.ingsw.network.socket.server;
 
+import it.polimi.ingsw.network.User;
 import it.polimi.ingsw.network.exceptions.ServerException;
+import it.polimi.ingsw.network.messages.ErrorMessage;
+import it.polimi.ingsw.network.messages.Message;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,13 +15,11 @@ import java.net.Socket;
  * It encapsulates two-way communication of serialized objects,
  * connection monitoring via heartbeat, and asynchronous listening for incoming messages from the client.
  */
-public class ClientHandler {
+public class ClientHandler extends User {
 
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
-
-    private final User user;
 
     private ListenLoop listenLoop;
 
@@ -30,23 +31,20 @@ public class ClientHandler {
      * @throws IOException if there's an error setting up the connection
      */
     public ClientHandler(String connectionCode, Socket socket) throws IOException {
+        super(connectionCode, false, null);
         this.socket = socket;
         this.output = new ObjectOutputStream(socket.getOutputStream());
         this.input = new ObjectInputStream(socket.getInputStream());
-        this.user = new User(connectionCode);
-        this.listenLoop = new ListenLoop(connectionCode, user);
-    }
-
-    // todo: is necessary or can be here?
-    public User getUser() {
-        return user;
+        this.listenLoop = new ListenLoop(this);
     }
 
     public void sendObject(Object data) throws ServerException {
         try {
+            this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {
+            Server.getInstance().closeConnection(connectionCode);
             throw new ServerException("[CLIENT CONNECTION] Error while sending object");
         }
     }
@@ -58,12 +56,30 @@ public class ClientHandler {
                 throw new ServerException();
             return obj;
         } catch (IOException | ClassNotFoundException | ServerException e) {
+            Server.getInstance().closeConnection(connectionCode);
             throw new ServerException("[CLIENT CONNECTION] Object is null or could not be read");
         }
     }
 
-    public void close() {
+    public void send(Message message) {
+        try {
+            sendObject(message);
+        } catch (ServerException e) {
+            System.err.println("[CLIENT HANDLER] Error while sending message: " + e.getMessage());
+            // Everything should be closed
+        }
+    }
 
+    public void receive(Message message) {
+        try {
+            message.execute(this);
+        } catch (RuntimeException e) {
+            System.err.println("[CLIENT HANDLER] Receive method has caught a RuntimeException: " + e.getMessage());
+            this.send(new ErrorMessage());
+        }
+    }
+
+    public void close() {
         if (this.socket == null) return; // Already closed
 
         if (this.listenLoop.isAlive()) {

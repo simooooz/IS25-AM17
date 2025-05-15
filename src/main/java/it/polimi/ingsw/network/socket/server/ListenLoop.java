@@ -8,12 +8,10 @@ import it.polimi.ingsw.network.socket.Sense;
 
 public class ListenLoop extends Thread {
 
-    private final String connectionCode;
-    private final User user;
+    private final ClientHandler clientHandler;
 
-    public ListenLoop(String connectionCode, User user) {
-        this.connectionCode = connectionCode;
-        this.user = user;
+    public ListenLoop(ClientHandler clientHandler) {
+        this.clientHandler = clientHandler;
         this.start();
     }
 
@@ -22,24 +20,22 @@ public class ListenLoop extends Thread {
         while (!Thread.interrupted()) {
 
             try {
-                Object read = Server.getInstance().receiveObject(this.connectionCode);
+                Object read = clientHandler.readObject();
 
                 if (!(read instanceof Heartbeat)) {
-                    // then input is a message
                     Message message = (Message) read;
                     System.out.println("[SERVER LISTEN LOOP] Received message: " + message.getMessageType());
-                    user.receive(message);
+                    clientHandler.receive(message);
                 } else
-                    // then input is an heartbeat
-                    Sense.sendSense(this.connectionCode);
+                    clientHandler.sendObject(new Sense());
 
                 // TODO delayer?
 
             } catch (ServerException e) {
                 // Connection is already closed by Server
-                // This Thread will be interrupted by ClientConnection
+                // This Thread will be interrupted by ClientHandler
             } catch (ClassCastException e) {
-                this.user.send(new ErrorMessage());
+                this.clientHandler.send(new ErrorMessage());
             }
 
         }

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.network.socket.server;
 
 import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.network.ServerBasis;
+import it.polimi.ingsw.network.User;
 import it.polimi.ingsw.network.exceptions.ServerException;
 
 import java.io.IOException;
@@ -9,7 +11,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class Server extends Thread {
+public class Server extends ServerBasis implements Runnable {
 
     private static Server instance;
 
@@ -24,18 +26,18 @@ public class Server extends Thread {
      */
     public Server(int port) throws ServerException {
         if (port < 0 || port > 65535)
-            throw new ServerException("Port is not valid");
+            throw new ServerException("[SOCKET SERVER] Port is not valid");
 
         connections = new HashMap<>();
 
         try {
             this.serverSocket = new ServerSocket(port);
-            System.out.println("[SERVER] Server started on port " + port);
+            System.out.println("[SOCKET SERVER] Server started on port " + port);
         } catch (IOException e) {
-            throw new ServerException("[SERVER] Server cannot be started: " + e.getMessage());
+            throw new ServerException("[SOCKET SERVER] Server cannot be started: " + e.getMessage());
         }
 
-        this.start();
+        new Thread(this).start();
     }
 
     /**
@@ -48,7 +50,7 @@ public class Server extends Thread {
         if (instance != null) {
             return instance;
         }
-        throw new ServerException("Server is not instantiated");
+        throw new ServerException("[SOCKET SERVER] Server is not instantiated");
     }
 
     /**
@@ -65,12 +67,6 @@ public class Server extends Thread {
         return instance;
     }
 
-    public HashMap<String, ClientHandler> getConnections() {
-        synchronized (this.connections) {
-            return connections;
-        }
-    }
-
     /**
      * Opens a connection with a client
      *
@@ -82,7 +78,7 @@ public class Server extends Thread {
 
         synchronized (this.connections) {
             if (this.connections.containsKey(connectionCode))
-                throw new ServerException("Connection codes must be unique");
+                throw new ServerException("[SOCKET SERVER] Connection codes must be unique");
         }
 
         try {
@@ -93,13 +89,13 @@ public class Server extends Thread {
             synchronized (this.connections) {
                 if (this.connections.containsKey(connectionCode)) {
                     connection.close(); // Close the connection
-                    throw new ServerException("[SERVER] Created a none unique connection");
+                    throw new ServerException("[SOCKET SERVER] Created a none unique connection");
                 }
                 this.connections.put(connectionCode, connection);
             }
             return connectionCode;
         } catch (IOException e) {
-            throw new ServerException("[SERVER] Error accepting client connection: " + e.getMessage());
+            throw new ServerException("[SOCKET SERVER] Error accepting client connection: " + e.getMessage());
         }
     }
 
@@ -107,59 +103,12 @@ public class Server extends Thread {
         synchronized (this.connections) {
             ClientHandler conn = this.connections.get(connectionCode);
             if (conn != null) {
+                User.removeUser(conn); // TODO da cambiare e mettere inattivo
                 conn.close();
                 this.connections.remove(connectionCode);
             }
         }
-        System.out.println("[SERVER] Connection " + connectionCode + " closed");
-    }
-
-    /**
-     * Sends an object to a client
-     *
-     * @param connectionCode the unique identifier for the connection
-     * @param data           the object to send
-     * @throws ServerException if the connection doesn't exist or there's an error sending the data
-     */
-    public void sendObject(String connectionCode, Object data) throws ServerException {
-        ClientHandler conn;
-        synchronized (this.connections) {
-            conn = this.connections.get(connectionCode);
-        }
-
-        if (conn == null)
-            throw new ServerException("[SERVER] Connection " + connectionCode + " not found");
-
-        try {
-            conn.sendObject(data);
-        } catch (ServerException e) {
-            this.closeConnection(connectionCode);
-            throw e;
-        }
-    }
-
-    /**
-     * Receives an object from a client
-     *
-     * @param connectionCode the unique identifier for the connection
-     * @return the received object
-     * @throws ServerException if the connection doesn't exist or there's an error receiving the data
-     */
-    public Object receiveObject(String connectionCode) throws ServerException {
-        ClientHandler conn;
-        synchronized (this.connections) {
-            conn = this.connections.get(connectionCode);
-        }
-
-        if (conn == null)
-            throw new ServerException("[SERVER] Connection " + connectionCode + " not found");
-
-        try {
-            return conn.readObject();
-        } catch (ServerException e) {
-            this.closeConnection(connectionCode);
-            throw e;
-        }
+        System.out.println("[SOCKET SERVER] Connection " + connectionCode + " closed");
     }
 
     @Override
@@ -168,9 +117,9 @@ public class Server extends Thread {
 
             try {
                 String connectionCode = this.openConnection();
-                System.out.println("[SERVER] Connection " + connectionCode + " opened");
+                System.out.println("[SOCKET SERVER] Connection " + connectionCode + " opened");
             } catch (ServerException e) {
-                System.err.println("[SERVER] Error while opening a new connection: " + e.getMessage());
+                System.err.println("[SOCKET SERVER] Error while opening a new connection: " + e.getMessage());
             }
 
         }
