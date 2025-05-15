@@ -2,10 +2,11 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
+import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
-import it.polimi.ingsw.network.socket.server.User;
+import it.polimi.ingsw.network.User;
+import it.polimi.ingsw.network.messages.MessageType;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ public class Lobby implements Serializable {
     /**
      * {@link GameController} reference, null if game not started
      */
-    private GameController game = null;
+    private transient GameController game = null;
     /**
      * unique id for the lobby
      */
@@ -76,6 +77,13 @@ public class Lobby implements Serializable {
         return uuid;
     }
 
+    public List<String> getPlayers() {
+        return players;
+    }
+
+    public boolean isLearnerMode() {
+        return learnerMode;
+    }
 
     /**
      * Check whether there are conditions to eliminate the lobby
@@ -86,22 +94,25 @@ public class Lobby implements Serializable {
         return (state == LobbyState.IN_GAME) && (players.size() < MIN_PLAYERS);
     }
 
-
-    public List<String> getPlayers() {
-        return new ArrayList<>(players);    // safe copy of the list (read-only)
-    }
-
     /**
      * Adds a player and if the lobby is full initializes an instance of {@link GameController}
      *
      * @param username player's username
      */
-    public void addPlayer(String username) throws PlayerAlreadyInException {
-        if (players.contains(username)) throw new PlayerAlreadyInException("Player's already in");
+    public void addPlayer(String username) {
+        if (hasPlayer(username)) throw new PlayerAlreadyInException("Player's already in");
 
         players.add(username);
         if (players.size() == maxPlayers)
             this.initGame();
+    }
+
+    /**
+     * Checks if the player is in the lobby
+     * @param username player's username
+     */
+    public boolean hasPlayer(String username) {
+        return players.contains(username);
     }
 
     /**
@@ -117,20 +128,23 @@ public class Lobby implements Serializable {
         if (this.state == LobbyState.IN_GAME) this.game.playerLeft(username);
     }
 
-
     /**
      * Init the {@link GameController} associated with the lobby
      */
-    public void initGame() {
+    private void initGame() {
         this.state = LobbyState.IN_GAME;
         this.game = new GameController(players, learnerMode);
 
         try {
-            for (String username : players) // Set GameController for each user
-                User.getUser(username).setGameController(game);
+            for (String username : players) { // Set GameController for each user and update state
+                User user = User.getUser(username);
+                user.setState(UserState.IN_GAME);
+                user.setGameController(game);
+            }
+            User.getUser(players.getFirst()).notifyLobbyEvent(MessageType.GAME_STARTED_OK, this);
         } catch (UserNotFoundException e) {
             this.state = LobbyState.WAITING;
-            throw new RuntimeException("Error initializing game");
+            throw e;
         }
 
         this.game.startMatch();

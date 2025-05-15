@@ -55,15 +55,18 @@ public class MatchController {
      * @param maxPlayers max number of allowed players
      * @param name       lobby's name
      */
-    public synchronized Lobby createNewGame(String username, int maxPlayers, String name, boolean learnerMode) throws PlayerAlreadyInException {
+    public synchronized Lobby createNewGame(String username, int maxPlayers, String name, boolean learnerMode) {
         if (maxPlayers < 2 || maxPlayers > 4) throw new IllegalArgumentException("Max number of allowed players must be between 2 and 4");
+        Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
+                .filter(e -> e.getValue().hasPlayer(username))
+                .findFirst();
+        if (lobbyEntry.isPresent()) throw new PlayerAlreadyInException("Player is already in another lobby");
 
         String gameID = UUID.randomUUID().toString();
         Lobby lobby = new Lobby(gameID, name, username, maxPlayers, learnerMode);
         lobbies.put(gameID, lobby);
 
-        // adding master
-        lobby.addPlayer(username);
+        lobby.addPlayer(username); // Join in the newly created lobby
         return lobby;
     }
 
@@ -73,10 +76,15 @@ public class MatchController {
      * @param username player's username
      * @param gameID   game to join
      */
-    public synchronized Lobby joinGame(String username, String gameID) throws LobbyNotFoundException, PlayerAlreadyInException {
-        // TODO check se è già in un'altra lobby?
+    public synchronized Lobby joinGame(String username, String gameID) {
+        Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
+                .filter(e -> e.getValue().hasPlayer(username))
+                .findFirst();
+        if (lobbyEntry.isPresent()) throw new PlayerAlreadyInException("Player is already in another lobby");
+
         Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
-        Lobby lobby = lobbyOptional.filter(l -> l.getState() == LobbyState.WAITING)
+        Lobby lobby = lobbyOptional
+                .filter(l -> l.getState() == LobbyState.WAITING)
                 .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
 
         lobby.addPlayer(username);
@@ -88,14 +96,20 @@ public class MatchController {
      *
      * @param username player's username
      */
-    public synchronized void joinRandomGame(String username) throws LobbyNotFoundException, PlayerAlreadyInException {
+    public synchronized Lobby joinRandomGame(String username, boolean learnerMode) {
+        Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
+                .filter(e -> e.getValue().hasPlayer(username))
+                .findFirst();
+        if (lobbyEntry.isPresent()) throw new PlayerAlreadyInException("Player is already in another lobby");
+
         List<Lobby> availableLobbies = this.lobbies.values().stream()
-                .filter(l -> l.getState() == LobbyState.WAITING)
+                .filter(l -> l.getState() == LobbyState.WAITING && l.isLearnerMode() == learnerMode)
                 .toList();
         if (availableLobbies.isEmpty()) throw new LobbyNotFoundException("No lobbies available");
 
         Lobby lobby = availableLobbies.get(new Random().nextInt(availableLobbies.size()));
         lobby.addPlayer(username);
+        return lobby;
     }
 
     /**
@@ -103,9 +117,9 @@ public class MatchController {
      *
      * @param username player's username
      */
-    public synchronized void leaveGame(String username) throws LobbyNotFoundException {
+    public synchronized void leaveGame(String username) {
         Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
-                .filter(e -> e.getValue().getPlayers().contains(username))
+                .filter(e -> e.getValue().hasPlayer(username))
                 .findFirst();
         if (lobbyEntry.isEmpty()) throw new LobbyNotFoundException("Lobby not found");
 
@@ -127,12 +141,6 @@ public class MatchController {
                 // todo: come si comporta il game controller? metodo endGame() nella lobby? bisogna eliminare tutti i giocatori
             }
         }
-    }
-
-    public synchronized Optional<Map.Entry<String, Lobby>> getLobbyByPlayer(String username) {
-        return lobbies.entrySet().stream()
-                .filter(e -> e.getValue().getPlayers().contains(username))
-                .findFirst();
     }
 
     /**
