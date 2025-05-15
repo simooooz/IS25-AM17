@@ -49,8 +49,6 @@ public abstract class Client {
     }
 
     public void setState(UserState state) {
-        if (this.state != state)
-            this.viewTui.unlockWaitingForStateChange();
         this.state = state;
     }
 

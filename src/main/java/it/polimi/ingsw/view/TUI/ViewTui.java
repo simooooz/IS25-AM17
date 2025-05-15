@@ -1,27 +1,24 @@
 package it.polimi.ingsw.view.TUI;
 
+import it.polimi.ingsw.model.components.*;
+import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.UserState;
-import it.polimi.ingsw.network.messages.Message;
+import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.network.messages.MessageType;
-import it.polimi.ingsw.network.messages.ZeroArgMessage;
+import it.polimi.ingsw.view.TUI.graphics.ComponentsTUI;
 
 import java.util.Scanner;
+import java.util.*;
+import java.util.List;
 
 public class ViewTui {
 
     private final Client client;
     private final Scanner scanner;
     private Thread inputThread;
-
-    /**
-     * Indicates whether the program is currently waiting for a response from the server.
-     * This variable is marked as volatile to ensure visibility of changes to it across threads.
-     */
-    private volatile boolean waitingForStateChange = false;
-    private final Object stateLock = new Object();
-
 
     /**
      * Constructs a new ViewTui with the given client controller.
@@ -55,26 +52,6 @@ public class ViewTui {
         }
     }
 
-    private void waitForStateChange() {
-        waitingForStateChange = true;
-        synchronized (stateLock) {
-            try {
-                while (waitingForStateChange) {
-                    stateLock.wait();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.err.println("Interrupted while waiting for state change: " + e.getMessage());
-            }
-        }
-    }
-
-    public void unlockWaitingForStateChange() {
-        synchronized (stateLock) {
-            waitingForStateChange = false;
-            stateLock.notifyAll();
-        }
-    }
 
     /**
      * Prompt for username.
@@ -194,48 +171,99 @@ public class ViewTui {
         clear();
         displayLobbyInfo(client.getLobby());
         TUIColors.printlnColored("\n\nWaiting for players to join in...", TUIColors.WHITE_BOLD);
-        System.out.println("Press 'q' to quit the lobby");
+        System.out.println("Press 'q' to go back to the menu.");
+
+        // todo: capire perché blocca aggiornamento e risolvere
+//        if (scanner.hasNextLine()) {
+//            String input = scanner.nextLine().trim();
 //
-//        if (waitingForStateChange) return;
-//
-//        this.inputThread = new Thread(() -> {
-//            while (client.getState() == UserState.IN_LOBBY) {
-//                // use scanner.hasNextLine() for non-blocking polling
+//            if (input.equals("q")) {
+//                TUIColors.printlnColored("You sure? (y/n)", TUIColors.WHITE_BOLD);
 //                if (scanner.hasNextLine()) {
-//                    String input = scanner.nextLine().trim();
-//
-//                    if (input.equals("q")) {
-//                        TUIColors.printlnColored("You sure? (y/n)", TUIColors.WHITE_BOLD);
-//                        if (scanner.hasNextLine()) {
-//                            String confirmation = scanner.nextLine().trim();
-//                            if (confirmation.equals("y")) {
-//                                client.send(MessageType.LEAVE_GAME);
-//                                break;
-//                            }
-//                        }
+//                    String confirmation = scanner.nextLine().trim();
+//                    if (confirmation.equals("y")) {
+//                        client.send(MessageType.LEAVE_GAME);
+//                    } else {
+//                        // todo: è utile?
+//                        handleInLobby();
 //                    }
 //                }
 //            }
-//        });
-//
-//        this.inputThread.setDaemon(true);  // thread daemon will terminate when the main program ends
-//        this.inputThread.start();
-//
-//        waitForStateChange();
-//
-//        // here the state has changed, then we can interrupt the input thread
-//        inputThread.interrupt();
+//        }
     }
 
     /**
      * Handles the in-game state.
      */
     private void handleInGame() {
-        System.out.println("\n=== MATCH IN PROGRESS ===");
-        // Game-specific implementation would go here
+        clear();
 
-        // For now, we return to the main menu
-        System.out.println("Game finished. Thank you for playing!");
+        // todo: only-for test the graphics of components
+        Map<Integer, Component> components = new Board(new ArrayList<>(), false).getMapIdComponents();
+
+        List<ComponentsTUI.ComponentUI> componentsView = new ArrayList<>();
+        for (Map.Entry<Integer, Component> entry : components.entrySet()) {
+            String key = String.valueOf(entry.getKey());
+            Component component = entry.getValue();
+
+            ComponentsTUI.ComponentUI componentUI = switch (component) {
+                case BatteryComponent ignored -> new ComponentsTUI.BatteryComponent(key, false);
+                case CabinComponent ignored -> new ComponentsTUI.CabinComponent(key);
+                case CannonComponent ignored -> new ComponentsTUI.CannonComponent(key, false);
+                case CargoHoldsComponent ignored -> new ComponentsTUI.CargoHoldsComponent(key);
+                case EngineComponent ignored -> new ComponentsTUI.EngineComponent(key, false);
+                case OddComponent ignored -> new ComponentsTUI.OddComponent(key, AlienType.ENGINE);
+                case ShieldComponent ignored -> new ComponentsTUI.ShieldComponent(key);
+                case SpecialCargoHoldsComponent ignored -> new ComponentsTUI.SpecialCargoHoldsComponent(key);
+                case null, default -> new ComponentsTUI.Component(key);
+            };
+
+            componentsView.add(componentUI);
+        }
+
+        // quick lookup of the components
+        Map<String, ComponentsTUI.ComponentUI> idToComponent = new HashMap<>();
+        for (ComponentsTUI.ComponentUI component : componentsView) {
+            idToComponent.put(component.getId(), component);
+        }
+
+        boolean ready = false;
+        while (!ready) {
+            String id;
+            do {
+                clear();
+                System.out.println(ComponentsTUI.gridOfComponents(componentsView, 13));
+                TUIColors.printColored("Press 'q' to quit the game.", TUIColors.WHITE_BOLD);
+                TUIColors.printColored("\nInsert the ID of the component you want to pick: ", TUIColors.YELLOW_BOLD);
+
+                id = scanner.nextLine().trim();
+
+                if (id.equals("q")) {
+                    client.send(MessageType.LEAVE_GAME);
+                    return;
+                }
+
+                if (id.equals("r")) {
+                    // todo: ready message
+                    ready = true;
+                    break;
+                }
+
+                if (!idToComponent.containsKey(id) || id.isEmpty()) {
+                    TUIColors.printlnColored("ID not valid", TUIColors.RED);
+                }
+
+            } while (id.isEmpty() || !idToComponent.containsKey(id));
+
+            // todo: message to uncover
+            if (!id.equals("r")) {
+                ComponentsTUI.ComponentUI component = idToComponent.get(id);
+                component.uncover();
+            }
+        }
+
+        TUIColors.printColored("READY! ", TUIColors.GREEN_BOLD);
+        System.out.println("Waiting for other players to get ready...");
     }
 
     /**
