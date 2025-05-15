@@ -1,6 +1,6 @@
 package it.polimi.ingsw.network.exceptions;
 
-public class UserNotFoundException extends Exception {
+public class UserNotFoundException extends RuntimeException {
 
     public UserNotFoundException() { super(); }
 

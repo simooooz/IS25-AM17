@@ -1,6 +1,6 @@
 package it.polimi.ingsw.controller.exceptions;
 
-public class LobbyNotFoundException extends Exception {
+public class LobbyNotFoundException extends RuntimeException {
     public LobbyNotFoundException(String message) {
         super(message);
     }
