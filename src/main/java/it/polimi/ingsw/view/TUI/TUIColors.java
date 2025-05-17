@@ -36,7 +36,8 @@ public class TUIColors {
     public static final String BLUE_BACKGROUND = "\033[44m";
     public static final String PURPLE_BACKGROUND = "\033[45m";
     public static final String CYAN_BACKGROUND = "\033[46m";
-    public static final String WHITE_BACKGROUND = "\033[47m";
+    public static final String WHITE_BACKGROUND = "\033[47m";// grigio scuro
+    public static final String DARK_PURPLE_BACKGROUND = "\u001B[48;5;234m";
 
     private TUIColors() {}
 

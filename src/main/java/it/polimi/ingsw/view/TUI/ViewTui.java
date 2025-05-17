@@ -9,6 +9,7 @@ import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.graphics.ComponentsTUI;
+import it.polimi.ingsw.view.TUI.graphics.ShipBoardTUI;
 
 import java.util.Scanner;
 import java.util.*;
@@ -19,6 +20,7 @@ public class ViewTui {
     private final Client client;
     private final Scanner scanner;
     private Thread inputThread;
+    private ShipBoardTUI shipBoard;
 
     /**
      * Constructs a new ViewTui with the given client controller.
@@ -28,6 +30,7 @@ public class ViewTui {
     public ViewTui(Client client) {
         this.client = client;
         this.scanner = new Scanner(System.in);
+        this.shipBoard = new ShipBoardTUI(null, 5, 7);
     }
 
     public void handleUIState() {
@@ -198,7 +201,7 @@ public class ViewTui {
     private void handleInGame() {
         clear();
 
-        // todo: only-for test the graphics of components
+        // Get components for testing
         Map<Integer, Component> components = new Board(new ArrayList<>(), false).getMapIdComponents();
 
         List<ComponentsTUI.ComponentUI> componentsView = new ArrayList<>();
@@ -221,21 +224,33 @@ public class ViewTui {
             componentsView.add(componentUI);
         }
 
-        // quick lookup of the components
+        // Display ship board
+        shipBoard.printBoard();
+
+        // Quick lookup of the components
         Map<String, ComponentsTUI.ComponentUI> idToComponent = new HashMap<>();
         for (ComponentsTUI.ComponentUI component : componentsView) {
             idToComponent.put(component.getId(), component);
         }
 
-        boolean ready = false;
-        while (!ready) {
+        boolean building = true;
+        while (building) {
             String id;
+            ComponentsTUI.ComponentUI selectedComponent = null;
+
+            // Selection phase - pick a component
             do {
                 clear();
                 System.out.println(ComponentsTUI.gridOfComponents(componentsView, 13));
-                TUIColors.printColored("Press 'q' to quit the game.", TUIColors.WHITE_BOLD);
-                TUIColors.printColored("\nInsert the ID of the component you want to pick: ", TUIColors.YELLOW_BOLD);
+                System.out.println("\nYour current ship:");
+                shipBoard.printBoard();
 
+                TUIColors.printColored("\nCommands:", TUIColors.WHITE_BOLD);
+                System.out.println("\n- Enter component ID to select it");
+                System.out.println("- Type 'r' when ready to finish building");
+                System.out.println("- Type 'q' to quit the game");
+
+                TUIColors.printColored("\nSelect component ID: ", TUIColors.YELLOW_BOLD);
                 id = scanner.nextLine().trim();
 
                 if (id.equals("q")) {
@@ -244,26 +259,41 @@ public class ViewTui {
                 }
 
                 if (id.equals("r")) {
-                    // todo: ready message
-                    ready = true;
+                    // Player is ready to finish building
+                    building = false;
+                    // todo: start timer
                     break;
                 }
 
                 if (!idToComponent.containsKey(id) || id.isEmpty()) {
                     TUIColors.printlnColored("ID not valid", TUIColors.RED);
+                } else {
+                    selectedComponent = idToComponent.get(id);
+                    selectedComponent.uncover(); // Reveal the component
                 }
 
-            } while (id.isEmpty() || !idToComponent.containsKey(id));
+            } while (id.isEmpty() || (!id.equals("r") && !idToComponent.containsKey(id)));
 
-            // todo: message to uncover
-            if (!id.equals("r")) {
-                ComponentsTUI.ComponentUI component = idToComponent.get(id);
-                component.uncover();
+            // Placement phase - place selected component on ship
+            if (selectedComponent != null && building) {
+                clear();
+                System.out.println("Selected component: " + selectedComponent.getId());
+                System.out.println(selectedComponent);
+                shipBoard.printBoard();
+
+                if (shipBoard.promptForPlacement(selectedComponent, scanner)) {
+                    // Component placed successfully
+                    idToComponent.remove(selectedComponent.getId());
+                    componentsView.remove(selectedComponent);
+                }
             }
         }
 
         TUIColors.printColored("READY! ", TUIColors.GREEN_BOLD);
         System.out.println("Waiting for other players to get ready...");
+
+        // todo: gestire il time
+
     }
 
     /**
@@ -288,9 +318,9 @@ public class ViewTui {
 //            }
 //        } catch (Exception e) {
 //            // print many lines as fallback
-            for (int i = 0; i < 50; i++) {
-                System.out.println();
-            }
+        for (int i = 0; i < 50; i++) {
+            System.out.println();
+        }
 //        }
     }
 
