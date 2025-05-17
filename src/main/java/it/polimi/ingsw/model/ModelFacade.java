@@ -12,6 +12,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class ModelFacade {
 
@@ -102,7 +103,7 @@ public class ModelFacade {
     public void setReady(String username) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         ship.getHandComponent().ifPresent(Component::weldComponent);
-        board.moveToBoard(board.getPlayerEntityByUsername(username));
+        board.moveToBoard(board.getPlayerEntityByUsername(username), learnerMode);
 
         if (arePlayersReady())
             moveStateAfterBuilding();
@@ -136,9 +137,15 @@ public class ModelFacade {
 
         for (PlayerData player : board.getPlayersByPos())
             if (board.getPlayersByPos().get(0).equals(player))
-                board.movePlayer(player, 6 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+                if(!learnerMode)
+                    board.movePlayer(player, 6 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+                else
+                    board.movePlayer(player, 4 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
             else if (board.getPlayersByPos().get(1).equals(player))
-                board.movePlayer(player, 3 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+                if(!learnerMode)
+                    board.movePlayer(player, 3 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+                else
+                    board.movePlayer(player, 2 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
             else if (board.getPlayersByPos().get(2).equals(player))
                 board.movePlayer(player, 1 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
 
@@ -158,7 +165,7 @@ public class ModelFacade {
 
         if (ship.checkShip()) {// If now ship is ready
             playersState.put(username, PlayerState.WAIT);
-            board.moveToBoard(board.getPlayerEntityByUsername(username));
+            board.moveToBoard(board.getPlayerEntityByUsername(username), learnerMode);
         }
         if (areShipsReady() && !learnerMode)
             manageChooseAlienPhase(0);
@@ -167,7 +174,9 @@ public class ModelFacade {
     }
 
     private boolean areShipsReady() {
-        for (PlayerData player : board.getPlayersByPos())
+        List<PlayerData> totalPlayers;
+        totalPlayers = Stream.concat(board.getPlayers().stream().map(AbstractMap.SimpleEntry::getKey), board.getStartingDeck().stream()).toList();
+        for (PlayerData player : totalPlayers)
             if (playersState.get(player.getUsername()) != PlayerState.WAIT)
                 return false;
         return true;

@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class AbandonedStationCard extends Card{
     private final int crew;
     private final int days;
     private final Map<ColorType, Integer> goods;
+    private List<PlayerData> players;
 
     private int playerIndex;
     private boolean shipConquered;
@@ -29,15 +31,16 @@ public class AbandonedStationCard extends Card{
     public boolean startCard(ModelFacade model, Board board) {
         this.playerIndex = 0;
         this.shipConquered = false;
+        this.players = new ArrayList<>(board.getPlayersByPos());
 
-        for (PlayerData player : board.getPlayersByPos())
+        for (PlayerData player : this.players)
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);
         return autoCheckPlayers(model, board);
     }
 
     private boolean autoCheckPlayers(ModelFacade model, Board board) {
-        for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
-            PlayerData player = board.getPlayersByPos().get(playerIndex);
+        for (; playerIndex < this.players.size(); playerIndex++) {
+            PlayerData player = this.players.get(playerIndex);
 
             if (shipConquered)
                 model.setPlayerState(player.getUsername(), PlayerState.DONE);
@@ -51,7 +54,7 @@ public class AbandonedStationCard extends Card{
 
         // Check if everyone has finished
         boolean hasDone = true;
-        for (PlayerData player : board.getPlayersByPos())
+        for (PlayerData player : this.players)
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 

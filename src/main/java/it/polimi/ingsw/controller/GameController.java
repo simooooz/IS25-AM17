@@ -60,6 +60,7 @@ public class GameController {
     public void reserveComponent(String username, int componentId) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
 
         model.reserveComponent(username, componentId);
     }
@@ -67,7 +68,6 @@ public class GameController {
     public void insertComponent(String username, int componentId, int row, int col) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
-        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
 
         model.insertComponent(username, componentId, row, col);
     }

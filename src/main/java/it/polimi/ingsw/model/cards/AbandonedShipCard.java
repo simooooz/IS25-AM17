@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AbandonedShipCard extends Card {
@@ -27,7 +28,7 @@ public class AbandonedShipCard extends Card {
     @Override
     public boolean startCard(ModelFacade model, Board board) {
         this.playerIndex = 0;
-        this.players = board.getPlayersByPos();
+        this.players = new ArrayList<>(board.getPlayersByPos());
         this.shipConquered = false;
 
         for (PlayerData player : board.getPlayersByPos())

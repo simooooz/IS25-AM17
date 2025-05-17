@@ -16,6 +16,7 @@ public class SmugglersCard extends Card {
     private final Map<ColorType, Integer> reward;
     private final int days;
 
+    private List<PlayerData> players;
     private boolean defeated;
     private int playerIndex;
 
@@ -31,6 +32,7 @@ public class SmugglersCard extends Card {
     public boolean startCard(ModelFacade model, Board board) {
         this.defeated = false;
         this.playerIndex = 0;
+        this.players = new ArrayList<>(board.getPlayersByPos());
 
         board.getPlayers().forEach(player ->
                 model.setPlayerState(player.getKey().getUsername(), PlayerState.WAIT)
@@ -39,8 +41,8 @@ public class SmugglersCard extends Card {
     }
 
     private boolean autoCheckPlayers(ModelFacade model, Board board) {
-        for (; playerIndex < board.getPlayers().size(); playerIndex++) {
-            PlayerData player = board.getPlayersByPos().get(playerIndex);
+        for (; playerIndex < players.size(); playerIndex++) {
+            PlayerData player = players.get(playerIndex);
 
             double freeCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
                     .filter(cannon -> !cannon.getIsDouble())
@@ -78,7 +80,7 @@ public class SmugglersCard extends Card {
         }
 
         boolean hasDone = true;
-        for (PlayerData p : board.getPlayersByPos())
+        for (PlayerData p : players)
             if (model.getPlayerState(p.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 

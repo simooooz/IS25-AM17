@@ -40,7 +40,7 @@ public class PiratesCard extends Card{
         this.playerIndex = 0;
         this.cannonIndex = 0;
         this.defeatedPlayers = new ArrayList<>();
-        this.players = board.getPlayersByPos();
+        this.players = new ArrayList<>(board.getPlayersByPos());
 
         for (PlayerData player : players) {
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);

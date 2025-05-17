@@ -151,6 +151,9 @@ public class Board {
                     nextPosition = (position > 0) ? nextPosition + 1 : nextPosition - 1;
             }
         }
+
+        players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
     }
 
     public void moveToStartingDeck(PlayerData player) {
@@ -161,26 +164,31 @@ public class Board {
         startingDeck.add(player);
     }
 
-    public void moveToBoard(PlayerData player) {
+    public void moveToBoard(PlayerData player, boolean learnerMode) {
         startingDeck.stream()
                 .filter(p -> p.equals(player))
                 .findFirst()
                 .orElseThrow(PlayerNotFoundException::new);
-
-        int pos = players.isEmpty() ? 6 : (players.size() == 1 ? 3 : (players.size() == 2 ? 1 : 0));
+        int pos;
+        if(!learnerMode)
+            pos = players.isEmpty() ? 6 : (players.size() == 1 ? 3 : (players.size() == 2 ? 1 : 0));
+        else
+            pos = players.isEmpty() ? 4 : (players.size() == 1 ? 2 : (players.size() == 2 ? 1 : 0));
         players.add(new SimpleEntry<>(player, pos));
 
         players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         startingDeck.remove(player);
     }
 
-    public List<PlayerData> getRanking() {
+    public List<PlayerData> getRanking(boolean learnerMode) {
         List<PlayerData> players = Stream.concat(
                 this.getPlayersByPos().stream(),
                 this.getStartingDeck().stream()
         ).toList();
 
-        int[] credits = {8, 6, 4, 2};       // 1°, 2°, 3°, 4°
+        int[] credits = learnerMode ? new int[]{4, 3, 2, 1} : new int[]{8, 6, 4, 2} ;
+
+
         Map<ColorType, Integer> CREDIT_MULTIPLIERS = Map.of(
                 ColorType.RED, 4,
                 ColorType.YELLOW, 3,
@@ -191,16 +199,23 @@ public class Board {
         IntStream.range(0, players.size())
                 .forEach(i -> {
                     PlayerData player = players.get(i);
-                    // reward for the order of arrival (only not dropped ou players)
+                    // reward for the order of arrival (only not dropped out players)
                     if (this.getPlayersByPos().contains(player))
                         player.setCredits(player.getCredits() + credits[i]);
-                    // handling sale of goods
-                    player.getShip().getGoods().keySet().forEach(good -> {
-                        int c = CREDIT_MULTIPLIERS.get(good) * player.getShip().getGoods().get(good);
-                        if (this.getStartingDeck().contains(player))
-                            c = c / 2;
-                        player.setCredits(player.getCredits() + c);
-                    });
+
+                    // handling sale of goods - calculating total goods value first
+                    int totalGoodsCredits = 0;
+                    for (ColorType good : player.getShip().getGoods().keySet()) {
+                        totalGoodsCredits += CREDIT_MULTIPLIERS.get(good) * player.getShip().getGoods().get(good);
+                    }
+
+                    // apply starting deck penalty if applicable (divide total by 2 and round up)
+                    if (this.getStartingDeck().contains(player)) {
+                        totalGoodsCredits = (int) Math.ceil(totalGoodsCredits / 2.0);
+                    }
+
+                    // add total goods credits to player's credits
+                    player.setCredits(player.getCredits() + totalGoodsCredits);
                     // component leaks
                     player.setCredits(player.getCredits() - player.getShip().getDiscards().size() - player.getShip().getReserves().size());
                 });
@@ -210,8 +225,8 @@ public class Board {
                 .mapToInt(p -> p.getShip().countExposedConnectors())
                 .toArray();
         players.stream()
-                .filter(p -> p.getShip().countExposedConnectors() == Arrays.stream(exposedConnectors).min().getAsInt())
-                .forEach(p -> p.setCredits(p.getCredits() + 4));
+                .filter(p -> p.getShip().countExposedConnectors() == Arrays.stream(exposedConnectors).min().orElseThrow())
+                .forEach(p -> p.setCredits(p.getCredits() + (learnerMode ? 2 : 4)));
 
         return players.stream()
                 .sorted(Comparator.comparingInt(PlayerData::getCredits).reversed())

@@ -30,8 +30,9 @@ public class SlaversCard extends Card {
 
     @Override
     public boolean startCard(ModelFacade model, Board board) {
+        this.slaversDefeated = false;
         this.playerIndex = 0;
-        this.players = board.getPlayersByPos();
+        this.players = new ArrayList<>(board.getPlayersByPos());
 
         for (PlayerData player : players)
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);

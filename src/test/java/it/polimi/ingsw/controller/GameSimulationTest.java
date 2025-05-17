@@ -22,13 +22,14 @@ public class GameSimulationTest {
 
     @BeforeEach
     void setUp() {
-        List<String> usernames = new ArrayList<>(List.of("Tommaso", "Simone", "Davide"));
-        controller = new GameController(usernames, false);
-        controller.startMatch();
+
     }
 
     @Test
     public void testFirstCompleteGame(){
+        List<String> usernames = new ArrayList<>(List.of("Tommaso", "Simone", "Davide"));
+        controller = new GameController(usernames, false);
+        controller.startMatch();
 
         // Building Ships
 
@@ -370,6 +371,11 @@ public class GameSimulationTest {
         controller.pickComponent("Davide", 87);
         controller.insertComponent("Davide", 87, 4, 6);
 
+        controller.showComponent("Davide", 156);
+        controller.pickComponent("Davide", 156);
+        controller.insertComponent("Davide", 156, 3, 6);
+
+
         controller.showComponent("Davide", 72);
         controller.reserveComponent("Davide", 72);
 
@@ -405,16 +411,15 @@ public class GameSimulationTest {
         assertTrue(controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().getDashboard(3,2).isEmpty());
         assertEquals(7, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().countExposedConnectors());
 
-        assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().countExposedConnectors());
-
 
         // Player 3 Ship Check
 
         toRemoveTilesIDs.clear();
-        toRemoveTilesIDs.add(87);
+        toRemoveTilesIDs.add(156);
 
-        Exception exception1 = assertThrows(IllegalStateException.class, () -> controller.checkShip("Davide", toRemoveTilesIDs));
-        assertEquals("State is not CHECKING", exception1.getMessage());
+        controller.checkShip("Davide", toRemoveTilesIDs);
+
+        assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().countExposedConnectors());
 
 
         //Alien management
@@ -747,13 +752,13 @@ public class GameSimulationTest {
         finish = card12.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 11, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
         if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking();
+        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking(false);
 
         assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().countExposedConnectors());
         assertEquals(9, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().countExposedConnectors());
         assertEquals(9, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().countExposedConnectors());
 
-        assertEquals(17, finalRank.get(0).getCredits());
+        assertEquals(16, finalRank.get(0).getCredits());
         assertEquals(3, finalRank.get(1).getCredits());
         assertEquals(0, finalRank.get(2).getCredits());
 
@@ -762,8 +767,553 @@ public class GameSimulationTest {
 
     @Test
     public void testSecondCompleteGame() {
+        List<String> usernames = new ArrayList<>(List.of("Tommaso", "Simone", "Davide", "Demetrio"));
+        controller = new GameController(usernames, false);
+        controller.startMatch();
 
         // Building Ships
+        controller.showComponent("Tommaso",69);
+        controller.pickComponent("Tommaso", 69);
+        controller.rotateComponent("Tommaso", 69, 3);
+        controller.insertComponent("Tommaso", 69, 0, 2);
+
+        controller.showComponent("Tommaso",108);
+        controller.pickComponent("Tommaso", 108);
+        controller.rotateComponent("Tommaso", 108, 0);
+        controller.insertComponent("Tommaso", 108, 0, 4);
+
+        controller.showComponent("Tommaso",106);
+        controller.pickComponent("Tommaso", 106);
+        controller.rotateComponent("Tommaso", 106, 0);
+        controller.insertComponent("Tommaso", 106, 1, 1);
+
+        controller.showComponent("Tommaso",57);
+        controller.pickComponent("Tommaso", 57);
+        controller.rotateComponent("Tommaso", 57, 0);
+        controller.insertComponent("Tommaso", 57, 1, 2);
+
+        controller.showComponent("Tommaso",122);
+        controller.pickComponent("Tommaso", 122);
+        controller.rotateComponent("Tommaso", 122, 0);
+        controller.insertComponent("Tommaso", 122, 1, 3);
+
+        controller.showComponent("Tommaso",6);
+        controller.pickComponent("Tommaso", 6);
+        controller.rotateComponent("Tommaso", 6, 3);
+        controller.insertComponent("Tommaso", 6, 1, 4);
+
+        controller.showComponent("Tommaso",113);
+        controller.pickComponent("Tommaso", 113);
+        controller.rotateComponent("Tommaso", 113, 0);
+        controller.insertComponent("Tommaso", 113, 1, 5);
+
+        controller.showComponent("Tommaso",127);
+        controller.pickComponent("Tommaso", 127);
+        controller.rotateComponent("Tommaso", 127, 0);
+        controller.insertComponent("Tommaso", 127, 2, 0);
+
+        controller.showComponent("Tommaso",37);
+        controller.pickComponent("Tommaso", 37);
+        controller.rotateComponent("Tommaso", 37, 0);
+        controller.insertComponent("Tommaso", 37, 2, 1);
+
+        controller.showComponent("Tommaso",31);
+        controller.pickComponent("Tommaso", 31);
+        controller.rotateComponent("Tommaso", 31, 3);
+        controller.insertComponent("Tommaso", 31, 2, 2);
+
+        controller.showComponent("Tommaso",33);
+        controller.pickComponent("Tommaso", 33);
+        controller.rotateComponent("Tommaso", 33, 3);
+        controller.insertComponent("Tommaso", 33, 2, 3);
+
+        controller.showComponent("Tommaso",18);
+        controller.pickComponent("Tommaso", 18);
+        controller.rotateComponent("Tommaso", 18, 3);
+        controller.insertComponent("Tommaso", 18, 2, 4);
+
+        controller.showComponent("Tommaso",44);
+        controller.pickComponent("Tommaso", 44);
+        controller.rotateComponent("Tommaso", 44, 2);
+        controller.insertComponent("Tommaso", 44, 2, 5);
+
+        controller.showComponent("Tommaso",2);
+        controller.pickComponent("Tommaso", 2);
+        controller.rotateComponent("Tommaso", 2, 2);
+        controller.insertComponent("Tommaso", 2, 2, 6);
+
+        controller.showComponent("Tommaso",149);
+        controller.pickComponent("Tommaso", 149);
+        controller.rotateComponent("Tommaso", 149, 3);
+        controller.insertComponent("Tommaso", 149, 3, 0);
+
+        controller.showComponent("Tommaso",66);
+        controller.pickComponent("Tommaso", 66);
+        controller.rotateComponent("Tommaso", 66, 0);
+        controller.insertComponent("Tommaso", 66, 3, 1);
+
+        controller.showComponent("Tommaso",29);
+        controller.pickComponent("Tommaso", 29);
+        controller.rotateComponent("Tommaso", 29, 2);
+        controller.insertComponent("Tommaso", 29, 3, 2);
+
+        controller.showComponent("Tommaso",14);
+        controller.pickComponent("Tommaso", 14);
+        controller.rotateComponent("Tommaso", 14, 0);
+        controller.insertComponent("Tommaso", 14, 3, 3);
+
+        controller.showComponent("Tommaso",135);
+        controller.pickComponent("Tommaso", 135);
+        controller.rotateComponent("Tommaso", 135, 0);
+        controller.insertComponent("Tommaso", 135, 3, 4);
+
+        controller.showComponent("Tommaso",24);
+        controller.pickComponent("Tommaso", 24);
+        controller.rotateComponent("Tommaso", 24, 0);
+        controller.insertComponent("Tommaso", 24, 3, 5);
+
+        controller.showComponent("Tommaso",152);
+        controller.pickComponent("Tommaso", 152);
+        controller.rotateComponent("Tommaso", 152, 1);
+        controller.insertComponent("Tommaso", 152, 3, 6);
+
+        controller.showComponent("Tommaso",77);
+        controller.pickComponent("Tommaso", 77);
+        controller.rotateComponent("Tommaso", 77, 0);
+        controller.insertComponent("Tommaso", 77, 4, 0);
+
+        controller.showComponent("Tommaso",9);
+        controller.pickComponent("Tommaso", 9);
+        controller.rotateComponent("Tommaso", 9, 0);
+        controller.insertComponent("Tommaso", 9, 4, 1);
+
+        controller.showComponent("Tommaso",81);
+        controller.pickComponent("Tommaso", 81);
+        controller.rotateComponent("Tommaso", 81, 0);
+        controller.insertComponent("Tommaso", 81, 4, 2);
+
+        controller.showComponent("Tommaso",143);
+        controller.pickComponent("Tommaso", 143);
+        controller.rotateComponent("Tommaso", 143, 2);
+        controller.insertComponent("Tommaso", 143, 4, 4);
+
+        controller.showComponent("Tommaso",99);
+        controller.pickComponent("Tommaso", 99);
+        controller.rotateComponent("Tommaso", 99, 0);
+        controller.insertComponent("Tommaso", 99, 4, 5);
+
+
+        controller.showComponent("Simone",104);
+        controller.pickComponent("Simone", 104);
+        controller.rotateComponent("Simone", 104, 1);
+        controller.insertComponent("Simone", 104, 0, 2);
+
+        controller.showComponent("Simone",125);
+        controller.pickComponent("Simone", 125);
+        controller.rotateComponent("Simone", 125, 0);
+        controller.insertComponent("Simone", 125, 0, 4);
+
+        controller.showComponent("Simone",20);
+        controller.pickComponent("Simone", 20);
+        controller.rotateComponent("Simone", 20, 2);
+        controller.insertComponent("Simone", 20, 1, 1);
+
+        controller.showComponent("Simone",55);
+        controller.pickComponent("Simone", 55);
+        controller.rotateComponent("Simone", 55, 2);
+        controller.insertComponent("Simone", 55, 1, 2);
+
+        controller.showComponent("Simone",119);
+        controller.pickComponent("Simone", 119);
+        controller.rotateComponent("Simone", 119, 0);
+        controller.insertComponent("Simone", 119, 1, 3);
+
+        controller.showComponent("Simone",59);
+        controller.pickComponent("Simone", 59);
+        controller.rotateComponent("Simone", 59, 1);
+        controller.insertComponent("Simone", 59, 1, 4);
+
+        controller.showComponent("Simone",118);
+        controller.pickComponent("Simone", 118);
+        controller.rotateComponent("Simone", 118, 0);
+        controller.insertComponent("Simone", 118, 1, 5);
+
+        controller.showComponent("Simone",13);
+        controller.pickComponent("Simone", 13);
+        controller.rotateComponent("Simone", 13, 1);
+        controller.insertComponent("Simone", 13, 2, 0);
+
+        controller.showComponent("Simone",68);
+        controller.pickComponent("Simone", 68);
+        controller.rotateComponent("Simone", 68, 2);
+        controller.insertComponent("Simone", 68, 2, 1);
+
+        controller.showComponent("Simone",12);
+        controller.pickComponent("Simone", 12);
+        controller.rotateComponent("Simone", 12, 3);
+        controller.insertComponent("Simone", 12, 2, 2);
+
+        controller.showComponent("Simone",34);
+        controller.pickComponent("Simone", 34);
+        controller.rotateComponent("Simone", 34, 1);
+        controller.insertComponent("Simone", 34, 2, 3);
+
+        controller.showComponent("Simone",65);
+        controller.pickComponent("Simone", 65);
+        controller.rotateComponent("Simone", 65, 2);
+        controller.insertComponent("Simone", 65, 2, 4);
+
+        controller.showComponent("Simone",54);
+        controller.pickComponent("Simone", 54);
+        controller.rotateComponent("Simone", 54, 0);
+        controller.insertComponent("Simone", 54, 2, 5);
+
+        controller.showComponent("Simone",36);
+        controller.pickComponent("Simone", 36);
+        controller.rotateComponent("Simone", 36, 0);
+        controller.insertComponent("Simone", 36, 2, 6);
+
+        controller.showComponent("Simone",16);
+        controller.pickComponent("Simone", 16);
+        controller.rotateComponent("Simone", 16, 3);
+        controller.insertComponent("Simone", 16, 3, 0);
+
+        controller.showComponent("Simone",138);
+        controller.pickComponent("Simone", 138);
+        controller.rotateComponent("Simone", 138, 3);
+        controller.insertComponent("Simone", 138, 3, 1);
+
+        controller.showComponent("Simone",147);
+        controller.pickComponent("Simone", 147);
+        controller.rotateComponent("Simone", 147, 3);
+        controller.insertComponent("Simone", 147, 3, 2);
+
+        controller.showComponent("Simone",30);
+        controller.pickComponent("Simone", 30);
+        controller.rotateComponent("Simone", 30, 0);
+        controller.insertComponent("Simone", 30, 3, 3);
+
+        controller.showComponent("Simone",11);
+        controller.pickComponent("Simone", 11);
+        controller.rotateComponent("Simone", 11, 2);
+        controller.insertComponent("Simone", 11, 3, 4);
+
+        controller.showComponent("Simone",39);
+        controller.pickComponent("Simone", 39);
+        controller.rotateComponent("Simone", 39, 2);
+        controller.insertComponent("Simone", 39, 3, 5);
+
+        controller.showComponent("Simone",146);
+        controller.pickComponent("Simone", 146);
+        controller.rotateComponent("Simone", 146, 1);
+        controller.insertComponent("Simone", 146, 3, 6);
+
+        controller.showComponent("Simone",140);
+        controller.pickComponent("Simone", 140);
+        controller.rotateComponent("Simone", 140, 1);
+        controller.insertComponent("Simone", 140, 4, 0);
+
+        controller.showComponent("Simone",95);
+        controller.pickComponent("Simone", 95);
+        controller.rotateComponent("Simone", 95, 0);
+        controller.insertComponent("Simone", 95, 4, 1);
+
+        controller.showComponent("Simone",126);
+        controller.pickComponent("Simone", 126);
+        controller.rotateComponent("Simone", 126, 2);
+        controller.insertComponent("Simone", 126, 4, 2);
+
+        controller.showComponent("Simone",92);
+        controller.pickComponent("Simone", 92);
+        controller.rotateComponent("Simone", 92, 0);
+        controller.insertComponent("Simone", 92, 4, 4);
+
+        controller.showComponent("Simone",156);
+        controller.pickComponent("Simone", 156);
+        controller.rotateComponent("Simone", 156, 1);
+        controller.insertComponent("Simone", 156, 4, 5);
+
+        controller.showComponent("Simone",73);
+        controller.pickComponent("Simone", 73);
+        controller.rotateComponent("Simone", 73, 0);
+        controller.insertComponent("Simone", 73, 4, 6);
+
+
+        controller.showComponent("Demetrio",101);
+        controller.pickComponent("Demetrio", 101);
+        controller.rotateComponent("Demetrio", 101, 0);
+        controller.insertComponent("Demetrio", 101, 0, 2);
+
+        controller.showComponent("Demetrio",103);
+        controller.pickComponent("Demetrio", 103);
+        controller.rotateComponent("Demetrio", 103, 0);
+        controller.insertComponent("Demetrio", 103, 0, 4);
+
+        controller.showComponent("Demetrio",128);
+        controller.pickComponent("Demetrio", 128);
+        controller.rotateComponent("Demetrio", 128, 0);
+        controller.insertComponent("Demetrio", 128, 1, 1);
+
+        controller.showComponent("Demetrio",61);
+        controller.pickComponent("Demetrio", 61);
+        controller.rotateComponent("Demetrio", 61, 2);
+        controller.insertComponent("Demetrio", 61, 1, 2);
+
+        controller.showComponent("Demetrio",3);
+        controller.pickComponent("Demetrio", 3);
+        controller.rotateComponent("Demetrio", 3, 1);
+        controller.insertComponent("Demetrio", 3, 1, 3);
+
+        controller.showComponent("Demetrio",60);
+        controller.pickComponent("Demetrio", 60);
+        controller.rotateComponent("Demetrio", 60, 2);
+        controller.insertComponent("Demetrio", 60, 1, 4);
+
+        controller.showComponent("Demetrio",117);
+        controller.pickComponent("Demetrio", 117);
+        controller.rotateComponent("Demetrio", 117, 0);
+        controller.insertComponent("Demetrio", 117, 1, 5);
+
+        controller.showComponent("Demetrio",153);
+        controller.pickComponent("Demetrio", 153);
+        controller.rotateComponent("Demetrio", 153, 3);
+        controller.insertComponent("Demetrio", 153, 2, 0);
+
+        controller.showComponent("Demetrio",56);
+        controller.pickComponent("Demetrio", 56);
+        controller.rotateComponent("Demetrio", 56, 2);
+        controller.insertComponent("Demetrio", 56, 2, 1);
+
+        controller.showComponent("Demetrio",27);
+        controller.pickComponent("Demetrio", 27);
+        controller.rotateComponent("Demetrio", 27, 1);
+        controller.insertComponent("Demetrio", 27, 2, 2);
+
+        controller.showComponent("Demetrio",32);
+        controller.pickComponent("Demetrio", 32);
+        controller.rotateComponent("Demetrio", 32, 0);
+        controller.insertComponent("Demetrio", 32, 2, 3);
+
+        controller.showComponent("Demetrio",151);
+        controller.pickComponent("Demetrio", 151);
+        controller.rotateComponent("Demetrio", 151, 1);
+        controller.insertComponent("Demetrio", 151, 2, 4);
+
+        controller.showComponent("Demetrio",25);
+        controller.pickComponent("Demetrio", 25);
+        controller.rotateComponent("Demetrio", 25, 3);
+        controller.insertComponent("Demetrio", 25, 2, 5);
+
+        controller.showComponent("Demetrio",137);
+        controller.pickComponent("Demetrio", 137);
+        controller.rotateComponent("Demetrio", 137, 3);
+        controller.insertComponent("Demetrio", 137, 2, 6);
+
+        controller.showComponent("Demetrio",40);
+        controller.pickComponent("Demetrio", 40);
+        controller.rotateComponent("Demetrio", 40, 1);
+        controller.insertComponent("Demetrio", 40, 3, 0);
+
+        controller.showComponent("Demetrio",17);
+        controller.pickComponent("Demetrio", 17);
+        controller.rotateComponent("Demetrio", 17, 3);
+        controller.insertComponent("Demetrio", 17, 3, 1);
+
+        controller.showComponent("Demetrio",145);
+        controller.pickComponent("Demetrio", 145);
+        controller.rotateComponent("Demetrio", 145, 3);
+        controller.insertComponent("Demetrio", 145, 3, 2);
+
+        controller.showComponent("Demetrio",26);
+        controller.pickComponent("Demetrio", 26);
+        controller.rotateComponent("Demetrio", 26, 1);
+        controller.insertComponent("Demetrio", 26, 3, 3);
+
+        controller.showComponent("Demetrio",48);
+        controller.pickComponent("Demetrio", 48);
+        controller.rotateComponent("Demetrio", 48, 1);
+        controller.insertComponent("Demetrio", 48, 3, 4);
+
+        controller.showComponent("Demetrio",5);
+        controller.pickComponent("Demetrio", 5);
+        controller.rotateComponent("Demetrio", 5, 1);
+        controller.insertComponent("Demetrio", 5, 3, 5);
+
+        controller.showComponent("Demetrio",1);
+        controller.pickComponent("Demetrio", 1);
+        controller.rotateComponent("Demetrio", 1, 3);
+        controller.insertComponent("Demetrio", 1, 3, 6);
+
+        controller.showComponent("Demetrio",94);
+        controller.pickComponent("Demetrio", 94);
+        controller.rotateComponent("Demetrio", 94, 0);
+        controller.insertComponent("Demetrio", 94, 4, 0);
+
+        controller.showComponent("Demetrio",79);
+        controller.pickComponent("Demetrio", 79);
+        controller.rotateComponent("Demetrio", 79, 0);
+        controller.insertComponent("Demetrio", 79, 4, 1);
+
+        controller.showComponent("Demetrio",90);
+        controller.pickComponent("Demetrio", 90);
+        controller.rotateComponent("Demetrio", 90, 0);
+        controller.insertComponent("Demetrio", 90, 4, 2);
+
+        controller.showComponent("Demetrio",78);
+        controller.pickComponent("Demetrio", 78);
+        controller.rotateComponent("Demetrio", 78, 0);
+        controller.insertComponent("Demetrio", 78, 4, 4);
+
+        controller.showComponent("Demetrio",139);
+        controller.pickComponent("Demetrio", 139);
+        controller.rotateComponent("Demetrio", 139, 0);
+        controller.insertComponent("Demetrio", 139, 4, 5);
+
+        controller.showComponent("Demetrio",88);
+        controller.pickComponent("Demetrio", 88);
+        controller.rotateComponent("Demetrio", 88, 0);
+        controller.insertComponent("Demetrio", 88, 4, 6);
+
+
+        controller.showComponent("Davide",124);
+        controller.pickComponent("Davide", 124);
+        controller.rotateComponent("Davide", 124, 0);
+        controller.insertComponent("Davide", 124, 0, 2);
+
+        controller.showComponent("Davide",100);
+        controller.pickComponent("Davide", 100);
+        controller.rotateComponent("Davide", 100, 0);
+        controller.insertComponent("Davide", 100, 0, 4);
+
+        controller.showComponent("Davide",67);
+        controller.pickComponent("Davide", 67);
+        controller.rotateComponent("Davide", 67, 2);
+        controller.insertComponent("Davide", 67, 1, 1);
+
+        controller.showComponent("Davide",63);
+        controller.pickComponent("Davide", 63);
+        controller.rotateComponent("Davide", 63, 2);
+        controller.insertComponent("Davide", 63, 1, 2);
+
+        controller.showComponent("Davide",141);
+        controller.pickComponent("Davide", 141);
+        controller.rotateComponent("Davide", 141, 2);
+        controller.insertComponent("Davide", 141, 1, 3);
+
+        controller.showComponent("Davide",41);
+        controller.pickComponent("Davide", 41);
+        controller.rotateComponent("Davide", 41, 1);
+        controller.insertComponent("Davide", 41, 1, 4);
+
+        controller.showComponent("Davide",133);
+        controller.pickComponent("Davide", 133);
+        controller.rotateComponent("Davide", 133, 0);
+        controller.insertComponent("Davide", 133, 1, 5);
+
+        controller.showComponent("Davide",105);
+        controller.pickComponent("Davide", 105);
+        controller.rotateComponent("Davide", 105, 0);
+        controller.insertComponent("Davide", 105, 2, 0);
+
+        controller.showComponent("Davide",136);
+        controller.pickComponent("Davide", 136);
+        controller.rotateComponent("Davide", 136, 2);
+        controller.insertComponent("Davide", 136, 2, 1);
+
+        controller.showComponent("Davide",58);
+        controller.pickComponent("Davide", 58);
+        controller.rotateComponent("Davide", 58, 0);
+        controller.insertComponent("Davide", 58, 2, 2);
+
+        controller.showComponent("Davide",35);
+        controller.pickComponent("Davide", 35);
+        controller.rotateComponent("Davide", 35, 0);
+        controller.insertComponent("Davide", 35, 2, 3);
+
+        controller.showComponent("Davide",4);
+        controller.pickComponent("Davide", 4);
+        controller.rotateComponent("Davide", 4, 3);
+        controller.insertComponent("Davide", 4, 2, 4);
+
+        controller.showComponent("Davide",150);
+        controller.pickComponent("Davide", 150);
+        controller.rotateComponent("Davide", 150, 0);
+        controller.insertComponent("Davide", 150, 2, 5);
+
+        controller.showComponent("Davide",155);
+        controller.pickComponent("Davide", 155);
+        controller.rotateComponent("Davide", 155, 0);
+        controller.insertComponent("Davide", 155, 2, 6);
+
+        controller.showComponent("Davide",154);
+        controller.pickComponent("Davide", 154);
+        controller.rotateComponent("Davide", 154, 1);
+        controller.insertComponent("Davide", 154, 3, 0);
+
+        controller.showComponent("Davide",51);
+        controller.pickComponent("Davide", 51);
+        controller.rotateComponent("Davide", 51, 2);
+        controller.insertComponent("Davide", 51, 3, 1);
+
+        controller.showComponent("Davide",7);
+        controller.pickComponent("Davide", 7);
+        controller.rotateComponent("Davide", 7, 2);
+        controller.insertComponent("Davide", 7, 3, 2);
+
+        controller.showComponent("Davide",96);
+        controller.pickComponent("Davide", 96);
+        controller.rotateComponent("Davide", 96, 0);
+        controller.insertComponent("Davide", 96, 3, 3);
+
+        controller.showComponent("Davide",148);
+        controller.pickComponent("Davide", 148);
+        controller.rotateComponent("Davide", 148, 3);
+        controller.insertComponent("Davide", 148, 3, 4);
+
+        controller.showComponent("Davide",19);
+        controller.pickComponent("Davide", 19);
+        controller.rotateComponent("Davide", 19, 3);
+        controller.insertComponent("Davide", 19, 3, 5);
+
+        controller.showComponent("Davide",23);
+        controller.pickComponent("Davide", 23);
+        controller.rotateComponent("Davide", 23, 3);
+        controller.insertComponent("Davide", 23, 3, 6);
+
+        controller.showComponent("Davide",71);
+        controller.pickComponent("Davide", 71);
+        controller.rotateComponent("Davide", 71, 0);
+        controller.insertComponent("Davide", 71, 4, 0);
+
+        controller.showComponent("Davide",142);
+        controller.pickComponent("Davide", 142);
+        controller.rotateComponent("Davide", 142, 0);
+        controller.insertComponent("Davide", 142, 4, 1);
+
+        controller.showComponent("Davide",85);
+        controller.pickComponent("Davide", 85);
+        controller.rotateComponent("Davide", 85, 0);
+        controller.insertComponent("Davide", 85, 4, 2);
+
+        controller.showComponent("Davide",10);
+        controller.pickComponent("Davide", 10);
+        controller.rotateComponent("Davide", 10, 1);
+        controller.insertComponent("Davide", 10, 4, 4);
+
+        controller.showComponent("Davide",84);
+        controller.pickComponent("Davide", 84);
+        controller.rotateComponent("Davide", 84, 0);
+        controller.insertComponent("Davide", 84, 4, 5);
+
+        controller.showComponent("Davide",45);
+        controller.pickComponent("Davide", 45);
+        controller.rotateComponent("Davide", 45, 0);
+        controller.insertComponent("Davide", 45, 4, 6);
+
+        controller.setReady("Davide");
+        controller.setReady("Tommaso");
+        controller.setReady("Demetrio");
+        controller.setReady("Simone");
 
         // Player 1 Ship Check
 
@@ -771,35 +1321,341 @@ public class GameSimulationTest {
 
         // Player 3 Ship Check
 
+        // Player 4 Ship Check
+
         // Alien Management
+
+        controller.chooseAlien("Davide", new HashMap<>(Map.of(51, AlienType.ENGINE, 41, AlienType.CANNON)));
+        controller.chooseAlien("Simone", new HashMap<>(Map.of(39, AlienType.CANNON)));
+
+        assertTrue(controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().getCannonAlien());
+        assertTrue(controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().getEngineAlien());
+        assertTrue(controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().getCannonAlien());
+
 
         // Card Deck Initialization
 
+        List<Card> cardDeck = controller.getModel().getBoard().getCardPile();
+        cardDeck.clear();
+        EpidemicCard card1 = new EpidemicCard(2, false);
+        cardDeck.add(card1);
+        PiratesCard card2 = new PiratesCard(2, false, 6, 7, 2, new ArrayList<>(List.of(new CannonFire(true, NORTH), new CannonFire(false, NORTH), new CannonFire(true, NORTH))));
+        cardDeck.add(card2);
+        Planet p1 = new Planet(new HashMap<>(Map.of(ColorType.RED, 2)));
+        Planet p2 = new Planet(new HashMap<>(Map.of(ColorType.GREEN, 4)));
+        PlanetCard card3 = new PlanetCard(2, false, new ArrayList<>(List.of(p1, p2)), 3);
+        cardDeck.add(card3);
+        AbandonedStationCard card4 = new AbandonedStationCard(1, true, 5, 1, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1)));
+        cardDeck.add(card4);
+        StardustCard card5 = new StardustCard(2, false);
+        cardDeck.add(card5);
+        MeteorSwarmCard card6 = new MeteorSwarmCard(2, false, new ArrayList<>(List.of(new Meteor(false, NORTH), new Meteor(false, NORTH), new Meteor(true, WEST), new Meteor(false, WEST), new Meteor(false, WEST))));
+        cardDeck.add(card6);
+        SmugglersCard card7 = new SmugglersCard(1, true, 4, 2, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1, ColorType.BLUE, 2)),1);
+        cardDeck.add(card7);
+        PenaltyCombatZone penalty1 = new CountablePenaltyZone(4, MalusType.DAYS);
+        PenaltyCombatZone penalty2 = new CountablePenaltyZone(3, MalusType.GOODS);
+        PenaltyCombatZone penalty3 = new CannonFirePenaltyCombatZone(new ArrayList<>(List.of(new CannonFire(false, NORTH), new CannonFire(false, WEST), new CannonFire(false, EAST), new CannonFire(true, SOUTH))));
+        List<SimpleEntry<CriteriaType, PenaltyCombatZone>> damages = new ArrayList<>();
+        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CANNON, penalty1));
+        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.ENGINE, penalty2));
+        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CREW, penalty3));
+        CombatZoneCard card8 = new CombatZoneCard(2, false, damages);
+        cardDeck.add(card8);
+        Planet p3 = new Planet(new HashMap<>(Map.of(ColorType.RED, 1, ColorType.YELLOW, 1)));
+        Planet p4 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1, ColorType.BLUE, 1)));
+        Planet p5 = new Planet(new HashMap<>(Map.of(ColorType.GREEN, 2)));
+        Planet p6 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1)));
+        PlanetCard card9 = new PlanetCard(2, false, new ArrayList<>(List.of(p3, p4, p5, p6)), 2);
+        cardDeck.add(card9);
+        OpenSpaceCard card10 = new OpenSpaceCard(1, false);
+        cardDeck.add(card10);
+        Planet p7 = new Planet(new HashMap<>(Map.of(ColorType.RED, 2)));
+        Planet p8 = new Planet(new HashMap<>(Map.of(ColorType.RED, 1, ColorType.BLUE, 2)));
+        Planet p9 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1)));
+        PlanetCard card11 = new PlanetCard(2, false, new ArrayList<>(List.of(p7, p8, p9)), 2);
+        cardDeck.add(card11);
+        AbandonedShipCard card12 = new AbandonedShipCard(2, false, 5, 8, 2);
+        cardDeck.add(card12);
+
+
+        assertEquals(1, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().countExposedConnectors());
+        assertEquals(1, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().countExposedConnectors());
+        assertEquals(0, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().countExposedConnectors());
+        assertEquals(2, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getShip().countExposedConnectors());
+
         // Card 1
+
+        controller.drawCard("Davide");
+
+        assertEquals(6, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().getCrew());
+        assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().getCrew());
+        assertEquals(6, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getShip().getCrew());
+        assertEquals(6, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().getCrew());
+
 
         // Card 2
 
+        controller.drawCard("Davide");
+
+        controller.activateCannons("Davide", new ArrayList<>(List.of(10)), new ArrayList<>(List.of(124)));
+
+        controller.getBoolean("Davide", true);
+
+        assertEquals(7, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getCredits());
+        assertEquals(7, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().getBatteries());
+        assertEquals(4, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Davide")))
+                .findFirst().orElseThrow().getValue());
+
+
         // Card 3
+
+        controller.drawCard("Davide");
+
+        controller.getIndex("Davide", 0);
+        controller.getIndex("Tommaso", 1);
+
+        controller.updateGoods("Davide", new HashMap<>(Map.of(67, new ArrayList<>(List.of(ColorType.RED)), 63, new ArrayList<>(List.of(ColorType.RED)))), new ArrayList<>());
+
+        controller.updateGoods("Tommaso", new HashMap<>(Map.of(29, new ArrayList<>(List.of(ColorType.GREEN, ColorType.GREEN, ColorType.GREEN)), 24, new ArrayList<>(List.of(ColorType.GREEN)))), new ArrayList<>());
 
         // Card 4
 
+        controller.drawCard("Demetrio");
+
+        controller.getBoolean("Demetrio", false);
+
+        controller.getBoolean("Simone", false);
+
+        controller.getBoolean("Davide", true);
+
+        controller.updateGoods("Davide", new HashMap<>(Map.of(67, new ArrayList<>(List.of(ColorType.RED)), 63, new ArrayList<>(List.of(ColorType.RED)),19, new ArrayList<>(List.of(ColorType.YELLOW, ColorType.GREEN)))), new ArrayList<>());
+
+
+
+
+
         // Card 5
+
+        controller.drawCard("Demetrio");
+
+        assertEquals(-4, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso")))
+                .findFirst().orElseThrow().getValue());
+        assertEquals(-1, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Simone")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-2, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-3, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Davide")))
+                .findFirst().orElseThrow().getValue());
+
+
 
         // Card 6
 
+        controller.drawCard("Simone");
+
+        boolean finish = card6.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 9, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        finish = card6.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 3, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        finish = card6.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 9, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        controller.chooseShipPart("Simone", 0);
+
+
+        finish = card6.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 7, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        finish = card6.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 7, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
         // Card 7
+
+        controller.drawCard("Simone");
+
+        controller.getBoolean("Simone", false);
 
         // Card 8
 
+        controller.drawCard("Simone");
+
+        controller.activateCannons("Simone", new ArrayList<>(), new ArrayList<>());
+
+        controller.activateCannons("Demetrio", new ArrayList<>(List.of(1)), new ArrayList<>(List.of(128)));
+
+        controller.activateCannons("Tommaso", new ArrayList<>(List.of(9)), new ArrayList<>(List.of(127)));
+
+        assertEquals(-8, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Simone")))
+                .findFirst().orElseThrow().getValue());
+
+        controller.activateEngines("Tommaso", new ArrayList<>(), new ArrayList<>());
+
+        controller.updateGoods("Tommaso", new HashMap<>(Map.of( 24, new ArrayList<>(List.of(ColorType.GREEN)))), new ArrayList<>());
+
+        finish = card8.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 5, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        controller.activateShield("Simone", 13);
+
+        finish = card8.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 7, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        controller.activateShield("Simone", 13);
+
+        finish = card8.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 10, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        finish = card8.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 5, controller.getModel(), controller.getModel().getBoard(), "Simone");
+        if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
+
+        assertEquals(7, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().getBatteries());
+        assertTrue(controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().getDashboard(4, 1).isEmpty());
+
+
+
         // Card 9
+
+        controller.drawCard("Demetrio");
+
+        controller.getIndex("Demetrio", 1);
+
+        controller.getIndex("Davide", 0);
+
+        controller.getIndex("Tommaso", 2);
+
+        controller.getIndex("Simone", 3);
+
+        controller.updateGoods("Davide", new HashMap<>(Map.of(67, new ArrayList<>(List.of(ColorType.RED, ColorType.RED)), 63, new ArrayList<>(List.of(ColorType.RED)),19, new ArrayList<>(List.of(ColorType.YELLOW, ColorType.GREEN)), 23, new ArrayList<>(List.of(ColorType.YELLOW)))), new ArrayList<>());
+
+        controller.updateGoods("Demetrio", new HashMap<>(Map.of( 27, new ArrayList<>(List.of(ColorType.GREEN, ColorType.YELLOW, ColorType.BLUE)))), new ArrayList<>());
+
+        controller.updateGoods("Tommaso", new HashMap<>(Map.of( 31, new ArrayList<>(List.of(ColorType.GREEN, ColorType.GREEN, ColorType.GREEN)))), new ArrayList<>());
+
+        controller.updateGoods("Simone", new HashMap<>(Map.of( 65, new ArrayList<>(List.of(ColorType.YELLOW)))), new ArrayList<>());
+
+        assertEquals(-4, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio")))
+                .findFirst().orElseThrow().getValue());
+        assertEquals(-5, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Davide")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-6, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-10, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Simone")))
+                .findFirst().orElseThrow().getValue());
 
         // Card 10
 
+        controller.drawCard("Demetrio");
+
+        controller.activateEngines("Davide", new ArrayList<>(List.of(154)), new ArrayList<>(List.of(96)));
+
+        controller.activateEngines("Tommaso", new ArrayList<>(List.of(14)), new ArrayList<>(List.of(99)));
+
+        controller.activateEngines("Simone", new ArrayList<>(List.of(13)), new ArrayList<>(List.of( 92)));
+
+        assertEquals(-0, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio")))
+                .findFirst().orElseThrow().getValue());
+        assertEquals(2, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Davide")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-3, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-7, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Simone")))
+                .findFirst().orElseThrow().getValue());
+
+
         // Card 11
+
+        controller.drawCard("Davide");
+
+        controller.getIndex("Davide", 2);
+
+        controller.getIndex("Demetrio", 1);
+
+        controller.getIndex("Tommaso", 0);
+
+        controller.updateGoods("Davide", new HashMap<>(Map.of(67, new ArrayList<>(List.of(ColorType.RED, ColorType.RED)), 63, new ArrayList<>(List.of(ColorType.RED)),19, new ArrayList<>(List.of(ColorType.YELLOW, ColorType.GREEN)), 23, new ArrayList<>(List.of(ColorType.YELLOW, ColorType.YELLOW)))), new ArrayList<>());
+
+        controller.updateGoods("Demetrio", new HashMap<>(Map.of( 27, new ArrayList<>(List.of(ColorType.GREEN, ColorType.YELLOW, ColorType.BLUE)), 61, new ArrayList<>(List.of(ColorType.RED)), 17, new ArrayList<>(List.of(ColorType.BLUE, ColorType.BLUE)))), new ArrayList<>());
+
+        controller.updateGoods("Tommaso", new HashMap<>(Map.of( 31, new ArrayList<>(List.of(ColorType.GREEN, ColorType.GREEN, ColorType.GREEN)), 69, new ArrayList<>(List.of(ColorType.RED, ColorType.RED)))), new ArrayList<>());
 
         // Card 12
 
+        controller.drawCard("Davide");
+
+        controller.getBoolean("Davide", true);
+
+        controller.removeCrew("Davide", new ArrayList<>(List.of(45, 45, 41, 51, 35)));
+
+        assertEquals(-2, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio")))
+                .findFirst().orElseThrow().getValue());
+        assertEquals(-3, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Davide")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-5, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso")))
+                .findFirst().orElseThrow().getValue());
+
+        assertEquals(-7, controller.getModel().getBoard().getPlayers()
+                .stream()
+                .filter(entry -> entry.getKey().equals(controller.getModel().getBoard().getPlayerEntityByUsername("Simone")))
+                .findFirst().orElseThrow().getValue());
+
         // Final Ranking
+
+        assertEquals(3, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().countExposedConnectors());
+        assertEquals(3, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().countExposedConnectors());
+        assertEquals(1, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().countExposedConnectors());
+        assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getShip().countExposedConnectors());
+
+
+        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking(false);
+
+        assertEquals(2, finalRank.stream().filter(p -> p.getUsername().equals("Simone")).findFirst().orElseThrow().getCredits());
+        assertEquals(17, finalRank.stream().filter(p -> p.getUsername().equals("Tommaso")).findFirst().orElseThrow().getCredits());
+        assertEquals(19, finalRank.stream().filter(p -> p.getUsername().equals("Demetrio")).findFirst().orElseThrow().getCredits());
+        assertEquals(47, finalRank.stream().filter(p -> p.getUsername().equals("Davide")).findFirst().orElseThrow().getCredits());
 
     }
 
