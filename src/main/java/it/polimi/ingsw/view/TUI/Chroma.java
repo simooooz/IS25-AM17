@@ -25,7 +25,6 @@ public class Chroma {
     public static final String PURPLE = "\033[0;35m";
 
     public static final String CYAN = "\033[0;36m";
-    public static final String BLUE = "\033[0;34m";
 
     // bold
     public static final String BLACK_BOLD = "\033[1;30m";
