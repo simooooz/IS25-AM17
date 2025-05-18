@@ -129,6 +129,14 @@ public class ClientSocket extends Client {
     public void receive(Message message) {
         try {
             message.execute(this);
+
+            // Send update to Display Updater thread
+            try {
+                viewTui.getNetworkMessageQueue().put(message.getMessageType().name());
+            } catch (InterruptedException e) {
+                // Just ignore it
+            }
+
         } catch (RuntimeException e) {
             System.err.println("[CLIENT SOCKET] Receive method has caught a RuntimeException: " + e.getMessage());
             // TODO view.handleError()

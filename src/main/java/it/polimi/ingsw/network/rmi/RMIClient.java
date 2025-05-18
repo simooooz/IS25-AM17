@@ -2,6 +2,7 @@ package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.Client;
+import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.Chroma;
 
@@ -77,7 +78,11 @@ public class RMIClient extends Client {
                 case RELEASE_COMPONENT -> server.releaseComponentHandler(sessionCode, (Integer) args[0]);
             }
         } catch (RemoteException | RuntimeException e) {
-            viewTui.displayError();
+            try {
+                viewTui.getNetworkMessageQueue().put(messageType.name());
+            } catch (InterruptedException ex) {
+                // Do nothing
+            }
         }
     }
 
@@ -87,7 +92,14 @@ public class RMIClient extends Client {
             setUsername(username);
         else
             Chroma.println("username already taken", Chroma.RED);
-        viewTui.handleUIState();
+
+        // Send update to Display Updater thread
+        try {
+            viewTui.getNetworkMessageQueue().put(MessageType.USERNAME_OK.name());
+        } catch (InterruptedException e) {
+            // Just ignore it
+        }
+
     }
 
 }

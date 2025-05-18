@@ -31,7 +31,13 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
                 client.setGameController(new GameController(lobby.getPlayers(), lobby.isLearnerMode()));
             }
         }
-        client.getViewTui().handleUIState();
+
+        // Send update to Display Updater thread
+        try {
+            client.getViewTui().getNetworkMessageQueue().put(lobbyEvent.name());
+        } catch (InterruptedException e) {
+            // Just ignore it
+        }
     }
 
     @Override
@@ -40,7 +46,13 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             case PICK_COMPONENT -> client.getGameController().pickComponent(username, (Integer) params[0]);
             case RELEASE_COMPONENT -> client.getGameController().releaseComponent(username, (Integer) params[0]);
         }
-        client.getViewTui().handleUIState();
+
+        // Send update to Display Updater thread
+        try {
+            client.getViewTui().getNetworkMessageQueue().put(eventType.name());
+        } catch (InterruptedException e) {
+            // Just ignore it
+        }
     }
 
     @Override

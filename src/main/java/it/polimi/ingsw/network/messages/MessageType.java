@@ -30,14 +30,12 @@ public enum MessageType {
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
             client.setUsername(castedMessage.getArg1());
-            client.getViewTui().handleUIState();
         }
     },
     USERNAME_ALREADY_TAKEN {
         @Override
         public void execute(ClientSocket client, Message message) {
-            Chroma.println("username already taken", Chroma.RED);
-            client.getViewTui().handleUIState();
+            Chroma.println("Username already taken", Chroma.RED);
         }
     },
 
@@ -54,7 +52,6 @@ public enum MessageType {
             SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
             client.setLobby(castedMessage.getArg1());
             client.setState(UserState.IN_LOBBY);
-            client.getViewTui().handleUIState();
         }
     },
 
@@ -71,7 +68,6 @@ public enum MessageType {
             SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
             client.setLobby(castedMessage.getArg1());
             client.setState(UserState.IN_LOBBY);
-            client.getViewTui().handleUIState();
         }
     },
 
@@ -88,7 +84,6 @@ public enum MessageType {
             SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
             client.setLobby(castedMessage.getArg1());
             client.setState(UserState.IN_LOBBY);
-            client.getViewTui().handleUIState();
         }
     },
 
@@ -100,7 +95,6 @@ public enum MessageType {
             client.setState(UserState.IN_GAME);
             client.setGameController(new GameController(castedMessage.getArg1().getPlayers(), castedMessage.getArg1().isLearnerMode()));
             client.getGameController().startMatch();
-            client.getViewTui().handleUIState();
         }
     },
 
@@ -117,7 +111,6 @@ public enum MessageType {
             client.setLobby(castedMessage.getArg1());
             client.setState(UserState.LOBBY_SELECTION);
             client.setGameController(null);
-            client.getViewTui().handleUIState();
         }
     },
 
@@ -136,12 +129,9 @@ public enum MessageType {
         public void execute(ClientSocket client, Message message) {
             DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
             client.getGameController().pickComponent(castedMessage.getArg1(), castedMessage.getArg2());
-            client.getViewTui().handleUIState();
         }
     },
-    PICK_COMPONENT_RES {
-
-    },
+    PICK_COMPONENT_RES,
 
     RELEASE_COMPONENT {
         @Override
@@ -156,7 +146,6 @@ public enum MessageType {
         public void execute(ClientSocket client, Message message) {
             DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
             client.getGameController().pickComponent(castedMessage.getArg1(), castedMessage.getArg2());
-            client.getViewTui().handleUIState();
         }
     },
 
