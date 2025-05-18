@@ -137,6 +137,7 @@ public class ViewTui {
 
         return output.toString();
     }
+
     /**
      * Handles the lobby menu.
      * Allows you to create a new lobby or join a specific or random one.
@@ -211,58 +212,19 @@ public class ViewTui {
      * Handles the in-game state.
      */
     private void handleInGame() {
-        clear();
+        // todo: get components for testing (then how?)
+        Map<Integer, Component> components = client.getGameController().getModel().getBoard().getMapIdComponents();
 
-        // Get components for testing
-        Map<Integer, Component> components = new Board(new ArrayList<>(), false).getMapIdComponents();
-
-//        List<ComponentsTUI.ComponentUI> componentsView = new ArrayList<>();
-//        for (Map.Entry<Integer, Component> entry : components.entrySet()) {
-//            String key = String.valueOf(entry.getKey());
-//            Component component = entry.getValue();
-//
-//            ComponentsTUI.ComponentUI componentUI = switch (component) {
-//                case BatteryComponent ignored -> new ComponentsTUI.BatteryComponent(key, false);
-//                case CabinComponent ignored -> new ComponentsTUI.CabinComponent(key);
-//                case CannonComponent ignored -> new ComponentsTUI.CannonComponent(key, false);
-//                case CargoHoldsComponent ignored -> new ComponentsTUI.CargoHoldsComponent(key);
-//                case EngineComponent ignored -> new ComponentsTUI.EngineComponent(key, false);
-//                case OddComponent ignored -> new ComponentsTUI.OddComponent(key, AlienType.ENGINE);
-//                case ShieldComponent ignored -> new ComponentsTUI.ShieldComponent(key);
-//                case SpecialCargoHoldsComponent ignored -> new ComponentsTUI.SpecialCargoHoldsComponent(key);
-//                case null, default -> new ComponentsTUI.Component(key);
-//            };
-//
-//            componentsView.add(componentUI);
-//        }
-
-        // Display ship board
-        shipBoard.printBoard();
-
-//        // Quick lookup of the components
-//        Map<String, ComponentsTUI.ComponentUI> idToComponent = new HashMap<>();
-//        for (ComponentsTUI.ComponentUI component : componentsView) {
-//            idToComponent.put(component.getId(), component);
-//        }
-
-        boolean building = true;
-        while (building) {
             String id;
-            Component selectedComponent = null;
-
-            // Selection phase - pick a component
             do {
                 clear();
                 System.out.println(gridOfComponents(components.values().stream().toList(), 6));
                 System.out.println("\nYour current ship:");
                 shipBoard.printBoard();
 
-                Chroma.print("\nCommands:", Chroma.WHITE_BOLD);
-                System.out.println("\n- Enter component ID to select it");
-                System.out.println("- Type 'r' when ready to finish building");
-                System.out.println("- Type 'q' to quit the game");
-
-                Chroma.print("\nSelect component ID: ", Chroma.ORANGE_BOLD);
+                Chroma.println("- Type 'r' when ready to finish building", Chroma.GREEN);
+                Chroma.println("- Type 'q' to quit the game", Chroma.ORANGE);
+                System.out.print("\n- Enter component ID to pick it: ");
                 id = scanner.nextLine().trim();
 
                 if (id.equals("q")) {
@@ -271,20 +233,18 @@ public class ViewTui {
                 }
 
                 if (id.equals("r")) {
-                    // Player is ready to finish building
-                    building = false;
-                    // todo: start timer
+                    // player has finished building the ship
+                    // building = false;
                     break;
                 }
 
-                if (!components.containsKey(id) || id.isEmpty()) {
+                if (!components.containsKey(Integer.parseInt(id)) || id.isEmpty()) {
                     Chroma.println("ID not valid", Chroma.RED);
                 } else {
-                    selectedComponent = components.get(id);
-                    //selectedComponent.uncover(); // Reveal the component
+                    client.send(MessageType.PICK_COMPONENT, Integer.parseInt(id));
                 }
+            } while (id.isEmpty() || !components.containsKey(Integer.parseInt(id)));
 
-            } while (id.isEmpty() || (!id.equals("r") && !components.containsKey(id)));
 
 //            // Placement phase - place selected component on ship
 //            if (selectedComponent != null && building) {
@@ -299,10 +259,9 @@ public class ViewTui {
 //                    componentsView.remove(selectedComponent);
 //                }
 //            }
-        }
 
-        Chroma.print("READY! ", Chroma.GREEN_BOLD);
-        System.out.println("Waiting for other players to get ready...");
+        //Chroma.print("READY! ", Chroma.GREEN_BOLD);
+        //System.out.println("Waiting for other players to get ready...");
 
         // todo: gestire il time
 
