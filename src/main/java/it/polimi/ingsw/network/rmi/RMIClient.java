@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
-import it.polimi.ingsw.view.TUI.TUIColors;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -90,7 +90,7 @@ public class RMIClient extends Client {
             if (done)
                 setUsername(username);
             else
-                TUIColors.printlnColored("username already taken", TUIColors.RED);
+                Chroma.println("username already taken", Chroma.RED);
             viewTui.handleUIState();
         } catch (RemoteException e) {
             // ui.displayError

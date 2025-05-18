@@ -63,11 +63,11 @@ public class ViewTui {
         String username;
 
         do {
-            TUIColors.printColored("username: ", TUIColors.WHITE_BOLD);
+            Chroma.print("username: ", Chroma.WHITE_BOLD);
             username = scanner.nextLine().trim();
 
             if (username.isEmpty()) {
-                TUIColors.printlnColored("username cannot be empty", TUIColors.RED);
+                Chroma.println("username cannot be empty", Chroma.RED);
             }
         } while (username.isEmpty());
 
@@ -87,7 +87,7 @@ public class ViewTui {
         do {
             maxPlayers = Integer.parseInt(scanner.nextLine().trim());
             if (maxPlayers < 2 || maxPlayers > 4) {
-                TUIColors.printColored("max number of players must be between 2 and 4", TUIColors.RED);
+                Chroma.print("max number of players must be between 2 and 4", Chroma.RED);
             }
         } while (maxPlayers < 2 || maxPlayers > 4);
 
@@ -107,7 +107,7 @@ public class ViewTui {
         do {
             lobbyName = scanner.nextLine().trim();
             if (lobbyName.isEmpty()) {
-                TUIColors.printColored("lobby name cannot be empty", TUIColors.RED);
+                Chroma.print("lobby name cannot be empty", Chroma.RED);
             }
         } while (lobbyName.isEmpty());
 
@@ -123,13 +123,44 @@ public class ViewTui {
         client.send(MessageType.JOIN_RANDOM_LOBBY, learnerFlight);
     }
 
+    // utility to print a grid of components
+    public static String gridOfComponents(List<Component> components, int componentsPerRow) {
+        StringBuilder output = new StringBuilder();
+
+        List<List<Component>> componentsRows = new ArrayList<>();
+        for (int i = 0; i < components.size(); i += componentsPerRow) {
+            int end_row = Math.min(i + componentsPerRow, components.size());
+            componentsRows.add(components.subList(i, end_row));
+        }
+
+        for (List<Component> row : componentsRows) {
+            List<String[]> printed = new ArrayList<>();
+            for (Component component : row) {
+                printed.add(component.toString().split("\n"));
+            }
+
+            int height = printed.getFirst().length;
+
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < printed.size(); j++) {
+                    output.append(printed.get(j)[i]);
+                    if (j < printed.size() - 1) {
+                        output.append("  ");
+                    }
+                }
+                output.append("\n");
+            }
+        }
+
+        return output.toString();
+    }
     /**
      * Handles the lobby menu.
      * Allows you to create a new lobby or join a specific or random one.
      */
     private void handleLobbySelection() {
         clear();
-        TUIColors.printlnColored("\nMENU", TUIColors.WHITE_BOLD);
+        Chroma.println("\nMENU", Chroma.WHITE_BOLD);
         System.out.println("1. Create a new lobby");
         System.out.println("2. Join a lobby");
         System.out.println("3. Join in a random lobby");
@@ -173,7 +204,7 @@ public class ViewTui {
     private void handleInLobby() {
         clear();
         displayLobbyInfo(client.getLobby());
-        TUIColors.printlnColored("\n\nWaiting for players to join in...", TUIColors.WHITE_BOLD);
+        Chroma.println("\n\nWaiting for players to join in...", Chroma.WHITE_BOLD);
         System.out.println("Press 'q' to go back to the menu.");
 
         // todo: capire perché blocca aggiornamento e risolvere
@@ -204,53 +235,53 @@ public class ViewTui {
         // Get components for testing
         Map<Integer, Component> components = new Board(new ArrayList<>(), false).getMapIdComponents();
 
-        List<ComponentsTUI.ComponentUI> componentsView = new ArrayList<>();
-        for (Map.Entry<Integer, Component> entry : components.entrySet()) {
-            String key = String.valueOf(entry.getKey());
-            Component component = entry.getValue();
-
-            ComponentsTUI.ComponentUI componentUI = switch (component) {
-                case BatteryComponent ignored -> new ComponentsTUI.BatteryComponent(key, false);
-                case CabinComponent ignored -> new ComponentsTUI.CabinComponent(key);
-                case CannonComponent ignored -> new ComponentsTUI.CannonComponent(key, false);
-                case CargoHoldsComponent ignored -> new ComponentsTUI.CargoHoldsComponent(key);
-                case EngineComponent ignored -> new ComponentsTUI.EngineComponent(key, false);
-                case OddComponent ignored -> new ComponentsTUI.OddComponent(key, AlienType.ENGINE);
-                case ShieldComponent ignored -> new ComponentsTUI.ShieldComponent(key);
-                case SpecialCargoHoldsComponent ignored -> new ComponentsTUI.SpecialCargoHoldsComponent(key);
-                case null, default -> new ComponentsTUI.Component(key);
-            };
-
-            componentsView.add(componentUI);
-        }
+//        List<ComponentsTUI.ComponentUI> componentsView = new ArrayList<>();
+//        for (Map.Entry<Integer, Component> entry : components.entrySet()) {
+//            String key = String.valueOf(entry.getKey());
+//            Component component = entry.getValue();
+//
+//            ComponentsTUI.ComponentUI componentUI = switch (component) {
+//                case BatteryComponent ignored -> new ComponentsTUI.BatteryComponent(key, false);
+//                case CabinComponent ignored -> new ComponentsTUI.CabinComponent(key);
+//                case CannonComponent ignored -> new ComponentsTUI.CannonComponent(key, false);
+//                case CargoHoldsComponent ignored -> new ComponentsTUI.CargoHoldsComponent(key);
+//                case EngineComponent ignored -> new ComponentsTUI.EngineComponent(key, false);
+//                case OddComponent ignored -> new ComponentsTUI.OddComponent(key, AlienType.ENGINE);
+//                case ShieldComponent ignored -> new ComponentsTUI.ShieldComponent(key);
+//                case SpecialCargoHoldsComponent ignored -> new ComponentsTUI.SpecialCargoHoldsComponent(key);
+//                case null, default -> new ComponentsTUI.Component(key);
+//            };
+//
+//            componentsView.add(componentUI);
+//        }
 
         // Display ship board
         shipBoard.printBoard();
 
-        // Quick lookup of the components
-        Map<String, ComponentsTUI.ComponentUI> idToComponent = new HashMap<>();
-        for (ComponentsTUI.ComponentUI component : componentsView) {
-            idToComponent.put(component.getId(), component);
-        }
+//        // Quick lookup of the components
+//        Map<String, ComponentsTUI.ComponentUI> idToComponent = new HashMap<>();
+//        for (ComponentsTUI.ComponentUI component : componentsView) {
+//            idToComponent.put(component.getId(), component);
+//        }
 
         boolean building = true;
         while (building) {
             String id;
-            ComponentsTUI.ComponentUI selectedComponent = null;
+            Component selectedComponent = null;
 
             // Selection phase - pick a component
             do {
                 clear();
-                System.out.println(ComponentsTUI.gridOfComponents(componentsView, 13));
+                System.out.println(gridOfComponents(components.values().stream().toList(), 6));
                 System.out.println("\nYour current ship:");
                 shipBoard.printBoard();
 
-                TUIColors.printColored("\nCommands:", TUIColors.WHITE_BOLD);
+                Chroma.print("\nCommands:", Chroma.WHITE_BOLD);
                 System.out.println("\n- Enter component ID to select it");
                 System.out.println("- Type 'r' when ready to finish building");
                 System.out.println("- Type 'q' to quit the game");
 
-                TUIColors.printColored("\nSelect component ID: ", TUIColors.YELLOW_BOLD);
+                Chroma.print("\nSelect component ID: ", Chroma.ORANGE_BOLD);
                 id = scanner.nextLine().trim();
 
                 if (id.equals("q")) {
@@ -265,31 +296,31 @@ public class ViewTui {
                     break;
                 }
 
-                if (!idToComponent.containsKey(id) || id.isEmpty()) {
-                    TUIColors.printlnColored("ID not valid", TUIColors.RED);
+                if (!components.containsKey(id) || id.isEmpty()) {
+                    Chroma.println("ID not valid", Chroma.RED);
                 } else {
-                    selectedComponent = idToComponent.get(id);
-                    selectedComponent.uncover(); // Reveal the component
+                    selectedComponent = components.get(id);
+                    //selectedComponent.uncover(); // Reveal the component
                 }
 
-            } while (id.isEmpty() || (!id.equals("r") && !idToComponent.containsKey(id)));
+            } while (id.isEmpty() || (!id.equals("r") && !components.containsKey(id)));
 
-            // Placement phase - place selected component on ship
-            if (selectedComponent != null && building) {
-                clear();
-                System.out.println("Selected component: " + selectedComponent.getId());
-                System.out.println(selectedComponent);
-                shipBoard.printBoard();
-
-                if (shipBoard.promptForPlacement(selectedComponent, scanner)) {
-                    // Component placed successfully
-                    idToComponent.remove(selectedComponent.getId());
-                    componentsView.remove(selectedComponent);
-                }
-            }
+//            // Placement phase - place selected component on ship
+//            if (selectedComponent != null && building) {
+//                clear();
+//                System.out.println("Selected component: " + selectedComponent.getId());
+//                System.out.println(selectedComponent);
+//                shipBoard.printBoard();
+//
+//                if (shipBoard.promptForPlacement(components, scanner)) {
+//                    // Component placed successfully
+//                    components.remove(selectedComponent.getId());
+//                    componentsView.remove(selectedComponent);
+//                }
+//            }
         }
 
-        TUIColors.printColored("READY! ", TUIColors.GREEN_BOLD);
+        Chroma.print("READY! ", Chroma.GREEN_BOLD);
         System.out.println("Waiting for other players to get ready...");
 
         // todo: gestire il time
@@ -349,7 +380,7 @@ public class ViewTui {
 
     public void handleDisconnect() {
         // TODO send message disconnect ?
-        TUIColors.printColored("\nBye!", TUIColors.YELLOW_BOLD);
+        Chroma.print("\nBye!", Chroma.ORANGE_BOLD);
         client.closeConnection();
         System.exit(0);
     }

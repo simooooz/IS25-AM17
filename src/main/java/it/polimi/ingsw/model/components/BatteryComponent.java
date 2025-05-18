@@ -4,6 +4,9 @@ import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.player.Ship;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BatteryComponent extends Component {
 
     private final boolean isTriple;
@@ -42,4 +45,14 @@ public class BatteryComponent extends Component {
         ship.setBatteries(ship.getBatteries() - batteries);
     }
 
+    @Override
+    public List<String> icon() {
+        String text = isTriple ? (" 🔋" + "\u200A" + "🔋" + "\u200A" + "🔋 ") : ("  🔋" + "\u200A"  + "\u200A" + "\u200A" + "🔋  ");
+
+        return new ArrayList<>(List.of(
+                text,
+                repeat(" ", 9),
+                "   " + getBatteries() + "/" + (isTriple ? 3 : 2) + "   "));
+
+    }
 }

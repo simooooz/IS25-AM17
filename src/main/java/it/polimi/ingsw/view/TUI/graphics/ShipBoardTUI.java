@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.TUI.graphics;
 
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.view.TUI.TUIColors;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -98,14 +98,14 @@ public class ShipBoardTUI {
                         String[] componentLines = board.get(pos).print().split("\n");
                         output.append(componentLines[componentRow]).append(" ");
                     } else {
-                        String bgColor = isPlayable ? TUIColors.PURPLE_BACKGROUND : TUIColors.DARK_PURPLE_BACKGROUND;
+                        String bgColor = isPlayable ? Chroma.PURPLE_BACKGROUND : Chroma.DARK_PURPLE_BACKGROUND;
 
                         if (componentRow == 0) {
-                            output.append(bgColor + "┌──────┐" + TUIColors.RESET + " ");
+                            output.append(bgColor + "┌──────┐" + Chroma.RESET + " ");
                         } else if (componentRow == 1) {
-                            output.append(bgColor + "│      │" + TUIColors.RESET + " ");
+                            output.append(bgColor + "│      │" + Chroma.RESET + " ");
                         } else {
-                            output.append(bgColor + "└──────┘" + TUIColors.RESET + " ");
+                            output.append(bgColor + "└──────┘" + Chroma.RESET + " ");
                         }
                     }
                 }
@@ -113,7 +113,7 @@ public class ShipBoardTUI {
             }
         }
 
-        TUIColors.printlnColored(output.toString(), TUIColors.PURPLE);
+        Chroma.println(output.toString(), Chroma.PURPLE);
     }
 
 
@@ -185,7 +185,7 @@ public class ShipBoardTUI {
 
             String[] parts = input.split(",");
             if (parts.length != 2) {
-                TUIColors.printlnColored("Invalid position format. Use format like '4,5'.", TUIColors.RED);
+                Chroma.println("Invalid position format. Use format like '4,5'.", Chroma.RED);
                 continue;
             }
 
@@ -197,10 +197,10 @@ public class ShipBoardTUI {
                 placed = placeComponent(component, position);
 
                 if (!placed) {
-                    TUIColors.printlnColored("Cannot place component there. Try another position.", TUIColors.RED);
+                    Chroma.println("Cannot place component there. Try another position.", Chroma.RED);
                 }
             } catch (NumberFormatException e) {
-                TUIColors.printlnColored("Invalid numbers. Please enter valid integers.", TUIColors.RED);
+                Chroma.println("Invalid numbers. Please enter valid integers.", Chroma.RED);
             }
         }
 

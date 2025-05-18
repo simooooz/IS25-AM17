@@ -6,7 +6,7 @@ import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
 import it.polimi.ingsw.network.socket.server.Server;
-import it.polimi.ingsw.view.TUI.TUIColors;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 
 @SuppressWarnings("unchecked")
@@ -36,7 +36,7 @@ public enum MessageType {
     USERNAME_ALREADY_TAKEN {
         @Override
         public void execute(ClientSocket client, Message message) {
-            TUIColors.printlnColored("username already taken", TUIColors.RED);
+            Chroma.println("username already taken", Chroma.RED);
             client.getViewTui().handleUIState();
         }
     },
