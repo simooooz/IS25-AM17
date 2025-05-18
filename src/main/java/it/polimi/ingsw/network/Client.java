@@ -52,6 +52,10 @@ public abstract class Client {
         this.state = state;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public void setUsername(String username) {
         this.username = username;
         setState(UserState.LOBBY_SELECTION);
