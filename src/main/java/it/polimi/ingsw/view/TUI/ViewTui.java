@@ -55,44 +55,27 @@ public class ViewTui {
         }
     }
 
-
     /**
      * Prompt for username.
      */
     private void handleUsername() {
-        String username;
-
-        do {
-            Chroma.print("username: ", Chroma.WHITE_BOLD);
-            username = scanner.nextLine().trim();
-
-            if (username.isEmpty()) {
-                Chroma.println("username cannot be empty", Chroma.RED);
-            }
-        } while (username.isEmpty());
-
+        String username = InputUtility.requestString("Username: ", false, 3, 18);
         client.send(MessageType.SET_USERNAME, username);
     }
-
 
     /**
      * Handles the lobby creation process.
      */
     private void handleCreateLobby() {
-        System.out.print("Name of the lobby: ");
-        String lobbyName = scanner.nextLine().trim();
+        clear();
+        Chroma.println("CREATE LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
 
-        System.out.print("Number of players (2-4): ");
-        int maxPlayers;
-        do {
-            maxPlayers = Integer.parseInt(scanner.nextLine().trim());
-            if (maxPlayers < 2 || maxPlayers > 4) {
-                Chroma.print("max number of players must be between 2 and 4", Chroma.RED);
-            }
-        } while (maxPlayers < 2 || maxPlayers > 4);
-
-        System.out.print("Learner flight? (true/false): ");
-        boolean learnerFlight = Boolean.parseBoolean(scanner.nextLine().trim());
+        String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
+        if (lobbyName == null) handleUIState();
+        Integer maxPlayers = InputUtility.requestInt("Number of players (2-4): ", true, 2, 4);
+        if (maxPlayers == null) handleUIState();
+        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false): ", true);
+        if (learnerFlight == null) handleUIState();
 
         client.send(MessageType.CREATE_LOBBY, lobbyName, maxPlayers, learnerFlight);
     }
@@ -101,15 +84,11 @@ public class ViewTui {
      * Handles the process of joining a specified existing lobby.
      */
     private void handleJoinLobby() {
-        System.out.print("Name of the lobby: ");
+        clear();
+        Chroma.println("JOIN LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
 
-        String lobbyName;
-        do {
-            lobbyName = scanner.nextLine().trim();
-            if (lobbyName.isEmpty()) {
-                Chroma.print("lobby name cannot be empty", Chroma.RED);
-            }
-        } while (lobbyName.isEmpty());
+        String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
+        if (lobbyName == null) handleUIState();
 
         client.send(MessageType.JOIN_LOBBY, lobbyName);
     }
@@ -118,8 +97,12 @@ public class ViewTui {
      * Handles the process of joining a random lobby.
      */
     private void handleJoinRandomLobby() {
-        System.out.print("Learner flight? (true/false): ");
-        boolean learnerFlight = Boolean.parseBoolean(scanner.nextLine().trim());
+        clear();
+        Chroma.println("JOIN RANDOM LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
+
+        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false): ", true);
+        if (learnerFlight == null) handleUIState();
+
         client.send(MessageType.JOIN_RANDOM_LOBBY, learnerFlight);
     }
 
@@ -160,37 +143,35 @@ public class ViewTui {
      */
     private void handleLobbySelection() {
         clear();
-        Chroma.println("\nMENU", Chroma.WHITE_BOLD);
+        Chroma.println("MENU", Chroma.WHITE_BOLD);
         System.out.println("1. Create a new lobby");
         System.out.println("2. Join a lobby");
         System.out.println("3. Join in a random lobby");
         System.out.println("4. Quit the game");
-        System.out.print("\nChoose an option (1-4): ");
-
-        String choice = scanner.nextLine().trim();
+        int choice = InputUtility.requestInt("Choose an option (1-4): ", false,1, 4);
 
         switch (choice) {
-            case "1":
+            case 1:
                 handleCreateLobby();
                 break;
-            case "2":
+            case 2:
                 handleJoinLobby();
                 break;
-            case "3":
+            case 3:
                 handleJoinRandomLobby();
                 break;
-            case "4":
+            case 4:
                 handleDisconnect();
                 break;
             default:
-                System.out.println("Option not valid. Please try again.");
+                Chroma.println("Option not valid. Please try again.", Chroma.RED);
                 break;
         }
     }
 
     private void displayLobbyInfo(Lobby lobby) {
         System.out.println("✅ Lobby ID: " + lobby.getGameID());
-        System.out.println("👥 Players:");
+        System.out.println("👥 " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players:");
 
         for (String player : lobby.getPlayers()) {
             System.out.println("- " + player);
@@ -360,7 +341,7 @@ public class ViewTui {
      */
     public void start() {
         clear();
-        System.out.println("\nWelcome to");
+        System.out.println("Welcome to");
         System.out.println(
                 """
                         
@@ -372,7 +353,7 @@ public class ViewTui {
                          ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
                         """
         );
-        System.out.println("\nPress ENTER to continue...");
+        System.out.println("Press ENTER to continue...");
         scanner.nextLine();
 
         handleUIState();
@@ -380,9 +361,15 @@ public class ViewTui {
 
     public void handleDisconnect() {
         // TODO send message disconnect ?
-        Chroma.print("\nBye!", Chroma.ORANGE_BOLD);
+        Chroma.println("Bye!", Chroma.YELLOW_BOLD);
         client.closeConnection();
         System.exit(0);
+    }
+
+    public void displayError() {
+        // TODO sistema che fa clear ma non si vede
+        Chroma.println("Remote error :/ please try again", Chroma.RED);
+        handleUIState();
     }
 
 }

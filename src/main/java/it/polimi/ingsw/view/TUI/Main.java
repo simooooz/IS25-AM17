@@ -14,9 +14,8 @@ public class Main {
     public static void main(String[] args) {
         if (args[0].equals("client")) {
 
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Using Client...\nPress 1 to choose socket client or 2 for RMI: ");
-            int clientType = scanner.nextInt();
+            System.out.println("Using client...");
+            int clientType = InputUtility.requestInt("Press 1 to choose socket client or 2 for RMI: ", false, 1, 2);
 
             if (clientType == 1)
                 new ClientSocket(Constants.DEFAULT_HOST, Constants.DEFAULT_SOCKET_PORT);
