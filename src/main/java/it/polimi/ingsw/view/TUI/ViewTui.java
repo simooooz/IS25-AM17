@@ -68,17 +68,7 @@ public class ViewTui {
      * Prompt for username.
      */
     private void handleUsername() {
-        String username;
-
-        do {
-            Chroma.print("username: ", Chroma.WHITE_BOLD);
-            username = scanner.nextLine().trim();
-
-            if (username.isEmpty()) {
-                Chroma.println("username cannot be empty", Chroma.RED);
-            }
-        } while (username.isEmpty());
-
+        String username = InputUtility.requestString("Username: ", false, 3, 18);
         client.send(MessageType.SET_USERNAME, username);
     }
 
@@ -86,20 +76,15 @@ public class ViewTui {
      * Handles the lobby creation process.
      */
     private void handleCreateLobby() {
-        System.out.print("Name of the lobby: ");
-        String lobbyName = scanner.nextLine().trim();
+        clear();
+        Chroma.println("CREATE LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
 
-        System.out.print("Number of players (2-4): ");
-        int maxPlayers;
-        do {
-            maxPlayers = Integer.parseInt(scanner.nextLine().trim());
-            if (maxPlayers < 2 || maxPlayers > 4) {
-                Chroma.print("max number of players must be between 2 and 4", Chroma.RED);
-            }
-        } while (maxPlayers < 2 || maxPlayers > 4);
-
-        System.out.print("Learner flight? (true/false): ");
-        boolean learnerFlight = Boolean.parseBoolean(scanner.nextLine().trim());
+        String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
+        if (lobbyName == null) handleUIState();
+        Integer maxPlayers = InputUtility.requestInt("Number of players (2-4): ", true, 2, 4);
+        if (maxPlayers == null) handleUIState();
+        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false): ", true);
+        if (learnerFlight == null) handleUIState();
 
         client.send(MessageType.CREATE_LOBBY, lobbyName, maxPlayers, learnerFlight);
     }
@@ -108,15 +93,11 @@ public class ViewTui {
      * Handles the process of joining a specified existing lobby.
      */
     private void handleJoinLobby() {
-        System.out.print("Name of the lobby: ");
+        clear();
+        Chroma.println("JOIN LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
 
-        String lobbyName;
-        do {
-            lobbyName = scanner.nextLine().trim();
-            if (lobbyName.isEmpty()) {
-                Chroma.print("lobby name cannot be empty", Chroma.RED);
-            }
-        } while (lobbyName.isEmpty());
+        String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
+        if (lobbyName == null) handleUIState();
 
         client.send(MessageType.JOIN_LOBBY, lobbyName);
     }
@@ -125,8 +106,12 @@ public class ViewTui {
      * Handles the process of joining a random lobby.
      */
     private void handleJoinRandomLobby() {
-        System.out.print("Learner flight? (true/false): ");
-        boolean learnerFlight = Boolean.parseBoolean(scanner.nextLine().trim());
+        clear();
+        Chroma.println("JOIN RANDOM LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
+
+        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false): ", true);
+        if (learnerFlight == null) handleUIState();
+
         client.send(MessageType.JOIN_RANDOM_LOBBY, learnerFlight);
     }
 
@@ -168,37 +153,35 @@ public class ViewTui {
      */
     private void handleLobbySelection() {
         clear();
-        Chroma.println("\nMENU", Chroma.WHITE_BOLD);
+        Chroma.println("MENU", Chroma.WHITE_BOLD);
         System.out.println("1. Create a new lobby");
         System.out.println("2. Join a lobby");
         System.out.println("3. Join in a random lobby");
         System.out.println("4. Quit the game");
-        System.out.print("\nChoose an option (1-4): ");
-
-        String choice = scanner.nextLine().trim();
+        int choice = InputUtility.requestInt("Choose an option (1-4): ", false,1, 4);
 
         switch (choice) {
-            case "1":
+            case 1:
                 handleCreateLobby();
                 break;
-            case "2":
+            case 2:
                 handleJoinLobby();
                 break;
-            case "3":
+            case 3:
                 handleJoinRandomLobby();
                 break;
-            case "4":
+            case 4:
                 handleDisconnect();
                 break;
             default:
-                System.out.println("Option not valid. Please try again.");
+                Chroma.println("Option not valid. Please try again.", Chroma.RED);
                 break;
         }
     }
 
     private void displayLobbyInfo(Lobby lobby) {
         System.out.println("✅ Lobby ID: " + lobby.getGameID());
-        System.out.println("👥 Players:");
+        System.out.println("👥 " + lobby.getPlayers().size() + "/" + lobby.getMaxPlayers() + " players:");
 
         for (String player : lobby.getPlayers()) {
             System.out.println("- " + player);
@@ -248,58 +231,19 @@ public class ViewTui {
      * Handles the in-game state.
      */
     private void handleInGame() {
-        clear();
+        // todo: get components for testing (then how?)
+        Map<Integer, Component> components = client.getGameController().getModel().getBoard().getMapIdComponents();
 
-        // Get components for testing
-        Map<Integer, Component> components = new Board(new ArrayList<>(), client.getLobby().isLearnerMode()).getMapIdComponents();
-
-//        List<ComponentsTUI.ComponentUI> componentsView = new ArrayList<>();
-//        for (Map.Entry<Integer, Component> entry : components.entrySet()) {
-//            String key = String.valueOf(entry.getKey());
-//            Component component = entry.getValue();
-//
-//            ComponentsTUI.ComponentUI componentUI = switch (component) {
-//                case BatteryComponent ignored -> new ComponentsTUI.BatteryComponent(key, false);
-//                case CabinComponent ignored -> new ComponentsTUI.CabinComponent(key);
-//                case CannonComponent ignored -> new ComponentsTUI.CannonComponent(key, false);
-//                case CargoHoldsComponent ignored -> new ComponentsTUI.CargoHoldsComponent(key);
-//                case EngineComponent ignored -> new ComponentsTUI.EngineComponent(key, false);
-//                case OddComponent ignored -> new ComponentsTUI.OddComponent(key, AlienType.ENGINE);
-//                case ShieldComponent ignored -> new ComponentsTUI.ShieldComponent(key);
-//                case SpecialCargoHoldsComponent ignored -> new ComponentsTUI.SpecialCargoHoldsComponent(key);
-//                case null, default -> new ComponentsTUI.Component(key);
-//            };
-//
-//            componentsView.add(componentUI);
-//        }
-
-        // Display ship board
-        shipBoard.printBoard();
-
-//        // Quick lookup of the components
-//        Map<String, ComponentsTUI.ComponentUI> idToComponent = new HashMap<>();
-//        for (ComponentsTUI.ComponentUI component : componentsView) {
-//            idToComponent.put(component.getId(), component);
-//        }
-
-        boolean building = true;
-        while (building) {
             String id;
-            Component selectedComponent = null;
-
-            // Selection phase - pick a component
             do {
                 clear();
                 System.out.println(gridOfComponents(components.values().stream().toList(), 6));
                 System.out.println("\nYour current ship:");
                 shipBoard.printBoard();
 
-                Chroma.print("\nCommands:", Chroma.WHITE_BOLD);
-                System.out.println("\n- Enter component ID to select it");
-                System.out.println("- Type 'r' when ready to finish building");
-                System.out.println("- Type 'q' to quit the game");
-
-                Chroma.print("\nSelect component ID: ", Chroma.ORANGE_BOLD);
+                Chroma.println("- Type 'r' when ready to finish building", Chroma.GREEN);
+                Chroma.println("- Type 'q' to quit the game", Chroma.ORANGE);
+                System.out.print("\n- Enter component ID to pick it: ");
                 id = scanner.nextLine().trim();
 
                 if (id.equals("q")) {
@@ -308,25 +252,18 @@ public class ViewTui {
                 }
 
                 if (id.equals("r")) {
-                    // Player is ready to finish building
-                    building = false;
-                    // todo: start timer
+                    // player has finished building the ship
+                    // building = false;
                     break;
                 }
 
-                try {
-                    int componentId = Integer.parseInt(id);
-                    if (!components.containsKey(componentId)) {
-                        Chroma.println("ID not valid", Chroma.RED);
-                    } else {
-                        selectedComponent = components.get(componentId);
-                        //selectedComponent.uncover(); // Reveal the component
-                    }
-                } catch (NumberFormatException e) {
-                    Chroma.println("ID must be a number", Chroma.RED);
+                if (!components.containsKey(Integer.parseInt(id)) || id.isEmpty()) {
+                    Chroma.println("ID not valid", Chroma.RED);
+                } else {
+                    client.send(MessageType.PICK_COMPONENT, Integer.parseInt(id));
                 }
+            } while (id.isEmpty() || !components.containsKey(Integer.parseInt(id)));
 
-            } while (!id.equals("r") && selectedComponent == null);
 
 //            // Placement phase - place selected component on ship
 //            if (selectedComponent != null && building) {
@@ -341,10 +278,9 @@ public class ViewTui {
 //                    componentsView.remove(selectedComponent);
 //                }
 //            }
-        }
 
-        Chroma.print("READY! ", Chroma.GREEN_BOLD);
-        System.out.println("Waiting for other players to get ready...");
+        //Chroma.print("READY! ", Chroma.GREEN_BOLD);
+        //System.out.println("Waiting for other players to get ready...");
 
         // todo: gestire il time
 
@@ -383,8 +319,8 @@ public class ViewTui {
      */
     public void start() {
         clear();
-        System.out.println("\nWelcome to");
-        Chroma.print(
+        System.out.println("Welcome to");
+        Chroma.println(
                 """
                         
                          ██████╗  █████╗ ██╗      █████╗ ██╗  ██╗██╗   ██╗    ████████╗██████╗ ██╗   ██╗ ██████╗██╗  ██╗███████╗██████╗ 
@@ -395,7 +331,7 @@ public class ViewTui {
                          ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
                         """, Chroma.ORANGE
         );
-        System.out.println("\nPress ENTER to continue...");
+        System.out.println("Press ENTER to continue...");
         scanner.nextLine();
 
         handleUIState();
@@ -403,8 +339,15 @@ public class ViewTui {
 
     public void handleDisconnect() {
         // TODO send message disconnect ?
-        Chroma.print("\nBye!", Chroma.ORANGE_BOLD);
+        Chroma.println("Bye!", Chroma.YELLOW_BOLD);
         client.closeConnection();
         System.exit(0);
     }
+
+    public void displayError() {
+        // TODO sistema che fa clear ma non si vede
+        Chroma.println("Remote error :/ please try again", Chroma.RED);
+        handleUIState();
+    }
+
 }

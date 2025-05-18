@@ -81,6 +81,10 @@ public class Lobby implements Serializable {
         return players;
     }
 
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
     public boolean isLearnerMode() {
         return learnerMode;
     }
@@ -141,7 +145,6 @@ public class Lobby implements Serializable {
                 user.setState(UserState.IN_GAME);
                 user.setGameController(game);
             }
-            User.getUser(players.getFirst()).notifyLobbyEvent(MessageType.GAME_STARTED_OK, this);
         } catch (UserNotFoundException e) {
             this.state = LobbyState.WAITING;
             throw e;

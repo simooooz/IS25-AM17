@@ -62,7 +62,10 @@ public class User {
                 }
             }
             else {
-                Message message = Constants.createMessage(gameEvent, username, args);
+                Object[] newArgs = new Object[args.length + 1];
+                newArgs[0] = username;
+                System.arraycopy(args, 0, newArgs, 1, args.length);
+                Message message = Constants.createMessage(gameEvent, newArgs);
                 ((ClientHandler) userToNotify).send(message);
             }
         }

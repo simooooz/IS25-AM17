@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.model.game.LobbyState;
 import it.polimi.ingsw.network.messages.MessageType;
 
 public abstract class ServerBasis {
@@ -28,14 +29,14 @@ public abstract class ServerBasis {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
         Lobby lobby = MatchController.getInstance().joinGame(user.getUsername(), lobbyName);
         user.setLobby(lobby);
-        user.notifyLobbyEvent(MessageType.JOIN_LOBBY_OK, lobby);
+        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_LOBBY_OK, lobby);
     }
 
     public static void joinRandomLobby(User user, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
         Lobby lobby = MatchController.getInstance().joinRandomGame(user.getUsername(), learnerMode);
         user.setLobby(lobby);
-        user.notifyLobbyEvent(MessageType.JOIN_RANDOM_LOBBY_OK, lobby);
+        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_RANDOM_LOBBY_OK, lobby);
     }
 
     public static void leaveGame(User user) {

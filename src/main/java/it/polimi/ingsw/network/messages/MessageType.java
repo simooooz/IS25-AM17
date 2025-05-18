@@ -99,6 +99,7 @@ public enum MessageType {
             client.setLobby(castedMessage.getArg1());
             client.setState(UserState.IN_GAME);
             client.setGameController(new GameController(castedMessage.getArg1().getPlayers(), castedMessage.getArg1().isLearnerMode()));
+            client.getGameController().startMatch();
             client.getViewTui().handleUIState();
         }
     },
@@ -130,14 +131,16 @@ public enum MessageType {
             Server.pickComponent(user, castedMessage.getArg1());
             user.notifyGameEvent(this, castedMessage.getArg1());
         }
-    },
-    PICK_COMPONENT_RES {
+
         @Override
         public void execute(ClientSocket client, Message message) {
             DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
             client.getGameController().pickComponent(castedMessage.getArg1(), castedMessage.getArg2());
             client.getViewTui().handleUIState();
         }
+    },
+    PICK_COMPONENT_RES {
+
     },
 
     RELEASE_COMPONENT {
