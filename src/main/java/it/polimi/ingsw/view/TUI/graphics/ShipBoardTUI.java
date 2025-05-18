@@ -65,8 +65,17 @@ public class ShipBoardTUI {
             new Position(0, 4)
     );
 
+    private static final Set<Position> RESERVE_CELL = Set.of(
+            new Position(0,5),
+            new Position(0,6)
+    );
+
     private boolean isValidPlayableCell(int row, int col) {
         return VALID_PLAYABLE_CELLS.contains(new Position(row, col));
+    }
+
+    private boolean isReserveCell(int row, int col) {
+        return RESERVE_CELL.contains(new Position(row, col));
     }
 
 
@@ -75,16 +84,17 @@ public class ShipBoardTUI {
 
         output.append("   ");
         for (int col = 0; col < cols; col++) {
-            output.append(String.format("  %-2d   ", col));
+            output.append(Chroma.color(String.format("      %-2d     ", col + 4), Chroma.RESET, false));
         }
         output.append("\n");
 
         for (int row = 0; row < rows; row++) {
-            // Print each of the 3 component rows
-            for (int componentRow = 0; componentRow < 3; componentRow++) {
-                // Row label for the middle row (also starts from 4)
-                if (componentRow == 1) {
-                    output.append((row)).append("  ");
+            // Print each of the component rows, now with 5 rows total instead of 3
+            // (1 top row, 3 middle rows instead of 1, 1 bottom row)
+            for (int componentRow = 0; componentRow < 5; componentRow++) {
+                // Row label for the middle row (second of the three middle rows)
+                if (componentRow == 2) {
+                    output.append((row + 5)).append("  ");
                 } else {
                     output.append("   ");
                 }
@@ -93,30 +103,60 @@ public class ShipBoardTUI {
                     Position pos = new Position(row, col);
 
                     boolean isPlayable = isValidPlayableCell(row, col);
+                    boolean isReserve = isReserveCell(row, col);
 
                     if (board.containsKey(pos)) {
                         String[] componentLines = board.get(pos).print().split("\n");
-                        output.append(componentLines[componentRow]).append(" ");
-                    } else {
-                        String bgColor = isPlayable ? Chroma.PURPLE_BACKGROUND : Chroma.DARK_PURPLE_BACKGROUND;
 
                         if (componentRow == 0) {
-                            output.append(bgColor + "┌──────┐" + Chroma.RESET + " ");
-                        } else if (componentRow == 1) {
-                            output.append(bgColor + "│      │" + Chroma.RESET + " ");
+                            // Top row
+                            output.append(componentLines[0]).append(" ");
+                        } else if (componentRow == 4) {
+                            // Bottom row
+                            output.append(componentLines[2]).append(" ");
                         } else {
-                            output.append(bgColor + "└──────┘" + Chroma.RESET + " ");
+                            output.append(componentLines[1]).append(" ");
+                        }
+                    } else {
+                        String bgColor;
+                        if (isPlayable) {
+                            bgColor = Chroma.PURPLE_BACKGROUND;
+                        } else if (isReserve) {
+                            bgColor = Chroma.DARKPURPLE_BACKGROUND;
+                        } else {
+                            bgColor = Chroma.RESET;
+                        }
+                        // Adjust the cell drawing for 5 rows total
+                        if (componentRow == 0) {
+                            // Top row
+                            output.append(Chroma.bg(" ┌─────────┐ ", bgColor));
+                        } else if (componentRow == 4) {
+                            // Bottom row
+                            output.append(Chroma.bg(" └─────────┘ ", bgColor));
+                        } else {
+                            // Middle rows (now 3 rows instead of 1)
+                            output.append(Chroma.bg(" │         │ ", bgColor));
                         }
                     }
+
                 }
+
+                if (componentRow == 2) {
+                    output.append("  ").append(row + 5);
+                }
+
                 output.append("\n");
             }
         }
 
+        output.append("   ");
+        for (int col = 0; col < cols; col++) {
+            output.append(Chroma.color(String.format("      %-2d     ", col + 4), Chroma.RESET, false));
+        }
+        output.append("\n");
+
         Chroma.println(output.toString(), Chroma.PURPLE);
     }
-
-
 
     /**
      * Attempts to place a component at the specified position
@@ -124,88 +164,88 @@ public class ShipBoardTUI {
      * @param position The position to place it at
      * @return true if placement was successful, false otherwise
      */
-    public boolean placeComponent(ComponentsTUI.ComponentUI component, Position position) {
-        // Check if position is valid
-        if (position.row < 0 || position.row >= rows ||
-                position.col < 0 || position.col >= cols) {
-            return false;
-        }
-
-        // Check if position is empty
-        if (board.containsKey(position)) {
-            return false;
-        }
-
-        // Check if the component would be adjacent to another component (except for the first cabin)
-        if (!board.isEmpty()) {
-            boolean hasAdjacent = false;
-            for (Position adjPos : getAdjacentPositions(position)) {
-                if (board.containsKey(adjPos)) {
-                    hasAdjacent = true;
-                    break;
-                }
-            }
-
-            if (!hasAdjacent) {
-                return false; // Component must connect to existing structure
-            }
-        }
-
-        // Place the component
-        board.put(position, component);
-        return true;
-    }
-
-    /**
-     * Get valid adjacent positions
-     */
-    private Position[] getAdjacentPositions(Position pos) {
-        return new Position[] {
-                new Position(pos.row - 1, pos.col),  // Up
-                new Position(pos.row + 1, pos.col),  // Down
-                new Position(pos.row, pos.col - 1),  // Left
-                new Position(pos.row, pos.col + 1)   // Right
-        };
-    }
-
-    /**
-     * Prompts the user to place a component and handles the interaction
-     */
-    public boolean promptForPlacement(ComponentsTUI.ComponentUI component, Scanner scanner) {
-        boolean placed = false;
-
-        while (!placed) {
-            System.out.println("\nWhere would you like to place " + component.getId() + "?");
-            System.out.print("Enter position (row,col) or 'q' to cancel: ");
-            String input = scanner.nextLine().trim().toUpperCase();
-
-            if (input.equals("Q")) {
-                return false;
-            }
-
-            String[] parts = input.split(",");
-            if (parts.length != 2) {
-                Chroma.println("Invalid position format. Use format like '4,5'.", Chroma.RED);
-                continue;
-            }
-
-            try {
-                int row = Integer.parseInt(parts[0].trim());
-                int col = Integer.parseInt(parts[1].trim());
-
-                Position position = new Position(row, col);
-                placed = placeComponent(component, position);
-
-                if (!placed) {
-                    Chroma.println("Cannot place component there. Try another position.", Chroma.RED);
-                }
-            } catch (NumberFormatException e) {
-                Chroma.println("Invalid numbers. Please enter valid integers.", Chroma.RED);
-            }
-        }
-
-        return true;
-    }
+//    public boolean placeComponent(ComponentsTUI.ComponentUI component, Position position) {
+//        // Check if position is valid
+//        if (position.row < 0 || position.row >= rows ||
+//                position.col < 0 || position.col >= cols) {
+//            return false;
+//        }
+//
+//        // Check if position is empty
+//        if (board.containsKey(position)) {
+//            return false;
+//        }
+//
+//        // Check if the component would be adjacent to another component (except for the first cabin)
+//        if (!board.isEmpty()) {
+//            boolean hasAdjacent = false;
+//            for (Position adjPos : getAdjacentPositions(position)) {
+//                if (board.containsKey(adjPos)) {
+//                    hasAdjacent = true;
+//                    break;
+//                }
+//            }
+//
+//            if (!hasAdjacent) {
+//                return false; // Component must connect to existing structure
+//            }
+//        }
+//
+//        // Place the component
+//        board.put(position, component);
+//        return true;
+//    }
+//
+//    /**
+//     * Get valid adjacent positions
+//     */
+//    private Position[] getAdjacentPositions(Position pos) {
+//        return new Position[] {
+//                new Position(pos.row - 1, pos.col),  // Up
+//                new Position(pos.row + 1, pos.col),  // Down
+//                new Position(pos.row, pos.col - 1),  // Left
+//                new Position(pos.row, pos.col + 1)   // Right
+//        };
+//    }
+//
+//    /**
+//     * Prompts the user to place a component and handles the interaction
+//     */
+//    public boolean promptForPlacement(ComponentsTUI.ComponentUI component, Scanner scanner) {
+//        boolean placed = false;
+//
+//        while (!placed) {
+//            System.out.println("\nWhere would you like to place " + component.getId() + "?");
+//            System.out.print("Enter position (row,col) or 'q' to cancel: ");
+//            String input = scanner.nextLine().trim().toUpperCase();
+//
+//            if (input.equals("Q")) {
+//                return false;
+//            }
+//
+//            String[] parts = input.split(",");
+//            if (parts.length != 2) {
+//                Chroma.println("Invalid position format. Use format like '4,5'.", Chroma.RED);
+//                continue;
+//            }
+//
+//            try {
+//                int row = Integer.parseInt(parts[0].trim());
+//                int col = Integer.parseInt(parts[1].trim());
+//
+//                Position position = new Position(row, col);
+//                placed = placeComponent(component, position);
+//
+//                if (!placed) {
+//                    Chroma.println("Cannot place component there. Try another position.", Chroma.RED);
+//                }
+//            } catch (NumberFormatException e) {
+//                Chroma.println("Invalid numbers. Please enter valid integers.", Chroma.RED);
+//            }
+//        }
+//
+//        return true;
+//    }
 
 
     /**
