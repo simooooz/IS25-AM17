@@ -1,9 +1,7 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.Client;
-import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.Chroma;
 
@@ -78,23 +76,18 @@ public class RMIClient extends Client {
                 case PICK_COMPONENT -> server.pickComponentHandler(sessionCode, (Integer) args[0]);
                 case RELEASE_COMPONENT -> server.releaseComponentHandler(sessionCode, (Integer) args[0]);
             }
-        } catch (RemoteException e) {
-            System.err.println("Errore!");
-            // ui.displayError
+        } catch (RemoteException | RuntimeException e) {
+            viewTui.displayError();
         }
     }
 
-    private void sendSetUsername(String username) {
-        try {
-            boolean done = server.setUsernameHandler(sessionCode, username);
-            if (done)
-                setUsername(username);
-            else
-                Chroma.println("username already taken", Chroma.RED);
-            viewTui.handleUIState();
-        } catch (RemoteException e) {
-            // ui.displayError
-        }
+    private void sendSetUsername(String username) throws RemoteException {
+        boolean done = server.setUsernameHandler(sessionCode, username);
+        if (done)
+            setUsername(username);
+        else
+            Chroma.println("username already taken", Chroma.RED);
+        viewTui.handleUIState();
     }
 
 }
