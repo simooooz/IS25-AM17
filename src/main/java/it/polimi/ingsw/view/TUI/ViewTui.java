@@ -10,6 +10,8 @@ import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.graphics.ComponentsTUI;
 import it.polimi.ingsw.view.TUI.graphics.ShipBoardTUI;
+import it.polimi.ingsw.view.TUI.graphics.StandardShipBoardTUI;
+import it.polimi.ingsw.view.TUI.graphics.LearnerFlightShipBoardTUI;
 
 import java.util.Scanner;
 import java.util.*;
@@ -22,6 +24,10 @@ public class ViewTui {
     private Thread inputThread;
     private ShipBoardTUI shipBoard;
 
+    // Constants for board dimensions
+    private static final int BOARD_ROWS = 5;
+    private static final int BOARD_COLS = 7;
+
     /**
      * Constructs a new ViewTui with the given client controller.
      *
@@ -30,7 +36,10 @@ public class ViewTui {
     public ViewTui(Client client) {
         this.client = client;
         this.scanner = new Scanner(System.in);
-        this.shipBoard = new ShipBoardTUI(null, 5, 7);
+
+        // Initialize with a standard ship board by default
+        // Will be replaced with the appropriate board when joining a lobby or game
+        this.shipBoard = new StandardShipBoardTUI(null, BOARD_ROWS, BOARD_COLS);
     }
 
     public void handleUIState() {
@@ -55,7 +64,6 @@ public class ViewTui {
         }
     }
 
-
     /**
      * Prompt for username.
      */
@@ -73,7 +81,6 @@ public class ViewTui {
 
         client.send(MessageType.SET_USERNAME, username);
     }
-
 
     /**
      * Handles the lobby creation process.
@@ -154,6 +161,7 @@ public class ViewTui {
 
         return output.toString();
     }
+
     /**
      * Handles the lobby menu.
      * Allows you to create a new lobby or join a specific or random one.
@@ -195,6 +203,16 @@ public class ViewTui {
         for (String player : lobby.getPlayers()) {
             System.out.println("- " + player);
         }
+
+        // Create the appropriate ship board based on the learner flight setting
+        boolean isLearnerFlight = lobby.isLearnerMode();
+        if (isLearnerFlight) {
+            shipBoard = new LearnerFlightShipBoardTUI(null, BOARD_ROWS, BOARD_COLS);
+            System.out.println("🔵 Game Mode: Learner Flight");
+        } else {
+            shipBoard = new StandardShipBoardTUI(null, BOARD_ROWS, BOARD_COLS);
+            System.out.println("🟣 Game Mode: Standard");
+        }
     }
 
     /**
@@ -233,7 +251,7 @@ public class ViewTui {
         clear();
 
         // Get components for testing
-        Map<Integer, Component> components = new Board(new ArrayList<>(), false).getMapIdComponents();
+        Map<Integer, Component> components = new Board(new ArrayList<>(), client.getLobby().isLearnerMode()).getMapIdComponents();
 
 //        List<ComponentsTUI.ComponentUI> componentsView = new ArrayList<>();
 //        for (Map.Entry<Integer, Component> entry : components.entrySet()) {
@@ -296,14 +314,19 @@ public class ViewTui {
                     break;
                 }
 
-                if (!components.containsKey(id) || id.isEmpty()) {
-                    Chroma.println("ID not valid", Chroma.RED);
-                } else {
-                    selectedComponent = components.get(id);
-                    //selectedComponent.uncover(); // Reveal the component
+                try {
+                    int componentId = Integer.parseInt(id);
+                    if (!components.containsKey(componentId)) {
+                        Chroma.println("ID not valid", Chroma.RED);
+                    } else {
+                        selectedComponent = components.get(componentId);
+                        //selectedComponent.uncover(); // Reveal the component
+                    }
+                } catch (NumberFormatException e) {
+                    Chroma.println("ID must be a number", Chroma.RED);
                 }
 
-            } while (id.isEmpty() || (!id.equals("r") && !components.containsKey(id)));
+            } while (!id.equals("r") && selectedComponent == null);
 
 //            // Placement phase - place selected component on ship
 //            if (selectedComponent != null && building) {
@@ -384,5 +407,4 @@ public class ViewTui {
         client.closeConnection();
         System.exit(0);
     }
-
 }

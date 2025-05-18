@@ -23,6 +23,7 @@ public class Chroma {
     public static final String PURPLE = "\033[0;35m";
 
     public static final String CYAN = "\033[0;36m";
+    public static final String BLUE = "\033[0;34m";
 
     // bold
     public static final String BLACK_BOLD = "\033[1;30m";
@@ -44,8 +45,12 @@ public class Chroma {
     public static final String GREEN_BACKGROUND = "\033[42m";
 
     public static final String ORANGE_BACKGROUND = "\033[48;5;214m";
+
     public static final String DARKPURPLE_BACKGROUND = "\033[48;2;38;21;70m";
-    public static final String PURPLE_BACKGROUND = "\033[48;5;97m";
+    public static final String PURPLE_BACKGROUND = "\033[48;5;97m";// DARK PURPLE
+
+    public static final String DARKBLUE_BACKGROUND = "\033[48;5;18m";    // DARK BLUE
+    public static final String BLUE_BACKGROUND = "\033[48;5;25m";
 
     public static final String CYAN_BACKGROUND = "\033[46m";
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-public class ShipBoardTUI {
+public abstract class ShipBoardTUI {
     private final Ship ship;
     private final Map<Position, ComponentsTUI.ComponentUI> board;
     private final int rows;
@@ -19,65 +19,48 @@ public class ShipBoardTUI {
         this.rows = rows;
         this.cols = cols;
         this.board = new HashMap<>();
-
-        // Prepopulate with central cabin if using default ship layout
         if (ship != null) {
             // todo: adding the starting cabin
         }
     }
 
-    private static final Set<Position> VALID_PLAYABLE_CELLS = Set.of(
-            // row 0
-            new Position(4, 0),
-            new Position(4, 1),
-            new Position(4, 2),
-            new Position(4, 4),
-            new Position(4, 5),
-            new Position(4, 6),
+    /**
+     * Get the background color for cells
+     * @return The background color string
+     */
+    protected abstract String getPlayableCellBgColor();
 
-            // row 1
-            new Position(3, 0),
-            new Position(3, 1),
-            new Position(3, 2),
-            new Position(3, 3),
-            new Position(3, 4),
-            new Position(3, 5),
-            new Position(3, 6),
+    /**
+     * Get the background color for reserve cells
+     * @return The background color string
+     */
+    protected abstract String getReserveCellBgColor();
 
-            // row 2
-            new Position(2, 0),
-            new Position(2, 1),
-            new Position(2, 2),
-            new Position(2, 3),
-            new Position(2, 4),
-            new Position(2, 5),
-            new Position(2, 6),
+    /**
+     * Get the set of valid playable cells
+     * @return Set of valid positions
+     */
+    protected abstract Set<Position> getValidPlayableCells();
 
-            // row 3
-            new Position(1, 1),
-            new Position(1, 2),
-            new Position(1, 3),
-            new Position(1, 4),
-            new Position(1, 5),
+    /**
+     * Get the set of reserve cells
+     * @return Set of reserve positions
+     */
+    protected abstract Set<Position> getReserveCells();
 
-            // row 4
-            new Position(0, 2),
-            new Position(0, 4)
-    );
-
-    private static final Set<Position> RESERVE_CELL = Set.of(
-            new Position(0,5),
-            new Position(0,6)
-    );
-
-    private boolean isValidPlayableCell(int row, int col) {
-        return VALID_PLAYABLE_CELLS.contains(new Position(row, col));
+    /**
+     * Check if a position is a valid playable cell
+     */
+    protected boolean isValidPlayableCell(int row, int col) {
+        return getValidPlayableCells().contains(new Position(row, col));
     }
 
-    private boolean isReserveCell(int row, int col) {
-        return RESERVE_CELL.contains(new Position(row, col));
+    /**
+     * Check if a position is a reserve cell
+     */
+    protected boolean isReserveCell(int row, int col) {
+        return getReserveCells().contains(new Position(row, col));
     }
-
 
     public void printBoard() {
         StringBuilder output = new StringBuilder();
@@ -120,9 +103,9 @@ public class ShipBoardTUI {
                     } else {
                         String bgColor;
                         if (isPlayable) {
-                            bgColor = Chroma.PURPLE_BACKGROUND;
+                            bgColor = getPlayableCellBgColor();
                         } else if (isReserve) {
-                            bgColor = Chroma.DARKPURPLE_BACKGROUND;
+                            bgColor = getReserveCellBgColor();
                         } else {
                             bgColor = Chroma.RESET;
                         }
@@ -246,7 +229,6 @@ public class ShipBoardTUI {
 //
 //        return true;
 //    }
-
 
     /**
      * Simple class to represent a position on the board
