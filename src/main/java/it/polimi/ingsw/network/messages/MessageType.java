@@ -2,11 +2,16 @@ package it.polimi.ingsw.network.messages;
 
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
 import it.polimi.ingsw.network.socket.server.Server;
 import it.polimi.ingsw.view.TUI.Chroma;
+
+import java.util.List;
+import java.util.Map;
 
 
 @SuppressWarnings("unchecked")
@@ -114,15 +119,12 @@ public enum MessageType {
         }
     },
 
-    SHOW_COMPONENT,
-    SHOW_COMPONENT_RES,
-
     PICK_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.pickComponent(user, castedMessage.getArg1());
-            user.notifyGameEvent(this, castedMessage.getArg1());
+
         }
 
         @Override
@@ -131,47 +133,285 @@ public enum MessageType {
             client.getGameController().pickComponent(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
-    PICK_COMPONENT_RES,
 
     RELEASE_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.releaseComponent(user, castedMessage.getArg1());
-            user.notifyGameEvent(this, castedMessage.getArg1());
         }
-    },
-    RELEASE_COMPONENT_RES {
+
         @Override
         public void execute(ClientSocket client, Message message) {
             DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().pickComponent(castedMessage.getArg1(), castedMessage.getArg2());
+            client.getGameController().releaseComponent(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
-    RESERVE_COMPONENT,
-    RESERVE_COMPONENT_RES,
 
-    INSERT_COMPONENT,
-    INSERT_COMPONENT_RES,
+    RESERVE_COMPONENT {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
+            Server.reserveComponent(user, castedMessage.getArg1());
+        }
 
-    MOVE_COMPONENT,
-    MOVE_COMPONENT_RES,
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().reserveComponent(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
 
-    ROTATE_COMPONENT,
-    ROTATE_COMPONENT_RES,
+    INSERT_COMPONENT {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            QuadrupleArgMessage<Integer, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<Integer, Integer, Integer, Integer>) message;
+            Server.insertComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            QuintupleArgMessage<String, Integer, Integer, Integer, Integer> castedMessage = (QuintupleArgMessage<String, Integer, Integer, Integer, Integer>) message;
+            client.getGameController().insertComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4(), castedMessage.getArg5());
+        }
+    },
+
+    MOVE_COMPONENT {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            QuadrupleArgMessage<Integer, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<Integer, Integer, Integer, Integer>) message;
+            Server.moveComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            QuintupleArgMessage<String, Integer, Integer, Integer, Integer> castedMessage = (QuintupleArgMessage<String, Integer, Integer, Integer, Integer>) message;
+            client.getGameController().moveComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4(), castedMessage.getArg5());
+        }
+    },
+
+    ROTATE_COMPONENT {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            DoubleArgMessage<Integer, Integer> castedMessage = (DoubleArgMessage<Integer, Integer>) message;
+            Server.rotateComponent(user, castedMessage.getArg1(), castedMessage.getArg2());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            TripleArgMessage<String, Integer, Integer> castedMessage = (TripleArgMessage<String, Integer, Integer>) message;
+            client.getGameController().rotateComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+        }
+    },
 
     LOOK_CARD_PILE,
     LOOK_CARD_PILE_RES,
 
-    MOVE_HOURGLASS,
-    MOVE_HOURGLASS_RES,
+    MOVE_HOURGLASS {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            Server.moveHourglass(user);
+        }
 
-    SET_READY,
-    SET_READY_RES,
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            client.getGameController().moveHourglass(castedMessage.getArg1());
+        }
+    },
 
-    CHECK_SHIP,
-    CHECK_SHIP_RES;
+    SET_READY {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            Server.setReady(user);
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            client.getGameController().setReady(castedMessage.getArg1());
+        }
+    },
+
+    CHECK_SHIP {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<List<Integer>> castedMessage = (SingleArgMessage<List<Integer>>) message;
+            Server.checkShip(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, List<Integer>> castedMessage = (DoubleArgMessage<String, List<Integer>>) message;
+            client.getGameController().checkShip(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    CHOOSE_ALIEN {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<Map<Integer, AlienType>> castedMessage = (SingleArgMessage<Map<Integer, AlienType>>) message;
+            Server.chooseAlien(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Map<Integer, AlienType>> castedMessage = (DoubleArgMessage<String, Map<Integer, AlienType>>) message;
+            client.getGameController().chooseAlien(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    CHOOSE_SHIP_PART {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
+            Server.chooseShipPart(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().chooseShipPart(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    DRAW_CARD {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            Server.drawCard(user);
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            client.getGameController().drawCard(castedMessage.getArg1());
+        }
+    },
+
+    ACTIVATE_CANNONS {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            DoubleArgMessage<List<Integer>, List<Integer>> castedMessage = (DoubleArgMessage<List<Integer>, List<Integer>>) message;
+            Server.activateCannons(user, castedMessage.getArg1(), castedMessage.getArg2());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            TripleArgMessage<String, List<Integer>, List<Integer>> castedMessage = (TripleArgMessage<String, List<Integer>, List<Integer>>) message;
+            client.getGameController().activateCannons(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+        }
+    },
+
+    ACTIVATE_ENGINES {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            DoubleArgMessage<List<Integer>, List<Integer>> castedMessage = (DoubleArgMessage<List<Integer>, List<Integer>>) message;
+            Server.activateEngines(user, castedMessage.getArg1(), castedMessage.getArg2());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            TripleArgMessage<String, List<Integer>, List<Integer>> castedMessage = (TripleArgMessage<String, List<Integer>, List<Integer>>) message;
+            client.getGameController().activateEngines(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+        }
+    },
+
+    ACTIVATE_SHIELD {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
+            Server.activateShield(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().activateShield(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    UPDATE_GOODS {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            DoubleArgMessage<Map<Integer, List<ColorType>>, List<Integer>> castedMessage = (DoubleArgMessage<Map<Integer, List<ColorType>>, List<Integer>>) message;
+            Server.updateGoods(user, castedMessage.getArg1(), castedMessage.getArg2());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            TripleArgMessage<String, Map<Integer, List<ColorType>>, List<Integer>> castedMessage = (TripleArgMessage<String, Map<Integer, List<ColorType>>, List<Integer>>) message;
+            client.getGameController().updateGoods(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+        }
+    },
+
+    REMOVE_CREW {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<List<Integer>> castedMessage = (SingleArgMessage<List<Integer>>) message;
+            Server.removeCrew(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, List<Integer>> castedMessage = (DoubleArgMessage<String, List<Integer>>) message;
+            client.getGameController().removeCrew(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    ROLL_DICES {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            Server.rollDices(user);
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            client.getGameController().rollDices(castedMessage.getArg1());
+        }
+    },
+
+    GET_BOOLEAN {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<Boolean> castedMessage = (SingleArgMessage<Boolean>) message;
+            Server.getBoolean(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Boolean> castedMessage = (DoubleArgMessage<String, Boolean>) message;
+            client.getGameController().getBoolean(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    GET_INDEX {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
+            Server.getIndex(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().getIndex(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    END_FLIGHT {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            Server.endFlight(user);
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            client.getGameController().endFlight(castedMessage.getArg1());
+        }
+    };
 
     public void execute(ClientHandler user, Message message) {
         // TODO unknown command

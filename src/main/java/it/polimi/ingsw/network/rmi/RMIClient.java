@@ -1,6 +1,8 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -11,6 +13,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -65,6 +69,7 @@ public class RMIClient extends Client {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void send(MessageType messageType, Object... args) {
         try {
@@ -76,6 +81,25 @@ public class RMIClient extends Client {
                 case LEAVE_GAME -> server.leaveGameHandler(sessionCode);
                 case PICK_COMPONENT -> server.pickComponentHandler(sessionCode, (Integer) args[0]);
                 case RELEASE_COMPONENT -> server.releaseComponentHandler(sessionCode, (Integer) args[0]);
+                case RESERVE_COMPONENT -> server.reserveComponentHandler(sessionCode, (Integer) args[0]);
+                case INSERT_COMPONENT -> server.insertComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+                case MOVE_COMPONENT -> server.moveComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+                case ROTATE_COMPONENT -> server.rotateComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1]);
+                case MOVE_HOURGLASS -> server.moveHourglassHandler(sessionCode);
+                case SET_READY -> server.setReadyHandler(sessionCode);
+                case CHECK_SHIP -> server.checkShipHandler(sessionCode, (List<Integer>) args[0]);
+                case CHOOSE_ALIEN -> server.chooseAlienHandler(sessionCode, (Map<Integer, AlienType>) args[0]);
+                case CHOOSE_SHIP_PART -> server.chooseShipPartHandler(sessionCode, (Integer) args[0]);
+                case DRAW_CARD -> server.drawCardHandler(sessionCode);
+                case ACTIVATE_CANNONS -> server.activateCannonsHandler(sessionCode, (List<Integer>) args[0], (List<Integer>) args[1]);
+                case ACTIVATE_ENGINES -> server.activateEnginesHandler(sessionCode, (List<Integer>) args[0], (List<Integer>) args[1]);
+                case ACTIVATE_SHIELD -> server.activateShieldHandler(sessionCode, (Integer) args[0]);
+                case UPDATE_GOODS -> server.updateGoodsHandler(sessionCode, (Map<Integer, List<ColorType>>) args[0], (List<Integer>) args[1]);
+                case REMOVE_CREW -> server.removeCrewHandler(sessionCode, (List<Integer>) args[0]);
+                case ROLL_DICES -> server.rollDicesHandler(sessionCode);
+                case GET_BOOLEAN -> server.getBooleanHandler(sessionCode, (Boolean) args[0]);
+                case GET_INDEX -> server.getIndexHandler(sessionCode, (Integer) args[0]);
+                case END_FLIGHT -> server.endFlightHandler(sessionCode);
             }
         } catch (RemoteException | RuntimeException e) {
             try {

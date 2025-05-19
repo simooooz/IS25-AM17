@@ -92,9 +92,8 @@ public class Component {
      * @throws ComponentNotValidException if the component is not pickable
      */
     public void pickComponent(Board board, Ship ship) {
-        // todo: for test, then to implement
         shown = true;
-        if (!board.getCommonComponents().contains(this) || !shown)
+        if (!board.getCommonComponents().contains(this))
             throw new ComponentNotValidException("This component is not pickable");
 
         if (ship.getHandComponent().isPresent())
@@ -124,12 +123,12 @@ public class Component {
         }
     }
 
-    public void reserveComponent(Board board, Ship ship) {
-        if (!board.getCommonComponents().contains(this) || !shown)
-            throw new ComponentNotValidException("This component is not reservable");
-        if (ship.getReserves().size() >= 2) throw new ComponentNotValidException("Reserves are full");
+    public void reserveComponent(Ship ship) {
+        if (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)) // Component is not in hand
+            throw new ComponentNotValidException("This component is not in hand");
+        else if (ship.getReserves().size() >= 2) throw new ComponentNotValidException("Reserves are full");
 
-        board.getCommonComponents().remove(this);
+        ship.setHandComponent(null);
         ship.getReserves().add(this);
     }
 

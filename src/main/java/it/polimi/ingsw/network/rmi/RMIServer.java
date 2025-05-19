@@ -2,6 +2,8 @@ package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.ServerBasis;
 import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
@@ -14,6 +16,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -164,14 +167,125 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     public void pickComponentHandler(String sessionCode, Integer id) throws RemoteException {
         User user = getUserInRmiSessions(sessionCode);
         pickComponent(user, id);
-        user.notifyGameEvent(MessageType.PICK_COMPONENT, id);
     }
 
     @Override
     public void releaseComponentHandler(String sessionCode, Integer id) throws RemoteException {
         User user = getUserInRmiSessions(sessionCode);
         releaseComponent(user, id);
-        user.notifyGameEvent(MessageType.RELEASE_COMPONENT, id);
     }
 
+    @Override
+    public void reserveComponentHandler(String sessionCode, Integer id) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        reserveComponent(user, id);
+    }
+
+    @Override
+    public void insertComponentHandler(String sessionCode, Integer id, Integer row, Integer col, Integer rotations) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        insertComponent(user, id, row, col, rotations);
+    }
+
+    @Override
+    public void moveComponentHandler(String sessionCode, Integer id, Integer row, Integer col, Integer rotations) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        moveComponent(user, id, row, col, rotations);
+    }
+
+    @Override
+    public void rotateComponentHandler(String sessionCode, Integer id, Integer num) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        rotateComponent(user, id, num);
+    }
+
+    @Override
+    public void moveHourglassHandler(String sessionCode) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        moveHourglass(user);
+    }
+
+    @Override
+    public void setReadyHandler(String sessionCode) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        setReady(user);
+    }
+
+    @Override
+    public void checkShipHandler(String sessionCode, List<Integer> toRemove) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        checkShip(user, toRemove);
+    }
+
+    @Override
+    public void chooseAlienHandler(String sessionCode, Map<Integer, AlienType> aliensIds) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        chooseAlien(user, aliensIds);
+    }
+
+    @Override
+    public void chooseShipPartHandler(String sessionCode, Integer partIndex) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        chooseShipPart(user, partIndex);
+    }
+
+    @Override
+    public void drawCardHandler(String sessionCode) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        drawCard(user);
+    }
+
+    @Override
+    public void activateCannonsHandler(String sessionCode, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        activateCannons(user, batteriesIds, cannonComponentsIds);
+    }
+
+    @Override
+    public void activateEnginesHandler(String sessionCode, List<Integer> batteriesIds, List<Integer> engineComponentsIds) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        activateEngines(user, batteriesIds, engineComponentsIds);
+    }
+
+    @Override
+    public void activateShieldHandler(String sessionCode, Integer batteryId) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        activateShield(user, batteryId);
+    }
+
+    @Override
+    public void updateGoodsHandler(String sessionCode, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        updateGoods(user, cargoHoldsIds, batteriesIds);
+    }
+
+    @Override
+    public void removeCrewHandler(String sessionCode, List<Integer> cabinsIds) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        removeCrew(user, cabinsIds);
+    }
+
+    @Override
+    public void rollDicesHandler(String sessionCode) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        rollDices(user);
+    }
+
+    @Override
+    public void getBooleanHandler(String sessionCode, Boolean value) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        getBoolean(user, value);
+    }
+
+    @Override
+    public void getIndexHandler(String sessionCode, Integer value) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        getIndex(user, value);
+    }
+
+    @Override
+    public void endFlightHandler(String sessionCode) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        endFlight(user);
+    }
 }

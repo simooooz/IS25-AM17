@@ -44,10 +44,6 @@ public class ModelFacade {
             board.getTimeManagement().startTimer(this);
     }
 
-    public void showComponent(int componentId) {
-        board.getMapIdComponents().get(componentId).showComponent();
-    }
-
     public void pickComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         board.getMapIdComponents().get(componentId).pickComponent(board, ship);
@@ -60,7 +56,7 @@ public class ModelFacade {
 
     public void reserveComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).reserveComponent(board, ship);
+        board.getMapIdComponents().get(componentId).reserveComponent(ship);
     }
 
     public void insertComponent(String username,  int componentId, int row, int col) {

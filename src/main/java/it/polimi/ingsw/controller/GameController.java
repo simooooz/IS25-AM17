@@ -36,13 +36,6 @@ public class GameController {
         model.startMatch();
     }
 
-    public void showComponent(String username, int componentId) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
-
-        model.showComponent(componentId);
-    }
-
     public void pickComponent(String username, int componentId) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
@@ -65,18 +58,20 @@ public class GameController {
         model.reserveComponent(username, componentId);
     }
 
-    public void insertComponent(String username, int componentId, int row, int col) {
+    public void insertComponent(String username, int componentId, int row, int col, int rotations) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.insertComponent(username, componentId, row, col);
+        model.rotateComponent(username, componentId, rotations);
     }
 
-    public void moveComponent(String username, int componentId, int row, int col) {
+    public void moveComponent(String username, int componentId, int row, int col, int rotations) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.moveComponent(username, componentId, row, col);
+        model.rotateComponent(username, componentId, rotations);
     }
 
     public void rotateComponent(String username, int componentId, int num) {
