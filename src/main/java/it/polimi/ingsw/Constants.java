@@ -10,6 +10,34 @@ public abstract class Constants {
     public static final int HEARTBEAT_INTERVAL = 2000;
     public static final int SOCKET_TIMEOUT = 4000;
 
+    public static final int SHIP_ROWS = 5;
+    public static final int SHIP_COLUMNS = 7;
+
+    public static String repeat(String str, int n) {
+        return String.valueOf(str).repeat(Math.max(0, n));
+    }
+
+    public static String inTheMiddle(String text, int width) {
+        // Rimuovi eventuali caratteri di controllo ANSI o altri caratteri speciali per il calcolo della lunghezza visiva
+        String visibleText = text.replaceAll("\\u001B\\[[;\\d]*m", "");
+        int visibleLength = visibleText.length();
+
+        if (visibleLength >= width) {
+            return text; // Restituisci il testo originale completo (con i codici di colore)
+        }
+
+        int leftPadding = (width - visibleLength) / 2;
+        int rightPadding = width - visibleLength - leftPadding;
+
+        // Crea la stringa centrata
+        StringBuilder centeredText = new StringBuilder();
+        centeredText.append(" ".repeat(leftPadding));
+        centeredText.append(text); // Aggiungi il testo originale con eventuali codici di colore
+        centeredText.append(" ".repeat(rightPadding));
+
+        return centeredText.toString();
+    }
+
     // Socket only
     public static Message createMessage(MessageType gameEvent, Object... args) {
         Message message;
@@ -23,9 +51,5 @@ public abstract class Constants {
         return message;
     }
 
-    // utility to repeat a string n times
-    public static String repeat(String str, int n) {
-        return String.valueOf(str).repeat(Math.max(0, n));
-    }
 
 }

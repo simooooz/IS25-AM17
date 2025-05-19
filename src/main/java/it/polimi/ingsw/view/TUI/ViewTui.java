@@ -1,18 +1,11 @@
 package it.polimi.ingsw.view.TUI;
 
-import it.polimi.ingsw.model.components.*;
-import it.polimi.ingsw.model.components.Component;
-import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
-import it.polimi.ingsw.view.TUI.graphics.StandardShipBoardTUI;
-import it.polimi.ingsw.view.TUI.graphics.LearnerFlightShipBoardTUI;
 
 import java.util.Scanner;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
@@ -24,11 +17,6 @@ public class ViewTui {
 
     private final DisplayUpdater displayUpdater;
     private final BlockingQueue<String> networkMessageQueue = new LinkedBlockingQueue<>();
-
-
-    // Constants for board dimensions
-    private static final int BOARD_ROWS = 5;
-    private static final int BOARD_COLS = 7;
 
     /**
      * Constructs a new ViewTui with the given client controller.
@@ -57,8 +45,8 @@ public class ViewTui {
                     case "1" -> handleCreateLobby();
                     case "2" -> handleJoinLobby();
                     case "3" -> handleJoinRandomLobby();
-                    case "4" -> handleDisconnect();
-                    default -> Chroma.println("Option not valid. Please try again.", Chroma.RED);
+                    case "q" -> handleDisconnect();
+                    default -> Chroma.println("not valid", Chroma.RED);
                 }
                 break;
 
@@ -72,12 +60,13 @@ public class ViewTui {
         }
     }
 
+
     /**
      * Handles the lobby creation process.
      */
     private void handleCreateLobby() {
         clear();
-        Chroma.println("CREATE LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
+        Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
 
         String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
         if (lobbyName == null) {
@@ -103,7 +92,7 @@ public class ViewTui {
      */
     private void handleJoinLobby() {
         clear();
-        Chroma.println("JOIN LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
+        Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
 
         String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
         if (lobbyName == null) {
@@ -119,7 +108,7 @@ public class ViewTui {
      */
     private void handleJoinRandomLobby() {
         clear();
-        Chroma.println("JOIN RANDOM LOBBY (press q to go back to main menù)", Chroma.WHITE_BOLD);
+        Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
 
         Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false): ", true);
         if (learnerFlight == null) {
@@ -130,43 +119,14 @@ public class ViewTui {
         client.send(MessageType.JOIN_RANDOM_LOBBY, learnerFlight);
     }
 
-    // utility to print a grid of components
-    public static String gridOfComponents(List<Component> components, int componentsPerRow) {
-        StringBuilder output = new StringBuilder();
-
-        List<List<Component>> componentsRows = new ArrayList<>();
-        for (int i = 0; i < components.size(); i += componentsPerRow) {
-            int end_row = Math.min(i + componentsPerRow, components.size());
-            componentsRows.add(components.subList(i, end_row));
-        }
-
-        for (List<Component> row : componentsRows) {
-            List<String[]> printed = new ArrayList<>();
-            for (Component component : row) {
-                printed.add(component.toString().split("\n"));
-            }
-
-            int height = printed.getFirst().length;
-
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < printed.size(); j++) {
-                    output.append(printed.get(j)[i]);
-                    if (j < printed.size() - 1) {
-                        output.append("  ");
-                    }
-                }
-                output.append("\n");
-            }
-        }
-
-        return output.toString();
-    }
-
     /**
-     * Manages the in-lobby status.
-     * You stay there until the game starts, or you leave the lobby.
+     * Handles user interactions while in the lobby.
+     *
+     * @param input the user-provided input to be processed. If the input is "q",
+     *              the user is prompted for confirmation to leave the lobby.
      */
     private void handleInLobby(String input) {
+        Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
         if (input.equals("q")) {
             boolean sure = InputUtility.requestBoolean("You sure? (y/n)", false);
             if (sure)
@@ -174,6 +134,12 @@ public class ViewTui {
         }
     }
 
+
+    /**
+     * Handles various in-game actions based on the player's current state.
+     *
+     * @param input provided by the user to influence the game logic
+     */
     private void handleInGame(String input) {
         try {
             switch (client.getGameController().getState(client.getUsername())) {
@@ -237,6 +203,7 @@ public class ViewTui {
         }
     }
 
+
     /**
      * Clears the screen.
      */
@@ -274,12 +241,12 @@ public class ViewTui {
         Chroma.println(
                 """
                         
-                         ██████╗  █████╗ ██╗      █████╗ ██╗  ██╗██╗   ██╗    ████████╗██████╗ ██╗   ██╗ ██████╗██╗  ██╗███████╗██████╗ ███████╗
-                        ██╔════╝ ██╔══██╗██║     ██╔══██╗╚██╗██╔╝╚██╗ ██╔╝    ╚══██╔══╝██╔══██╗██║   ██║██╔════╝██║ ██╔╝██╔════╝██╔══██╗██╔════╝
-                        ██║  ███╗███████║██║     ███████║ ╚███╔╝  ╚████╔╝        ██║   ██████╔╝██║   ██║██║     █████╔╝ █████╗  ██████╔╝███████╗
-                        ██║   ██║██╔══██║██║     ██╔══██║ ██╔██╗   ╚██╔╝         ██║   ██╔══██╗██║   ██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗╚════██║
-                        ╚██████╔╝██║  ██║███████╗██║  ██║██╔╝ ██╗   ██║          ██║   ██║  ██║╚██████╔╝╚██████╗██║  ██╗███████╗██║  ██║███████║
-                         ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
+                         ██████╗  █████╗ ██╗      █████╗ ██╗  ██╗██╗   ██╗    ████████╗██████╗ ██╗   ██╗ ██████╗██╗  ██╗███████╗██████╗
+                        ██╔════╝ ██╔══██╗██║     ██╔══██╗╚██╗██╔╝╚██╗ ██╔╝    ╚══██╔══╝██╔══██╗██║   ██║██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+                        ██║  ███╗███████║██║     ███████║ ╚███╔╝  ╚████╔╝        ██║   ██████╔╝██║   ██║██║     █████╔╝ █████╗  ██████╔╝
+                        ██║   ██║██╔══██║██║     ██╔══██║ ██╔██╗   ╚██╔╝         ██║   ██╔══██╗██║   ██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+                        ╚██████╔╝██║  ██║███████╗██║  ██║██╔╝ ██╗   ██║          ██║   ██║  ██║╚██████╔╝╚██████╗██║  ██╗███████╗██║  ██║
+                         ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
                         """, Chroma.ORANGE
         );
         System.out.println("Press ENTER to continue...");

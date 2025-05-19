@@ -27,7 +27,7 @@ public class InputUtility {
                     Chroma.println(errorMessage, Chroma.RED);
                 }
             } catch (Exception e) {
-                Chroma.println("Format error. " + errorMessage, Chroma.RED);
+                Chroma.println(errorMessage, Chroma.RED);
                 result = null;
             }
         } while (true);
@@ -41,7 +41,7 @@ public class InputUtility {
                     return Integer.parseInt(s);
                 },
                 x -> x >= min && x <= max,
-                "Insert a number between " + min + " and " + max + "."
+                "not valid"
         );
     }
 

@@ -7,9 +7,12 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.Constants;
 
+import static it.polimi.ingsw.Constants.inTheMiddle;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 public class Component {
 
@@ -211,9 +214,8 @@ public class Component {
     public int getY() {
         return y;
     }
-    
-    @Override
-    public String toString() {
+
+    public String print(Optional<Integer> id) {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
@@ -223,11 +225,12 @@ public class Component {
             String topBorder = " " + angles[0] + Constants.repeat(hBorder, 9) + angles[1] + " ";
             componentLines.add(topBorder);
 
-            String leftBorder= "";
+            String leftBorder = "";
             leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
             componentLines.add(leftBorder);
 
-            leftBorder = " " + vBorder + Constants.repeat(" ", 4) + "1" + Constants.repeat(" ", 4) + vBorder + " ";
+            String idStr = id.isEmpty() ? "" : String.valueOf(id.get());
+            leftBorder = " " + vBorder + inTheMiddle(idStr, 9) + vBorder + " ";
             componentLines.add(leftBorder);
 
             leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
@@ -241,31 +244,35 @@ public class Component {
             // Prima riga
             String topBorder = " " + angles[0];
 
-            if(connectors[0]==ConnectorType.EMPTY)
+            if (connectors[0] == ConnectorType.EMPTY)
                 topBorder = topBorder + Constants.repeat(hBorder, 9) + angles[1] + " ";
-            else if (connectors[0]==ConnectorType.SINGLE)
+            else if (connectors[0] == ConnectorType.SINGLE)
                 topBorder = topBorder + Constants.repeat(hBorder, 4) + vBorder + Constants.repeat(hBorder, 4) + angles[1] + " ";
-            else if (connectors[0]==ConnectorType.DOUBLE)
+            else if (connectors[0] == ConnectorType.DOUBLE)
                 topBorder = topBorder + hBorder + vBorder + Constants.repeat(hBorder, 5) + vBorder + hBorder + angles[1] + " ";
-            else if (connectors[0]==ConnectorType.UNIVERSAL)
+            else if (connectors[0] == ConnectorType.UNIVERSAL)
                 topBorder = topBorder + hBorder + vBorder + Constants.repeat(hBorder, 2) + vBorder + Constants.repeat(hBorder, 2) + vBorder + hBorder + angles[1] + " ";
             componentLines.add(topBorder);
 
             // Seconda Riga
-            String leftBorder= "";
+            String leftBorder = "";
             switch (connectors[3]) {
                 case ConnectorType.EMPTY, ConnectorType.SINGLE -> {
                     leftBorder = " " + vBorder;
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().getFirst() + Constants.repeat(hBorder, 2);
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE ->
+                                leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL ->
+                                leftBorder = leftBorder + icon().getFirst() + Constants.repeat(hBorder, 2);
                     }
                 }
                 case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> {
                     leftBorder = Constants.repeat(hBorder, 2);
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().getFirst() + Constants.repeat(hBorder, 2);
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE ->
+                                leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL ->
+                                leftBorder = leftBorder + icon().getFirst() + Constants.repeat(hBorder, 2);
                     }
                 }
             }
@@ -277,15 +284,19 @@ public class Component {
                 case ConnectorType.EMPTY, ConnectorType.DOUBLE -> {
                     leftBorder = " " + vBorder;
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.DOUBLE -> leftBorder = leftBorder + icon().get(1) + vBorder + " ";
-                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(1) + Constants.repeat(hBorder, 2);
+                        case ConnectorType.EMPTY, ConnectorType.DOUBLE ->
+                                leftBorder = leftBorder + icon().get(1) + vBorder + " ";
+                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL ->
+                                leftBorder = leftBorder + icon().get(1) + Constants.repeat(hBorder, 2);
                     }
                 }
                 case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> {
                     leftBorder = Constants.repeat(hBorder, 2);
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.DOUBLE -> leftBorder = leftBorder + icon().get(1) + vBorder + " ";
-                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(1) + Constants.repeat(hBorder, 2);
+                        case ConnectorType.EMPTY, ConnectorType.DOUBLE ->
+                                leftBorder = leftBorder + icon().get(1) + vBorder + " ";
+                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL ->
+                                leftBorder = leftBorder + icon().get(1) + Constants.repeat(hBorder, 2);
                     }
                 }
             }
@@ -296,15 +307,19 @@ public class Component {
                 case ConnectorType.EMPTY, ConnectorType.SINGLE -> {
                     leftBorder = " " + vBorder;
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().get(2) + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(2) + Constants.repeat(hBorder, 2);
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE ->
+                                leftBorder = leftBorder + icon().get(2) + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL ->
+                                leftBorder = leftBorder + icon().get(2) + Constants.repeat(hBorder, 2);
                     }
                 }
                 case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> {
                     leftBorder = Constants.repeat(hBorder, 2);
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().get(2) + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(2) + Constants.repeat(hBorder, 2);
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE ->
+                                leftBorder = leftBorder + icon().get(2) + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL ->
+                                leftBorder = leftBorder + icon().get(2) + Constants.repeat(hBorder, 2);
                     }
                 }
             }
@@ -312,13 +327,13 @@ public class Component {
 
             // Quinta Riga
             String bottomBorder = " " + angles[2];
-            if(connectors[2]==ConnectorType.EMPTY)
+            if (connectors[2] == ConnectorType.EMPTY)
                 bottomBorder = bottomBorder + Constants.repeat(hBorder, 9) + angles[3] + " ";
-            else if (connectors[2]==ConnectorType.SINGLE)
+            else if (connectors[2] == ConnectorType.SINGLE)
                 bottomBorder = bottomBorder + Constants.repeat(hBorder, 4) + vBorder + Constants.repeat(hBorder, 4) + angles[3] + " ";
-            else if (connectors[2]==ConnectorType.DOUBLE)
-                bottomBorder = bottomBorder + hBorder + vBorder + Constants.repeat(hBorder, 5) + vBorder + hBorder +angles[3] + " ";
-            else if (connectors[2]==ConnectorType.UNIVERSAL)
+            else if (connectors[2] == ConnectorType.DOUBLE)
+                bottomBorder = bottomBorder + hBorder + vBorder + Constants.repeat(hBorder, 5) + vBorder + hBorder + angles[3] + " ";
+            else if (connectors[2] == ConnectorType.UNIVERSAL)
                 bottomBorder = bottomBorder + hBorder + vBorder + Constants.repeat(hBorder, 2) + vBorder + Constants.repeat(hBorder, 2) + vBorder + hBorder + angles[3] + " ";
             componentLines.add(bottomBorder);
 
@@ -327,7 +342,7 @@ public class Component {
     }
 
     public List<String> icon() {
-         return new ArrayList<>(List.of(Constants.repeat(" ", 9), Constants.repeat(" ", 9), Constants.repeat(" ", 9)));
+        return new ArrayList<>(List.of(Constants.repeat(" ", 9), Constants.repeat(" ", 9), Constants.repeat(" ", 9)));
     }
 
 }
