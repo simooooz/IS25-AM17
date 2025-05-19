@@ -25,11 +25,8 @@ public class ViewTui {
     private final DisplayUpdater displayUpdater;
     private final BlockingQueue<String> networkMessageQueue = new LinkedBlockingQueue<>();
 
-
-    // Constants for board dimensions
-    private static final int BOARD_ROWS = 5;
-    private static final int BOARD_COLS = 7;
-
+    private int rotateCounter = 0;
+    
     /**
      * Constructs a new ViewTui with the given client controller.
      *
@@ -39,7 +36,8 @@ public class ViewTui {
         this.client = client;
         this.scanner = new Scanner(System.in);
         this.displayUpdater = new DisplayUpdater(this.client);
-
+        
+        this.rotateCounter = 0;
         // Initialize with a standard ship board by default
         // Will be replaced with the appropriate board when joining a lobby or game
         // this.shipBoard = new StandardShipBoardTUI(null, BOARD_ROWS, BOARD_COLS);
@@ -184,16 +182,16 @@ public class ViewTui {
                         case "release" -> client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
                         case "reserve" -> client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
                         case "insert" -> {
-                            // TODO cacl giri
-                            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]));
+                            // todo calc giri
+                            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]), rotateCounter);
                         }
                         case "move" -> {
                             // todo cacl giri
-                            client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]));
+                            client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]), rotateCounter);
                         }
                         case "rotate" -> {
                             // todo calc giri
-                            client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]));
+                            client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]), rotateCounter);
                         }
                         case "look-at-cards" -> {
                             int deckIndex = Integer.parseInt(commands[1]);
