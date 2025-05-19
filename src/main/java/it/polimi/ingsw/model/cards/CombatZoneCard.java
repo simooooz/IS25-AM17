@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.CriteriaType;
 import it.polimi.ingsw.model.cards.utils.PenaltyCombatZone;
@@ -10,6 +11,7 @@ import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -170,6 +172,59 @@ public class CombatZoneCard extends Card {
             int num = warLines.get(warLineIndex).getValue().getPenaltyNumber();
             super.doSpecificCheck(commandType, num, deltaGood, batteries, username, board);
         }
+    }
+
+    @Override
+    public String toString() {
+        String hBorder = "─";
+        String vBorder = "│";
+        String[] angles = {"┌", "┐", "└", "┘"};
+        String hDivider = "┼";
+        String leftDivider = "├";
+        String rightDivider = "┤";
+
+        List<String> cardLines = new ArrayList<>();
+
+        // Title box
+        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        cardLines.add(topBorder);
+
+        String title = " " + vBorder + "     Combat Zone     " + vBorder + " ";
+        cardLines.add(title);
+
+        // First row divider
+        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        cardLines.add(divider);
+
+        String firstRow = " " + vBorder + "  "  +
+                warLines.getFirst().getKey().toString() + "        "  + "\u2009" + "\u200A" +
+                warLines.getFirst().getValue().toString() + "  " +
+                vBorder + " ";
+        cardLines.add(firstRow);
+
+        // Second row divider
+        cardLines.add(divider);
+
+        String secondRow = " " + vBorder + "  "  +
+                warLines.get(1).getKey().toString() + "        "  + "\u2009" + "\u200A" +
+                warLines.get(1).getValue().toString() + "  " +
+                vBorder + " ";
+        cardLines.add(secondRow);
+
+        // Third row divider
+        cardLines.add(divider);
+
+        String thirdRow = " " + vBorder + "  "  +
+                warLines.get(2).getKey().toString() + " "  +
+                warLines.get(2).getValue().toString() + " " + "\u2009" +
+                vBorder + " ";
+        cardLines.add(thirdRow);
+
+        // Bottom border
+        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        cardLines.add(bottomBorder);
+
+        return String.join("\n", cardLines);
     }
 
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.player.Ship;
@@ -51,7 +52,7 @@ public class BatteryComponent extends Component {
 
         return new ArrayList<>(List.of(
                 text,
-                repeat(" ", 9),
+                Constants.repeat(" ", 9),
                 "   " + getBatteries() + "/" + (isTriple ? 3 : 2) + "   "));
 
     }

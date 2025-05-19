@@ -24,4 +24,9 @@ public class CountablePenaltyZone extends PenaltyCombatZone {
         return penaltyNumber;
     }
 
+    @Override
+    public String toString() {
+        return penaltyNumber + " " + penaltyType.toString();
+    }
+
 }

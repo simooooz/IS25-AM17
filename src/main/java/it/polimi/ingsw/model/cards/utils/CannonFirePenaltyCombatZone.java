@@ -81,4 +81,22 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             throw new RuntimeException("Command type not valid in doCommandEffects");
     }
 
+    @Override
+    public String toString() {
+        String fires = "";
+        for (int i = 0; i < cannonFires.size(); i++) {
+            if (i == 0)
+                fires = fires + "    " + cannonFires.get(i).toString() + "\u2009" + "   │\n";
+            else if (i == cannonFires.size() - 1)
+                fires = fires + " │           "  + "\u200A" + cannonFires.get(i).toString() + "  ";
+            else {
+                fires = fires + " │           " + "\u200A" + cannonFires.get(i).toString() + "\u2009" + "   │\n";
+            }
+        }
+
+        return fires;
+    }
+
+
+
 }

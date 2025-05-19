@@ -35,6 +35,18 @@ public class CannonFire {
         return directionFrom.getComponentsFromThisDirection(ship.getDashboard(), coord).stream().findFirst();
     }
 
+    @Override
+    public String toString() {
+        String arrow = "";
+        switch (directionFrom) {
+            case NORTH: arrow = "⬇️"; break;
+            case SOUTH: arrow = "⬆️"; break;
+            case EAST: arrow = "⬅️"; break;
+            case WEST: arrow = "➡️"; break;
+
+        }
+        return (!isBig ? (" " + "\u200A" + "🔥" + "  ") : "🔥🔥 ") + arrow;
+    }
 }
 
 

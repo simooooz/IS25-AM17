@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.Meteor;
 import it.polimi.ingsw.model.components.CannonComponent;
@@ -8,6 +9,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.properties.DirectionType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -134,6 +136,49 @@ public class MeteorSwarmCard extends Card{
             return autoCheckPlayers(model, board);
         }
         throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public String toString() {
+        String hBorder = "─";
+        String vBorder = "│";
+        String[] angles = {"┌", "┐", "└", "┘"};
+        String hDivider = "┼";
+        String leftDivider = "├";
+        String rightDivider = "┤";
+
+        List<String> cardLines = new ArrayList<>();
+
+        // Title box
+        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        cardLines.add(topBorder);
+
+        String title = " " + vBorder + "     MeteorSwarm     " + vBorder + " ";
+        cardLines.add(title);
+
+        // First row divider
+        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        cardLines.add(divider);
+
+        String fires = "";
+        for (int i = 0; i < meteors.size(); i++) {
+            if (i == 0)
+                fires = fires + "       " + meteors.get(i).toString() + "\u2009" + "\u200A" + "       │\n";
+            else if (i == meteors.size() - 1)
+                fires = fires + " │       " + meteors.get(i).toString() + "\u2009" + "\u200A" + "      ";
+            else {
+                fires = fires + " │       " + meteors.get(i).toString()+ "\u2009" + "\u200A" + "       │\n";
+            }
+        }
+        String firstRow = " " + vBorder + fires + " " + vBorder + "  ";
+        cardLines.add(firstRow);
+
+        // Bottom border
+        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        cardLines.add(bottomBorder);
+
+        return String.join("\n", cardLines);
+
     }
 
 }

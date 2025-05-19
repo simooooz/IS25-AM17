@@ -19,6 +19,11 @@ public enum CriteriaType {
             }
             return PlayerState.DONE;
         }
+
+        @Override
+        public String toString() {
+            return "↓ 👨‍🚀";
+        }
     },
 
     CANNON {
@@ -50,6 +55,11 @@ public enum CriteriaType {
                 return PlayerState.DONE;
             }
         }
+
+        @Override
+        public String toString() {
+            return "↓ 💥";
+        }
     },
 
     ENGINE {
@@ -77,6 +87,11 @@ public enum CriteriaType {
                 worst.setValue(freeEnginesPower);
                 return PlayerState.DONE;
             }
+        }
+
+        @Override
+        public String toString() {
+            return "↓ 🚀";
         }
     };
 

@@ -23,4 +23,9 @@ public abstract class Constants {
         return message;
     }
 
+    // utility to repeat a string n times
+    public static String repeat(String str, int n) {
+        return String.valueOf(str).repeat(Math.max(0, n));
+    }
+
 }

@@ -63,4 +63,17 @@ public class Meteor {
     public DirectionType getDirectionFrom() {
         return directionFrom;
     }
+
+    @Override
+    public String toString() {
+        String arrow = "";
+        switch (directionFrom) {
+            case NORTH: arrow = "↓"; break;
+            case SOUTH: arrow = "↑"; break;
+            case EAST: arrow = "←"; break;
+            case WEST: arrow = "→"; break;
+
+        }
+        return (!isBig ? (" " + "☄️" + " " + "\u200A" + "\u200A") : "☄️☄️") + " " + arrow;
+    }
 }
