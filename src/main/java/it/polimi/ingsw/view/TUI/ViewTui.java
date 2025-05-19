@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.graphics.StandardShipBoardTUI;
@@ -14,6 +15,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.IntStream;
 
 public class ViewTui {
 
@@ -173,8 +175,65 @@ public class ViewTui {
     }
 
     private void handleInGame(String input) {
-        switch (client.getGameController().getState(client.getUsername())) {
+        try {
+            switch (client.getGameController().getState(client.getUsername())) {
+                case BUILD -> {
+                    String[] commands = input.split(" ");
+                    switch (commands[0]) {
+                        case "pick" -> client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
+                        case "release" -> client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
+                        case "reserve" -> client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
+                        case "insert" -> {
+                            // TODO cacl giri
+                            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]));
+                        }
+                        case "move" -> {
+                            // todo cacl giri
+                            client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]));
+                        }
+                        case "rotate" -> {
+                            // todo calc giri
+                            client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]));
+                        }
+                        case "look-at-cards" -> {
+                            int deckIndex = Integer.parseInt(commands[1]);
+                            if (deckIndex < 1 || deckIndex > 3)
+                                throw new IllegalArgumentException("Deck index out of bounds");
+                            client.send(MessageType.LOOK_CARD_PILE, deckIndex);
+                        }
+                        case "ready" -> client.send(MessageType.SET_READY);
+                        default -> Chroma.println("Command not valid. Please try again.", Chroma.RED);
+                    }
+                }
+                case CHECK -> {
+                    Object[] ids = Arrays.stream(input.split(" "))
+                            .map(Integer::parseInt)
+                            .toArray(Object[]::new);
+                    client.send(MessageType.CHECK_SHIP, ids);
+                }
+                case WAIT_ALIEN -> {
+                    String[] commands = input.split(" ");
+                    Integer[] ids = IntStream.range(0, commands.length)
+                            .filter(i -> i % 2 == 0)
+                            .mapToObj(i -> Integer.parseInt(commands[i]))
+                            .toArray(Integer[]::new);
+                    AlienType[] aliens = IntStream.range(0, commands.length)
+                            .filter(i -> i % 2 == 1)
+                            .mapToObj(i -> Objects.equals(commands[i], "cannon") ? AlienType.CANNON : AlienType.ENGINE)
+                            .toArray(AlienType[]::new);
 
+                    if (ids.length != aliens.length)
+                        Chroma.println("Command not valid. Please try again.", Chroma.RED);
+
+                    Map<Integer, AlienType> alienMap = new HashMap<>();
+                    for (int i = 0; i < ids.length; i++)
+                        alienMap.put(ids[i], aliens[i]);
+                    client.send(MessageType.CHOOSE_ALIEN, alienMap);
+                }
+                case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
+            }
+        } catch (IllegalArgumentException e) {
+            Chroma.println("Command not valid. Please try again.", Chroma.RED);
         }
     }
 
