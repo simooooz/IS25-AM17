@@ -46,6 +46,8 @@ public abstract class Constants {
             case 1 -> message = new SingleArgMessage<>(gameEvent, args[0]);
             case 2 -> message = new DoubleArgMessage<>(gameEvent, args[0], args[1]);
             case 3 -> message = new TripleArgMessage<>(gameEvent, args[0], args[1], args[2]);
+            case 4 -> message = new QuadrupleArgMessage<>(gameEvent, args[0], args[1], args[2], args[3]);
+            case 5 -> message = new QuintupleArgMessage<>(gameEvent, args[0], args[1], args[2], args[3], args[4]);
             default -> message = new ErrorMessage("Unknown message");
         }
         return message;
