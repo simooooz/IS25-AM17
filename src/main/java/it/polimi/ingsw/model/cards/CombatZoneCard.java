@@ -189,7 +189,7 @@ public class CombatZoneCard extends Card {
         String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
         cardLines.add(topBorder);
 
-        String title = " " + vBorder + "     Combat Zone     " + vBorder + " ";
+        String title = " " + vBorder + Constants.inTheMiddle("Combat Zone" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
         cardLines.add(title);
 
         // First row divider

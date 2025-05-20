@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.CannonFire;
+import it.polimi.ingsw.model.cards.utils.Meteor;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
@@ -181,6 +183,58 @@ public class PiratesCard extends Card{
             return autoCheckPlayers(model, board);
         }
         throw new RuntimeException("Command type not valid in doCommandEffects");
+    }
+
+    @Override
+    public String toString() {
+        String hBorder = "─";
+        String vBorder = "│";
+        String[] angles = {"┌", "┐", "└", "┘"};
+        String hDivider = "┼";
+        String leftDivider = "├";
+        String rightDivider = "┤";
+
+        List<String> cardLines = new ArrayList<>();
+
+        // Title box
+        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        cardLines.add(topBorder);
+
+        String title = " " + vBorder + Constants.inTheMiddle("Pirates" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        cardLines.add(title);
+
+        // First row divider
+        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        cardLines.add(divider);
+
+        String firePowerRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(piratesFirePower + " 💥", 20) +
+                "\u2009"  + "\u200A" + vBorder + " ";
+        cardLines.add(firePowerRow);
+
+        cardLines.add(divider);
+
+        for (CannonFire c : cannonFires) {
+            String meteorRow = " " + vBorder + "     " + c.toString() +"\u200A" + "\u2005" + "     " + vBorder + " ";
+            cardLines.add(meteorRow);
+        }
+
+        cardLines.add(divider);
+
+        String creditRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(credits + " 💲", 20) +
+                "\u2009"  + "\u200A" + vBorder + " ";
+        cardLines.add(creditRow);
+
+        cardLines.add(divider);
+
+        String dayRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(days + " 📅", 20) +
+                "\u2009"  + "\u200A" + vBorder + " ";
+        cardLines.add(dayRow);
+
+        // Bottom border
+        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        cardLines.add(bottomBorder);
+
+        return String.join("\n", cardLines);
     }
 
 }
