@@ -1,11 +1,14 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.EngineComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OpenSpaceCard extends Card {
@@ -89,4 +92,36 @@ public class OpenSpaceCard extends Card {
         super.endCard(board);
     }
 
+    @Override
+    public String toString() {
+        String hBorder = "─";
+        String vBorder = "│";
+        String[] angles = {"┌", "┐", "└", "┘"};
+        String hDivider = "┼";
+        String leftDivider = "├";
+        String rightDivider = "┤";
+
+        List<String> cardLines = new ArrayList<>();
+
+        // Title box
+        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        cardLines.add(topBorder);
+
+        String title = " " + vBorder + Constants.inTheMiddle("Open Space" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        cardLines.add(title);
+
+        // First row divider
+        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        cardLines.add(divider);
+
+        String row = " " + vBorder + "     🚀  " + "\u200A" + "⬆️" + "\u200A" + "  📅     " + vBorder + "";
+        cardLines.add(row);
+
+
+        // Bottom border
+        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        cardLines.add(bottomBorder);
+
+        return String.join("\n", cardLines);
+    }
 }

@@ -3,7 +3,9 @@ package it.polimi.ingsw.model.components;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.player.Ship;
+import it.polimi.ingsw.view.TUI.Chroma;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,4 +47,12 @@ public class OddComponent extends Component {
         }
     }
 
+    @Override
+    public List<String> icon() {
+        String color = type.equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
+        return new ArrayList<>(List.of(
+                " " + Chroma.color("┌─────┐", color) + " ",
+                " " + Chroma.color("│ " + "\u2009" + "🛸" + "\u2009" + " │", color) + " ",
+                " " + Chroma.color("└─────┘", color) + " "));
+    }
 }

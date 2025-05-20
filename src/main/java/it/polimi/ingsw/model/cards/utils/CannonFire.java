@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.player.Ship;
@@ -45,7 +46,8 @@ public class CannonFire {
             case WEST: arrow = "➡️"; break;
 
         }
-        return (!isBig ? (" " + "\u200A" + "🔥" + "  ") : "🔥🔥 ") + arrow;
+        return  (isBig ? Constants.inTheMiddle("\u2002" + "🔥🔥  ", 7)
+                : Constants.inTheMiddle(" 🔥  ", 7)) + " " + arrow;
     }
 }
 

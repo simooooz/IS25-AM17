@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CannonComponent;
@@ -148,6 +149,60 @@ public class SmugglersCard extends Card {
     @Override
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> r, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
         super.doSpecificCheck(commandType, this.reward, deltaGood, batteries, username, board);
+    }
+
+    @Override
+    public String toString() {
+        String hBorder = "─";
+        String vBorder = "│";
+        String[] angles = {"┌", "┐", "└", "┘"};
+        String hDivider = "┼";
+        String leftDivider = "├";
+        String rightDivider = "┤";
+
+        List<String> cardLines = new ArrayList<>();
+
+        // Title box
+        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        cardLines.add(topBorder);
+
+        String title = " " + vBorder + Constants.inTheMiddle("Smugglers" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        cardLines.add(title);
+
+        // First row divider
+        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        cardLines.add(divider);
+
+        String firePowerRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(smugglersFirePower + " 💥", 20) +
+                "\u2009"  + "\u200A" + vBorder + " ";
+        cardLines.add(firePowerRow);
+
+        cardLines.add(divider);
+
+        String penaltyRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(penalty + " 🔲❌", 19) +
+                "\u2009"  + vBorder + " ";
+        cardLines.add(penaltyRow);
+
+        cardLines.add(divider);
+
+        String good = "  ";
+        for (ColorType c : reward.keySet()) {
+            for (int k = 0; k < reward.get(c); k++)
+                good = good + c.toString() + "  ";
+        }
+        String goodsRow = " " + vBorder + Constants.inTheMiddle(good, 21) + vBorder + " ";
+        cardLines.add(goodsRow);
+        cardLines.add(divider);
+
+        String dayRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(days + " 📅", 20) +
+                "\u2009"  + "\u200A" + vBorder + " ";
+        cardLines.add(dayRow);
+
+        // Bottom border
+        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        cardLines.add(bottomBorder);
+
+        return String.join("\n", cardLines);
     }
 
 }

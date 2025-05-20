@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
@@ -7,8 +8,7 @@ import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
 
-import java.io.Console;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -68,12 +68,13 @@ public class Meteor {
     public String toString() {
         String arrow = "";
         switch (directionFrom) {
-            case NORTH: arrow = "↓"; break;
-            case SOUTH: arrow = "↑"; break;
-            case EAST: arrow = "←"; break;
-            case WEST: arrow = "→"; break;
+            case NORTH: arrow = "⬇️"; break;
+            case SOUTH: arrow = "⬆️"; break;
+            case EAST: arrow = "⬅️"; break;
+            case WEST: arrow = "➡️"; break;
 
         }
-        return (!isBig ? (" " + "☄️" + " " + "\u200A" + "\u200A") : "☄️☄️") + " " + arrow;
+        return  (isBig ? Constants.inTheMiddle("\u2002" + "☄️☄️  ", 7)
+                : Constants.inTheMiddle("  ☄️  ", 7)) + " " + arrow;
     }
 }

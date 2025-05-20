@@ -153,25 +153,18 @@ public class MeteorSwarmCard extends Card{
         String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
         cardLines.add(topBorder);
 
-        String title = " " + vBorder + "     MeteorSwarm     " + vBorder + " ";
+        String title = " " + vBorder + Constants.inTheMiddle("MeteorSwarm" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
         cardLines.add(title);
 
         // First row divider
         String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
         cardLines.add(divider);
 
-        String fires = "";
-        for (int i = 0; i < meteors.size(); i++) {
-            if (i == 0)
-                fires = fires + "       " + meteors.get(i).toString() + "\u2009" + "\u200A" + "       │\n";
-            else if (i == meteors.size() - 1)
-                fires = fires + " │       " + meteors.get(i).toString() + "\u2009" + "\u200A" + "      ";
-            else {
-                fires = fires + " │       " + meteors.get(i).toString()+ "\u2009" + "\u200A" + "       │\n";
-            }
+        for (Meteor m : meteors) {
+            String meteorRow = " " + vBorder + "     " + m.toString() +"\u200A" + "\u2005" + "     " + vBorder + " ";
+            cardLines.add(meteorRow);
         }
-        String firstRow = " " + vBorder + fires + " " + vBorder + "  ";
-        cardLines.add(firstRow);
+
 
         // Bottom border
         String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";

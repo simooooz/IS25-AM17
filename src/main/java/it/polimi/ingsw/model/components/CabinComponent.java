@@ -5,7 +5,10 @@ import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.player.Ship;
+import it.polimi.ingsw.view.TUI.Chroma;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CabinComponent extends Component {
@@ -84,6 +87,37 @@ public class CabinComponent extends Component {
         setHumans(0, ship);
         setAlien(null, ship);
         super.affectDestroy(ship);
+    }
+
+
+    public List<String> icon() {
+        if (getHumans() == 0 && alien.isEmpty()) {
+            return new ArrayList<>(List.of(
+                    " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
+                    " " + Chroma.color("│     │", Chroma.GREY_BOLD) + " ",
+                    " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " "));
+
+        }
+        else if (getHumans() > 0) {
+            if(getHumans() == 2)
+                return new ArrayList<>(List.of(
+                        " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
+                        " " + Chroma.color("│" + "👨🏻‍🚀" + "\u200A" + "\u200A"+ "👨🏻‍🚀" + "│", Chroma.GREY_BOLD) + " ",
+                        " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " "));
+            else
+                return new ArrayList<>(List.of(
+                    " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
+                    " " + Chroma.color("│ " + "\u2009" + "👨🏻‍🚀" + "\u2009" + " │", Chroma.GREY_BOLD) + " ",
+                    " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " "));
+        }
+        else {
+            String color = getAlien().orElseThrow().equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
+            return new ArrayList<>(List.of(
+                    " " + Chroma.color("┌─────┐", color) + " ",
+                    " " + Chroma.color("│ " + "\u2009" + "👽" + "\u2009" + " │", color) + " ",
+                    " " + Chroma.color("└─────┘", color) + " "));
+
+        }
     }
 
 }

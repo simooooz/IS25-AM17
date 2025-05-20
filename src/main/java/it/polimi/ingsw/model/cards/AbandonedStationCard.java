@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.game.Board;
@@ -100,5 +101,54 @@ public class AbandonedStationCard extends Card{
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> r, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
         super.doSpecificCheck(commandType, this.goods, deltaGood, batteries, username, board);
     }
+
+    @Override
+    public String toString() {
+        String hBorder = "─";
+        String vBorder = "│";
+        String[] angles = {"┌", "┐", "└", "┘"};
+        String hDivider = "┼";
+        String leftDivider = "├";
+        String rightDivider = "┤";
+
+        List<String> cardLines = new ArrayList<>();
+
+        // Title box
+        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        cardLines.add(topBorder);
+
+        String title = " " + vBorder + Constants.inTheMiddle("AbandonedStation" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        cardLines.add(title);
+
+        // First row divider
+        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        cardLines.add(divider);
+
+        String crewRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(crew + " 👨‍🚀", 23) +
+                "\u2009"  + "\u200A" + vBorder + " ";
+        cardLines.add(crewRow);
+        cardLines.add(divider);
+
+        String good = "  ";
+        for (ColorType c : goods.keySet()) {
+            for (int k = 0; k < goods.get(c); k++)
+                good = good + c.toString() + "  ";
+        }
+        String goodsRow = " " + vBorder + Constants.inTheMiddle(good, 21) + vBorder + " ";
+        cardLines.add(goodsRow);
+        cardLines.add(divider);
+
+        String dayRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(days + " 📅", 20) +
+                "\u2009" + "\u200A" + vBorder + " ";
+        cardLines.add(dayRow);
+
+        // Bottom border
+        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        cardLines.add(bottomBorder);
+
+        return String.join("\n", cardLines);
+
+    }
+
 
 }
