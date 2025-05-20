@@ -33,7 +33,7 @@ public interface RMIServerInterface extends Remote {
 
     void reserveComponentHandler(String sessionCode, Integer id) throws RemoteException;
 
-    void insertComponentHandler(String sessionCode, Integer row, Integer col, Integer rotations) throws RemoteException;
+    void insertComponentHandler(String sessionCode, Integer id, Integer row, Integer col, Integer rotations) throws RemoteException;
 
     void moveComponentHandler(String sessionCode, Integer id, Integer row, Integer col, Integer rotations) throws RemoteException;
 

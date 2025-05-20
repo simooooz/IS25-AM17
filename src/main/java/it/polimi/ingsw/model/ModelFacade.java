@@ -66,17 +66,11 @@ public class ModelFacade {
         component.reserveComponent(ship);
     }
 
-    public void insertComponent(String username, int row, int col, int rotations) {
+    public void insertComponent(String username, int componentId, int row, int col, int rotations) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-
-        if (ship.getHandComponent().isPresent()) { // Component is in hand
-            ship.getHandComponent().get().insertComponent(ship, row, col, learnerMode);
-            for (int i=0; i<rotations; i++)
-                ship.getHandComponent().get().rotateComponent(ship);
-            ship.setHandComponent(null);
-        }
-        else
-            throw new ComponentNotValidException("Component to insert isn't in hand");
+        Component component = board.getMapIdComponents().get(componentId);
+        if (component == null) throw new ComponentNotValidException("Invalid component id");
+        component.insertComponent(ship, row, col, rotations, learnerMode);
     }
 
     public void moveComponent(String username, int componentId, int row, int col) {

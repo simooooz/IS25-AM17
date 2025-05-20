@@ -70,10 +70,10 @@ public abstract class ServerBasis {
         client.notifyGameEvent(MessageType.RESERVE_COMPONENT, id);
     }
 
-    public static void insertComponent(User client, Integer row, Integer col, Integer rotations) {
+    public static void insertComponent(User client, Integer id, Integer row, Integer col, Integer rotations) {
         if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().insertComponent(client.getUsername(), row, col, rotations);
-        client.notifyGameEvent(MessageType.INSERT_COMPONENT, row, col, rotations);
+        client.getGameController().insertComponent(client.getUsername(), id, row, col, rotations);
+        client.notifyGameEvent(MessageType.INSERT_COMPONENT, id, row, col, rotations);
     }
 
     public static void moveComponent(User client, Integer id, Integer row, Integer col, Integer rotations) {

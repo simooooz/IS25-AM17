@@ -182,9 +182,9 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     }
 
     @Override
-    public void insertComponentHandler(String sessionCode, Integer row, Integer col, Integer rotations) throws RemoteException {
+    public void insertComponentHandler(String sessionCode, Integer id, Integer row, Integer col, Integer rotations) throws RemoteException {
         User user = getUserInRmiSessions(sessionCode);
-        insertComponent(user, row, col, rotations);
+        insertComponent(user, id, row, col, rotations);
     }
 
     @Override

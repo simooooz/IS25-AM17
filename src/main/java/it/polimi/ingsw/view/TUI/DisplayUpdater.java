@@ -154,7 +154,7 @@ public class DisplayUpdater implements Runnable {
                                             [reserve <id>]               - reserve the picked component
                                             [insert <x> <y>]             - inserts the component into (x,y)
                                             [move <id> <x> <y>]          - moves the component corresponding to the given id into the box with the given coordinates
-                                            [rotate <times>]             - rotate picked card clockwise (0-3)
+                                            [rotate <id> <times>]        - rotate the selected component clockwise n-times
                                             [look-at-cards <id>]         - view specific card pile (1,2 or 3)
                                             [ready]                      - end building phase
                                     """,

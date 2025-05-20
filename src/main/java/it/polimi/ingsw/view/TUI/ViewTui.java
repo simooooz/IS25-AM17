@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.TUI;
 
+import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -18,7 +19,7 @@ public class ViewTui {
     private final DisplayUpdater displayUpdater;
     private final BlockingQueue<String> networkMessageQueue = new LinkedBlockingQueue<>();
 
-    private int rotateCounter = 0;
+    private int offlineRotations = 0;
 
     /**
      * Constructs a new ViewTui with the given client controller.
@@ -30,7 +31,7 @@ public class ViewTui {
         this.scanner = new Scanner(System.in);
         this.displayUpdater = new DisplayUpdater(this.client);
 
-        this.rotateCounter = 0;
+        this.offlineRotations = 0;
     }
 
     private void processUserInput(String input) {
@@ -148,24 +149,33 @@ public class ViewTui {
             case BUILD -> {
                 String[] commands = input.split(" ");
                 switch (commands[0]) {
-                    case "pick" -> client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
+                    case "pick" -> {
+                        client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
+                        this.offlineRotations = 0;
+                    }
                     case "release" -> client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
                     case "reserve" -> client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
                     case "insert" -> {
-                        // todo calc giri
-                        int row = Integer.parseInt(commands[1]) - 5;
-                        int col = Integer.parseInt(commands[2]) - 4;
-                        client.send(MessageType.INSERT_COMPONENT, row, col, rotateCounter);
-                    }
-                    case "move" -> {
-                        // todo cacl giri
                         int row = Integer.parseInt(commands[2]) - 5;
                         int col = Integer.parseInt(commands[3]) - 4;
-                        client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), row, col, rotateCounter);
+                        client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(commands[1]), row, col, offlineRotations);
+                        this.offlineRotations = 0;
+                    }
+                    case "move" -> {
+                        int row = Integer.parseInt(commands[2]) - 5;
+                        int col = Integer.parseInt(commands[3]) - 4;
+                        client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), row, col, offlineRotations);
                     }
                     case "rotate" -> {
-                        // todo calc giri
-                        client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]), rotateCounter);
+                        int id = Integer.parseInt(commands[1]);
+                        Component component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
+                        Optional<Component> handComponent = client.getGameController().getModel().getBoard().getPlayerEntityByUsername(client.getUsername()).getShip().getHandComponent();
+
+                        if (component == null) throw new IllegalArgumentException();
+                        else if (handComponent.isPresent() && handComponent.get().equals(component)) // If component is already in the dashboard send rotare, otherwise increase counter
+                            offlineRotations += Integer.parseInt(commands[2]);
+                        else
+                            client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]));
                     }
                     case "look-at-cards" -> {
                         int deckIndex = Integer.parseInt(commands[1]);
@@ -178,9 +188,9 @@ public class ViewTui {
                 }
             }
             case CHECK -> {
-                Object[] ids = Arrays.stream(input.split(" "))
-                        .map(Integer::parseInt)
-                        .toArray(Object[]::new);
+                List<Integer> ids = Arrays.stream(input.split(" "))
+                    .map(Integer::parseInt)
+                    .toList();
                 client.send(MessageType.CHECK_SHIP, ids);
             }
             case WAIT_ALIEN -> {
