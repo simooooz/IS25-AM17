@@ -2,10 +2,13 @@ package it.polimi.ingsw.view.TUI;
 
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.model.game.Board;
+import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.network.Client;
 
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 
 public class DisplayUpdater implements Runnable {
 
@@ -34,7 +37,6 @@ public class DisplayUpdater implements Runnable {
             }
         }
     }
-
 
     public void updateDisplay() {
         switch (client.getState()) {
@@ -78,57 +80,70 @@ public class DisplayUpdater implements Runnable {
         System.out.print("\n> ");
     }
 
-
-    private String gridOfComponents(TreeMap<Integer, Component> components, int componentsPerRow) {
+    private String gridOfComponents(List<Component> components, int componentsPerRow) {
         StringBuilder output = new StringBuilder();
 
-        List<Integer> keys = new ArrayList<>(components.keySet());
-        // row by row
-        for (int rowStart = 0; rowStart < keys.size(); rowStart += componentsPerRow) {
-            int rowEnd = Math.min(rowStart + componentsPerRow, keys.size());
+        for (int rowStart = 0; rowStart < components.size(); rowStart += componentsPerRow) {
+            int rowEnd = Math.min(rowStart + componentsPerRow, components.size());
 
             // Collect all component for this row
             String[][] rowComponentLines = new String[rowEnd - rowStart][];
 
-            for (int i = 0; i < rowEnd - rowStart; i++) {
-                Integer key = keys.get(rowStart + i);
-                rowComponentLines[i] = components.get(key).print(Optional.of(key)).split("\n");
-            }
+            for (int i = 0; i < rowEnd - rowStart; i++)
+                rowComponentLines[i] = components.get(i).toString().split("\n");
 
+            // Print the row line by line
             int height = rowComponentLines[0].length;
-            // print the row line by line
             for (int lineIndex = 0; lineIndex < height; lineIndex++) {
                 for (int compIndex = 0; compIndex < rowComponentLines.length; compIndex++) {
                     output.append(rowComponentLines[compIndex][lineIndex]);
 
-                    // add spacing between components, except after the last one
-                    if (compIndex < rowComponentLines.length - 1) {
+                    // Add spacing between components, except after the last one
+                    if (compIndex < rowComponentLines.length - 1)
                         output.append("  ");
-                    }
                 }
                 output.append("\n");
             }
         }
-
         return output.toString();
     }
 
     private void displayGame() {
         PlayerState state = client.getGameController().getState(client.getUsername());
-        Ship ship = client.getGameController().getModel().getBoard().getPlayerEntityByUsername(client.getUsername()).getShip();
+        Board board = client.getGameController().getModel().getBoard();
+        Ship ship = board.getPlayerEntityByUsername(client.getUsername()).getShip();
+
         switch (state) {
             case BUILD -> {
-                // todo: how to get the map of components properly?
-                Map<Integer, Component> components = client.getGameController().getModel().getBoard().getMapIdComponents();
-                System.out.println(
-                        gridOfComponents(
-                                new TreeMap<>(components),
-                                10
-                        )
-                );
+                List<Component> commonComponents = board.getCommonComponents();
+                System.out.println("Common components:\n");
+                System.out.println(gridOfComponents(commonComponents,10));
 
                 System.out.print("\n\n\n\n\n");
+                if (ship.getReserves().isEmpty())
+                    System.out.println("Reserves: None");
+                else {
+                    System.out.println("Reserves:\n");
+                    System.out.println(gridOfComponents(ship.getReserves(), 2));
+                }
+
+                ship.getHandComponent().ifPresent(handComponent -> {
+                    System.out.print("\n\n\n\n\n");
+                    System.out.println("Hand component:\n");
+                    System.out.println(handComponent);
+                });
+
+                System.out.print("\n\n\n\n\n");
+                System.out.println("Your ship:\n");
                 System.out.println(ship);
+
+                System.out.print("\n\n\n\n\n");
+                System.out.println("Hourglass position: ");
+                System.out.println("Time left: ");
+                for (PlayerData player : board.getStartingDeck())
+                    System.out.println("- " + player.getUsername() + "not ready");
+                for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
+                    System.out.println("- " + entry.getKey().getUsername() + "READY");
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println(
@@ -146,6 +161,7 @@ public class DisplayUpdater implements Runnable {
                 );
                 System.out.print("> ");
             }
+
             case CHECK -> {
                 System.out.println(ship);
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
@@ -158,6 +174,7 @@ public class DisplayUpdater implements Runnable {
                 );
                 System.out.print("> ");
             }
+
             case WAIT_ALIEN -> {
                 System.out.println(ship);
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
@@ -173,32 +190,53 @@ public class DisplayUpdater implements Runnable {
                 );
                 System.out.print("> ");
             }
+
             case DRAW_CARD -> {
                 System.out.println(ship);
+
+                System.out.print("\n\n\n\n\n");
+                System.out.println("Cards resolved: " + (board.getCardPilePos() + 1) + "/" + board.getCardPile().size());
+
+                System.out.print("\n\n\n\n\n");
+                System.out.println("Positions: " + (board.getCardPilePos() + 1) + "/" + board.getCardPile().size());
+                for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
+                    System.out.println("- " + entry.getKey().getUsername() + "at position " + entry.getValue() + " with " + entry.getKey().getCredits() + " credits");
+                for (PlayerData player : board.getStartingDeck())
+                    System.out.println("- " + player.getUsername() + "at starting deck with" + player.getCredits() + " credits");
+
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 System.out.println("PRESS enter to draw a card...");
             }
+
             case WAIT_CANNONS -> {
             }
+
             case WAIT_ENGINES -> {
             }
+
             case WAIT_GOODS -> {
             }
+
             case WAIT_REMOVE_GOODS -> {
             }
+
             case WAIT_ROLL_DICES -> {
             }
+
             case WAIT_REMOVE_CREW -> {
             }
+
             case WAIT_SHIELD -> {
             }
+
             case WAIT_BOOLEAN -> {
             }
+
             case WAIT_INDEX -> {
             }
+
         }
     }
-
 
     public void displayError() {
         Chroma.println("Remote error :/ please try again", Chroma.RED);

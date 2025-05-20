@@ -214,149 +214,56 @@ public class Ship {
         StringBuilder output = new StringBuilder();
 
         output.append("   ");
-        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
-            // column label
+        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
             output.append(Chroma.color(String.format("       %-2d      ", col + 4), Chroma.RESET));
-        }
         output.append("\n");
 
         for (int row = 0; row < Constants.SHIP_ROWS; row++) {
             for (int componentRow = 0; componentRow < 5; componentRow++) {
-                // row label
-                if (componentRow == 2) {
+
+                if (componentRow == 2) // Row label
                     output.append((row + 5)).append("  ");
-                } else {
+                else
                     output.append("   ");
-                }
 
                 for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
-                    Optional<Component> componentOpt = dashboard[row][col];
-                    Position pos = new Position(row, col);
+                    Optional<Component> componentOpt = getDashboard(row, col);
 
-                    boolean isPlayable = validPos().contains(pos);
-                    Set<Position> reserves = isLearner
-                            ? Set.of()
-                            : Set.of(new Position(0, 5), new Position(0, 6));
-
+                    boolean isPlayable = Component.validPositions(row, col, isLearner);
                     if (componentOpt.isPresent()) {
-                        String[] cellLines = componentOpt.get().print(Optional.empty()).split("\n");
+                        String[] cellLines = componentOpt.get().toString().split("\n");
                         output.append(" ").append(cellLines[componentRow]).append(" ");
-                    } else {
+                    }
+                    else {
                         String bgColor;
-                        if (isPlayable) {
+                        if (isPlayable)
                             bgColor = isLearner ? Chroma.BLUE_BACKGROUND : Chroma.PURPLE_BACKGROUND;
-                        } else if (reserves.contains(pos)) {
-                            bgColor = Chroma.DARKPURPLE_BACKGROUND;
-                        } else {
+                        else
                             bgColor = Chroma.RESET;
-                        }
 
-                        if (componentRow == 0) {
-                            // top row
+                        if (componentRow == 0)
                             output.append(Chroma.color("  ┌─────────┐  ", bgColor));
-                        } else if (componentRow == 4) {
-                            // bottom row
+                        else if (componentRow == 4)
                             output.append(Chroma.color("  └─────────┘  ", bgColor));
-                        } else {
+                        else
                             output.append(Chroma.color("  │         │  ", bgColor));
-                        }
                     }
 
                 }
 
-                // row label
-                if (componentRow == 2) {
+                if (componentRow == 2) // Row label
                     output.append("  ").append(row + 5);
-                }
 
                 output.append("\n");
             }
         }
 
         output.append("   ");
-        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
-            // column label
+        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
             output.append(String.format("       %-2d      ", col + 4));
-        }
         output.append("\n");
 
         return output.toString();
-    }
-
-
-    private record Position(int row, int col) {
-    }
-
-    private Set<Position> validPos() {
-        if (this.isLearner) {
-            return Set.of(
-                    new Position(4, 1),
-                    new Position(4, 2),
-                    new Position(4, 4),
-                    new Position(4, 5),
-
-                    // row 1
-                    new Position(3, 1),
-                    new Position(3, 2),
-                    new Position(3, 3),
-                    new Position(3, 4),
-                    new Position(3, 5),
-
-                    // row 2
-                    new Position(2, 1),
-                    new Position(2, 2),
-                    new Position(2, 3),
-                    new Position(2, 4),
-                    new Position(2, 5),
-
-                    // row 3
-                    new Position(1, 2),
-                    new Position(1, 3),
-                    new Position(1, 4),
-
-                    // row 4
-                    new Position(0, 3)
-            );
-        } else {
-            return Set.of(
-                    // row 0
-                    new Position(4, 0),
-                    new Position(4, 1),
-                    new Position(4, 2),
-                    new Position(4, 4),
-                    new Position(4, 5),
-                    new Position(4, 6),
-
-                    // row 1
-                    new Position(3, 0),
-                    new Position(3, 1),
-                    new Position(3, 2),
-                    new Position(3, 3),
-                    new Position(3, 4),
-                    new Position(3, 5),
-                    new Position(3, 6),
-
-                    // row 2
-                    new Position(2, 0),
-                    new Position(2, 1),
-                    new Position(2, 2),
-                    new Position(2, 3),
-                    new Position(2, 4),
-                    new Position(2, 5),
-                    new Position(2, 6),
-
-                    // row 3
-                    new Position(1, 1),
-                    new Position(1, 2),
-                    new Position(1, 3),
-                    new Position(1, 4),
-                    new Position(1, 5),
-
-                    // row 4
-                    new Position(0, 2),
-                    new Position(0, 4)
-            );
-        }
     }
 
 }
