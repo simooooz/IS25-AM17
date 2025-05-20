@@ -51,18 +51,19 @@ public class CannonComponent extends Component {
     @Override
     public List<String> icon() {
         List<String> icon = new ArrayList<>();
-        // TODO rotate
+        String arrow = "";
         switch (this.direction) {
-            case NORTH ->
-                icon = new ArrayList<>(List.of(
-                    "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                    Chroma.color("  │" + "\u2009" + "⬆️" + "\u2009" + "│  ", Chroma.PURPLE_BOLD),
-                    Chroma.color("  └───┘  ", Chroma.PURPLE_BOLD)
-                ));
-            case EAST -> {}
-            case WEST -> {}
-            case SOUTH -> {}
-        }
+            case NORTH -> arrow = "⬆️";
+            case EAST -> arrow = "➡️";
+            case WEST -> arrow = "⬅️️";
+            case SOUTH -> arrow = "⬇️️";
+
+            }
+        icon = new ArrayList<>(List.of(
+                getIsDouble() ? Chroma.color("│🔥" + "\u200A" + arrow + "\u200A" + "🔥│", Chroma.PURPLE)
+                        : Chroma.color("│ 🔥" + "\u200A" + "\u200A" + "\u200A" + arrow + " │", Chroma.PURPLE),
+                Chroma.color("└───────┘", Chroma.PURPLE)
+        ));
         return icon;
     }
 

@@ -77,8 +77,8 @@ public class CabinComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col, boolean learnerMode) {
-        super.insertComponent(ship, row, col, learnerMode);
+    public void insertComponent(Ship ship, int row, int col, int rotations, boolean learnerMode) {
+        super.insertComponent(ship, row, col, rotations, learnerMode);
         setHumans(2, ship);
     }
 
@@ -93,26 +93,22 @@ public class CabinComponent extends Component {
     public List<String> icon() {
         if (this.humans == 0 && alien.isEmpty())
             return new ArrayList<>(List.of(
-                " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
                 " " + Chroma.color("│     │", Chroma.GREY_BOLD) + " ",
                 " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
             );
         else if (this.humans == 1)
             return new ArrayList<>(List.of(
-                " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
                 " " + Chroma.color("│ " + "\u2009" + "👨🏻‍🚀" + "\u2009" + " │", Chroma.GREY_BOLD) + " ",
                 " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
             );
         else if (this.humans == 2)
             return new ArrayList<>(List.of(
-                " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
                 " " + Chroma.color("│" + "👨🏻‍🚀" + "\u200A" + "\u200A"+ "👨🏻‍🚀" + "│", Chroma.GREY_BOLD) + " ",
                 " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
             );
         else {
             String color = getAlien().orElseThrow().equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
             return new ArrayList<>(List.of(
-                " " + Chroma.color("┌─────┐", color) + " ",
                 " " + Chroma.color("│ " + "\u2009" + "👽" + "\u2009" + " │", color) + " ",
                 " " + Chroma.color("└─────┘", color) + " ")
             );

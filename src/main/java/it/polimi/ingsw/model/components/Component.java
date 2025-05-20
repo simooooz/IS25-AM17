@@ -243,10 +243,12 @@ public class Component {
             componentLines.add(topBorder);
 
             String leftBorder = "";
-            leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
+            leftBorder = " " + vBorder +
+                    (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
+                    : inTheMiddle(String.valueOf(this.id), 9)) + vBorder + " ";
             componentLines.add(leftBorder);
 
-            leftBorder = " " + vBorder + inTheMiddle(String.valueOf(this.id), 9) + vBorder + " ";
+            leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
             componentLines.add(leftBorder);
 
             leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
@@ -277,15 +279,23 @@ public class Component {
                 case ConnectorType.EMPTY, ConnectorType.SINGLE -> {
                     leftBorder = " " + vBorder;
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().getFirst() + "├" + hBorder;
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder +
+                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
+                                : inTheMiddle(String.valueOf(this.id), 9)) + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder +
+                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
+                                : inTheMiddle(String.valueOf(this.id), 9)) + "├" + hBorder;
                     }
                 }
                 case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> {
                     leftBorder = hBorder + "┤";
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().getFirst() + "├" + hBorder;
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder +
+                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
+                                : inTheMiddle(String.valueOf(this.id), 9)) + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder +
+                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
+                                : inTheMiddle(String.valueOf(this.id), 9)) + "├" + hBorder;
                     }
                 }
             }
@@ -296,15 +306,15 @@ public class Component {
                 case ConnectorType.EMPTY, ConnectorType.DOUBLE -> {
                     leftBorder = " " + vBorder;
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.DOUBLE -> leftBorder = leftBorder + icon().get(1) + vBorder + " ";
-                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(1) + "├" + hBorder;
+                        case ConnectorType.EMPTY, ConnectorType.DOUBLE -> leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
+                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().getFirst() + "├" + hBorder;
                     }
                 }
                 case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> {
                     leftBorder = hBorder + "┤";
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.DOUBLE -> leftBorder = leftBorder + icon().get(1) + vBorder + " ";
-                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(1) + "├" + hBorder;
+                        case ConnectorType.EMPTY, ConnectorType.DOUBLE -> leftBorder = leftBorder + icon().getFirst() + vBorder + " ";
+                        case ConnectorType.SINGLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().getFirst() + "├" + hBorder;
                     }
                 }
             }
@@ -315,15 +325,15 @@ public class Component {
                 case ConnectorType.EMPTY, ConnectorType.SINGLE -> {
                     leftBorder = " " + vBorder;
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().get(2) + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(2) + "├" + hBorder;
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().get(1) + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(1) + "├" + hBorder;
                     }
                 }
                 case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> {
                     leftBorder = hBorder + "┤";
                     switch (connectors[1]) {
-                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().get(2) + vBorder + " ";
-                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(2) + "├" + hBorder;
+                        case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder + icon().get(1) + vBorder + " ";
+                        case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder + icon().get(1) + "├" + hBorder;
                     }
                 }
             }

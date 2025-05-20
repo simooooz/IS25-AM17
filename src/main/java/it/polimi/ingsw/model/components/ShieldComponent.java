@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.Ship;
@@ -22,8 +23,8 @@ public class ShieldComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col, boolean learnerMode) {
-        super.insertComponent(ship, row, col, learnerMode);
+    public void insertComponent(Ship ship, int row, int col, int rotations, boolean learnerMode) {
+        super.insertComponent(ship, row, col, rotations, learnerMode);
         for (DirectionType direction : directionsProtected)
             ship.getProtectedSides().add(direction);
     }
@@ -47,27 +48,23 @@ public class ShieldComponent extends Component {
     public List<String> icon() {
         List<String> icon = new ArrayList<>();
         if (directionsProtected[0] == DirectionType.NORTH || directionsProtected[1] == DirectionType.NORTH) {
-            icon.add(" 🛡️"+ "\u200A" + "🛡️" + "\u200A" + "🛡️ ");
             if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
-                icon.add("     " + "\u200A" + "\u2009" + "\u2009" +"🛡️ ");
-                icon.add("     " + "\u200A" + "\u2009" + "\u2009" +"🛡️ ");
+                icon.add(" ⬆️"+ "\u200A" + "🛡️" + "\u200A" + "➡️ ");
             }
             else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add(" 🛡️" + "\u200A" + "\u2009" + "\u2009" +"     ");
-                icon.add(" 🛡️" + "\u200A" + "\u2009" + "\u2009" +"     ");
+                icon.add(" ⬅️"+ "\u200A" + "🛡️" + "\u200A" + "⬆️️️ ");
             }
         }
         else if (directionsProtected[0] == DirectionType.SOUTH || directionsProtected[1] == DirectionType.SOUTH){
             if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
-                icon.add("     " + "\u200A" + "\u2009" + "\u2009" +"🛡️ ");
-                icon.add("     " + "\u200A" + "\u2009" + "\u2009" +"🛡️ ");
+                icon.add(" ⬇️"+ "\u200A" + "🛡️" + "\u200A" + "➡️ ");
             }
             else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add(" 🛡️" + "\u200A" + "\u2009" + "\u2009" + "     ");
-                icon.add(" 🛡️" + "\u200A" + "\u2009" + "\u2009" + "     ");
+                icon.add(" ⬅️" + "\u200A" + "🛡️" + "\u200A" + "⬇️️️ ");
             }
-            icon.add(" 🛡️"+ "\u200A" + "🛡️" + "\u200A" + "🛡️ ");
         }
+        icon.add(Constants.repeat(" ", 9));
+
         return icon;
     }
 

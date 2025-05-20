@@ -78,7 +78,6 @@ public class SpecialCargoHoldsComponent extends Component {
         }
 
         return new ArrayList<>(List.of(
-            Constants.repeat(" ", 9),
             text,
             "   " + goods.size() + "/" + getNumber() + "   "
         ));

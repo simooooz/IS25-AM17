@@ -4,6 +4,7 @@ import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.player.Ship;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +35,8 @@ public class BatteryComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col, boolean learnerMode) {
-        super.insertComponent(ship, row, col, learnerMode);
+    public void insertComponent(Ship ship, int row, int col, int rotations, boolean learnerMode) {
+        super.insertComponent(ship, row, col, rotations, learnerMode);
         if (isTriple) { ship.setBatteries(ship.getBatteries() + 3); }
         else { ship.setBatteries(ship.getBatteries() + 2); }
     }
@@ -48,12 +49,15 @@ public class BatteryComponent extends Component {
 
     @Override
     public List<String> icon() {
-        String text = isTriple ? (" 🔋" + "\u200A" + "🔋" + "\u200A" + "🔋 ") : ("  🔋" + "\u200A"  + "\u200A" + "\u200A" + "🔋  ");
-
+        String text = "";
+        switch (getBatteries()) {
+            case 0 -> text = Constants.repeat(" ", 9);
+            case 1 -> text = "   " + "\u2009" + "🔋" + "\u2009" + "   ";
+            case 2 -> text = "  🔋" + "\u200A" + "\u200A" + "\u200A" + "🔋  ";
+            case 3 -> text = " 🔋" + "\u200A" + "🔋" + "\u200A" + "🔋 ";
+        }
         return new ArrayList<>(List.of(
                 text,
-                Constants.repeat(" ", 9),
-                "   " + getBatteries() + "/" + (isTriple ? 3 : 2) + "   ")
-        );
+                "   " + getBatteries() + "/" + (isTriple ? 3 : 2) + "   "));
     }
 }

@@ -46,38 +46,19 @@ public class EngineComponent extends Component {
     @Override
     public List<String> icon() {
         List<String> icon = new ArrayList<>();
+        String arrow = "";
         switch (this.direction) {
-            case SOUTH ->
-                icon = new ArrayList<>(List.of(
-                    Chroma.color("  ┌───┐  ", Chroma.ORANGE_BOLD),
-                    Chroma.color("  │" + "\u2009" + "🚀" + "\u2009" + "│  ", Chroma.ORANGE_BOLD),
-                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
-                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A"
-                ));
-            case EAST ->
-                icon = new ArrayList<>(List.of(
-                    "  ┌────  ",
-                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
-                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                    "  │   🔥  ",
-                    "  └────  "
-                ));
-            case NORTH ->
-                icon = new ArrayList<>(List.of(
-                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
-                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                    "  │   │  ",
-                    "  └───┘  "
-                ));
-            case WEST ->
-                icon = new ArrayList<>(List.of(
-                    "  ────┐  ",
-                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
-                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                    " 🔥   │  ",
-                    "  ────┘  "
-                ));
+            case NORTH -> arrow = "⬆️";
+            case EAST -> arrow = "➡️";
+            case WEST -> arrow = "⬅️️";
+            case SOUTH -> arrow = "⬇️️";
+
         }
+        icon = new ArrayList<>(List.of(
+                getIsDouble() ? Chroma.color("│🚀" + "\u200A" + arrow + "\u200A" + "🚀│", Chroma.ORANGE)
+                        : Chroma.color("│ 🚀" + "\u200A" + "\u200A" + "\u200A" + arrow + " │", Chroma.ORANGE),
+                Chroma.color("└───────┘", Chroma.ORANGE)
+        ));
         return icon;
     }
 
