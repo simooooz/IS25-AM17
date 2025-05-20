@@ -213,159 +213,78 @@ public class Ship {
     public String toString() {
         StringBuilder output = new StringBuilder();
 
+        output.append("   ");
+        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
+            // column label
+            output.append(Chroma.color(String.format("       %-2d      ", col + 4), Chroma.RESET));
+        }
+        output.append("\n");
+
         for (int row = 0; row < Constants.SHIP_ROWS; row++) {
-            // Arrays to hold each line of the row's representation
-            String[] rowLines = new String[5];
-            for (int i = 0; i < rowLines.length; i++) {
-                rowLines[i] = "";
-            }
-
-            // Build each column's representation
-            for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
-                Optional<Component> componentOpt = dashboard[row][col];
-                String[] cellLines;
-
-                if (componentOpt.isPresent()) {
-                    // Split the component's string representation into lines
-                    cellLines = componentOpt.get().toString().split("\n");
+            for (int componentRow = 0; componentRow < 5; componentRow++) {
+                // row label
+                if (componentRow == 2) {
+                    output.append((row + 5)).append("  ");
                 } else {
-                    // Default empty cell representation
-                    cellLines = new String[5];
-                    cellLines[0] = "┌─────────┐";
-                    cellLines[1] = "│         │";
-                    cellLines[2] = "│         │";
-                    cellLines[3] = "│         │";
-                    cellLines[4] = "└─────────┘";
+                    output.append("   ");
                 }
 
-                // Append each cell line to the corresponding row line
-                for (int i = 0; i < 5; i++) {
-                    rowLines[i] += " " + cellLines[i] + " ";
-                }
-            }
+                for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
+                    Optional<Component> componentOpt = dashboard[row][col];
+                    Position pos = new Position(row, col);
 
-            // Append all lines for this row to the output
-            for (String line : rowLines) {
-                output.append(line).append("\n");
+                    boolean isPlayable = validPos().contains(pos);
+                    Set<Position> reserves = isLearner
+                            ? Set.of()
+                            : Set.of(new Position(0, 5), new Position(0, 6));
+
+                    if (componentOpt.isPresent()) {
+                        String[] cellLines = componentOpt.get().print(Optional.empty()).split("\n");
+                        output.append(" ").append(cellLines[componentRow]).append(" ");
+                    } else {
+                        String bgColor;
+                        if (isPlayable) {
+                            bgColor = isLearner ? Chroma.BLUE_BACKGROUND : Chroma.PURPLE_BACKGROUND;
+                        } else if (reserves.contains(pos)) {
+                            bgColor = Chroma.DARKPURPLE_BACKGROUND;
+                        } else {
+                            bgColor = Chroma.RESET;
+                        }
+
+                        if (componentRow == 0) {
+                            // top row
+                            output.append(Chroma.color("  ┌─────────┐  ", bgColor));
+                        } else if (componentRow == 4) {
+                            // bottom row
+                            output.append(Chroma.color("  └─────────┘  ", bgColor));
+                        } else {
+                            output.append(Chroma.color("  │         │  ", bgColor));
+                        }
+                    }
+
+                }
+
+                // row label
+                if (componentRow == 2) {
+                    output.append("  ").append(row + 5);
+                }
+
+                output.append("\n");
             }
         }
+
+        output.append("   ");
+        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
+            // column label
+            output.append(String.format("       %-2d      ", col + 4));
+        }
+        output.append("\n");
 
         return output.toString();
     }
-//    @Override
-//    public String toString() {
-//        StringBuilder output = new StringBuilder();
-//        int rows = Constants.SHIP_ROWS;
-//        int cols = Constants.SHIP_COLUMNS;
-//
-//        // numbers of columns
-//        output.append("   ");
-//        for (int col = 0; col < cols; col++) {
-//            output.append(Chroma.color(String.format("      %-2d     ", col + 4), Chroma.RESET));
-//        }
-//        output.append("\n");
-//
-//        // reserves only if standard mode
-//        Set<Position> reserves = isLearner
-//                ? Set.of()
-//                : Set.of(new Position(0, 5), new Position(0, 6));
-//
-//        // defines colors according to game type (learner o standard)
-//        String playableBgColor = isLearner ? Chroma.BLUE_BACKGROUND : Chroma.PURPLE_BACKGROUND;
-//        String reserveBgColor = isLearner ? Chroma.DARKBLUE_BACKGROUND : Chroma.DARKPURPLE_BACKGROUND;
-//
-//        // Matrice per memorizzare le righe di output di ogni componente
-//        String[][][] componentsOutput = new String[rows][cols][5]; // [riga][colonna][riga_componente]
-//
-//        // Prepara tutte le celle (vuote o con componenti)
-//        for (int row = 0; row < rows; row++) {
-//            for (int col = 0; col < cols; col++) {
-//                Position pos = new Position(row, col);
-//                boolean isPlayable = validPos().contains(pos);
-//                boolean isReserve = reserves.contains(pos);
-//                Optional<Component> componentOpt = dashboard[row][col];
-//
-//                // if a component is placed and shown
-//                if (componentOpt.isPresent()) {
-//                    String componentOutput = componentOpt.get().print(Optional.empty());
-//                    String[] componentLines = componentOutput.split("\n");
-//                    // Memorizza le linee nella matrice
-//                    for (int i = 0; i < 5; i++) {
-//                        componentsOutput[row][col][i] = componentLines[i];
-//                    }
-//                } else {
-//                    // Cella vuota - colora in base al tipo (giocabile, riserva, o normale)
-//                    String bgColor = Chroma.RESET;
-//                    if (isPlayable) {
-//                        bgColor = playableBgColor;
-//                    } else if (isReserve) {
-//                        bgColor = reserveBgColor;
-//                    }
-//
-//                    // Prepara le linee della cella vuota
-//                    String[] emptyCell = new String[5];
-//                    emptyCell[0] = " ┌─────────┐ "; // Riga superiore
-//                    emptyCell[1] = " │         │ "; // Riga centrale
-//                    emptyCell[2] = " │         │ "; // Riga centrale
-//                    emptyCell[3] = " │         │ "; // Riga centrale
-//                    emptyCell[4] = " └─────────┘ "; // Riga inferiore
-//
-//                    // Applica colore e memorizza
-//                    for (int i = 0; i < 5; i++) {
-//                        if (bgColor.equals(Chroma.RESET)) {
-//                            componentsOutput[row][col][i] = emptyCell[i];
-//                        } else {
-//                            componentsOutput[row][col][i] = Chroma.color(emptyCell[i], bgColor);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        // Costruisci l'output finale riga per riga
-//        for (int row = 0; row < rows; row++) {
-//            // Per ogni riga del componente (5 righe per componente)
-//            for (int componentRow = 0; componentRow < 5; componentRow++) {
-//                // Numero di riga mostrato solo nella riga centrale (componentRow = 2)
-//                if (componentRow == 2) {
-//                    output.append(String.format("%-2d ", row + 5));
-//                } else {
-//                    output.append("   ");
-//                }
-//
-//                // Stampa la riga corrente di ogni componente in questa riga
-//                for (int col = 0; col < cols; col++) {
-//                    output.append(componentsOutput[row][col][componentRow]);
-//                }
-//
-//                // Etichetta di riga fine (solo per la riga centrale)
-//                if (componentRow == 2) {
-//                    output.append(String.format("  %d", row + 5));
-//                }
-//
-//                output.append("\n");
-//            }
-//        }
-//
-//        // Stampa intestazione colonne (ripetuta in fondo)
-//        output.append("   ");
-//        for (int col = 0; col < cols; col++) {
-//            output.append(Chroma.color(String.format("      %-2d     ", col + 4), Chroma.RESET));
-//        }
-//        output.append("\n");
-//
-//        return output.toString();
-//    }
 
 
-    private static class Position {
-        final int row;
-        final int col;
-
-        public Position(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
+    private record Position(int row, int col) {
     }
 
     private Set<Position> validPos() {
