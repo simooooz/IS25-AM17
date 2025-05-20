@@ -58,12 +58,11 @@ public class GameController {
         model.reserveComponent(username, componentId);
     }
 
-    public void insertComponent(String username, int componentId, int row, int col, int rotations) {
+    public void insertComponent(String username, int row, int col, int rotations) {
         if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.insertComponent(username, componentId, row, col);
-        model.rotateComponent(username, componentId, rotations);
+        model.insertComponent(username, row, col, rotations);
     }
 
     public void moveComponent(String username, int componentId, int row, int col, int rotations) {

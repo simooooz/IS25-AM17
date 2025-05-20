@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
+import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -59,9 +60,17 @@ public class ModelFacade {
         board.getMapIdComponents().get(componentId).reserveComponent(ship);
     }
 
-    public void insertComponent(String username,  int componentId, int row, int col) {
+    public void insertComponent(String username, int row, int col, int rotations) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).insertComponent(ship, row, col, learnerMode);
+
+        if (ship.getHandComponent().isPresent()) { // Component is in hand
+            ship.getHandComponent().get().insertComponent(ship, row, col, learnerMode);
+            for (int i=0; i<rotations; i++)
+                ship.getHandComponent().get().rotateComponent(ship);
+            ship.setHandComponent(null);
+        }
+        else
+            throw new ComponentNotValidException("Component to insert isn't present in hand");
     }
 
     public void moveComponent(String username, int componentId, int row, int col) {

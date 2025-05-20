@@ -82,7 +82,7 @@ public class RMIClient extends Client {
                 case PICK_COMPONENT -> server.pickComponentHandler(sessionCode, (Integer) args[0]);
                 case RELEASE_COMPONENT -> server.releaseComponentHandler(sessionCode, (Integer) args[0]);
                 case RESERVE_COMPONENT -> server.reserveComponentHandler(sessionCode, (Integer) args[0]);
-                case INSERT_COMPONENT -> server.insertComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+                case INSERT_COMPONENT -> server.insertComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2]);
                 case MOVE_COMPONENT -> server.moveComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
                 case ROTATE_COMPONENT -> server.rotateComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1]);
                 case MOVE_HOURGLASS -> server.moveHourglassHandler(sessionCode);
@@ -103,7 +103,7 @@ public class RMIClient extends Client {
             }
         } catch (RemoteException | RuntimeException e) {
             try {
-                viewTui.getNetworkMessageQueue().put(messageType.name());
+                viewTui.getNetworkMessageQueue().put(MessageType.ERROR.name());
             } catch (InterruptedException ex) {
                 // Do nothing
             }

@@ -31,15 +31,12 @@ public class ViewTui {
         this.displayUpdater = new DisplayUpdater(this.client);
 
         this.rotateCounter = 0;
-        // Initialize with a standard ship board by default
-        // Will be replaced with the appropriate board when joining a lobby or game
-        // this.shipBoard = new StandardShipBoardTUI(null, BOARD_ROWS, BOARD_COLS);
     }
 
     private void processUserInput(String input) {
         switch (client.getState()) {
             case USERNAME:
-                if (input.length() < 3 || input.length() > 18) {}
+                if (input.length() < 3 || input.length() > 18) Chroma.println("Option not valid. Please try again.", Chroma.RED);
                 client.send(MessageType.SET_USERNAME, input);
                 break;
 
@@ -136,7 +133,6 @@ public class ViewTui {
         }
     }
 
-
     /**
      * Handles various in-game actions based on the player's current state.
      *
@@ -149,15 +145,19 @@ public class ViewTui {
                     String[] commands = input.split(" ");
                     switch (commands[0]) {
                         case "pick" -> client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
-                        case "release" -> client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
+                        case "release" -> client.send(MessageType.RELEASE_COMPONENT);
                         case "reserve" -> client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
                         case "insert" -> {
                             // todo calc giri
-                            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]), rotateCounter);
+                            int row = Integer.parseInt(commands[1]) - 5;
+                            int col = Integer.parseInt(commands[2]) - 4;
+                            client.send(MessageType.INSERT_COMPONENT, row, col, rotateCounter);
                         }
                         case "move" -> {
                             // todo cacl giri
-                            client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]), Integer.parseInt(commands[3]), rotateCounter);
+                            int row = Integer.parseInt(commands[1]) - 5;
+                            int col = Integer.parseInt(commands[2]) - 4;
+                            client.send(MessageType.MOVE_COMPONENT, row, col, rotateCounter);
                         }
                         case "rotate" -> {
                             // todo calc giri
@@ -200,7 +200,7 @@ public class ViewTui {
                 }
                 case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
             }
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
             Chroma.println("Command not valid. Please try again.", Chroma.RED);
         }
     }

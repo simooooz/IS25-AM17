@@ -166,14 +166,14 @@ public enum MessageType {
     INSERT_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
-            QuadrupleArgMessage<Integer, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<Integer, Integer, Integer, Integer>) message;
-            Server.insertComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
+            TripleArgMessage<Integer, Integer, Integer> castedMessage = (TripleArgMessage<Integer, Integer, Integer>) message;
+            Server.insertComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
         }
 
         @Override
         public void execute(ClientSocket client, Message message) {
-            QuintupleArgMessage<String, Integer, Integer, Integer, Integer> castedMessage = (QuintupleArgMessage<String, Integer, Integer, Integer, Integer>) message;
-            client.getGameController().insertComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4(), castedMessage.getArg5());
+            QuadrupleArgMessage<String, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<String, Integer, Integer, Integer>) message;
+            client.getGameController().insertComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
         }
     },
 
