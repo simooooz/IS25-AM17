@@ -10,9 +10,9 @@ public class PlayerData {
     private int credits;
     private boolean endedInAdvance;
 
-    public PlayerData(String username) {
+    public PlayerData(String username, boolean isLearner) {
         this.username = username;
-        this.ship = new Ship();
+        this.ship = new Ship(isLearner);
         this.credits = 0;
         this.color = null;
         this.endedInAdvance = false;

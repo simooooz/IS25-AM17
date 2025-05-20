@@ -32,7 +32,7 @@ public class Board {
     public Board(List<String> usernames, boolean learnerMode) {
         this.startingDeck = new ArrayList<>();
         for (String username : usernames)
-            this.startingDeck.add(new PlayerData(username));
+            this.startingDeck.add(new PlayerData(username, learnerMode));
 
         this.players = new ArrayList<>();
 
