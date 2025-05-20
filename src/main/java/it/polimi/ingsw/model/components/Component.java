@@ -82,13 +82,6 @@ public class Component {
     }
 
     /**
-     * Sets the shown attribute of this(component) to true
-     */
-    public void showComponent() {
-        this.shown = true;
-    }
-
-    /**
      * Handles the selection of this(component) by a ship from the
      * board's list with the components available
      *
@@ -99,10 +92,10 @@ public class Component {
     public void pickComponent(Board board, Ship ship) {
         shown = true;
 
-        if (board.getCommonComponents().contains(this))
+        if (ship.getReserves().contains(this))
+            throw new ComponentNotValidException("Reserves can't be picked");
+        else if (board.getCommonComponents().contains(this))
             board.getCommonComponents().remove(this);
-        else if (ship.getReserves().contains(this))
-            ship.getReserves().remove(this);
         else
             throw new ComponentNotValidException("This component is not in common components or in reserves");
 
@@ -113,14 +106,16 @@ public class Component {
     }
 
     /**
-     * Releases to the board this(component) from the hand, or ship if not inserted yet
+     * Releases to the board this(component) from the hand, or ship if not welded yet
      *
      * @param board
      * @param ship
      */
     public void releaseComponent(Board board, Ship ship) {
-        if (board.getCommonComponents().contains(this) || inserted || !shown)
-            throw new ComponentNotValidException("This component is not releasable");
+        if (board.getCommonComponents().contains(this) || !shown)
+            throw new ComponentNotValidException("This component is already released");
+        if (inserted)
+            throw new ComponentNotValidException("Component is welded");
 
         if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) { // Component to release is in hand
             ship.setHandComponent(null);
@@ -133,12 +128,19 @@ public class Component {
     }
 
     public void reserveComponent(Ship ship) {
-        if (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)) // Component is not in hand
-            throw new ComponentNotValidException("Component is not in hand");
-        else if (ship.getReserves().size() >= 2)
+        if (ship.getReserves().size() >= 2)
             throw new ComponentNotValidException("Reserves are full");
 
-        ship.setHandComponent(null);
+        if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) {
+            ship.setHandComponent(null);
+        }
+        else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) { // Component to reserve is in dashboard
+            ship.getDashboard()[y][x] = Optional.empty();
+            ship.setPreviousComponent(null);
+        }
+        else
+            throw new ComponentNotValidException("Component to reserve isn't in hand or in dashboard");
+
         ship.getReserves().add(this);
     }
 
@@ -162,10 +164,11 @@ public class Component {
 
     public void moveComponent(Ship ship, int row, int col, boolean learnerMode) {
         if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
-            throw new ComponentNotValidException("Tile not valid");
-        if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
-        if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
-            throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
+            throw new ComponentNotValidException("Component isn't in dashboard");
+        else if (inserted)
+            throw new ComponentNotValidException("Component already welded");
+        else if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
+            throw new ComponentNotValidException("New position isn't valid or is already occupied"); // Check if new position is valid
 
         ship.getDashboard()[y][x] = Optional.empty();
         this.x = col;
@@ -174,9 +177,10 @@ public class Component {
     }
 
     public void rotateComponent(Ship ship) {
-        if (inserted || !shown) throw new ComponentNotValidException("Tile already welded or hidden");
-        if ((ship.getDashboard(y, x).isPresent() && !ship.getDashboard(y, x).get().equals(this)) || (ship.getHandComponent().isPresent() && !ship.getHandComponent().get().equals(this)))
-            throw new ComponentNotValidException("Tile not valid");
+        if ((ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) && (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)))
+            throw new ComponentNotValidException("Component isn't in hand or in dashboard");
+        if (inserted)
+            throw new ComponentNotValidException("Component is already welded");
 
         ConnectorType[] newConnectors = new ConnectorType[4];
         newConnectors[0] = connectors[3];

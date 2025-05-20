@@ -47,17 +47,23 @@ public class ModelFacade {
 
     public void pickComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).pickComponent(board, ship);
+        Component component = board.getMapIdComponents().get(componentId);
+        if (component == null) throw new ComponentNotValidException("Invalid component id");
+        component.pickComponent(board, ship);
     }
 
     public void releaseComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).releaseComponent(board, ship);
+        Component component = board.getMapIdComponents().get(componentId);
+        if (component == null) throw new ComponentNotValidException("Invalid component id");
+        component.releaseComponent(board, ship);
     }
 
     public void reserveComponent(String username, int componentId) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).reserveComponent(ship);
+        Component component = board.getMapIdComponents().get(componentId);
+        if (component == null) throw new ComponentNotValidException("Invalid component id");
+        component.reserveComponent(ship);
     }
 
     public void insertComponent(String username, int row, int col, int rotations) {
@@ -70,18 +76,22 @@ public class ModelFacade {
             ship.setHandComponent(null);
         }
         else
-            throw new ComponentNotValidException("Component to insert isn't present in hand");
+            throw new ComponentNotValidException("Component to insert isn't in hand");
     }
 
     public void moveComponent(String username, int componentId, int row, int col) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        board.getMapIdComponents().get(componentId).moveComponent(ship, row, col, learnerMode);
+        Component component = board.getMapIdComponents().get(componentId);
+        if (component == null) throw new ComponentNotValidException("Invalid component id");
+        component.moveComponent(ship, row, col, learnerMode);
     }
 
     public void rotateComponent(String username, int componentId, int num) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
+        Component component = board.getMapIdComponents().get(componentId);
+        if (component == null) throw new ComponentNotValidException("Invalid component id");
         for (int i=0; i<num; i++)
-            board.getMapIdComponents().get(componentId).rotateComponent(ship);
+            component.rotateComponent(ship);
     }
 
     public List<Card> lookCardPile(String username, int deckIndex) {
