@@ -23,13 +23,9 @@ public class DisplayUpdater implements Runnable {
         while (!Thread.interrupted()) {
             try {
                 String message = client.getViewTui().getNetworkMessageQueue().poll();
-                if (message != null) {
-                    if (message.equals("ERROR")) {
-                        displayError();
-                    } else {
-                        client.getViewTui().clear();
-                        updateDisplay();
-                    }
+                if (message != null && !message.equals("ERROR")) {
+                    client.getViewTui().clear();
+                    updateDisplay();
                 }
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -90,7 +86,7 @@ public class DisplayUpdater implements Runnable {
             String[][] rowComponentLines = new String[rowEnd - rowStart][];
 
             for (int i = 0; i < rowEnd - rowStart; i++)
-                rowComponentLines[i] = components.get(i).toString().split("\n");
+                rowComponentLines[i] = components.get(rowStart + i).toString().split("\n");
 
             // Print the row line by line
             int height = rowComponentLines[0].length;
@@ -115,51 +111,57 @@ public class DisplayUpdater implements Runnable {
 
         switch (state) {
             case BUILD -> {
-                List<Component> commonComponents = board.getCommonComponents();
-                System.out.println("Common components:\n");
-                System.out.println(gridOfComponents(commonComponents,10));
 
-                System.out.print("\n\n\n\n\n");
-                if (ship.getReserves().isEmpty())
-                    System.out.println("Reserves: None");
-                else {
-                    System.out.println("Reserves:\n");
-                    System.out.println(gridOfComponents(ship.getReserves(), 2));
+                // Not ready
+                if (board.getStartingDeck().contains(board.getPlayerEntityByUsername(client.getUsername()))) {
+                    List<Component> commonComponents = board.getCommonComponents();
+                    System.out.println("Common components:\n");
+                    System.out.println(gridOfComponents(commonComponents, 10));
+
+                    if (ship.getReserves().isEmpty())
+                        System.out.println("\nReserves: none");
+                    else {
+                        System.out.println("\nReserves:\n");
+                        System.out.println(gridOfComponents(ship.getReserves(), 2));
+                    }
+
+                    if (ship.getHandComponent().isEmpty())
+                        System.out.println("\nHand: empty");
+                    else {
+                        System.out.println("\nHand:\n");
+                        System.out.println(ship.getHandComponent().get());
+                    }
                 }
 
-                ship.getHandComponent().ifPresent(handComponent -> {
-                    System.out.print("\n\n\n\n\n");
-                    System.out.println("Hand component:\n");
-                    System.out.println(handComponent);
-                });
-
-                System.out.print("\n\n\n\n\n");
-                System.out.println("Your ship:\n");
+                System.out.println("\nYour ship:\n");
                 System.out.println(ship);
 
-                System.out.print("\n\n\n\n\n");
-                System.out.println("Hourglass position: ");
+                System.out.println("\nHourglass position: ");
                 System.out.println("Time left: ");
                 for (PlayerData player : board.getStartingDeck())
-                    System.out.println("- " + player.getUsername() + "not ready");
+                    System.out.println("- " + player.getUsername() + " not ready");
                 for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
-                    System.out.println("- " + entry.getKey().getUsername() + "READY");
+                    System.out.println("- " + entry.getKey().getUsername() + " READY");
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
-                Chroma.println(
-                        """
-                                        [pick <id>]                  - pick a component
-                                        [release]                    - release the picked component
-                                        [reserve <id>]               - reserve the picked component
-                                        [insert <x> <y>]             - inserts the component into (x,y)
-                                        [move <id> <x> <y>]          - moves the component corresponding to the given id into the box with the given coordinates
-                                        [rotate <times>]             - rotate picked card clockwise (0-3)
-                                        [look-at-cards <id>]         - view specific card pile (1,2 or 3)
-                                        [ready]                      - end building phase
-                                """,
-                        Chroma.BLUE
-                );
-                System.out.print("> ");
+
+                // Not ready
+                if (board.getStartingDeck().contains(board.getPlayerEntityByUsername(client.getUsername()))) {
+                    Chroma.println(
+                            """
+                                            [pick <id>]                  - pick a component
+                                            [release]                    - release the picked component
+                                            [reserve <id>]               - reserve the picked component
+                                            [insert <x> <y>]             - inserts the component into (x,y)
+                                            [move <id> <x> <y>]          - moves the component corresponding to the given id into the box with the given coordinates
+                                            [rotate <times>]             - rotate picked card clockwise (0-3)
+                                            [look-at-cards <id>]         - view specific card pile (1,2 or 3)
+                                            [ready]                      - end building phase
+                                    """,
+                            Chroma.BLUE
+                    );
+                    System.out.print("> ");
+                }
             }
 
             case CHECK -> {
@@ -236,10 +238,6 @@ public class DisplayUpdater implements Runnable {
             }
 
         }
-    }
-
-    public void displayError() {
-        Chroma.println("Remote error :/ please try again", Chroma.RED);
     }
 
 }

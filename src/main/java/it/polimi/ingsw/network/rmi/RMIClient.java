@@ -102,11 +102,7 @@ public class RMIClient extends Client {
                 case END_FLIGHT -> server.endFlightHandler(sessionCode);
             }
         } catch (RemoteException | RuntimeException e) {
-            try {
-                viewTui.getNetworkMessageQueue().put(MessageType.ERROR.name());
-            } catch (InterruptedException ex) {
-                // Do nothing
-            }
+            viewTui.displayError(e.getMessage());
         }
     }
 
@@ -114,8 +110,10 @@ public class RMIClient extends Client {
         boolean done = server.setUsernameHandler(sessionCode, username);
         if (done)
             setUsername(username);
-        else
-            Chroma.println("username already taken", Chroma.RED);
+        else {
+            Chroma.println("Username already taken", Chroma.RED);
+            System.out.print("> ");
+        }
 
         // Send update to Display Updater thread
         try {

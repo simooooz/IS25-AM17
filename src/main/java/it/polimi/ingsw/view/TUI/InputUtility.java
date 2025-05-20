@@ -28,6 +28,7 @@ public class InputUtility {
                 }
             } catch (Exception e) {
                 Chroma.println(errorMessage, Chroma.RED);
+                System.out.println("> ");
                 result = null;
             }
         } while (true);
@@ -41,7 +42,7 @@ public class InputUtility {
                     return Integer.parseInt(s);
                 },
                 x -> x >= min && x <= max,
-                "not valid"
+                "Insert a number between " + min + " and " + max + "."
         );
     }
 

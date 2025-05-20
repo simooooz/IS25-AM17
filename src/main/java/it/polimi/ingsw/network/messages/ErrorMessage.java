@@ -1,6 +1,8 @@
 package it.polimi.ingsw.network.messages;
 
 
+import it.polimi.ingsw.network.socket.client.ClientSocket;
+
 public class ErrorMessage extends Message {
 
     private final String message;
@@ -15,9 +17,13 @@ public class ErrorMessage extends Message {
         this.message = null;
     }
 
-    // TODO è necessario?
     public String getMessage() {
         return message != null ? message : "Empty message";
+    }
+
+    @Override
+    public void execute(ClientSocket client) {
+        client.getViewTui().displayError(message);
     }
 
 }

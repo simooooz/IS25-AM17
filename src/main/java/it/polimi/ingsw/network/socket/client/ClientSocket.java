@@ -130,7 +130,6 @@ public class ClientSocket extends Client {
         try {
             message.execute(this);
 
-            // Send update to Display Updater thread
             try {
                 viewTui.getNetworkMessageQueue().put(message.getMessageType().name());
             } catch (InterruptedException e) {
@@ -138,8 +137,7 @@ public class ClientSocket extends Client {
             }
 
         } catch (RuntimeException e) {
-            System.err.println("[CLIENT SOCKET] Receive method has caught a RuntimeException: " + e.getMessage());
-            // TODO view.handleError()
+            viewTui.displayError(e.getMessage());
         }
     }
 

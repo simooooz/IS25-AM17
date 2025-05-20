@@ -31,8 +31,7 @@ public class ListenLoopOfClient extends Thread {
                 // Connection is already closed by ClientSocket
                 // This Thread will be interrupted by ClientSocket
             } catch (ClassCastException e) {
-                // TODO che faccio
-                this.clientSocket.send(MessageType.ERROR);
+                // Just ignore the received message
             }
         }
     }

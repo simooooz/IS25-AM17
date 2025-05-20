@@ -75,7 +75,7 @@ public class ClientHandler extends User {
             message.execute(this);
         } catch (RuntimeException e) {
             System.err.println("[CLIENT HANDLER] Receive method has caught a RuntimeException: " + e.getMessage());
-            this.send(new ErrorMessage());
+            this.send(new ErrorMessage(e.getMessage()));
         }
     }
 

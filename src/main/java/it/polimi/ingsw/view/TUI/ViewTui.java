@@ -34,29 +34,34 @@ public class ViewTui {
     }
 
     private void processUserInput(String input) {
-        switch (client.getState()) {
-            case USERNAME:
-                if (input.length() < 3 || input.length() > 18) Chroma.println("Option not valid. Please try again.", Chroma.RED);
-                client.send(MessageType.SET_USERNAME, input);
-                break;
+        try {
+            switch (client.getState()) {
+                case USERNAME:
+                    if (input.length() < 3 || input.length() > 18) throw new IllegalArgumentException();
+                    client.send(MessageType.SET_USERNAME, input);
+                    break;
 
-            case LOBBY_SELECTION:
-                switch (input) {
-                    case "1" -> handleCreateLobby();
-                    case "2" -> handleJoinLobby();
-                    case "3" -> handleJoinRandomLobby();
-                    case "q" -> handleDisconnect();
-                    default -> Chroma.println("not valid", Chroma.RED);
-                }
-                break;
+                case LOBBY_SELECTION:
+                    switch (input) {
+                        case "1" -> handleCreateLobby();
+                        case "2" -> handleJoinLobby();
+                        case "3" -> handleJoinRandomLobby();
+                        case "q" -> handleDisconnect();
+                        default -> throw new IllegalArgumentException();
+                    }
+                    break;
 
-            case IN_LOBBY:
-                handleInLobby(input);
-                break;
+                case IN_LOBBY:
+                    handleInLobby(input);
+                    break;
 
-            case IN_GAME:
-                handleInGame(input);
-                break;
+                case IN_GAME:
+                    handleInGame(input);
+                    break;
+            }
+        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            Chroma.println("Command not valid. Please try again.", Chroma.RED);
+            System.out.print("> ");
         }
     }
 
@@ -139,69 +144,65 @@ public class ViewTui {
      * @param input provided by the user to influence the game logic
      */
     private void handleInGame(String input) {
-        try {
-            switch (client.getGameController().getState(client.getUsername())) {
-                case BUILD -> {
-                    String[] commands = input.split(" ");
-                    switch (commands[0]) {
-                        case "pick" -> client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
-                        case "release" -> client.send(MessageType.RELEASE_COMPONENT);
-                        case "reserve" -> client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
-                        case "insert" -> {
-                            // todo calc giri
-                            int row = Integer.parseInt(commands[1]) - 5;
-                            int col = Integer.parseInt(commands[2]) - 4;
-                            client.send(MessageType.INSERT_COMPONENT, row, col, rotateCounter);
-                        }
-                        case "move" -> {
-                            // todo cacl giri
-                            int row = Integer.parseInt(commands[1]) - 5;
-                            int col = Integer.parseInt(commands[2]) - 4;
-                            client.send(MessageType.MOVE_COMPONENT, row, col, rotateCounter);
-                        }
-                        case "rotate" -> {
-                            // todo calc giri
-                            client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]), rotateCounter);
-                        }
-                        case "look-at-cards" -> {
-                            int deckIndex = Integer.parseInt(commands[1]);
-                            if (deckIndex < 1 || deckIndex > 3)
-                                throw new IllegalArgumentException("Deck index out of bounds");
-                            client.send(MessageType.LOOK_CARD_PILE, deckIndex);
-                        }
-                        case "ready" -> client.send(MessageType.SET_READY);
-                        default -> Chroma.println("Command not valid. Please try again.", Chroma.RED);
+        switch (client.getGameController().getState(client.getUsername())) {
+            case BUILD -> {
+                String[] commands = input.split(" ");
+                switch (commands[0]) {
+                    case "pick" -> client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
+                    case "release" -> client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
+                    case "reserve" -> client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
+                    case "insert" -> {
+                        // todo calc giri
+                        int row = Integer.parseInt(commands[1]) - 5;
+                        int col = Integer.parseInt(commands[2]) - 4;
+                        client.send(MessageType.INSERT_COMPONENT, row, col, rotateCounter);
                     }
+                    case "move" -> {
+                        // todo cacl giri
+                        int row = Integer.parseInt(commands[2]) - 5;
+                        int col = Integer.parseInt(commands[3]) - 4;
+                        client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), row, col, rotateCounter);
+                    }
+                    case "rotate" -> {
+                        // todo calc giri
+                        client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]), rotateCounter);
+                    }
+                    case "look-at-cards" -> {
+                        int deckIndex = Integer.parseInt(commands[1]);
+                        if (deckIndex < 1 || deckIndex > 3)
+                            throw new IllegalArgumentException("Deck index out of bounds");
+                        client.send(MessageType.LOOK_CARD_PILE, deckIndex);
+                    }
+                    case "ready" -> client.send(MessageType.SET_READY);
+                    default -> throw new IllegalArgumentException();
                 }
-                case CHECK -> {
-                    Object[] ids = Arrays.stream(input.split(" "))
-                            .map(Integer::parseInt)
-                            .toArray(Object[]::new);
-                    client.send(MessageType.CHECK_SHIP, ids);
-                }
-                case WAIT_ALIEN -> {
-                    String[] commands = input.split(" ");
-                    Integer[] ids = IntStream.range(0, commands.length)
-                            .filter(i -> i % 2 == 0)
-                            .mapToObj(i -> Integer.parseInt(commands[i]))
-                            .toArray(Integer[]::new);
-                    AlienType[] aliens = IntStream.range(0, commands.length)
-                            .filter(i -> i % 2 == 1)
-                            .mapToObj(i -> Objects.equals(commands[i], "cannon") ? AlienType.CANNON : AlienType.ENGINE)
-                            .toArray(AlienType[]::new);
-
-                    if (ids.length != aliens.length)
-                        Chroma.println("Command not valid. Please try again.", Chroma.RED);
-
-                    Map<Integer, AlienType> alienMap = new HashMap<>();
-                    for (int i = 0; i < ids.length; i++)
-                        alienMap.put(ids[i], aliens[i]);
-                    client.send(MessageType.CHOOSE_ALIEN, alienMap);
-                }
-                case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
             }
-        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-            Chroma.println("Command not valid. Please try again.", Chroma.RED);
+            case CHECK -> {
+                Object[] ids = Arrays.stream(input.split(" "))
+                        .map(Integer::parseInt)
+                        .toArray(Object[]::new);
+                client.send(MessageType.CHECK_SHIP, ids);
+            }
+            case WAIT_ALIEN -> {
+                String[] commands = input.split(" ");
+                Integer[] ids = IntStream.range(0, commands.length)
+                        .filter(i -> i % 2 == 0)
+                        .mapToObj(i -> Integer.parseInt(commands[i]))
+                        .toArray(Integer[]::new);
+                AlienType[] aliens = IntStream.range(0, commands.length)
+                        .filter(i -> i % 2 == 1)
+                        .mapToObj(i -> Objects.equals(commands[i], "cannon") ? AlienType.CANNON : AlienType.ENGINE)
+                        .toArray(AlienType[]::new);
+
+                if (ids.length != aliens.length)
+                    throw new IllegalArgumentException();
+
+                Map<Integer, AlienType> alienMap = new HashMap<>();
+                for (int i = 0; i < ids.length; i++)
+                    alienMap.put(ids[i], aliens[i]);
+                client.send(MessageType.CHOOSE_ALIEN, alienMap);
+            }
+            case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
         }
     }
 
@@ -231,6 +232,11 @@ public class ViewTui {
             System.out.println();
         }
 //        }
+    }
+
+    public void displayError(String message) {
+        Chroma.println(message, Chroma.RED);
+        System.out.print("> ");
     }
 
     /**
