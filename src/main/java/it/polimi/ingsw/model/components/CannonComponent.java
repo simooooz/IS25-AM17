@@ -3,6 +3,10 @@ package it.polimi.ingsw.model.components;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
+import it.polimi.ingsw.view.TUI.Chroma;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CannonComponent extends Component {
 
@@ -42,5 +46,19 @@ public class CannonComponent extends Component {
     public double calcPower() {
         int factor = direction == DirectionType.NORTH ? 1 : 2;
         return (isDouble ? 2.0 : 1.0) / factor;
+    }
+
+    @Override
+    public List<String> icon() {
+        List<String> icon = new ArrayList<>();
+        switch (this.direction) {
+            case NORTH ->
+                icon = new ArrayList<>(List.of(
+                        "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                        Chroma.color("  │" + "\u2009" + "⬆️" + "\u2009" + "│  ", Chroma.PURPLE_BOLD),
+                        Chroma.color("  └───┘  ", Chroma.PURPLE_BOLD)
+                ));
+        }
+        return icon;
     }
 }

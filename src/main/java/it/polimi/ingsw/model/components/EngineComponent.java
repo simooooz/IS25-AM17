@@ -3,6 +3,10 @@ package it.polimi.ingsw.model.components;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
+import it.polimi.ingsw.view.TUI.Chroma;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EngineComponent extends Component {
 
@@ -39,4 +43,42 @@ public class EngineComponent extends Component {
         return isDouble ? 2 : 1;
     }
 
+    @Override
+    public List<String> icon() {
+        List<String> icon = new ArrayList<>();
+        switch (this.direction) {
+            case SOUTH ->
+                icon = new ArrayList<>(List.of(
+                    Chroma.color("  ┌───┐  ", Chroma.ORANGE_BOLD),
+                    Chroma.color("  │" + "\u2009" + "🚀" + "\u2009" + "│  ", Chroma.ORANGE_BOLD),
+                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
+                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A"
+                ));
+            case EAST ->
+                icon = new ArrayList<>(List.of(
+                        "  ┌────  ",
+                        getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
+                                "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                        "  │   🔥  ",
+                        "  └────  "
+                ));
+            case NORTH ->
+                icon = new ArrayList<>(List.of(
+                        getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
+                                "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                        "  │   │  ",
+                        "  └───┘  "
+                ));
+            case WEST ->
+                icon = new ArrayList<>(List.of(
+                        "  ────┐  ",
+                        getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
+                                "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                        " 🔥   │  ",
+                        "  ────┘  "
+                ));
+
+        }
+        return icon;
+    }
 }
