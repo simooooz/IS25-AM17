@@ -13,8 +13,8 @@ public class CannonComponent extends Component {
     private DirectionType direction;
     private final boolean isDouble;
 
-    public CannonComponent(ConnectorType[] connectors, DirectionType direction, boolean isDouble) {
-        super(connectors);
+    public CannonComponent(int id, ConnectorType[] connectors, DirectionType direction, boolean isDouble) {
+        super(id, connectors);
         this.direction = direction;
         this.isDouble = isDouble;
     }
@@ -51,14 +51,19 @@ public class CannonComponent extends Component {
     @Override
     public List<String> icon() {
         List<String> icon = new ArrayList<>();
+        // TODO rotate
         switch (this.direction) {
             case NORTH ->
                 icon = new ArrayList<>(List.of(
-                        "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                        Chroma.color("  │" + "\u2009" + "⬆️" + "\u2009" + "│  ", Chroma.PURPLE_BOLD),
-                        Chroma.color("  └───┘  ", Chroma.PURPLE_BOLD)
+                    "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                    Chroma.color("  │" + "\u2009" + "⬆️" + "\u2009" + "│  ", Chroma.PURPLE_BOLD),
+                    Chroma.color("  └───┘  ", Chroma.PURPLE_BOLD)
                 ));
+            case EAST -> {}
+            case WEST -> {}
+            case SOUTH -> {}
         }
         return icon;
     }
+
 }

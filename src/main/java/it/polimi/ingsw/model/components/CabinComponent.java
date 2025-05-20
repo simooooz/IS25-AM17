@@ -17,8 +17,8 @@ public class CabinComponent extends Component {
     private Optional<AlienType> alien;
     private final boolean isStarting;
 
-    public CabinComponent(ConnectorType[] connectors, boolean isStarting) {
-        super(connectors);
+    public CabinComponent(int id, ConnectorType[] connectors, boolean isStarting) {
+        super(id, connectors);
         this.humans = 0;
         this.alien = Optional.empty();
         this.isStarting = isStarting;
@@ -89,34 +89,33 @@ public class CabinComponent extends Component {
         super.affectDestroy(ship);
     }
 
-
+    @Override
     public List<String> icon() {
-        if (getHumans() == 0 && alien.isEmpty()) {
+        if (this.humans == 0 && alien.isEmpty())
             return new ArrayList<>(List.of(
-                    " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
-                    " " + Chroma.color("│     │", Chroma.GREY_BOLD) + " ",
-                    " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " "));
-
-        }
-        else if (getHumans() > 0) {
-            if(getHumans() == 2)
-                return new ArrayList<>(List.of(
-                        " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
-                        " " + Chroma.color("│" + "👨🏻‍🚀" + "\u200A" + "\u200A"+ "👨🏻‍🚀" + "│", Chroma.GREY_BOLD) + " ",
-                        " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " "));
-            else
-                return new ArrayList<>(List.of(
-                    " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
-                    " " + Chroma.color("│ " + "\u2009" + "👨🏻‍🚀" + "\u2009" + " │", Chroma.GREY_BOLD) + " ",
-                    " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " "));
-        }
+                " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
+                " " + Chroma.color("│     │", Chroma.GREY_BOLD) + " ",
+                " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
+            );
+        else if (this.humans == 1)
+            return new ArrayList<>(List.of(
+                " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
+                " " + Chroma.color("│ " + "\u2009" + "👨🏻‍🚀" + "\u2009" + " │", Chroma.GREY_BOLD) + " ",
+                " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
+            );
+        else if (this.humans == 2)
+            return new ArrayList<>(List.of(
+                " " + Chroma.color("┌─────┐", Chroma.GREY_BOLD) + " ",
+                " " + Chroma.color("│" + "👨🏻‍🚀" + "\u200A" + "\u200A"+ "👨🏻‍🚀" + "│", Chroma.GREY_BOLD) + " ",
+                " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
+            );
         else {
             String color = getAlien().orElseThrow().equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
             return new ArrayList<>(List.of(
-                    " " + Chroma.color("┌─────┐", color) + " ",
-                    " " + Chroma.color("│ " + "\u2009" + "👽" + "\u2009" + " │", color) + " ",
-                    " " + Chroma.color("└─────┘", color) + " "));
-
+                " " + Chroma.color("┌─────┐", color) + " ",
+                " " + Chroma.color("│ " + "\u2009" + "👽" + "\u2009" + " │", color) + " ",
+                " " + Chroma.color("└─────┘", color) + " ")
+            );
         }
     }
 

@@ -15,8 +15,8 @@ public class SpecialCargoHoldsComponent extends Component {
     private final int number;
     private final List<ColorType> goods;
 
-    public SpecialCargoHoldsComponent(ConnectorType[] connectors, int number) {
-        super(connectors);
+    public SpecialCargoHoldsComponent(int id, ConnectorType[] connectors, int number) {
+        super(id, connectors);
         this.number = number;
         this.goods = new ArrayList<>();
     }
@@ -52,43 +52,36 @@ public class SpecialCargoHoldsComponent extends Component {
     @Override
     public List<String> icon() {
         String text = "";
-        if (getNumber() == 2){
-            if (goods.size() == 1) {
+        if (getNumber() == 2) {
+            if (goods.size() == 1)
                 text = " " + "\u2009" + "\u200A" + goods.getFirst().toString() + "  " + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + "\u2009" + "\u200A" + " ";
-            }
-            else if (goods.size() == 2) {
+            else if (goods.size() == 2)
                 text = " " + "\u2009" + "\u200A" + goods.getFirst().toString() + "  " + goods.get(1).toString() + "\u2009" + "\u200A" + " ";
-            }
             else
                 text = " " + "\u2009" + "\u200A" + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + "  " + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + "\u2009" + "\u200A" + " ";
         }
         else if (getNumber() == 3) {
-            if (goods.size() == 1) {
+            if (goods.size() == 1)
                 text = " " + goods.getFirst().toString() + "\u2009" + "\u200A" + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + "\u2009" + "\u200A" + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + " ";
-            }
-            else if (goods.size() == 2) {
+            else if (goods.size() == 2)
                 text =  " " + goods.getFirst().toString() + "\u2009" + "\u200A"  + " " + goods.get(1).toString() + "\u2009" + "\u200A"+ Chroma.color("  " , Chroma.WHITE_BACKGROUND) + " ";
-
-            }
-            else if (goods.size() == 3) {
+            else if (goods.size() == 3)
                 text =  " " + goods.getFirst().toString() + "\u2009" + "\u200A"  + " " + goods.get(1).toString() + "\u2009" + "\u200A"+ goods.get(2).toString() + " ";
-
-            }
             else
                 text = " " + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + "\u2009" + "\u200A" + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + "\u2009" + "\u200A" + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + " ";
-
         }
         else {
-            if (goods.size() == 1) {
+            if (goods.size() == 1)
                 text = "   " + "\u2009" + "\u200A" + goods.getFirst().toString() + "\u2009" + "\u200A" + "   ";
-            }
             else
                 text = "   " + "\u2009" + "\u200A" + Chroma.color("  " , Chroma.WHITE_BACKGROUND) + "\u2009" + "\u200A" + "   ";;
         }
 
         return new ArrayList<>(List.of(
-                Constants.repeat(" ", 9),
-                text,
-                "   " + goods.size() + "/" + getNumber() + "   "));
+            Constants.repeat(" ", 9),
+            text,
+            "   " + goods.size() + "/" + getNumber() + "   "
+        ));
     }
+
 }

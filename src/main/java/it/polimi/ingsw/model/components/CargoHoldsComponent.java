@@ -7,8 +7,8 @@ import it.polimi.ingsw.model.player.Ship;
 
 public class CargoHoldsComponent extends SpecialCargoHoldsComponent {
 
-    public CargoHoldsComponent(ConnectorType[] connectors, int number) {
-        super(connectors, number);
+    public CargoHoldsComponent(int id, ConnectorType[] connectors, int number) {
+        super(id, connectors, number);
     }
 
     @Override

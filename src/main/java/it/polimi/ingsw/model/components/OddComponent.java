@@ -13,8 +13,8 @@ public class OddComponent extends Component {
 
     private final AlienType type;
 
-    public OddComponent(ConnectorType[] connectors, AlienType type) {
-        super(connectors);
+    public OddComponent(int id, ConnectorType[] connectors, AlienType type) {
+        super(id, connectors);
         this.type = type;
     }
 
@@ -51,8 +51,9 @@ public class OddComponent extends Component {
     public List<String> icon() {
         String color = type.equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
         return new ArrayList<>(List.of(
-                " " + Chroma.color("┌─────┐", color) + " ",
-                " " + Chroma.color("│ " + "\u2009" + "🛸" + "\u2009" + " │", color) + " ",
-                " " + Chroma.color("└─────┘", color) + " "));
+            " " + Chroma.color("┌─────┐", color) + " ",
+            " " + Chroma.color("│ " + "\u2009" + "🛸" + "\u2009" + " │", color) + " ",
+            " " + Chroma.color("└─────┘", color) + " "));
     }
+
 }

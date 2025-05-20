@@ -12,8 +12,8 @@ public class ShieldComponent extends Component {
 
     private final DirectionType[] directionsProtected;
 
-    public ShieldComponent(ConnectorType[] connectors, DirectionType[] directionsProtected) {
-        super(connectors);
+    public ShieldComponent(int id, ConnectorType[] connectors, DirectionType[] directionsProtected) {
+        super(id, connectors);
         this.directionsProtected = directionsProtected;
     }
 
@@ -70,4 +70,5 @@ public class ShieldComponent extends Component {
         }
         return icon;
     }
+
 }

@@ -13,8 +13,8 @@ public class EngineComponent extends Component {
     private DirectionType direction;
     private final boolean isDouble;
 
-    public EngineComponent(ConnectorType[] connectors, DirectionType direction, boolean isDouble) {
-        super(connectors);
+    public EngineComponent(int id, ConnectorType[] connectors, DirectionType direction, boolean isDouble) {
+        super(id, connectors);
         this.direction = direction;
         this.isDouble = isDouble;
     }
@@ -56,29 +56,29 @@ public class EngineComponent extends Component {
                 ));
             case EAST ->
                 icon = new ArrayList<>(List.of(
-                        "  ┌────  ",
-                        getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
-                                "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                        "  │   🔥  ",
-                        "  └────  "
+                    "  ┌────  ",
+                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
+                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                    "  │   🔥  ",
+                    "  └────  "
                 ));
             case NORTH ->
                 icon = new ArrayList<>(List.of(
-                        getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
-                                "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                        "  │   │  ",
-                        "  └───┘  "
+                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
+                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                    "  │   │  ",
+                    "  └───┘  "
                 ));
             case WEST ->
                 icon = new ArrayList<>(List.of(
-                        "  ────┐  ",
-                        getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
-                                "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
-                        " 🔥   │  ",
-                        "  ────┘  "
+                    "  ────┐  ",
+                    getIsDouble() ? "  " + "\u200A" + "🔥" + "\u200A" + "🔥" + "\u200A" + "  " :
+                            "   " + "\u2009" + "🔥" + "\u2009" + "   " + "\u200A",
+                    " 🔥   │  ",
+                    "  ────┘  "
                 ));
-
         }
         return icon;
     }
+
 }

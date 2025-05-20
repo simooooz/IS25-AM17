@@ -53,6 +53,7 @@ public class ComponentFactory {
 
 
     private Component createComponent(JSONObject componentJson) {
+        int id = componentJson.getInt("id");
         String type = componentJson.getString("type");
         JSONArray connectorsArray = componentJson.getJSONArray("connectors");
         ConnectorType[] connectors = new ConnectorType[connectorsArray.length()];
@@ -63,32 +64,32 @@ public class ComponentFactory {
         switch(type) {
             case "BatteryComponent":
                 boolean isTriple = componentJson.optBoolean("isTriple", false);
-                return new BatteryComponent(connectors, isTriple);
+                return new BatteryComponent(id, connectors, isTriple);
 
             case "CargoHoldsComponent":
                 int numberCargo = componentJson.optInt("number", 0);
-                return new CargoHoldsComponent(connectors, numberCargo);
+                return new CargoHoldsComponent(id, connectors, numberCargo);
 
             case "CabinComponent":
                 boolean isStartingCabin = componentJson.optBoolean("isStarting", false);
-                return new CabinComponent(connectors, isStartingCabin);
+                return new CabinComponent(id, connectors, isStartingCabin);
 
             case "Component":
-                return new Component(connectors);
+                return new Component(id, connectors);
 
             case "SpecialCargoHoldsComponent":
                 int numberSpecialCargo = componentJson.optInt("number", 0);
-                return new SpecialCargoHoldsComponent(connectors, numberSpecialCargo);
+                return new SpecialCargoHoldsComponent(id, connectors, numberSpecialCargo);
 
             case "EngineComponent":
                 DirectionType engineDirection = DirectionType.valueOf(componentJson.getString("direction"));
                 boolean engineIsDouble = componentJson.optBoolean("isDouble", false);
-                return new EngineComponent(connectors, engineDirection, engineIsDouble);
+                return new EngineComponent(id, connectors, engineDirection, engineIsDouble);
 
             case "CannonComponent":
                 DirectionType cannonDirection = DirectionType.valueOf(componentJson.getString("direction"));
                 boolean cannonIsDouble = componentJson.optBoolean("isDouble", false);
-                return new CannonComponent(connectors, cannonDirection, cannonIsDouble);
+                return new CannonComponent(id, connectors, cannonDirection, cannonIsDouble);
 
             case "ShieldComponent":
                 JSONArray directionArray = componentJson.getJSONArray("directionsProtected");
@@ -96,11 +97,11 @@ public class ComponentFactory {
                 for (int i = 0; i < directionArray.length(); i++) {
                     direction[i] = (DirectionType.valueOf(directionArray.getString(i)));
                 }
-                return new ShieldComponent(connectors, direction);
+                return new ShieldComponent(id, connectors, direction);
 
             case "OddComponent":
                 AlienType alienType = AlienType.valueOf(componentJson.getString("typeAlien"));
-                return new OddComponent(connectors, alienType);
+                return new OddComponent(id, connectors, alienType);
 
             default:
                 throw new IllegalArgumentException("Unknown component type: " + type);

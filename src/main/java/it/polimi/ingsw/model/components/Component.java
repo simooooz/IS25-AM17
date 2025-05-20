@@ -16,13 +16,15 @@ import java.util.Optional;
 
 public class Component {
 
+    private final int id;
     private ConnectorType[] connectors;
     protected int x;
     protected int y;
     private boolean inserted;
     private boolean shown;
 
-    public Component(ConnectorType[] connectors) {
+    public Component(int id, ConnectorType[] connectors) {
+        this.id = id;
         this.connectors = connectors;
         this.inserted = false;
         this.shown = false;
@@ -96,13 +98,17 @@ public class Component {
      */
     public void pickComponent(Board board, Ship ship) {
         shown = true;
-        if (!board.getCommonComponents().contains(this))
-            throw new ComponentNotValidException("This component is not pickable");
+
+        if (board.getCommonComponents().contains(this))
+            board.getCommonComponents().remove(this);
+        else if (ship.getReserves().contains(this))
+            ship.getReserves().remove(this);
+        else
+            throw new ComponentNotValidException("This component is not in common components or in reserves");
 
         if (ship.getHandComponent().isPresent())
             ship.getHandComponent().get().releaseComponent(board, ship);
 
-        board.getCommonComponents().remove(this);
         ship.setHandComponent(this);
     }
 
@@ -114,7 +120,7 @@ public class Component {
      */
     public void releaseComponent(Board board, Ship ship) {
         if (board.getCommonComponents().contains(this) || inserted || !shown)
-            throw new ComponentNotValidException("This component is not releaseble");
+            throw new ComponentNotValidException("This component is not releasable");
 
         if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) { // Component to release is in hand
             ship.setHandComponent(null);
@@ -128,8 +134,9 @@ public class Component {
 
     public void reserveComponent(Ship ship) {
         if (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)) // Component is not in hand
-            throw new ComponentNotValidException("This component is not in hand");
-        else if (ship.getReserves().size() >= 2) throw new ComponentNotValidException("Reserves are full");
+            throw new ComponentNotValidException("Component is not in hand");
+        else if (ship.getReserves().size() >= 2)
+            throw new ComponentNotValidException("Reserves are full");
 
         ship.setHandComponent(null);
         ship.getReserves().add(this);
@@ -137,15 +144,8 @@ public class Component {
 
     public void insertComponent(Ship ship, int row, int col, boolean learnerMode) {
         if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
-            throw new ComponentNotValidException("Position not valid"); // Check if new position is valid
-        else if (!shown) throw new ComponentNotValidException("Hidden tile");
-
-        if (ship.getReserves().contains(this)) // Component is into reserves
-            ship.getReserves().remove(this);
-        else if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) // Component is in hand
-            ship.setHandComponent(null);
-        else
-            throw new ComponentNotValidException("Tile to insert isn't present");
+            throw new ComponentNotValidException("The position where to insert it is not valid"); // Check if new position is valid
+        else if (!shown) throw new ComponentNotValidException("Component is hidden");
 
         this.x = col;
         this.y = row;
@@ -215,7 +215,8 @@ public class Component {
         return y;
     }
 
-    public String print(Optional<Integer> id) {
+    @Override
+    public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
@@ -229,8 +230,7 @@ public class Component {
             leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
             componentLines.add(leftBorder);
 
-            String idStr = id.isEmpty() ? "" : String.valueOf(id.get());
-            leftBorder = " " + vBorder + inTheMiddle(idStr, 9) + vBorder + " ";
+            leftBorder = " " + vBorder + inTheMiddle(String.valueOf(this.id), 9) + vBorder + " ";
             componentLines.add(leftBorder);
 
             leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
@@ -240,8 +240,9 @@ public class Component {
             componentLines.add(bottomBorder);
 
             return String.join("\n", componentLines);
-        } else {
-            // Prima riga
+        }
+        else {
+            // First row
             String topBorder = " " + angles[0];
 
             if (connectors[0] == ConnectorType.EMPTY)
@@ -254,7 +255,7 @@ public class Component {
                 topBorder = topBorder + hBorder + "┴" + Constants.repeat(hBorder, 2) + "┴" + Constants.repeat(hBorder, 2) + "┴" + hBorder + angles[1] + " ";
             componentLines.add(topBorder);
 
-            // Seconda Riga
+            // Second Riga
             String leftBorder = "";
             switch (connectors[3]) {
                 case ConnectorType.EMPTY, ConnectorType.SINGLE -> {
@@ -274,8 +275,7 @@ public class Component {
             }
             componentLines.add(leftBorder);
 
-
-            // Terza Riga
+            // Third Riga
             switch (connectors[3]) {
                 case ConnectorType.EMPTY, ConnectorType.DOUBLE -> {
                     leftBorder = " " + vBorder;
@@ -294,7 +294,7 @@ public class Component {
             }
             componentLines.add(leftBorder);
 
-            // Quarta Riga
+            // Fourth Riga
             switch (connectors[3]) {
                 case ConnectorType.EMPTY, ConnectorType.SINGLE -> {
                     leftBorder = " " + vBorder;
@@ -313,7 +313,7 @@ public class Component {
             }
             componentLines.add(leftBorder);
 
-            // Quinta Riga
+            // Fifth Riga
             String bottomBorder = " " + angles[2];
             if (connectors[2] == ConnectorType.EMPTY)
                 bottomBorder = bottomBorder + Constants.repeat(hBorder, 9) + angles[3] + " ";
@@ -330,7 +330,11 @@ public class Component {
     }
 
     public List<String> icon() {
-        return new ArrayList<>(List.of(Constants.repeat(" ", 9), Constants.repeat(" ", 9), Constants.repeat(" ", 9)));
+        return new ArrayList<>(List.of(
+            Constants.repeat(" ", 9),
+            Constants.repeat(" ", 9),
+            Constants.repeat(" ", 9))
+        );
     }
 
 }

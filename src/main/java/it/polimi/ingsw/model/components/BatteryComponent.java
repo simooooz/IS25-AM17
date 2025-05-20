@@ -13,8 +13,8 @@ public class BatteryComponent extends Component {
     private final boolean isTriple;
     private int batteries;
 
-    public BatteryComponent(ConnectorType[] connectors, boolean isTriple) {
-        super(connectors);
+    public BatteryComponent(int id, ConnectorType[] connectors, boolean isTriple) {
+        super(id, connectors);
         this.isTriple = isTriple;
         this.batteries = isTriple ? 3 : 2;
     }
@@ -53,7 +53,7 @@ public class BatteryComponent extends Component {
         return new ArrayList<>(List.of(
                 text,
                 Constants.repeat(" ", 9),
-                "   " + getBatteries() + "/" + (isTriple ? 3 : 2) + "   "));
-
+                "   " + getBatteries() + "/" + (isTriple ? 3 : 2) + "   ")
+        );
     }
 }
