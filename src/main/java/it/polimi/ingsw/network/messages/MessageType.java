@@ -113,9 +113,13 @@ public enum MessageType {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
-            client.setLobby(castedMessage.getArg1());
-            client.setState(UserState.LOBBY_SELECTION);
-            client.setGameController(null);
+            if (castedMessage.getArg1().hasPlayer(client.getUsername()))
+                client.setLobby(castedMessage.getArg1());
+            else {
+                client.setLobby(null);
+                client.setGameController(null);
+                client.setState(UserState.LOBBY_SELECTION);
+            }
         }
     },
 
@@ -124,7 +128,6 @@ public enum MessageType {
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.pickComponent(user, castedMessage.getArg1());
-
         }
 
         @Override

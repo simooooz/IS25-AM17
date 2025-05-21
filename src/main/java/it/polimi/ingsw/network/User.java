@@ -73,19 +73,19 @@ public class User {
 
     // RMI -> callback for lobby
     // Socket -> message with lobby
-    public void notifyLobbyEvent(MessageType lobbyEvent, Lobby lobby) {
-        for (String username : lobby.getPlayers()) {
+    public void notifyLobbyEvent(MessageType lobbyEvent, List<String> playersToNotify) {
+        for (String username : playersToNotify) {
             User player = User.getUser(username);
             if (player.isRMI) {
                 try {
-                    player.getCallback().updateLobbyStatus(lobbyEvent, lobby);
+                    player.getCallback().updateLobbyStatus(lobbyEvent, this.lobby);
                 } catch (RemoteException e) {
                     // Error while notifying an update to a client
                     // Just ignore it
                 }
             }
             else
-                ((ClientHandler) player).send(new SingleArgMessage<>(lobbyEvent, lobby));
+                ((ClientHandler) player).send(new SingleArgMessage<>(lobbyEvent, this.lobby));
         }
     }
 

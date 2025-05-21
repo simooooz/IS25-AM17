@@ -27,6 +27,11 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
         switch (lobbyEvent) {
             case CREATE_LOBBY_OK, JOIN_LOBBY_OK, JOIN_RANDOM_LOBBY_OK -> client.setState(UserState.IN_LOBBY);
             case LEAVE_GAME_OK -> {
+                if (!lobby.hasPlayer(client.getUsername())) {
+                    client.setLobby(null);
+                    client.setGameController(null);
+                    client.setState(UserState.LOBBY_SELECTION);
+                }
                 client.setState(UserState.LOBBY_SELECTION);
                 client.setGameController(null);
             }

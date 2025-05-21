@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.messages.MessageType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,27 +28,32 @@ public abstract class ServerBasis {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
         Lobby lobby = MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
         user.setLobby(lobby);
-        user.notifyLobbyEvent(MessageType.CREATE_LOBBY_OK, lobby);
+        user.notifyLobbyEvent(MessageType.CREATE_LOBBY_OK, lobby.getPlayers());
     }
 
     public static void joinLobby(User user, String lobbyName) throws LobbyNotFoundException, PlayerAlreadyInException {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
         Lobby lobby = MatchController.getInstance().joinGame(user.getUsername(), lobbyName);
         user.setLobby(lobby);
-        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_LOBBY_OK, lobby);
+        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_LOBBY_OK, lobby.getPlayers());
     }
 
     public static void joinRandomLobby(User user, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
         Lobby lobby = MatchController.getInstance().joinRandomGame(user.getUsername(), learnerMode);
         user.setLobby(lobby);
-        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_RANDOM_LOBBY_OK, lobby);
+        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_RANDOM_LOBBY_OK, lobby.getPlayers());
     }
 
     public static void leaveGame(User user) {
         // TODO check state
+        // TODO gestire situazione lobby si elimina perché ci sono < 2 giocatori
         MatchController.getInstance().leaveGame(user.getUsername());
-        user.notifyLobbyEvent(MessageType.LEAVE_GAME_OK, user.getLobby());
+
+        List<String> playersToNotify = new ArrayList<>(user.getLobby().getPlayers());
+        playersToNotify.add(user.getUsername());
+        user.notifyLobbyEvent(MessageType.LEAVE_GAME_OK, playersToNotify);
+
         user.setLobby(null);
         user.setGameController(null); // Giusto?
     }
