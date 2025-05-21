@@ -8,6 +8,7 @@ import it.polimi.ingsw.network.messages.MessageType;
 import java.util.Scanner;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
 
@@ -18,8 +19,9 @@ public class ViewTui {
 
     private final DisplayUpdater displayUpdater;
     private final BlockingQueue<String> networkMessageQueue = new LinkedBlockingQueue<>();
+    protected volatile CountDownLatch waitLatch = new CountDownLatch(0);
 
-    private int offlineRotations = 0;
+    private String localCommand = "";
 
     /**
      * Constructs a new ViewTui with the given client controller.
@@ -30,15 +32,13 @@ public class ViewTui {
         this.client = client;
         this.scanner = new Scanner(System.in);
         this.displayUpdater = new DisplayUpdater(this.client);
-
-        this.offlineRotations = 0;
     }
 
     private void processUserInput(String input) {
         try {
             switch (client.getState()) {
                 case USERNAME:
-                    if (input.length() < 3 || input.length() > 18) throw new IllegalArgumentException();
+                    if (input.length() < 3 || input.length() > 18) throw new IllegalArgumentException("Username length must be between 3 and 18.");
                     client.send(MessageType.SET_USERNAME, input);
                     break;
 
@@ -48,7 +48,7 @@ public class ViewTui {
                         case "2" -> handleJoinLobby();
                         case "3" -> handleJoinRandomLobby();
                         case "q" -> handleDisconnect();
-                        default -> throw new IllegalArgumentException();
+                        default -> throw new IllegalArgumentException("Command not valid. Please try again.");
                     }
                     break;
 
@@ -61,7 +61,7 @@ public class ViewTui {
                     break;
             }
         } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-            Chroma.println("Command not valid. Please try again.", Chroma.RED);
+            Chroma.println(e.getMessage(), Chroma.RED);
             System.out.print("> ");
         }
     }
@@ -133,7 +133,7 @@ public class ViewTui {
     private void handleInLobby(String input) {
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
         if (input.equals("q")) {
-            boolean sure = InputUtility.requestBoolean("You sure? (y/n)", false);
+            boolean sure = InputUtility.requestBoolean("You sure? (y/n) ", false);
             if (sure)
                 client.send(MessageType.LEAVE_GAME);
         }
@@ -147,44 +147,127 @@ public class ViewTui {
     private void handleInGame(String input) {
         switch (client.getGameController().getState(client.getUsername())) {
             case BUILD -> {
-                String[] commands = input.split(" ");
+                String[] commands = input.trim().split(" ");
                 switch (commands[0]) {
-                    case "pick" -> {
+                    case "pick" -> {;
+                        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
+                            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
+                        revertRotation();
+
+                        localCommand = "";
                         client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
-                        this.offlineRotations = 0;
                     }
-                    case "release" -> client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
-                    case "reserve" -> client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
+                    case "release" -> {
+                        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", revert rotations
+                            try {
+                                int times = 4 - (Integer.parseInt(localCommand.split(" ")[4]) % 4);
+                                client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
+                            } catch (RuntimeException e) {
+                                // Propagate general exceptions
+                                throw new IllegalArgumentException(e.getMessage());
+                            }
+                        }
+                        revertRotation();
+
+                        localCommand = "";
+                        client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
+                    }
+                    case "reserve" -> {
+                        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", revert rotations
+                            try {
+                                int times = 4 - (Integer.parseInt(localCommand.split(" ")[4]) % 4);
+                                client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
+                            } catch (RuntimeException e) {
+                                // Propagate general exceptions
+                                throw new IllegalArgumentException(e.getMessage());
+                            }
+                        }
+                        revertRotation();
+
+                        localCommand = "";
+                        client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
+                    }
                     case "insert" -> {
-                        int row = Integer.parseInt(commands[2]) - 5;
-                        int col = Integer.parseInt(commands[3]) - 4;
-                        client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(commands[1]), row, col, offlineRotations);
-                        this.offlineRotations = 0;
+                        // Do insert locally
+                        try {
+                            int row = Integer.parseInt(commands[2]) - 5;
+                            int col = Integer.parseInt(commands[3]) - 4;
+                            input = String.join(" ", "insert", commands[1], String.valueOf(row), String.valueOf(col));
+                            client.getGameController().insertComponent(client.getUsername(), Integer.parseInt(commands[1]), row, col, 0, false);
+
+                            if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("rotate")) // Previous local command was "rotate"
+                                localCommand = String.join(" ", "insert", commands[1], String.valueOf(row), String.valueOf(col), localCommand.split(" ")[2]);
+                            else if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert" (ex. of a reserve)
+                                client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
+                                localCommand = input + " 0";
+                            }
+                            else // No previous local command
+                                localCommand = input + " 0";
+
+                            displayUpdater.updateDisplay();
+                        } catch (RuntimeException e) {
+                            // Propagate general exceptions
+                            throw new IllegalArgumentException(e.getMessage());
+                        }
                     }
                     case "move" -> {
-                        int row = Integer.parseInt(commands[2]) - 5;
-                        int col = Integer.parseInt(commands[3]) - 4;
-                        client.send(MessageType.MOVE_COMPONENT, Integer.parseInt(commands[1]), row, col, offlineRotations);
+                        // Do move locally
+                        try {
+                            int row = Integer.parseInt(commands[2]) - 5;
+                            int col = Integer.parseInt(commands[3]) - 4;
+                            client.getGameController().moveComponent(client.getUsername(), Integer.parseInt(commands[1]), row, col, 0);
+
+                            if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
+                                localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], String.valueOf(row), String.valueOf(col), localCommand.split(" ")[4]);
+                            else // No previous local command
+                                localCommand = input;
+
+                            displayUpdater.updateDisplay();
+                        } catch (RuntimeException e) {
+                            // Propagate general exceptions
+                            throw new IllegalArgumentException(e.getMessage());
+                        }
                     }
                     case "rotate" -> {
-                        int id = Integer.parseInt(commands[1]);
-                        Component component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
-                        Optional<Component> handComponent = client.getGameController().getModel().getBoard().getPlayerEntityByUsername(client.getUsername()).getShip().getHandComponent();
+                        // Do rotation locally
+                        try {
+                            int times = Integer.parseInt(commands[2]) % 4;
+                            client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(commands[1]), times);
 
-                        if (component == null) throw new IllegalArgumentException();
-                        else if (handComponent.isPresent() && handComponent.get().equals(component)) // If component is already in the dashboard send rotare, otherwise increase counter
-                            offlineRotations += Integer.parseInt(commands[2]);
-                        else
-                            client.send(MessageType.ROTATE_COMPONENT, Integer.parseInt(commands[1]), Integer.parseInt(commands[2]));
+                            if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("rotate")) // Previous local command was "rotate"
+                                localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], String.valueOf((times + Integer.parseInt(commands[2])) % 4));
+                            else if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
+                                localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], localCommand.split(" ")[2], localCommand.split(" ")[3], String.valueOf((Integer.parseInt(localCommand.split(" ")[4]) + times) % 4));
+                            else // No previous local command
+                                localCommand = input;
+
+                            displayUpdater.updateDisplay();
+                        } catch (RuntimeException e) {
+                            // Propagate general exceptions
+                            throw new IllegalArgumentException(e.getMessage());
+                        }
                     }
                     case "look-at-cards" -> {
                         int deckIndex = Integer.parseInt(commands[1]);
                         if (deckIndex < 1 || deckIndex > 3)
                             throw new IllegalArgumentException("Deck index out of bounds");
+
+                        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", otherwise don't change it
+                            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
+                            localCommand = "";
+                        }
+
                         client.send(MessageType.LOOK_CARD_PILE, deckIndex);
                     }
-                    case "ready" -> client.send(MessageType.SET_READY);
-                    default -> throw new IllegalArgumentException();
+                    case "ready" -> {
+                        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
+                            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
+                        revertRotation();
+
+                        localCommand = "";
+                        client.send(MessageType.SET_READY);
+                    }
+                    default -> throw new IllegalArgumentException("Command not valid. Please try again.");
                 }
             }
             case CHECK -> {
@@ -205,7 +288,7 @@ public class ViewTui {
                         .toArray(AlienType[]::new);
 
                 if (ids.length != aliens.length)
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("Command not valid. Please try again.");
 
                 Map<Integer, AlienType> alienMap = new HashMap<>();
                 for (int i = 0; i < ids.length; i++)
@@ -213,6 +296,18 @@ public class ViewTui {
                 client.send(MessageType.CHOOSE_ALIEN, alienMap);
             }
             case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
+        }
+    }
+
+    private void revertRotation() {
+        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("rotate")) { // Previous local command was "rotate", revert it
+            try {
+                int times = 4 - (Integer.parseInt(localCommand.split(" ")[2]) % 4);
+                client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
+            } catch (RuntimeException e) {
+                // Propagate general exceptions
+                throw new IllegalArgumentException(e.getMessage());
+            }
         }
     }
 
@@ -275,9 +370,20 @@ public class ViewTui {
         displayThread.start();
 
         while (true) {
+
+            try {
+                this.waitLatch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Chroma.println("Input thread interrupted during wait", Chroma.RED);
+                break;
+            }
+
             String input = scanner.nextLine();
             processUserInput(input);
         }
+
+        this.scanner.close();
     }
 
     public void handleDisconnect() {

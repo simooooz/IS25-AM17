@@ -9,6 +9,7 @@ import it.polimi.ingsw.network.Client;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.concurrent.CountDownLatch;
 
 public class DisplayUpdater implements Runnable {
 
@@ -109,6 +110,12 @@ public class DisplayUpdater implements Runnable {
         Board board = client.getGameController().getModel().getBoard();
         Ship ship = board.getPlayerEntityByUsername(client.getUsername()).getShip();
 
+        // Handle wait state
+        if (state == PlayerState.WAIT)
+            client.getViewTui().waitLatch = new CountDownLatch(1);
+        else
+            client.getViewTui().waitLatch.countDown();
+
         switch (state) {
             case BUILD -> {
 
@@ -166,8 +173,9 @@ public class DisplayUpdater implements Runnable {
 
             case CHECK -> {
                 System.out.println(ship);
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("Oh no! Your ship is not valid :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
+
+                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 System.out.println(
                         """
                                 ENTER a series of components <id> to remove to fix the ship
@@ -179,11 +187,9 @@ public class DisplayUpdater implements Runnable {
 
             case WAIT_ALIEN -> {
                 System.out.println(ship);
+                Chroma.println("You might want to put aliens in your cabins!", Chroma.GREEN_BOLD);
+
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
-                Chroma.println(
-                        "You might want to put aliens in your cabins!",
-                        Chroma.GREEN_BOLD
-                );
                 System.out.println(
                         """
                                 ENTER a series of <id> cabins in which to put aliens
@@ -195,12 +201,9 @@ public class DisplayUpdater implements Runnable {
 
             case DRAW_CARD -> {
                 System.out.println(ship);
+                System.out.println("\n\nCards resolved: " + board.getCardPilePos() + "/" + board.getCardPile().size());
 
-                System.out.print("\n\n\n\n\n");
-                System.out.println("Cards resolved: " + (board.getCardPilePos() + 1) + "/" + board.getCardPile().size());
-
-                System.out.print("\n\n\n\n\n");
-                System.out.println("Positions: " + (board.getCardPilePos() + 1) + "/" + board.getCardPile().size());
+                System.out.println("\nPositions: ");
                 for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
                     System.out.println("- " + entry.getKey().getUsername() + "at position " + entry.getValue() + " with " + entry.getKey().getCredits() + " credits");
                 for (PlayerData player : board.getStartingDeck())
@@ -236,6 +239,8 @@ public class DisplayUpdater implements Runnable {
 
             case WAIT_INDEX -> {
             }
+
+            case WAIT -> System.out.println("It's not your turn. Wait other players' actions");
 
         }
     }
