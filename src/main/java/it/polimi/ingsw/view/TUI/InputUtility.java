@@ -77,9 +77,9 @@ public class InputUtility {
                     s = s.toLowerCase();
                     if (s.equals("q") && acceptQ)
                         return null;
-                    if (s.equals("yes") || s.equals("true")) {
+                    if (s.equals("yes") || s.equals("true") || s.equals("y")) {
                         return true;
-                    } else if (s.equals("no") || s.equals("false")) {
+                    } else if (s.equals("no") || s.equals("false") || s.equals("n")) {
                         return false;
                     } else {
                         throw new IllegalArgumentException();
