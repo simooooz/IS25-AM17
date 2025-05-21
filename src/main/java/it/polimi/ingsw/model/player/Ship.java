@@ -16,7 +16,6 @@ public class Ship {
     private final List<Component> discards;
     private final List<Component> reserves;
     private Optional<Component> handComponent;
-    private Optional<Component> previousComponent;
     private int crew;
     private int batteries;
     private boolean engineAlien;
@@ -29,7 +28,6 @@ public class Ship {
         this.discards = new ArrayList<>();
         this.reserves = new ArrayList<>();
         this.handComponent = Optional.empty();
-        this.previousComponent = Optional.empty();
         this.crew = 0;
         this.batteries = 0;
         this.engineAlien = false;
@@ -74,14 +72,6 @@ public class Ship {
 
     public void setHandComponent(Component component) {
         this.handComponent = Optional.ofNullable(component);
-    }
-
-    public Optional<Component> getPreviousComponent() {
-        return previousComponent;
-    }
-
-    public void setPreviousComponent(Component component) {
-        this.previousComponent = Optional.ofNullable(component);
     }
 
     public int countExposedConnectors() {

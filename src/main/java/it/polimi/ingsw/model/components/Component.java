@@ -117,28 +117,25 @@ public class Component {
         if (inserted)
             throw new ComponentNotValidException("Component is welded");
 
-        if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) { // Component to release is in hand
+        if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) // Component to release is in hand
             ship.setHandComponent(null);
-            board.getCommonComponents().add(this);
-        } else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) { // Component to release is in dashboard
+        else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) // Component to release is in dashboard
             ship.getDashboard()[y][x] = Optional.empty();
-            board.getCommonComponents().add(this);
-            ship.setPreviousComponent(null);
-        }
+
+        board.getCommonComponents().add(this);
     }
 
     public void reserveComponent(Ship ship) {
         if (ship.getReserves().size() >= 2)
             throw new ComponentNotValidException("Reserves are full");
 
-        if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) {
+        if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) { // Component to reserve is in hand
             ship.setHandComponent(null);
         }
         else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) { // Component to reserve is in dashboard
             if (inserted)
                 throw new ComponentNotValidException("Component is already welded");
             ship.getDashboard()[y][x] = Optional.empty();
-            ship.setPreviousComponent(null);
         }
         else
             throw new ComponentNotValidException("Component to reserve isn't in hand or in dashboard");
@@ -146,17 +143,24 @@ public class Component {
         ship.getReserves().add(this);
     }
 
-    public void insertComponent(Ship ship, int row, int col, int rotations, boolean learnerMode) {
+    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld, boolean learnerMode) {
         if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) // Component is in hand
             ship.setHandComponent(null);
-        else if (ship.getReserves().contains(this))
+        else if (ship.getReserves().contains(this)) { // Component is in reserves, weld it
             ship.getReserves().remove(this);
+            weld = true;
+        }
+        else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) { // Is already inserted, just ignore it
+            if (weld) this.weldComponent();
+            return;
+        }
         else
             throw new ComponentNotValidException("Component to insert isn't in hand or in reserves");
 
         if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("The position where to insert it is not valid"); // Check if new position is valid
-        else if (!shown) throw new ComponentNotValidException("Component is hidden");
+        else if (!shown)
+            throw new ComponentNotValidException("Component is hidden");
 
         for (int i=0; i<rotations; i++)
             rotateComponent(ship);
@@ -165,9 +169,9 @@ public class Component {
         this.y = row;
         ship.getDashboard()[row][col] = Optional.of(this);
 
-        // Weld previous component and update attribute to new component
-        ship.getPreviousComponent().ifPresent(Component::weldComponent);
-        ship.setPreviousComponent(this);
+        // Eventually weld component
+        if (weld)
+            this.weldComponent();
     }
 
     public void weldComponent() {
@@ -189,8 +193,6 @@ public class Component {
     }
 
     public void rotateComponent(Ship ship) {
-        if ((ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) && (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)))
-            throw new ComponentNotValidException("Component isn't in hand or in dashboard");
         if (inserted)
             throw new ComponentNotValidException("Component is already welded");
 

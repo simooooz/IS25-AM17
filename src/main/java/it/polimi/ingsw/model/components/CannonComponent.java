@@ -50,21 +50,18 @@ public class CannonComponent extends Component {
 
     @Override
     public List<String> icon() {
-        List<String> icon = new ArrayList<>();
         String arrow = "";
         switch (this.direction) {
             case NORTH -> arrow = "⬆️";
             case EAST -> arrow = "➡️";
             case WEST -> arrow = "⬅️️";
             case SOUTH -> arrow = "⬇️️";
-
-            }
-        icon = new ArrayList<>(List.of(
+        }
+        return new ArrayList<>(List.of(
                 getIsDouble() ? Chroma.color("│🔥" + "\u200A" + arrow + "\u200A" + "🔥│", Chroma.PURPLE)
                         : Chroma.color("│ 🔥" + "\u200A" + "\u200A" + "\u200A" + arrow + " │", Chroma.PURPLE),
                 Chroma.color("└───────┘", Chroma.PURPLE)
         ));
-        return icon;
     }
 
 }

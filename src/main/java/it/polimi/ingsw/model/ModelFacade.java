@@ -66,11 +66,11 @@ public class ModelFacade {
         component.reserveComponent(ship);
     }
 
-    public void insertComponent(String username, int componentId, int row, int col, int rotations) {
+    public void insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
-        component.insertComponent(ship, row, col, rotations, learnerMode);
+        component.insertComponent(ship, row, col, rotations, weld, learnerMode);
     }
 
     public void moveComponent(String username, int componentId, int row, int col) {
@@ -84,7 +84,11 @@ public class ModelFacade {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
-        for (int i=0; i<num; i++)
+
+        if ((ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component)) && (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(component)))
+            throw new ComponentNotValidException("Component isn't in hand or in dashboard");
+
+        for (int i=0; i<(num % 4); i++)
             component.rotateComponent(ship);
     }
 
@@ -111,7 +115,8 @@ public class ModelFacade {
 
     public void setReady(String username) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        ship.getHandComponent().ifPresent(Component::weldComponent);
+        ship.getHandComponent().ifPresent(c -> c.releaseComponent(board, ship));
+
         board.moveToBoard(board.getPlayerEntityByUsername(username), learnerMode);
 
         if (arePlayersReady())

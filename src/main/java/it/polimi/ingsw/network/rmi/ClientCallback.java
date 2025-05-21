@@ -52,7 +52,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             case PICK_COMPONENT -> client.getGameController().pickComponent(username, (Integer) args[0]);
             case RELEASE_COMPONENT -> client.getGameController().releaseComponent(username, (Integer) args[0]);
             case RESERVE_COMPONENT -> client.getGameController().reserveComponent(username, (Integer) args[0]);
-            case INSERT_COMPONENT -> client.getGameController().insertComponent(username, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+            case INSERT_COMPONENT -> client.getGameController().insertComponent(username, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3], true);
             case MOVE_COMPONENT -> client.getGameController().moveComponent(username, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
             case ROTATE_COMPONENT -> client.getGameController().rotateComponent(username, (Integer) args[0], (Integer) args[1]);
             case MOVE_HOURGLASS -> client.getGameController().moveHourglass(username);
