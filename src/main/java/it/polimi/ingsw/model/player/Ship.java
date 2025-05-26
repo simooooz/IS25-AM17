@@ -226,8 +226,11 @@ public class Ship {
                     }
                     else {
                         String bgColor;
+
                         if (isPlayable)
                             bgColor = isLearner ? Chroma.BLUE_BACKGROUND : Chroma.PURPLE_BACKGROUND;
+                        else if (!isLearner && (row == 0 && (col == 5 || col == 6)))
+                            bgColor = Chroma.DARKPURPLE_BACKGROUND;
                         else
                             bgColor = Chroma.RESET;
 
