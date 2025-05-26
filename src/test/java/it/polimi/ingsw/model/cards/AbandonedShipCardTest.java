@@ -38,50 +38,40 @@ class AbandonedShipCardTest {
         p3 = board.getPlayerEntityByUsername("Tommaso");
 
 
-        controller.showComponent("Simone", 141);
         controller.pickComponent("Simone", 141);
-        controller.insertComponent("Simone", 141, 2, 1);
+        controller.insertComponent("Simone", 141, 2, 1, 0, true);
 
-        controller.showComponent("Simone", 37);
         controller.pickComponent("Simone", 37);
         controller.rotateComponent("Simone", 37, 3);
-        controller.insertComponent("Simone", 37, 1, 1);
+        controller.insertComponent("Simone", 37, 1, 1, 0, true);
 
-        controller.showComponent("Simone", 59);
         controller.pickComponent("Simone", 59);
-        controller.insertComponent("Simone", 59, 2, 2);
+        controller.insertComponent("Simone", 59, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
 
-        controller.showComponent("Davide", 136);
         controller.pickComponent("Davide", 136);
-        controller.insertComponent("Davide", 136, 3, 1);
+        controller.insertComponent("Davide", 136, 3, 1, 0, true);
 
-        controller.showComponent("Davide", 46);
         controller.pickComponent("Davide", 46);
         controller.rotateComponent("Davide",46, 2);
-        controller.insertComponent("Davide", 46, 2, 2);
+        controller.insertComponent("Davide", 46, 2, 2, 0, true);
 
-        controller.showComponent("Davide", 44);
         controller.pickComponent("Davide", 44);
-        controller.insertComponent("Davide", 44, 2, 1);
+        controller.insertComponent("Davide", 44, 2, 1, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
 
-        controller.showComponent("Tommaso", 117);
         controller.pickComponent("Tommaso", 117);
         controller.rotateComponent("Tommaso", 117, 3);
-        controller.insertComponent("Tommaso", 117, 1, 3);
+        controller.insertComponent("Tommaso", 117, 1, 3, 0, true);
 
-        controller.showComponent("Tommaso", 34);
         controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3);
+        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");

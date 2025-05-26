@@ -45,17 +45,14 @@ class PiratesCardTest {
         p3.setCredits(30);
 
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
-        controller.showComponent("Tommaso", 34);
         controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3);
+        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
     }
 
@@ -67,31 +64,25 @@ class PiratesCardTest {
     @Test
     void testShouldCheckThatP1DrawAutomaticallyP2DrawAndP3WinButNotRedeemReward() {
 
-        controller.showComponent("Simone", 155);
         controller.pickComponent("Simone", 155);
-        controller.insertComponent("Simone", 155, 2, 4);
+        controller.insertComponent("Simone", 155, 2, 4, 0, true);
 
 
-        controller.showComponent("Davide", 132);
         controller.pickComponent("Davide", 132);
-        controller.insertComponent("Davide", 132, 1, 3);
+        controller.insertComponent("Davide", 132, 1, 3, 0, true);
 
-        controller.showComponent("Davide", 121);
         controller.pickComponent("Davide", 121);
-        controller.insertComponent("Davide", 121, 1, 4);
+        controller.insertComponent("Davide", 121, 1, 4, 0, true);
 
-        controller.showComponent("Davide", 9);
         controller.pickComponent("Davide", 9);
-        controller.insertComponent("Davide", 9, 2, 2);
+        controller.insertComponent("Davide", 9, 2, 2, 0, true);
 
 
-        controller.showComponent("Tommaso", 107);
         controller.pickComponent("Tommaso", 107);
-        controller.insertComponent("Tommaso", 107, 2, 2);
+        controller.insertComponent("Tommaso", 107, 2, 2, 0, true);
 
-        controller.showComponent("Tommaso", 119);
         controller.pickComponent("Tommaso", 119);
-        controller.insertComponent("Tommaso", 119, 2, 4);
+        controller.insertComponent("Tommaso", 119, 2, 4, 0, true);
 
 
         controller.setReady("Simone");
@@ -121,38 +112,31 @@ class PiratesCardTest {
     @Test
     void testShouldCheckThatP1WinsAndRedeemRewards() {
 
-        controller.showComponent("Simone", 121);
         controller.pickComponent("Simone", 121);
-        controller.insertComponent("Simone", 121, 1, 4);
+        controller.insertComponent("Simone", 121, 1, 4, 0, true);
 
-        controller.showComponent("Simone", 15);
         controller.pickComponent("Simone", 15);
-        controller.insertComponent("Simone", 15, 1, 3);
+        controller.insertComponent("Simone", 15, 1, 3, 0, true);
 
-        controller.showComponent("Simone", 132);
         controller.pickComponent("Simone", 132);
         controller.rotateComponent("Simone", 132, 1);
-        controller.insertComponent("Simone", 132, 1, 5);
+        controller.insertComponent("Simone", 132, 1, 5, 0, true);
 
-        controller.showComponent("Simone", 126);
         controller.pickComponent("Simone", 126);
         controller.rotateComponent("Simone", 126, 3);
-        controller.insertComponent("Simone", 126, 2, 2);
+        controller.insertComponent("Simone", 126, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 122);
         controller.pickComponent("Simone", 122);
         controller.rotateComponent("Simone", 122, 2);
-        controller.insertComponent("Simone", 122, 2, 4);
+        controller.insertComponent("Simone", 122, 2, 4, 0, true);
 
 
-        controller.showComponent("Davide", 144);
         controller.pickComponent("Davide", 144);
-        controller.insertComponent("Davide", 144, 2, 4);
+        controller.insertComponent("Davide", 144, 2, 4, 0, true);
 
 
-        controller.showComponent("Tommaso", 74);
         controller.pickComponent("Tommaso", 74);
-        controller.insertComponent("Tommaso", 74, 3, 3);
+        controller.insertComponent("Tommaso", 74, 3, 3, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");
@@ -182,43 +166,35 @@ class PiratesCardTest {
     @Test
     void testShouldCheckThatP1andP2LoseAndP3Wins() {
 
-        controller.showComponent("Simone", 15);
         controller.pickComponent("Simone", 15);
         controller.rotateComponent("Simone", 15, 2);
-        controller.insertComponent("Simone", 15, 1, 4);
+        controller.insertComponent("Simone", 15, 1, 4, 0, true);
 
-        controller.showComponent("Simone", 132);
         controller.pickComponent("Simone", 132);
-        controller.insertComponent("Simone", 132, 1, 3);
+        controller.insertComponent("Simone", 132, 1, 3, 0, true);
 
-        controller.showComponent("Simone", 155);
         controller.pickComponent("Simone", 155);
         controller.rotateComponent("Simone", 155, 3);
-        controller.insertComponent("Simone", 155, 2, 2);
+        controller.insertComponent("Simone", 155, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 150);
         controller.pickComponent("Simone", 150);
         controller.rotateComponent("Simone", 150, 3);
-        controller.insertComponent("Simone", 150, 3, 2);
+        controller.insertComponent("Simone", 150, 3, 2, 0, true);
 
 
-        controller.showComponent("Davide", 74);
         controller.pickComponent("Davide", 74);
-        controller.insertComponent("Davide", 74, 3, 3);
+        controller.insertComponent("Davide", 74, 3, 3, 0, true);
 
 
-        controller.showComponent("Tommaso", 9);
         controller.pickComponent("Tommaso", 9);
-        controller.insertComponent("Tommaso", 9, 2, 2);
+        controller.insertComponent("Tommaso", 9, 2, 2, 0, true);
 
-        controller.showComponent("Tommaso", 121);
         controller.pickComponent("Tommaso", 121);
-        controller.insertComponent("Tommaso", 121, 1, 3);
+        controller.insertComponent("Tommaso", 121, 1, 3, 0, true);
 
-        controller.showComponent("Tommaso", 126);
         controller.pickComponent("Tommaso", 126);
         controller.rotateComponent("Tommaso", 126, 1);
-        controller.insertComponent("Tommaso", 126, 1, 4);
+        controller.insertComponent("Tommaso", 126, 1, 4, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");

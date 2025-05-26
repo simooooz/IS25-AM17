@@ -27,358 +27,288 @@ public class LearnerModeGameSimulationTest {
     public void testCompleteLearnerModeGame() {
 
         // Building Ships
-        controller.showComponent("Tommaso",130);
         controller.pickComponent("Tommaso", 130);
         controller.rotateComponent("Tommaso", 130, 3);
-        controller.insertComponent("Tommaso", 130, 0, 3);
+        controller.insertComponent("Tommaso", 130, 0, 3, 0, true);
 
-        controller.showComponent("Tommaso",68);
         controller.pickComponent("Tommaso", 68);
         controller.rotateComponent("Tommaso", 68, 2);
-        controller.insertComponent("Tommaso", 68, 1, 4);
+        controller.insertComponent("Tommaso", 68, 1, 4, 0, true);
 
-        controller.showComponent("Tommaso",14);
         controller.pickComponent("Tommaso", 14);
         controller.rotateComponent("Tommaso", 14, 1);
-        controller.insertComponent("Tommaso", 14, 1, 2);
+        controller.insertComponent("Tommaso", 14, 1, 2, 0, true);
 
-        controller.showComponent("Tommaso",58);
         controller.pickComponent("Tommaso", 58);
         controller.rotateComponent("Tommaso", 58, 1);
-        controller.insertComponent("Tommaso", 58, 1, 3);
+        controller.insertComponent("Tommaso", 58, 1, 3, 0, true);
 
-        controller.showComponent("Tommaso",25);
         controller.pickComponent("Tommaso", 25);
         controller.rotateComponent("Tommaso", 25, 2);
-        controller.insertComponent("Tommaso", 25, 2, 1);
+        controller.insertComponent("Tommaso", 25, 2, 1, 0, true);
 
-        controller.showComponent("Tommaso",44);
         controller.pickComponent("Tommaso", 44);
         controller.rotateComponent("Tommaso", 44, 3);
-        controller.insertComponent("Tommaso", 44, 2, 2);
+        controller.insertComponent("Tommaso", 44, 2, 2, 0, true);
 
-        controller.showComponent("Tommaso",33);
         controller.pickComponent("Tommaso", 33);
         controller.rotateComponent("Tommaso", 33, 3);
-        controller.insertComponent("Tommaso", 33, 2, 3);
+        controller.insertComponent("Tommaso", 33, 2, 3, 0, true);
 
-        controller.showComponent("Tommaso",115);
         controller.pickComponent("Tommaso", 115);
         controller.rotateComponent("Tommaso", 115, 1);
-        controller.insertComponent("Tommaso", 115, 2, 5);
+        controller.insertComponent("Tommaso", 115, 2, 5, 0, true);
 
-        controller.showComponent("Tommaso",29);
         controller.pickComponent("Tommaso", 29);
         controller.rotateComponent("Tommaso", 29, 1);
-        controller.insertComponent("Tommaso", 29, 2, 4);
+        controller.insertComponent("Tommaso", 29, 2, 4, 0, true);
 
-        controller.showComponent("Tommaso",96);
         controller.pickComponent("Tommaso", 96);
         controller.rotateComponent("Tommaso", 96, 0);
-        controller.insertComponent("Tommaso", 96, 3, 1);
+        controller.insertComponent("Tommaso", 96, 3, 1, 0, true);
 
-        controller.showComponent("Tommaso",31);
         controller.pickComponent("Tommaso", 31);
         controller.rotateComponent("Tommaso", 31, 0);
-        controller.insertComponent("Tommaso", 31, 3, 2);
+        controller.insertComponent("Tommaso", 31, 3, 2, 0, true);
 
-        controller.showComponent("Tommaso",51);
         controller.pickComponent("Tommaso", 51);
         controller.rotateComponent("Tommaso", 51, 1);
-        controller.insertComponent("Tommaso", 51, 4, 2);
+        controller.insertComponent("Tommaso", 51, 4, 2, 0, true);
 
-        controller.showComponent("Tommaso",77);
         controller.pickComponent("Tommaso", 77);
         controller.rotateComponent("Tommaso", 77, 0);
-        controller.insertComponent("Tommaso", 77, 3, 3);
+        controller.insertComponent("Tommaso", 77, 3, 3, 0, true);
 
-        controller.showComponent("Tommaso",5);
         controller.pickComponent("Tommaso", 5);
         controller.rotateComponent("Tommaso", 5, 3);
-        controller.insertComponent("Tommaso", 5, 3, 4);
+        controller.insertComponent("Tommaso", 5, 3, 4, 0, true);
 
-        controller.showComponent("Tommaso",147);
         controller.pickComponent("Tommaso", 147);
         controller.rotateComponent("Tommaso", 147, 1);
-        controller.insertComponent("Tommaso", 147, 4, 4);
+        controller.insertComponent("Tommaso", 147, 4, 4, 0, true);
 
-        controller.showComponent("Tommaso",89);
         controller.pickComponent("Tommaso", 89);
         controller.rotateComponent("Tommaso", 89, 0);
-        controller.insertComponent("Tommaso", 89, 4, 5);
+        controller.insertComponent("Tommaso", 89, 4, 5, 0, true);
 
 
-        controller.showComponent("Simone",118);
         controller.pickComponent("Simone", 118);
         controller.rotateComponent("Simone", 118, 3);
-        controller.insertComponent("Simone", 118, 0, 3);
+        controller.insertComponent("Simone", 118, 0, 3, 0, true);
 
-        controller.showComponent("Simone",13);
         controller.pickComponent("Simone", 13);
         controller.rotateComponent("Simone", 13, 1);
-        controller.insertComponent("Simone", 13, 1, 2);
+        controller.insertComponent("Simone", 13, 1, 2, 0, true);
 
-        controller.showComponent("Simone",150);
         controller.pickComponent("Simone", 150);
         controller.rotateComponent("Simone", 150, 1);
-        controller.insertComponent("Simone", 150, 1, 3);
+        controller.insertComponent("Simone", 150, 1, 3, 0, true);
 
-        controller.showComponent("Simone",116);
         controller.pickComponent("Simone", 116);
         controller.rotateComponent("Simone", 116, 1);
-        controller.insertComponent("Simone", 116, 1, 4);
+        controller.insertComponent("Simone", 116, 1, 4, 0, true);
 
-        controller.showComponent("Simone",125);
         controller.pickComponent("Simone", 125);
         controller.rotateComponent("Simone", 125, 0);
-        controller.insertComponent("Simone", 125, 2, 1);
+        controller.insertComponent("Simone", 125, 2, 1, 0, true);
 
-        controller.showComponent("Simone",149);
         controller.pickComponent("Simone", 149);
         controller.rotateComponent("Simone", 149, 3);
-        controller.insertComponent("Simone", 149, 2, 2);
+        controller.insertComponent("Simone", 149, 2, 2, 0, true);
 
-        controller.showComponent("Simone",32);
         controller.pickComponent("Simone", 32);
         controller.rotateComponent("Simone", 32, 3);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
-        controller.showComponent("Simone",63);
         controller.pickComponent("Simone", 63);
         controller.rotateComponent("Simone", 63, 3);
-        controller.insertComponent("Simone", 63, 2, 4);
+        controller.insertComponent("Simone", 63, 2, 4, 0, true);
 
-        controller.showComponent("Simone",62);
         controller.pickComponent("Simone", 62);
         controller.rotateComponent("Simone", 62, 2);
-        controller.insertComponent("Simone", 62, 2, 5);
+        controller.insertComponent("Simone", 62, 2, 5, 0, true);
 
-        controller.showComponent("Simone",30);
         controller.pickComponent("Simone", 30);
         controller.rotateComponent("Simone", 30, 2);
-        controller.insertComponent("Simone", 30, 3, 1);
+        controller.insertComponent("Simone", 30, 3, 1, 0, true);
 
-        controller.showComponent("Simone",56);
         controller.pickComponent("Simone", 56);
         controller.rotateComponent("Simone", 56, 3);
-        controller.insertComponent("Simone", 56, 3, 2);
+        controller.insertComponent("Simone", 56, 3, 2, 0, true);
 
-        controller.showComponent("Simone",18);
         controller.pickComponent("Simone", 18);
         controller.rotateComponent("Simone", 18, 1);
-        controller.insertComponent("Simone", 18, 3, 3);
+        controller.insertComponent("Simone", 18, 3, 3, 0, true);
 
-        controller.showComponent("Simone",60);
         controller.pickComponent("Simone", 60);
         controller.rotateComponent("Simone", 60, 2);
-        controller.insertComponent("Simone", 60, 3, 4);
+        controller.insertComponent("Simone", 60, 3, 4, 0, true);
 
-        controller.showComponent("Simone",124);
         controller.pickComponent("Simone", 124);
         controller.rotateComponent("Simone", 124, 1);
-        controller.insertComponent("Simone", 124, 3, 5);
+        controller.insertComponent("Simone", 124, 3, 5, 0, true);
 
-        controller.showComponent("Simone",84);
         controller.pickComponent("Simone", 84);
         controller.rotateComponent("Simone", 84, 0);
-        controller.insertComponent("Simone", 84, 4, 1);
+        controller.insertComponent("Simone", 84, 4, 1, 0, true);
 
-        controller.showComponent("Simone",99);
         controller.pickComponent("Simone", 99);
         controller.rotateComponent("Simone", 99, 0);
-        controller.insertComponent("Simone", 99, 4, 2);
+        controller.insertComponent("Simone", 99, 4, 2, 0, true);
 
-        controller.showComponent("Simone",94);
         controller.pickComponent("Simone", 94);
         controller.rotateComponent("Simone", 94, 0);
-        controller.insertComponent("Simone", 94, 4, 4);
+        controller.insertComponent("Simone", 94, 4, 4, 0, true);
 
-        controller.showComponent("Simone",16);
         controller.pickComponent("Simone", 16);
         controller.rotateComponent("Simone", 16, 0);
-        controller.insertComponent("Simone", 16, 4, 5);
+        controller.insertComponent("Simone", 16, 4, 5, 0, true);
 
 
-        controller.showComponent("Demetrio",103);
         controller.pickComponent("Demetrio", 103);
         controller.rotateComponent("Demetrio", 103, 0);
-        controller.insertComponent("Demetrio", 103, 0, 3);
+        controller.insertComponent("Demetrio", 103, 0, 3, 0, true);
 
-        controller.showComponent("Demetrio",152);
         controller.pickComponent("Demetrio", 152);
         controller.rotateComponent("Demetrio", 152, 3);
-        controller.insertComponent("Demetrio", 152, 1, 2);
+        controller.insertComponent("Demetrio", 152, 1, 2, 0, true);
 
-        controller.showComponent("Demetrio",4);
         controller.pickComponent("Demetrio", 4);
         controller.rotateComponent("Demetrio", 4, 2);
-        controller.insertComponent("Demetrio", 4, 1, 3);
+        controller.insertComponent("Demetrio", 4, 1, 3, 0, true);
 
-        controller.showComponent("Demetrio",129);
         controller.pickComponent("Demetrio", 129);
         controller.rotateComponent("Demetrio", 129, 0);
-        controller.insertComponent("Demetrio", 129, 1, 4);
+        controller.insertComponent("Demetrio", 129, 1, 4, 0, true);
 
-        controller.showComponent("Demetrio",12);
         controller.pickComponent("Demetrio", 12);
         controller.rotateComponent("Demetrio", 12, 0);
-        controller.insertComponent("Demetrio", 12, 2, 1);
+        controller.insertComponent("Demetrio", 12, 2, 1, 0, true);
 
-        controller.showComponent("Demetrio",65);
         controller.pickComponent("Demetrio", 65);
         controller.rotateComponent("Demetrio", 65, 0);
-        controller.insertComponent("Demetrio", 65, 2, 2);
+        controller.insertComponent("Demetrio", 65, 2, 2, 0, true);
 
-        controller.showComponent("Demetrio",34);
         controller.pickComponent("Demetrio", 34);
         controller.rotateComponent("Demetrio", 34, 0);
-        controller.insertComponent("Demetrio", 34, 2, 3);
+        controller.insertComponent("Demetrio", 34, 2, 3, 0, true);
 
-        controller.showComponent("Demetrio",24);
         controller.pickComponent("Demetrio", 24);
         controller.rotateComponent("Demetrio", 24, 2);
-        controller.insertComponent("Demetrio", 24, 2, 4);
+        controller.insertComponent("Demetrio", 24, 2, 4, 0, true);
 
-        controller.showComponent("Demetrio",153);
         controller.pickComponent("Demetrio", 153);
         controller.rotateComponent("Demetrio", 153, 1);
-        controller.insertComponent("Demetrio", 153, 2, 5);
+        controller.insertComponent("Demetrio", 153, 2, 5, 0, true);
 
-        controller.showComponent("Demetrio",1);
         controller.pickComponent("Demetrio", 1);
         controller.rotateComponent("Demetrio", 1, 0);
-        controller.insertComponent("Demetrio", 1, 3, 1);
+        controller.insertComponent("Demetrio", 1, 3, 1, 0, true);
 
-        controller.showComponent("Demetrio",55);
         controller.pickComponent("Demetrio", 55);
         controller.rotateComponent("Demetrio", 55, 1);
-        controller.insertComponent("Demetrio", 55, 3, 2);
+        controller.insertComponent("Demetrio", 55, 3, 2, 0, true);
 
-        controller.showComponent("Demetrio",146);
         controller.pickComponent("Demetrio", 146);
         controller.rotateComponent("Demetrio", 146, 2);
-        controller.insertComponent("Demetrio", 146, 3, 3);
+        controller.insertComponent("Demetrio", 146, 3, 3, 0, true);
 
-        controller.showComponent("Demetrio",6);
         controller.pickComponent("Demetrio", 6);
         controller.rotateComponent("Demetrio", 6, 0);
-        controller.insertComponent("Demetrio", 6, 3, 4);
+        controller.insertComponent("Demetrio", 6, 3, 4, 0, true);
 
-        controller.showComponent("Demetrio",47);
         controller.pickComponent("Demetrio", 47);
         controller.rotateComponent("Demetrio", 47, 1);
-        controller.insertComponent("Demetrio", 47, 3, 5);
+        controller.insertComponent("Demetrio", 47, 3, 5, 0, true);
 
-        controller.showComponent("Demetrio",66);
         controller.pickComponent("Demetrio", 66);
         controller.rotateComponent("Demetrio", 66, 1);
-        controller.insertComponent("Demetrio", 66, 4, 1);
+        controller.insertComponent("Demetrio", 66, 4, 1, 0, true);
 
-        controller.showComponent("Demetrio",95);
         controller.pickComponent("Demetrio", 95);
         controller.rotateComponent("Demetrio", 95, 0);
-        controller.insertComponent("Demetrio", 95, 4, 2);
+        controller.insertComponent("Demetrio", 95, 4, 2, 0, true);
 
-        controller.showComponent("Demetrio",61);
         controller.pickComponent("Demetrio", 61);
         controller.rotateComponent("Demetrio", 61, 2);
-        controller.insertComponent("Demetrio", 61, 4, 4);
+        controller.insertComponent("Demetrio", 61, 4, 4, 0, true);
 
-        controller.showComponent("Demetrio",97);
         controller.pickComponent("Demetrio", 97);
         controller.rotateComponent("Demetrio", 97, 0);
-        controller.insertComponent("Demetrio", 97, 4, 5);
+        controller.insertComponent("Demetrio", 97, 4, 5, 0, true);
 
 
-        controller.showComponent("Davide",102);
         controller.pickComponent("Davide", 102);
         controller.rotateComponent("Davide", 102, 0);
-        controller.insertComponent("Davide", 102, 0, 3);
+        controller.insertComponent("Davide", 102, 0, 3, 0, true);
 
-        controller.showComponent("Davide",132);
         controller.pickComponent("Davide", 132);
         controller.rotateComponent("Davide", 132, 3);
-        controller.insertComponent("Davide", 132, 1, 2);
+        controller.insertComponent("Davide", 132, 1, 2, 0, true);
 
-        controller.showComponent("Davide",38);
         controller.pickComponent("Davide", 38);
         controller.rotateComponent("Davide", 38, 3);
-        controller.insertComponent("Davide", 38, 1, 3);
+        controller.insertComponent("Davide", 38, 1, 3, 0, true);
 
-        controller.showComponent("Davide",109);
         controller.pickComponent("Davide", 109);
         controller.rotateComponent("Davide", 109, 1);
-        controller.insertComponent("Davide", 109, 1, 4);
+        controller.insertComponent("Davide", 109, 1, 4, 0, true);
 
-        controller.showComponent("Davide",151);
         controller.pickComponent("Davide", 151);
         controller.rotateComponent("Davide", 151, 2);
-        controller.insertComponent("Davide", 151, 2, 1);
+        controller.insertComponent("Davide", 151, 2, 1, 0, true);
 
-        controller.showComponent("Davide",15);
         controller.pickComponent("Davide", 15);
         controller.rotateComponent("Davide", 15, 3);
-        controller.insertComponent("Davide", 15, 2, 2);
+        controller.insertComponent("Davide", 15, 2, 2, 0, true);
 
-        controller.showComponent("Davide",35);
         controller.pickComponent("Davide", 35);
         controller.rotateComponent("Davide", 35, 3);
-        controller.insertComponent("Davide", 35, 2, 3);
+        controller.insertComponent("Davide", 35, 2, 3, 0, true);
 
-        controller.showComponent("Davide",148);
         controller.pickComponent("Davide", 148);
         controller.rotateComponent("Davide", 148, 0);
-        controller.insertComponent("Davide", 148, 2, 4);
+        controller.insertComponent("Davide", 148, 2, 4, 0, true);
 
-        controller.showComponent("Davide",17);
         controller.pickComponent("Davide", 17);
         controller.rotateComponent("Davide", 17, 2);
-        controller.insertComponent("Davide", 17, 2, 5);
+        controller.insertComponent("Davide", 17, 2, 5, 0, true);
 
-        controller.showComponent("Davide",144);
         controller.pickComponent("Davide", 144);
         controller.rotateComponent("Davide", 144, 3);
-        controller.insertComponent("Davide", 144, 3, 1);
+        controller.insertComponent("Davide", 144, 3, 1, 0, true);
 
-        controller.showComponent("Davide",67);
         controller.pickComponent("Davide", 67);
         controller.rotateComponent("Davide", 67, 3);
-        controller.insertComponent("Davide", 67, 3, 2);
+        controller.insertComponent("Davide", 67, 3, 2, 0, true);
 
-        controller.showComponent("Davide",92);
         controller.pickComponent("Davide", 92);
         controller.rotateComponent("Davide", 92, 0);
-        controller.insertComponent("Davide", 92, 3, 3);
+        controller.insertComponent("Davide", 92, 3, 3, 0, true);
 
-        controller.showComponent("Davide",136);
         controller.pickComponent("Davide", 136);
         controller.rotateComponent("Davide", 136, 0);
-        controller.insertComponent("Davide", 136, 3, 4);
+        controller.insertComponent("Davide", 136, 3, 4, 0, true);
 
-        controller.showComponent("Davide",41);
         controller.pickComponent("Davide", 41);
         controller.rotateComponent("Davide", 41, 0);
-        controller.insertComponent("Davide", 41, 3, 5);
+        controller.insertComponent("Davide", 41, 3, 5, 0, true);
 
-        controller.showComponent("Davide",37);
         controller.pickComponent("Davide", 37);
         controller.rotateComponent("Davide", 37, 2);
-        controller.insertComponent("Davide", 37, 4, 1);
+        controller.insertComponent("Davide", 37, 4, 1, 0, true);
 
-        controller.showComponent("Davide",82);
         controller.pickComponent("Davide", 82);
         controller.rotateComponent("Davide", 82, 0);
-        controller.insertComponent("Davide", 82, 4, 2);
+        controller.insertComponent("Davide", 82, 4, 2, 0, true);
 
-        controller.showComponent("Davide",3);
         controller.pickComponent("Davide", 3);
         controller.rotateComponent("Davide", 3, 3);
-        controller.insertComponent("Davide", 3, 4, 4);
+        controller.insertComponent("Davide", 3, 4, 4, 0, true);
 
-        controller.showComponent("Davide",19);
         controller.pickComponent("Davide", 19);
         controller.rotateComponent("Davide", 19, 0);
-        controller.insertComponent("Davide", 19, 4, 5);
+        controller.insertComponent("Davide", 19, 4, 5, 0, true);
 
         controller.setReady("Tommaso");
         controller.setReady("Simone");

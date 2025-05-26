@@ -40,13 +40,11 @@ class EpidemicCardTest {
         board.getCardPile().clear();
         board.getCardPile().add(epidemicCard);
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
 
     }
@@ -59,46 +57,38 @@ class EpidemicCardTest {
     @Test
     void testShouldReduceAliensInTwoAdjacentCabinsAndHumansInThreeAdjacentCabins() {
 
-        controller.showComponent("Simone", 38);
         controller.pickComponent("Simone", 38);
         controller.rotateComponent("Simone", 38, 2);
-        controller.insertComponent("Simone", 38, 1, 1);
+        controller.insertComponent("Simone", 38, 1, 1, 0, true);
 
-        controller.showComponent("Simone", 50);
         controller.pickComponent("Simone", 50);
         controller.rotateComponent("Simone", 50, 3);
-        controller.insertComponent("Simone", 50, 1, 2);
+        controller.insertComponent("Simone", 50, 1, 2, 0, true);
 
-        controller.showComponent("Simone", 142);
         controller.pickComponent("Simone", 142);
         controller.rotateComponent("Simone", 142, 2);
-        controller.insertComponent("Simone", 142, 1, 3);
+        controller.insertComponent("Simone", 142, 1, 3, 0, true);
 
-        controller.showComponent("Simone", 139);
         controller.pickComponent("Simone", 139);
         controller.rotateComponent("Simone", 139, 1);
-        controller.insertComponent("Simone", 139, 2, 1);
+        controller.insertComponent("Simone", 139, 2, 1, 0, true);
 
 
-        controller.showComponent("Davide", 52);
         controller.pickComponent("Davide", 52);
         controller.rotateComponent("Davide", 52, 2);
-        controller.insertComponent("Davide", 52, 1, 1);
+        controller.insertComponent("Davide", 52, 1, 1, 0, true);
 
-        controller.showComponent("Davide", 37);
         controller.pickComponent("Davide", 37);
         controller.rotateComponent("Davide", 37, 1);
-        controller.insertComponent("Davide", 37, 1, 2);
+        controller.insertComponent("Davide", 37, 1, 2, 0, true);
         ((CabinComponent) p2.getShip().getDashboard(1, 2).orElseThrow()).setHumans(1, p2.getShip());
 
-        controller.showComponent("Davide", 36);
         controller.pickComponent("Davide", 36);
         controller.rotateComponent("Davide", 36, 2);
-        controller.insertComponent("Davide", 36, 2, 1);
+        controller.insertComponent("Davide", 36, 2, 1, 0, true);
 
-        controller.showComponent("Davide", 57);
         controller.pickComponent("Davide", 57);
-        controller.insertComponent("Davide", 57, 2, 2);
+        controller.insertComponent("Davide", 57, 2, 2, 0, true);
 
 
         controller.setReady("Simone");
@@ -122,35 +112,29 @@ class EpidemicCardTest {
     @Test
     void testShouldNotReduceHumansAndAliensInNonAdjacentCabins() {
 
-        controller.showComponent("Simone", 46);
         controller.pickComponent("Simone", 46);
         controller.rotateComponent("Simone", 46, 2);
-        controller.insertComponent("Simone", 46, 2, 1);
+        controller.insertComponent("Simone", 46, 2, 1, 0, true);
 
-        controller.showComponent("Simone", 48);
         controller.pickComponent("Simone", 48);
         controller.rotateComponent("Simone", 48, 3);
-        controller.insertComponent("Simone", 48, 1, 2);
+        controller.insertComponent("Simone", 48, 1, 2, 0, true);
 
-        controller.showComponent("Simone", 63);
         controller.pickComponent("Simone", 63);
         controller.rotateComponent("Simone", 63, 1);
-        controller.insertComponent("Simone", 63, 2, 2);
+        controller.insertComponent("Simone", 63, 2, 2, 0, true);
 
 
-        controller.showComponent("Davide", 44);
         controller.pickComponent("Davide", 44);
         controller.rotateComponent("Davide", 44, 1);
-        controller.insertComponent("Davide", 44, 1, 2);
+        controller.insertComponent("Davide", 44, 1, 2, 0, true);
 
-        controller.showComponent("Davide", 40);
         controller.pickComponent("Davide", 40);
         controller.rotateComponent("Davide", 40, 1);
-        controller.insertComponent("Davide", 40, 2, 1);
+        controller.insertComponent("Davide", 40, 2, 1, 0, true);
 
-        controller.showComponent("Davide", 141);
         controller.pickComponent("Davide", 141);
-        controller.insertComponent("Davide", 141, 2, 2);
+        controller.insertComponent("Davide", 141, 2, 2, 0, true);
 
 
         controller.setReady("Simone");

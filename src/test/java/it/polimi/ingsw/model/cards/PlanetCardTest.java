@@ -39,17 +39,14 @@ class PlanetCardTest {
         p2 = board.getPlayerEntityByUsername("Davide");
         p3 = board.getPlayerEntityByUsername("Tommaso");
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
-        controller.showComponent("Tommaso", 34);
         controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3);
+        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
 
         Map<ColorType, Integer> rewards1 = new HashMap<>();
@@ -74,23 +71,19 @@ class PlanetCardTest {
     @Test
     void testShouldLandonPlanetP1() {
 
-        controller.showComponent("Simone", 31);
         controller.pickComponent("Simone", 31);
-        controller.insertComponent("Simone", 31, 1, 3);
+        controller.insertComponent("Simone", 31, 1, 3, 0, true);
 
-        controller.showComponent("Simone", 68);
         controller.pickComponent("Simone", 68);
-        controller.insertComponent("Simone", 68, 2, 2);
+        controller.insertComponent("Simone", 68, 2, 2, 0, true);
 
 
-        controller.showComponent("Davide", 51);
         controller.pickComponent("Davide", 51);
-        controller.insertComponent("Davide", 51, 2, 4);
+        controller.insertComponent("Davide", 51, 2, 4, 0, true);
 
 
-        controller.showComponent("Tommaso", 69);
         controller.pickComponent("Tommaso", 69);
-        controller.insertComponent("Tommaso", 69, 2, 4);
+        controller.insertComponent("Tommaso", 69, 2, 4, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");
@@ -121,19 +114,16 @@ class PlanetCardTest {
     @Test
     void testShouldLandOnPlanetAllThePlayers() {
 
-        controller.showComponent("Simone", 68);
         controller.pickComponent("Simone", 68);
-        controller.insertComponent("Simone", 68, 2, 2);
+        controller.insertComponent("Simone", 68, 2, 2, 0, true);
 
 
-        controller.showComponent("Davide", 31);
         controller.pickComponent("Davide", 31);
-        controller.insertComponent("Davide", 31, 2, 4);
+        controller.insertComponent("Davide", 31, 2, 4, 0, true);
 
 
-        controller.showComponent("Tommaso", 69);
         controller.pickComponent("Tommaso", 69);
-        controller.insertComponent("Tommaso", 69, 2, 4);
+        controller.insertComponent("Tommaso", 69, 2, 4, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");

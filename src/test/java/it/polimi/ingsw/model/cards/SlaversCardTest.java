@@ -38,29 +38,24 @@ class SlaversCardTest {
         p2.setCredits(40);
 
 
-        controller.showComponent("Simone", 136);
         controller.pickComponent("Simone", 136);
         controller.rotateComponent("Simone", 136, 1);
-        controller.insertComponent("Simone", 136, 2, 1);
+        controller.insertComponent("Simone", 136, 2, 1, 0, true);
 
-        controller.showComponent("Simone", 52);
         controller.pickComponent("Simone", 52);
-        controller.insertComponent("Simone", 52, 2, 2);
+        controller.insertComponent("Simone", 52, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
 
-        controller.showComponent("Davide", 53);
         controller.pickComponent("Davide", 53);
         controller.rotateComponent("Davide", 53, 1);
-        controller.insertComponent("Davide", 53, 2, 2);
+        controller.insertComponent("Davide", 53, 2, 2, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
         controller.rotateComponent("Davide", 33, 2);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
     }
 
@@ -73,18 +68,15 @@ class SlaversCardTest {
     @Test
     void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() {
 
-        controller.showComponent("Simone", 115);
         controller.pickComponent("Simone", 115);
-        controller.insertComponent("Simone", 115, 1, 3);
+        controller.insertComponent("Simone", 115, 1, 3, 0, true);
 
-        controller.showComponent("Simone", 132);
         controller.pickComponent("Simone", 132);
-        controller.insertComponent("Simone", 132, 1, 4);
+        controller.insertComponent("Simone", 132, 1, 4, 0, true);
 
-        controller.showComponent("Simone", 15);
         controller.pickComponent("Simone", 15);
         controller.rotateComponent("Simone", 15, 2);
-        controller.insertComponent("Simone", 15, 2, 4);
+        controller.insertComponent("Simone", 15, 2, 4, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");
@@ -108,23 +100,19 @@ class SlaversCardTest {
     @Test
     void testShouldCheckThatCardIsUsedBySecondPLayer() {
 
-        controller.showComponent("Simone", 115);
         controller.pickComponent("Simone", 115);
         controller.rotateComponent("Simone", 115, 1);
-        controller.insertComponent("Simone", 115, 1, 3);
+        controller.insertComponent("Simone", 115, 1, 3, 0, true);
 
 
-        controller.showComponent("Davide", 114);
         controller.pickComponent("Davide", 114);
-        controller.insertComponent("Davide", 114, 1, 3);
+        controller.insertComponent("Davide", 114, 1, 3, 0, true);
 
-        controller.showComponent("Davide", 134);
         controller.pickComponent("Davide", 134);
-        controller.insertComponent("Davide", 134, 1, 4);
+        controller.insertComponent("Davide", 134, 1, 4, 0, true);
 
-        controller.showComponent("Davide", 5);
         controller.pickComponent("Davide", 5);
-        controller.insertComponent("Davide", 5, 2, 4);
+        controller.insertComponent("Davide", 5, 2, 4, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");

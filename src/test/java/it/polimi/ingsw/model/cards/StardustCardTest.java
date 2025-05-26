@@ -38,58 +38,46 @@ class StardustCardTest {
         p3 = board.getPlayerEntityByUsername("Tommaso");
 
 
-        controller.showComponent("Simone", 3);
         controller.pickComponent("Simone", 3);
-        controller.insertComponent("Simone", 3, 1, 1);
+        controller.insertComponent("Simone", 3, 1, 1, 0, true);
 
-        controller.showComponent("Simone", 40);
         controller.pickComponent("Simone", 40);
         controller.rotateComponent("Simone", 40, 1);
-        controller.insertComponent("Simone", 40, 2, 1);
+        controller.insertComponent("Simone", 40, 2, 1, 0, true);
 
-        controller.showComponent("Simone", 66);
         controller.pickComponent("Simone", 66);
         controller.rotateComponent("Simone", 66, 3);
-        controller.insertComponent("Simone", 66, 1, 2);
+        controller.insertComponent("Simone", 66, 1, 2, 0, true);
 
-        controller.showComponent("Simone", 52);
         controller.pickComponent("Simone", 52);
-        controller.insertComponent("Simone", 52, 2, 2);
+        controller.insertComponent("Simone", 52, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
 
-        controller.showComponent("Davide", 5);
         controller.pickComponent("Davide", 5);
         controller.rotateComponent("Davide", 5, 3);
-        controller.insertComponent("Davide", 5, 1, 1);
+        controller.insertComponent("Davide", 5, 1, 1, 0, true);
 
-        controller.showComponent("Davide", 59);
         controller.pickComponent("Davide", 59);
-        controller.insertComponent("Davide", 59, 2, 1);
+        controller.insertComponent("Davide", 59, 2, 1, 0, true);
 
-        controller.showComponent("Davide", 132);
         controller.pickComponent("Davide", 132);
-        controller.insertComponent("Davide", 132, 2, 2);
+        controller.insertComponent("Davide", 132, 2, 2, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
 
-        controller.showComponent("Tommaso", 34);
         controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3);
+        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
-        controller.showComponent("Tommaso", 136);
         controller.pickComponent("Tommaso", 136);
-        controller.insertComponent("Tommaso", 136, 2, 4);
+        controller.insertComponent("Tommaso", 136, 2, 4, 0, true);
 
-        controller.showComponent("Tommaso", 156);
         controller.pickComponent("Tommaso", 156);
-        controller.insertComponent("Tommaso", 156, 2, 5);
+        controller.insertComponent("Tommaso", 156, 2, 5, 0, true);
 
         controller.setReady("Tommaso");
         controller.setReady("Davide");

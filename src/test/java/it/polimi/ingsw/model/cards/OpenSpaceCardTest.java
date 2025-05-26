@@ -41,71 +41,56 @@ class OpenSpaceCardTest {
         p4 = board.getPlayerEntityByUsername("Giovanni");
 
 
-        controller.showComponent("Simone", 43);
         controller.pickComponent("Simone", 43);
         controller.rotateComponent("Simone",43, 1);
-        controller.insertComponent("Simone", 43, 2, 2);
+        controller.insertComponent("Simone", 43, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 75);
         controller.pickComponent("Simone", 75);
-        controller.insertComponent("Simone", 75, 3, 2);
+        controller.insertComponent("Simone", 75, 3, 2, 0, true);
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
 
-        controller.showComponent("Davide", 15);
         controller.pickComponent("Davide", 15);
         controller.rotateComponent("Davide",15, 1);
-        controller.insertComponent("Davide", 15, 2, 2);
+        controller.insertComponent("Davide", 15, 2, 2, 0, true);
 
-        controller.showComponent("Davide", 79);
         controller.pickComponent("Davide", 79);
-        controller.insertComponent("Davide", 79, 3, 1);
+        controller.insertComponent("Davide", 79, 3, 1, 0, true);
 
-        controller.showComponent("Davide", 44);
         controller.pickComponent("Davide", 44);
         controller.rotateComponent("Davide",44, 1);
-        controller.insertComponent("Davide", 44, 3, 2);
+        controller.insertComponent("Davide", 44, 3, 2, 0, true);
 
-        controller.showComponent("Davide", 91);
         controller.pickComponent("Davide", 91);
-        controller.insertComponent("Davide", 91, 4, 2);
+        controller.insertComponent("Davide", 91, 4, 2, 0, true);
 
-        controller.showComponent("Davide", 85);
         controller.pickComponent("Davide", 85);
-        controller.insertComponent("Davide", 85, 3, 3);
+        controller.insertComponent("Davide", 85, 3, 3, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
 
-        controller.showComponent("Tommaso", 41);
         controller.pickComponent("Tommaso", 41);
-        controller.insertComponent("Tommaso", 41, 2, 2);
+        controller.insertComponent("Tommaso", 41, 2, 2, 0, true);
 
-        controller.showComponent("Tommaso", 77);
         controller.pickComponent("Tommaso", 77);
-        controller.insertComponent("Tommaso", 77, 3, 2);
+        controller.insertComponent("Tommaso", 77, 3, 2, 0, true);
 
-        controller.showComponent("Tommaso", 34);
         controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3);
+        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
 
-        controller.showComponent("Giovanni", 6);
         controller.pickComponent("Giovanni", 6);
-        controller.insertComponent("Giovanni", 6, 2, 2);
+        controller.insertComponent("Giovanni", 6, 2, 2, 0, true);
 
-        controller.showComponent("Giovanni", 38);
         controller.pickComponent("Giovanni", 38);
-        controller.insertComponent("Giovanni", 38, 3, 2);
+        controller.insertComponent("Giovanni", 38, 3, 2, 0, true);
 
-        controller.showComponent("Giovanni", 35);
         controller.pickComponent("Giovanni", 35);
-        controller.insertComponent("Giovanni", 35, 2, 3);
+        controller.insertComponent("Giovanni", 35, 2, 3, 0, true);
 
 
         controller.setReady("Giovanni");

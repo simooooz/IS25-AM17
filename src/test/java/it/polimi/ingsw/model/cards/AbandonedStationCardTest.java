@@ -38,42 +38,35 @@ class AbandonedStationCardTest {
         p2 = board.getPlayerEntityByUsername("Davide");
 
 
-        controller.showComponent("Simone", 69);
         controller.pickComponent("Simone", 69);
         controller.rotateComponent("Simone", 69, 3);
-        controller.insertComponent("Simone", 69, 1, 4);
+        controller.insertComponent("Simone", 69, 1, 4, 0, true);
 
         ((SpecialCargoHoldsComponent) p1.getShip().getDashboard(1,4).orElseThrow()).loadGood(ColorType.BLUE, p1.getShip());
         ((SpecialCargoHoldsComponent) p1.getShip().getDashboard(1,4).orElseThrow()).loadGood(ColorType.RED, p1.getShip());
 
-        controller.showComponent("Simone", 44);
         controller.pickComponent("Simone", 44);
         controller.rotateComponent("Simone", 44, 1);
-        controller.insertComponent("Simone", 44, 2, 4);
+        controller.insertComponent("Simone", 44, 2, 4, 0, true);
 
-        controller.showComponent("Simone", 67);
         controller.pickComponent("Simone", 67);
         controller.rotateComponent("Simone", 67, 1);
-        controller.insertComponent("Simone", 67, 3, 4);
+        controller.insertComponent("Simone", 67, 3, 4, 0, true);
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
 
-        controller.showComponent("Davide", 39);
         controller.pickComponent("Davide", 39);
         controller.rotateComponent("Davide", 39, 3);
-        controller.insertComponent("Davide", 39, 2, 4);
+        controller.insertComponent("Davide", 39, 2, 4, 0, true);
 
-        controller.showComponent("Davide", 68);
         controller.pickComponent("Davide", 68);
         controller.rotateComponent("Davide", 68, 1);
-        controller.insertComponent("Davide", 68, 3, 4);
+        controller.insertComponent("Davide", 68, 3, 4, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
 
         controller.setReady("Simone");

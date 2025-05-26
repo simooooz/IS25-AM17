@@ -43,43 +43,35 @@ class SmugglersCardTest {
         p2.setCredits(40);
 
 
-        controller.showComponent("Simone", 52);
         controller.pickComponent("Simone", 52);
         controller.rotateComponent("Simone", 52, 1);
-        controller.insertComponent("Simone", 52, 2, 2);
+        controller.insertComponent("Simone", 52, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 69);
         controller.pickComponent("Simone", 69);
         controller.rotateComponent("Simone", 69, 1);
-        controller.insertComponent("Simone", 69, 3, 2);
+        controller.insertComponent("Simone", 69, 3, 2, 0, true);
 
-        controller.showComponent("Simone", 17);
         controller.pickComponent("Simone", 17);
-        controller.insertComponent("Simone", 17, 1, 2);
+        controller.insertComponent("Simone", 17, 1, 2, 0, true);
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
 
-        controller.showComponent("Davide", 38);
         controller.pickComponent("Davide", 38);
         controller.rotateComponent("Davide", 38, 2);
-        controller.insertComponent("Davide", 38, 1, 2);
+        controller.insertComponent("Davide", 38, 1, 2, 0, true);
 
-        controller.showComponent("Davide", 68);
         controller.pickComponent("Davide", 68);
         controller.rotateComponent("Davide", 68, 1);
-        controller.insertComponent("Davide", 68, 0, 2);
+        controller.insertComponent("Davide", 68, 0, 2, 0, true);
 
-        controller.showComponent("Davide", 53);
         controller.pickComponent("Davide", 53);
         controller.rotateComponent("Davide", 53, 1);
-        controller.insertComponent("Davide", 53, 2, 2);
+        controller.insertComponent("Davide", 53, 2, 2, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
         rewards = new HashMap<>();
         rewards.put(ColorType.RED, 2);
@@ -94,18 +86,15 @@ class SmugglersCardTest {
     @Test
     void testShouldGetRewardsIfFirePowerEnoughAndMovePlayer() {
 
-        controller.showComponent("Simone", 129);
         controller.pickComponent("Simone", 129);
-        controller.insertComponent("Simone", 129, 0, 2);
+        controller.insertComponent("Simone", 129, 0, 2, 0, true);
 
-        controller.showComponent("Simone", 115);
         controller.pickComponent("Simone", 115);
-        controller.insertComponent("Simone", 115, 1, 3);
+        controller.insertComponent("Simone", 115, 1, 3, 0, true);
 
-        controller.showComponent("Simone", 15);
         controller.pickComponent("Simone", 15);
         controller.rotateComponent("Simone", 15, 2);
-        controller.insertComponent("Simone", 15, 1, 4);
+        controller.insertComponent("Simone", 15, 1, 4, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");
@@ -133,23 +122,19 @@ class SmugglersCardTest {
     @Test
     void testShouldCheckThatCardIsUsedBySecondPLayer() {
 
-        controller.showComponent("Davide", 102);
         controller.pickComponent("Davide", 102);
         controller.rotateComponent("Davide", 102, 3);
-        controller.insertComponent("Davide", 102, 1, 1);
+        controller.insertComponent("Davide", 102, 1, 1, 0, true);
 
-        controller.showComponent("Davide", 114);
         controller.pickComponent("Davide", 114);
-        controller.insertComponent("Davide", 114, 1, 3);
+        controller.insertComponent("Davide", 114, 1, 3, 0, true);
 
-        controller.showComponent("Davide", 134);
         controller.pickComponent("Davide", 134);
         controller.rotateComponent("Davide", 134, 2);
-        controller.insertComponent("Davide", 134, 3, 2);
+        controller.insertComponent("Davide", 134, 3, 2, 0, true);
 
-        controller.showComponent("Davide", 5);
         controller.pickComponent("Davide", 5);
-        controller.insertComponent("Davide", 5, 3, 3);
+        controller.insertComponent("Davide", 5, 3, 3, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");

@@ -46,17 +46,14 @@ class CombatZoneCardTest {
         p3.setCredits(30);
 
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
-        controller.showComponent("Tommaso", 34);
         controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3);
+        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
     }
 
@@ -68,106 +65,85 @@ class CombatZoneCardTest {
     @Test
     void testShouldCheckThatP1HasLessCannonPowerP2HasLessEnginePowerAndP3HasLessCrew() {
 
-        controller.showComponent("Simone", 45);
         controller.pickComponent("Simone", 45);
         controller.rotateComponent("Simone", 45, 2);
-        controller.insertComponent("Simone", 45, 2, 2);
+        controller.insertComponent("Simone", 45, 2, 2, 0, true);
 
-        controller.showComponent("Simone", 114);
         controller.pickComponent("Simone", 114);
-        controller.insertComponent("Simone", 114, 2, 4);
+        controller.insertComponent("Simone", 114, 2, 4, 0, true);
 
-        controller.showComponent("Simone", 108);
         controller.pickComponent("Simone", 108);
         controller.rotateComponent("Simone", 108, 1);
-        controller.insertComponent("Simone", 108, 2, 5);
+        controller.insertComponent("Simone", 108, 2, 5, 0, true);
 
-        controller.showComponent("Simone", 73);
         controller.pickComponent("Simone", 73);
-        controller.insertComponent("Simone", 73, 3, 2);
+        controller.insertComponent("Simone", 73, 3, 2, 0, true);
 
-        controller.showComponent("Simone", 93);
         controller.pickComponent("Simone", 93);
-        controller.insertComponent("Simone", 93, 3, 3);
+        controller.insertComponent("Simone", 93, 3, 3, 0, true);
 
-        controller.showComponent("Simone", 11);
         controller.pickComponent("Simone", 11);
-        controller.insertComponent("Simone", 11, 3, 4);
+        controller.insertComponent("Simone", 11, 3, 4, 0, true);
 
-        controller.showComponent("Simone", 69);
         controller.pickComponent("Simone", 69);
         controller.rotateComponent("Simone", 69, 1);
-        controller.insertComponent("Simone", 69, 3, 5);
+        controller.insertComponent("Simone", 69, 3, 5, 0, true);
 
 
-        controller.showComponent("Davide", 143);
         controller.pickComponent("Davide", 143);
         controller.rotateComponent("Davide", 143, 3);
-        controller.insertComponent("Davide", 143, 1, 2);
+        controller.insertComponent("Davide", 143, 1, 2, 0, true);
 
-        controller.showComponent("Davide", 43);
         controller.pickComponent("Davide", 43);
         controller.rotateComponent("Davide", 43, 1);
-        controller.insertComponent("Davide", 43, 2, 2);
+        controller.insertComponent("Davide", 43, 2, 2, 0, true);
 
-        controller.showComponent("Davide", 121);
         controller.pickComponent("Davide", 121);
-        controller.insertComponent("Davide", 121, 2, 4);
+        controller.insertComponent("Davide", 121, 2, 4, 0, true);
 
-        controller.showComponent("Davide", 134);
         controller.pickComponent("Davide", 134);
-        controller.insertComponent("Davide", 134, 2, 5);
+        controller.insertComponent("Davide", 134, 2, 5, 0, true);
 
-        controller.showComponent("Davide", 75);
         controller.pickComponent("Davide", 75);
         controller.rotateComponent("Davide", 75, 0);
-        controller.insertComponent("Davide", 75, 3, 2);
+        controller.insertComponent("Davide", 75, 3, 2, 0, true);
 
-        controller.showComponent("Davide", 3);
         controller.pickComponent("Davide", 3);
         controller.rotateComponent("Davide", 3, 0);
-        controller.insertComponent("Davide", 3, 3, 3);
+        controller.insertComponent("Davide", 3, 3, 3, 0, true);
 
-        controller.showComponent("Davide", 18);
         controller.pickComponent("Davide", 18);
         controller.rotateComponent("Davide", 18, 3);
-        controller.insertComponent("Davide", 18, 3, 4);
+        controller.insertComponent("Davide", 18, 3, 4, 0, true);
 
-        controller.showComponent("Davide", 60);
         controller.pickComponent("Davide", 60);
         controller.rotateComponent("Davide", 60, 0);
-        controller.insertComponent("Davide", 60, 3, 5);
+        controller.insertComponent("Davide", 60, 3, 5, 0, true);
 
 
-        controller.showComponent("Tommaso", 135);
         controller.pickComponent("Tommaso", 135);
         controller.rotateComponent("Tommaso", 135, 1);
-        controller.insertComponent("Tommaso", 135, 2, 2);
+        controller.insertComponent("Tommaso", 135, 2, 2, 0, true);
 
-        controller.showComponent("Tommaso", 115);
         controller.pickComponent("Tommaso", 115);
         controller.rotateComponent("Tommaso", 115, 0);
-        controller.insertComponent("Tommaso", 115, 2, 4);
+        controller.insertComponent("Tommaso", 115, 2, 4, 0, true);
 
-        controller.showComponent("Tommaso", 126);
         controller.pickComponent("Tommaso", 126);
         controller.rotateComponent("Tommaso", 126, 1);
-        controller.insertComponent("Tommaso", 126, 2, 5);
+        controller.insertComponent("Tommaso", 126, 2, 5, 0, true);
 
-        controller.showComponent("Tommaso", 96);
         controller.pickComponent("Tommaso", 96);
         controller.rotateComponent("Tommaso", 96, 0);
-        controller.insertComponent("Tommaso", 96, 3, 3);
+        controller.insertComponent("Tommaso", 96, 3, 3, 0, true);
 
-        controller.showComponent("Tommaso", 15);
         controller.pickComponent("Tommaso", 15);
         controller.rotateComponent("Tommaso", 15, 3);
-        controller.insertComponent("Tommaso", 15, 3, 4);
+        controller.insertComponent("Tommaso", 15, 3, 4, 0, true);
 
-        controller.showComponent("Tommaso", 30);
         controller.pickComponent("Tommaso", 30);
         controller.rotateComponent("Tommaso", 30, 0);
-        controller.insertComponent("Tommaso", 30, 3, 5);
+        controller.insertComponent("Tommaso", 30, 3, 5, 0, true);
 
 
         controller.setReady("Simone");

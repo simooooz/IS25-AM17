@@ -42,45 +42,36 @@ class MeteorSwarmCardTest {
         p2 = board.getPlayerEntityByUsername("Davide");
         p3 = board.getPlayerEntityByUsername("Tommaso");
 
-        controller.showComponent("Simone", 32);
         controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3);
+        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
-        controller.showComponent("Simone", 132);
         controller.pickComponent("Simone", 132);
-        controller.insertComponent("Simone", 132, 1, 1);
+        controller.insertComponent("Simone", 132, 1, 1, 0, true);
 
-        controller.showComponent("Simone", 15);
         controller.pickComponent("Simone", 15);
         controller.rotateComponent("Simone", 15, 2);
-        controller.insertComponent("Simone", 15, 1, 2);
+        controller.insertComponent("Simone", 15, 1, 2, 0, true);
 
-        controller.showComponent("Simone", 36);
         controller.pickComponent("Simone", 36);
         controller.rotateComponent("Simone", 36, 2);
-        controller.insertComponent("Simone", 36, 2, 1);
+        controller.insertComponent("Simone", 36, 2, 1, 0, true);
 
-        controller.showComponent("Simone", 148);
         controller.pickComponent("Simone", 148);
-        controller.insertComponent("Simone", 148, 2, 2);
+        controller.insertComponent("Simone", 148, 2, 2, 0, true);
 
 
-        controller.showComponent("Davide", 33);
         controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3);
+        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
-        controller.showComponent("Davide", 28);
         controller.pickComponent("Davide", 28);
-        controller.insertComponent("Davide", 28, 2, 4);
+        controller.insertComponent("Davide", 28, 2, 4, 0, true);
 
 
-        controller.showComponent("Tommaso", 34);
         controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3);
+        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
-        controller.showComponent("Tommaso", 22);
         controller.pickComponent("Tommaso", 22);
-        controller.insertComponent("Tommaso", 22, 2, 4);
+        controller.insertComponent("Tommaso", 22, 2, 4, 0, true);
 
 
     }
@@ -251,41 +242,33 @@ class MeteorSwarmCardTest {
     @Test
     void testShouldCheckMeteorHitEveryPlayer() {
 
-        controller.showComponent("Davide", 43);
         controller.pickComponent("Davide", 43);
-        controller.insertComponent("Davide", 43, 2, 1);
+        controller.insertComponent("Davide", 43, 2, 1, 0,true);
 
-        controller.showComponent("Davide", 126);
         controller.pickComponent("Davide", 126);
-        controller.insertComponent("Davide", 126, 1, 1);
+        controller.insertComponent("Davide", 126, 1, 1, 0, true);
 
-        controller.showComponent("Davide", 12);
         controller.pickComponent("Davide", 12);
         controller.rotateComponent("Davide", 12, 2);
-        controller.insertComponent("Davide", 12, 1, 2);
+        controller.insertComponent("Davide", 12, 1, 2, 0, true);
 
-        controller.showComponent("Davide", 151);
         controller.pickComponent("Davide", 151);
-        controller.insertComponent("Davide", 151, 2, 2);
+        controller.insertComponent("Davide", 151, 2, 2, 0, true);
 
 
-        controller.showComponent("Tommaso", 128);
         controller.pickComponent("Tommaso", 128);
-        controller.insertComponent("Tommaso", 128, 1, 1);
+        controller.insertComponent("Tommaso", 128, 1, 1, 0 , true);
 
-        controller.showComponent("Tommaso", 14);
         controller.pickComponent("Tommaso", 14);
         controller.rotateComponent("Tommaso", 14, 3);
-        controller.insertComponent("Tommaso", 14, 1, 2);
+        controller.insertComponent("Tommaso", 14, 1, 2, 0,true);
 
-        controller.showComponent("Tommaso", 38);
         controller.pickComponent("Tommaso", 38);
         controller.rotateComponent("Tommaso", 38, 3);
-        controller.insertComponent("Tommaso", 38, 2, 1);
+        controller.insertComponent("Tommaso", 38, 2, 1, 0, true);
 
-        controller.showComponent("Tommaso", 150);
         controller.pickComponent("Tommaso", 150);
-        controller.insertComponent("Tommaso", 150, 2, 2);
+        controller.insertComponent("Tommaso", 150, 2, 2, 0, true);
 
 
         controller.setReady("Simone");
