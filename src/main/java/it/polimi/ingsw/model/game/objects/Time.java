@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game.objects;
 
 import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,10 +39,9 @@ public class Time {
             public void run() {
                 if (timeLeft == 1) {
                     timer.cancel();
-                    if (hourglassPos == 0) {
-                        // TODO muovi i giocatori nella board (in che ordine?)
-                        model.moveStateAfterBuilding();
-                    }
+                    if (hourglassPos == 0)
+                        for (PlayerData player : model.getBoard().getStartingDeck())
+                            model.setReady(player.getUsername());
                 }
                 timeLeft -= 1;
             }

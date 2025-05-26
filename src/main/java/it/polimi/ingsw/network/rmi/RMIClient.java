@@ -85,6 +85,7 @@ public class RMIClient extends Client {
                 case INSERT_COMPONENT -> server.insertComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
                 case MOVE_COMPONENT -> server.moveComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
                 case ROTATE_COMPONENT -> server.rotateComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1]);
+                case LOOK_CARD_PILE -> server.lookCardPileHandler(sessionCode, (Integer) args[0]);
                 case MOVE_HOURGLASS -> server.moveHourglassHandler(sessionCode);
                 case SET_READY -> server.setReadyHandler(sessionCode);
                 case CHECK_SHIP -> server.checkShipHandler(sessionCode, (List<Integer>) args[0]);

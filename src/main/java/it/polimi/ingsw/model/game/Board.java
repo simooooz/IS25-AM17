@@ -54,16 +54,6 @@ public class Board {
         return players;
     }
 
-    public void reconnectPlayer(SimpleEntry<PlayerData, Integer> player) {
-        // todo
-    }
-
-    public void disconnectPlayer(String username) {
-        boolean removed = this.players.removeIf(e -> e.getKey().getUsername().equals(username));
-        if (!removed)
-            this.startingDeck.removeIf(e -> e.getUsername().equals(username));
-    }
-
     public List<PlayerData> getPlayersByPos() {
         return players.stream().map(SimpleEntry::getKey).collect(Collectors.toList());
     }
@@ -111,10 +101,8 @@ public class Board {
 
     public void pickNewCard(ModelFacade model) {
         cardPilePos++;
-        if (cardPilePos == cardPile.size()) { // All cards are resolved
-            for (PlayerData p : getPlayersByPos())
-                model.setPlayerState(p.getUsername(), PlayerState.END);
-        }
+        if (cardPilePos == cardPile.size()) // All cards are resolved
+            model.endGame();
         else { // Change card
             for (PlayerData p : getPlayersByPos())
                 model.setPlayerState(p.getUsername(), PlayerState.WAIT);

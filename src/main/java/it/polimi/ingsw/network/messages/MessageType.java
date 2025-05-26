@@ -208,8 +208,19 @@ public enum MessageType {
         }
     },
 
-    LOOK_CARD_PILE,
-    LOOK_CARD_PILE_RES,
+    LOOK_CARD_PILE {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
+            Server.lookCardPile(user, castedMessage.getArg1());
+        }
+
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().lookCardPile(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
 
     MOVE_HOURGLASS {
         @Override
@@ -417,11 +428,13 @@ public enum MessageType {
     };
 
     public void execute(ClientHandler user, Message message) {
-        // TODO unknown command
+        // This code should not be executed
+        // Otherwise, do nothing
     }
 
     public void execute(ClientSocket client, Message message) {
-        // TODO unknown command
+        // This code should not be executed
+        // Otherwise, do nothing
     }
 
 }
