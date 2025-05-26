@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.factory.ComponentFactory;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 
 import java.util.*;
@@ -69,9 +70,9 @@ public class Board {
 
     public PlayerData getPlayerEntityByUsername(String username) {
         return Stream.concat(players.stream().map(SimpleEntry::getKey), startingDeck.stream())
-            .filter(p -> p.getUsername().equals(username))
-            .findFirst()
-            .orElseThrow(PlayerNotFoundException::new);
+                .filter(p -> p.getUsername().equals(username))
+                .findFirst()
+                .orElseThrow(PlayerNotFoundException::new);
     }
 
     public List<PlayerData> getStartingDeck() {
@@ -231,6 +232,28 @@ public class Board {
         return players.stream()
                 .sorted(Comparator.comparingInt(PlayerData::getCredits).reversed())
                 .toList();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Chroma.color("Cards resolved so far " + getCardPilePos() + "/" + getCardPile().size(), Chroma.GREY_BOLD)).append("\n");
+
+        players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+        sb.append("Players:\n");
+        for (SimpleEntry<PlayerData, Integer> entry : players) {
+            sb.append("  ").append(entry.getKey().getUsername()).append(" | ").append("square: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
+        }
+
+        if (!startingDeck.isEmpty()) {
+            sb.append("Starting deck:\n");
+            for (PlayerData player : startingDeck) {
+                sb.append("  ").append(player.getUsername()).append(" | ").append("$").append(player.getCredits()).append("\n");
+            }
+        }
+
+        return sb.toString();
     }
 
 }

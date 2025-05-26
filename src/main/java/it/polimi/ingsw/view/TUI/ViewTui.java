@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -38,7 +39,8 @@ public class ViewTui {
         try {
             switch (client.getState()) {
                 case USERNAME:
-                    if (input.length() < 3 || input.length() > 18) throw new IllegalArgumentException("Username length must be between 3 and 18.");
+                    if (input.length() < 3 || input.length() > 18)
+                        throw new IllegalArgumentException("Username length must be between 3 and 18.");
                     client.send(MessageType.SET_USERNAME, input);
                     break;
 
@@ -149,7 +151,8 @@ public class ViewTui {
             case BUILD -> {
                 String[] commands = input.trim().split(" ");
                 switch (commands[0]) {
-                    case "pick" -> {;
+                    case "pick" -> {
+                        ;
                         if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
                             client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
                         revertRotation();
@@ -200,8 +203,7 @@ public class ViewTui {
                             else if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert" (ex. of a reserve)
                                 client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
                                 localCommand = input + " 0";
-                            }
-                            else // No previous local command
+                            } else // No previous local command
                                 localCommand = input + " 0";
 
                             displayUpdater.updateDisplay();
@@ -272,8 +274,8 @@ public class ViewTui {
             }
             case CHECK -> {
                 List<Integer> ids = Arrays.stream(input.split(" "))
-                    .map(Integer::parseInt)
-                    .toList();
+                        .map(Integer::parseInt)
+                        .toList();
                 client.send(MessageType.CHECK_SHIP, ids);
             }
             case WAIT_ALIEN -> {
@@ -296,6 +298,16 @@ public class ViewTui {
                 client.send(MessageType.CHOOSE_ALIEN, alienMap);
             }
             case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
+            case DRAW_CARD -> client.send(MessageType.DRAW_CARD);
+            case WAIT_CANNONS -> {}
+            case WAIT_ENGINES -> {}
+            case WAIT_GOODS -> {}
+            case WAIT_REMOVE_GOODS -> {}
+            case WAIT_ROLL_DICES -> client.send(MessageType.ROLL_DICES);
+            case WAIT_REMOVE_CREW -> {}
+            case WAIT_SHIELD -> {}
+            case WAIT_BOOLEAN -> {}
+            case WAIT_INDEX -> {}
         }
     }
 
@@ -315,28 +327,12 @@ public class ViewTui {
      * Clears the screen.
      */
     public void clear() {
-//        try {
-//            String operatingSystem = System.getProperty("os.name");
-//
-//            // Windows
-//            if (operatingSystem.contains("Windows")) {
-//                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-//            }
-//            // Unix/Linux/MacOS
-//            else {
-//                // ANSI escape code to clear the screen
-//                System.out.print("\033[H\033[2J");
-//                System.out.flush();
-//
-//                // Otherwise, it can be used this
-//                // new ProcessBuilder("clear").inheritIO().start().waitFor();
-//            }
-//        } catch (Exception e) {
-//            // print many lines as fallback
-        for (int i = 0; i < 50; i++) {
-            System.out.println();
+        try {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        } catch (IOException | InterruptedException e) {
+            // for mac
+            System.out.println("\033\143");
         }
-//        }
     }
 
     public void displayError(String message) {
