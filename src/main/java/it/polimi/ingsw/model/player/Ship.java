@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.player;
 
 import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -199,10 +200,26 @@ public class Ship {
         dfs(i, j + 1, visited, group, dashboard[i][j]);
     }
 
-    @Override
-    public String toString() {
+    public String toString(String username, PlayerState state) {
         StringBuilder output = new StringBuilder();
 
+        switch (state) {
+            case BUILD -> {
+                output.append(Chroma.color("\nreserves: ", Chroma.GREY_BOLD)).append(Chroma.color(reserves.isEmpty() ? "none" : Constants.displayComponents(reserves, 2), Chroma.GREY_BOLD)).append("\n\n");
+                output.append(Chroma.color(username + "'s ship:\n", Chroma.YELLOW_BOLD));
+                printShip(output);
+                output.append("\nyour hand: ").append(handComponent.isEmpty() ? "empty" : handComponent.get());
+            }
+            case LOOK_CARD_PILE, CHECK, DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, DONE -> {
+                output.append(Chroma.color(username + "'s ship:\n", Chroma.YELLOW_BOLD));
+                printShip(output);
+            }
+        }
+
+        return output.toString();
+    }
+
+    private void printShip(StringBuilder output) {
         output.append("   ");
         for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
             output.append(Chroma.color(String.format("       %-2d      ", col + 4), Chroma.RESET));
@@ -255,8 +272,6 @@ public class Ship {
         for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
             output.append(String.format("       %-2d      ", col + 4));
         output.append("\n");
-
-        return output.toString();
     }
 
 }

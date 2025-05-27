@@ -10,8 +10,10 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
+import it.polimi.ingsw.Constants;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,5 +112,4 @@ abstract public class Card {
     public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
-
 }

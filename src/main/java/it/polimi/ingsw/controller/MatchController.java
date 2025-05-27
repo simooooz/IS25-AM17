@@ -135,12 +135,9 @@ public class MatchController {
      * @param lobby to delete
      */
     private void delete(Lobby lobby) {
-        switch (lobby.getState()) {
-            case WAITING -> lobbies.remove(lobby.getGameID());
-            case IN_GAME -> {
-                // todo: come si comporta il game controller? metodo endGame() nella lobby? bisogna eliminare tutti i giocatori
-            }
-        }
+        lobbies.remove(lobby.getGameID());
+        if (lobby.getState() == LobbyState.IN_GAME)
+            lobby.endGame();
     }
 
     /**

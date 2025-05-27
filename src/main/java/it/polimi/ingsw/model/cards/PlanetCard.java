@@ -78,10 +78,10 @@ public class PlanetCard extends Card{
     @Override
     public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_INDEX) {
-            if (value >= planets.size() || (value < 0 && value != -1)) // Invalid index
-                throw new RuntimeException("Index not valid");
-            else if (value == -1) // Players doesn't land
+            if (value == null) // Players doesn't land
                 model.setPlayerState(username, PlayerState.DONE);
+            else if (value >= planets.size() || value < 0) // Invalid index
+                throw new RuntimeException("Index not valid");
             else { // Land
                 PlayerData player = board.getPlayerEntityByUsername(username);
                 landedPlayers.put(player, planets.get(value));
@@ -144,7 +144,7 @@ public class PlanetCard extends Card{
         }
 
         String dayRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(days + " 📅", 20) +
-                 "\u2009"  + "\u200A" + vBorder + " ";
+                "\u2009"  + "\u200A" + vBorder + " ";
         cardLines.add(dayRow);
 
 

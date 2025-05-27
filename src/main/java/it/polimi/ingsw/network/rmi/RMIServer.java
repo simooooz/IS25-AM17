@@ -200,6 +200,12 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     }
 
     @Override
+    public void lookCardPileHandler(String sessionCode, Integer pileIndex) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        lookCardPile(user, pileIndex);
+    }
+
+    @Override
     public void moveHourglassHandler(String sessionCode) throws RemoteException {
         User user = getUserInRmiSessions(sessionCode);
         moveHourglass(user);

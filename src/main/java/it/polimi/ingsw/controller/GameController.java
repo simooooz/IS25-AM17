@@ -6,7 +6,9 @@ import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
 
@@ -37,65 +39,76 @@ public class GameController {
     }
 
     public void pickComponent(String username, int componentId) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.pickComponent(username, componentId);
     }
 
     public void releaseComponent(String username, int componentId) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.releaseComponent(username, componentId);
     }
 
     public void reserveComponent(String username, int componentId) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
-        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        else if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
 
         model.reserveComponent(username, componentId);
     }
 
     public void insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.insertComponent(username, componentId, row, col, rotations, weld);
     }
 
     public void moveComponent(String username, int componentId, int row, int col, int rotations) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.moveComponent(username, componentId, row, col);
         model.rotateComponent(username, componentId, rotations);
     }
 
     public void rotateComponent(String username, int componentId, int num) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.rotateComponent(username, componentId, num);
     }
 
-    public List<Card> lookCardPile(String username, int deckIndex) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (model.isPlayerReady(username))
-            throw new RuntimeException("Player is ready"); // TODO non lo so se quando è ready può ancora guardarle
+    public void lookCardPile(String username, int deckIndex) {
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.isPlayerReady(username)) throw new IllegalStateException("Player is already ready");
+        else if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
 
-        return model.lookCardPile(username, deckIndex);
+        model.lookCardPile(username, deckIndex);
     }
 
     public void moveHourglass(String username) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
+
         model.moveHourglass(username);
     }
 
     public void setReady(String username) {
-        if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
+        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+
         model.setReady(username);
     }
 
@@ -154,22 +167,23 @@ public class GameController {
         model.getBoolean(username, value);
     }
 
-    public void getIndex(String username, int value) {
+    public void getIndex(String username, Integer value) {
         if (model.getPlayerState(username) != PlayerState.WAIT_INDEX) throw new IllegalStateException("State is not WAIT_INDEX");
         model.getIndex(username, value);
     }
 
-    public void endFlight(String username) {;
+    public void endFlight(String username) {
         if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
         model.endFlight(username);
     }
 
-    public void playerRejoined(String username) {
-        // todo
+    public void leaveGame(String username) {
+        model.setPlayerState(username, PlayerState.END);
+        model.endFlight(username);
     }
 
-    public void playerLeft(String username) {
-        this.model.playerLeft(username);
+    public void endGame() {
+        model.endGame();
     }
 
     // TEST only

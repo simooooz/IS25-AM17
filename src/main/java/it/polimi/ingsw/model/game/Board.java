@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
@@ -29,13 +30,16 @@ public class Board {
     private final Time timeManagement;
     private final Map<Integer, Component> mapIdComponents;
     private final Map<ColorType, Integer> availableGoods;
+    private final boolean learnerMode;
 
     public Board(List<String> usernames, boolean learnerMode) {
+        this.learnerMode = learnerMode;
         this.startingDeck = new ArrayList<>();
         for (String username : usernames)
             this.startingDeck.add(new PlayerData(username, learnerMode));
 
         this.players = new ArrayList<>();
+        this.timeManagement = learnerMode ? null : new Time();
 
         ComponentFactory componentFactory = new ComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
@@ -43,25 +47,10 @@ public class Board {
         this.cardPile = new ArrayList<>(new CardFactory(learnerMode).getCards());
         this.cardPilePos = 0;
         this.availableGoods = new HashMap<>();
-
-        if (!learnerMode)
-            this.timeManagement = new Time();
-        else
-            timeManagement = null;
     }
 
     public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
         return players;
-    }
-
-    public void reconnectPlayer(SimpleEntry<PlayerData, Integer> player) {
-        // todo
-    }
-
-    public void disconnectPlayer(String username) {
-        boolean removed = this.players.removeIf(e -> e.getKey().getUsername().equals(username));
-        if (!removed)
-            this.startingDeck.removeIf(e -> e.getUsername().equals(username));
     }
 
     public List<PlayerData> getPlayersByPos() {
@@ -111,10 +100,8 @@ public class Board {
 
     public void pickNewCard(ModelFacade model) {
         cardPilePos++;
-        if (cardPilePos == cardPile.size()) { // All cards are resolved
-            for (PlayerData p : getPlayersByPos())
-                model.setPlayerState(p.getUsername(), PlayerState.END);
-        }
+        if (cardPilePos == cardPile.size()) // All cards are resolved
+            model.endGame();
         else { // Change card
             for (PlayerData p : getPlayersByPos())
                 model.setPlayerState(p.getUsername(), PlayerState.WAIT);
@@ -181,7 +168,7 @@ public class Board {
         startingDeck.remove(player);
     }
 
-    public List<PlayerData> getRanking(boolean learnerMode) {
+    public List<PlayerData> getRanking() {
         List<PlayerData> players = Stream.concat(
                 this.getPlayersByPos().stream(),
                 this.getStartingDeck().stream()
@@ -234,25 +221,58 @@ public class Board {
                 .toList();
     }
 
-    @Override
-    public String toString() {
+    public String toString(String username, PlayerState state) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(Chroma.color("Cards resolved so far " + getCardPilePos() + "/" + getCardPile().size(), Chroma.GREY_BOLD)).append("\n");
+        switch (state) {
+            case BUILD -> {
+                sb.append(Constants.displayComponents(commonComponents, 10));
 
-        players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-        sb.append("Players:\n");
-        for (SimpleEntry<PlayerData, Integer> entry : players) {
-            sb.append("  ").append(entry.getKey().getUsername()).append(" | ").append("square: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
-        }
+                sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
+                sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
 
-        if (!startingDeck.isEmpty()) {
-            sb.append("Starting deck:\n");
-            for (PlayerData player : startingDeck) {
-                sb.append("  ").append(player.getUsername()).append(" | ").append("$").append(player.getCredits()).append("\n");
+                for (PlayerData player : startingDeck)
+                    sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
+                for (SimpleEntry<PlayerData, Integer> entry : players)
+                    sb.append("- ").append(entry.getKey().getUsername()).append(Chroma.color(" READY\n", Chroma.GREEN));
+            }
+
+            case LOOK_CARD_PILE -> {
+                int deckIndex = PlayerState.LOOK_CARD_PILE.getDeckIndex().get(username);
+                int startingDeckIndex = deckIndex == 0 ? 0 : (deckIndex == 1 ? 3 : 6);
+                int endingDeckIndex = startingDeckIndex + 3;
+                cardPile.subList(startingDeckIndex, endingDeckIndex).forEach(card -> sb.append(card).append("\n") );
+                // todo CHANGE with displayCards
+
+                sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
+                sb.append("\nTime left: ").append(timeManagement.getTimeLeft());
+
+                for (PlayerData player : startingDeck)
+                    sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
+                for (SimpleEntry<PlayerData, Integer> entry : players)
+                    sb.append("- ").append(entry.getKey().getUsername()).append(Chroma.color(" READY\n", Chroma.GREEN));
+            }
+
+            case DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, DONE -> {
+                sb.append(Chroma.color("Cards resolved so far " + getCardPilePos() + "/" + getCardPile().size(), Chroma.GREY_BOLD)).append("\n");
+
+                sb.append("Players in game:\n");
+                for (SimpleEntry<PlayerData, Integer> entry : players)
+                    sb.append("  ").append(entry.getKey().getUsername()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
+
+                if (!startingDeck.isEmpty()) {
+                    sb.append("Starting deck:\n");
+                    for (PlayerData player : startingDeck)
+                        sb.append("  ").append(player.getUsername()).append(" | ").append("$").append(player.getCredits()).append("\n");
+                }
+            }
+
+            case END -> {
+                sb.append("\nRanking:\n");
+                for (PlayerData player : this.getRanking())
+                    sb.append("-  ").append(player.getUsername()).append(" $").append(player.getCredits()).append("\n");
             }
         }
-
         return sb.toString();
     }
 

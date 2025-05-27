@@ -27,16 +27,16 @@ Alongside the core gameplay mechanics, the project also integrates several of th
 ## 📌 Development Progress
 
 | Feature                     | Status |
-|-----------------------------|--------|
-| Base game rules             | ✅      |
-| Full ruleset                | ✅      |
-| Socket-based networking     | 🟠      |
-| RMI networking              | 🟠      |
-| CLI                         | 🟠      |
-| GUI                         | ❌      |
-| Support for multiple games  | 🟠      |
-| Learning flight             | ❌      |
-| Resilience & recovery       | ❌      |
+|-----------------------------|-------|
+| Base game rules             | ✅     |
+| Full ruleset                | ✅     |
+| Socket-based networking     | ✅     |
+| RMI networking              | ✅     |
+| CLI                         | 🟠     |
+| GUI                         | 🟠     |
+| Support for multiple games  | ✅     |
+| Learning flight             | ✅      |
+| Resilience & recovery       | 🟠     |
 
 > (*) Advanced Function
 

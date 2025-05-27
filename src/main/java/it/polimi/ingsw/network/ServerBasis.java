@@ -94,6 +94,12 @@ public abstract class ServerBasis {
         client.notifyGameEvent(MessageType.ROTATE_COMPONENT, id, num);
     }
 
+    public static void lookCardPile(User client, Integer pileIndex) {
+        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        client.getGameController().lookCardPile(client.getUsername(), pileIndex);
+        client.notifyGameEvent(MessageType.LOOK_CARD_PILE);
+    }
+
     public static void moveHourglass(User client) {
         if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
         client.getGameController().moveHourglass(client.getUsername());

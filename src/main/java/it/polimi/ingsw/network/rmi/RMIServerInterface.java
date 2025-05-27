@@ -39,6 +39,8 @@ public interface RMIServerInterface extends Remote {
 
     void rotateComponentHandler(String sessionCode, Integer id, Integer num) throws RemoteException;
 
+    void lookCardPileHandler(String sessionCode, Integer pileIndex) throws RemoteException;
+
     void moveHourglassHandler(String sessionCode) throws RemoteException;
 
     void setReadyHandler(String sessionCode) throws RemoteException;

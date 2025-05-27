@@ -35,7 +35,6 @@ public class DisplayUpdater implements Runnable {
         }
     }
 
-
     public void updateDisplay() {
         switch (client.getState()) {
             case DISCONNECT:
@@ -78,37 +77,6 @@ public class DisplayUpdater implements Runnable {
         System.out.print("\n> ");
     }
 
-
-    private String displayComponents(List<Component> components, int componentsPerRow) {
-        StringBuilder output = new StringBuilder();
-
-        Collections.shuffle(components);
-
-        for (int rowStart = 0; rowStart < components.size(); rowStart += componentsPerRow) {
-            int rowEnd = Math.min(rowStart + componentsPerRow, components.size());
-
-            // Collect all component for this row
-            String[][] rowComponentLines = new String[rowEnd - rowStart][];
-
-            for (int i = 0; i < rowEnd - rowStart; i++)
-                rowComponentLines[i] = components.get(rowStart + i).toString().split("\n");
-
-            // Print the row line by line
-            int height = rowComponentLines[0].length;
-            for (int lineIndex = 0; lineIndex < height; lineIndex++) {
-                for (int compIndex = 0; compIndex < rowComponentLines.length; compIndex++) {
-                    output.append(rowComponentLines[compIndex][lineIndex]);
-
-                    // Add spacing between components, except after the last one
-                    if (compIndex < rowComponentLines.length - 1)
-                        output.append("  ");
-                }
-                output.append("\n");
-            }
-        }
-        return output.toString();
-    }
-
     private void displayGame() {
         PlayerState state = client.getGameController().getState(client.getUsername());
 
@@ -116,6 +84,7 @@ public class DisplayUpdater implements Runnable {
         Ship ship = board.getPlayerEntityByUsername(client.getUsername()).getShip();
 
         // Handle wait state
+        // todo also end, done?
         if (state == PlayerState.WAIT)
             client.getViewTui().waitLatch = new CountDownLatch(1);
         else
@@ -123,96 +92,63 @@ public class DisplayUpdater implements Runnable {
 
         switch (state) {
 
-            case BUILD -> {
-                // is player ready?
-                boolean isReady = board.getStartingDeck().contains(board.getPlayerEntityByUsername(client.getUsername()));
-                if (!isReady) {
-                    List<Component> commonComponents = board.getCommonComponents();
-                    System.out.println(displayComponents(commonComponents, 10));
-
-                    Chroma.println("\nreserves: " + (
-                            ship.getReserves().isEmpty()
-                                    ? "none"
-                                    : displayComponents(ship.getReserves(), 2)
-                    ), Chroma.GREY_BOLD);
-                }
-
-                Chroma.println("\nYOUR ship:\n", Chroma.YELLOW_BOLD);
-                System.out.println(ship);
-
-                if (!isReady) {
-                    System.out.println("\nyour hand: " + (
-                            ship.getHandComponent().isEmpty()
-                                    ? "empty"
-                                    : ship.getHandComponent()
-                    ));
-                }
-
-                // todo: hourglass
-                System.out.println("\nHourglass position: ");
-                System.out.println("Time left: ");
-
-                for (PlayerData player : board.getStartingDeck())
-                    System.out.println("- " + player.getUsername() + Chroma.color(" not ready", Chroma.RED));
-                for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
-                    System.out.println("- " + entry.getKey().getUsername() + Chroma.color(" READY", Chroma.GREEN));
+            case BUILD, LOOK_CARD_PILE -> {
+                System.out.println(board.toString(client.getUsername(), state));
+                System.out.println(ship.toString(client.getUsername(), state));
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
+                Chroma.println(
+                        "[pick <id>]                  - pick a component\n" +
+                                "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
+                                "[release]                    - release the picked component\n" +
+                                (client.getGameController().getModel().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
 
-                if (!isReady) {
-                    Chroma.println(
-                            "[pick <id>]                  - pick a component\n" +
-                                    "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
-                                    "[release]                    - release the picked component\n" +
-                                    (client.getGameController().getModel().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
-
-                                    "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
-                                    "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
-                                    "[look-at-cards <id>]         - view specific card pile (1, 2 or 3)\n" +
-                                    "[ready]                      - end building phase",
-                            Chroma.BLUE
-                    );
-                    System.out.print("> ");
-                }
+                                "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
+                                "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
+                                "[look-cards <id>]         - view specific card pile (1, 2 or 3)\n" +
+                                "[ready]                      - end building phase",
+                        Chroma.BLUE
+                );
+                System.out.print("> ");
             }
 
             case CHECK -> {
-                System.out.println(ship);
+                System.out.println(ship.toString(client.getUsername(), state));
                 Chroma.println("Oh no! Your ship is not valid :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 System.out.println(
                         """
-                                ENTER a series of components <id> to remove to fix the ship
-                                [<id> <id> ... <id>]               - remove a 'bad' component from the ship]
-                                """
+                            ENTER a series of components <id> to remove to fix the ship
+                            [<id> <id> ... <id>]               - remove a 'bad' component from the ship]
+                        """
                 );
                 System.out.print("> ");
             }
 
             case WAIT_ALIEN -> {
-                System.out.println(ship);
+                System.out.println(ship.toString(client.getUsername(), state));
                 Chroma.println("You might want to put aliens in your cabins!", Chroma.YELLOW_BOLD);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 System.out.println(
                         """
-                                ENTER a series of <id> cabins in which to put aliens
-                                [<id> <id> ... <id>]               - add alien into the given cabins]
-                                """
+                            ENTER a series of <id> cabins in which to put aliens
+                            [<id> <id> ... <id>]               - add alien into the given cabins]
+                        """
                 );
                 System.out.print("> ");
             }
 
             case DRAW_CARD -> {
-                gameInfo(board, ship);
+                this.printGameInfo(board, ship, state);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 System.out.println("PRESS enter to draw a card...");
             }
 
             case WAIT_CANNONS -> {
-                gameInfo(board, ship);
+                this.printGameInfo(board, ship, state);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to activate DOUBLE cannons!", Chroma.YELLOW_BOLD);
@@ -222,116 +158,121 @@ public class DisplayUpdater implements Runnable {
                                 (a component put in multiple times uses multiple batteries)
                                 in order to activate the DOUBLE cannons you wish to activate
                                 (a single battery activates a cannon!)
-                                [<battery1_id> ... <batteryN_id> | <cannon1_id> ... <cannonN_id>]
+                                [<cannon1_id> ... <cannonN_id> - <battery1_id> ... <batteryN_id>]
                                 """
                 );
                 System.out.print("> ");
             }
 
             case WAIT_ENGINES -> {
-                gameInfo(board, ship);
+                this.printGameInfo(board, ship, state);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to activate DOUBLE engines!", Chroma.YELLOW_BOLD);
                 System.out.println(
                         """
-                                ENTER a series of battery components from which to use batteries
-                                (a component put in multiple times uses multiple batteries)
-                                in order to activate the DOUBLE engines you wish to activate
-                                (a single battery activates a engine!)
-                                [<battery1_id> ... <batteryN_id> | <engine1_id> ... <engineN_id>]
-                                """
+                            ENTER a series of battery components from which to use batteries
+                            (a component put in multiple times uses multiple batteries)
+                            in order to activate the DOUBLE engines you wish to activate
+                            (a single battery activates a engine!)
+                            [<engine1_id> ... <engineN_id> - <battery1_id> ... <batteryN_id>]
+                            """
                 );
                 System.out.print("> ");
             }
 
             case WAIT_GOODS -> {
-                // todo
+                this.printGameInfo(board, ship, state);
+
+                System.out.println("prompt to write");
+                System.out.print("> ");
             }
 
             case WAIT_REMOVE_GOODS -> {
-                // todo
+                this.printGameInfo(board, ship, state);
+
+                System.out.println("prompt to write");
+                System.out.print("> ");
             }
 
             case WAIT_ROLL_DICES -> {
-                gameInfo(board, ship);
-
+                this.printGameInfo(board, ship, state);
                 System.out.println("PRESS enter to roll the dices...");
             }
 
             case WAIT_REMOVE_CREW -> {
-                gameInfo(board, ship);
+                this.printGameInfo(board, ship, state);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 System.out.println(
                         """
-                                ENTER a series of cabin components in order to remove crew/alien
-                                [<cabin1_id> <cabin2_id> ... <cabinN_id>]
-                                """
+                            ENTER a series of cabin components in order to remove crew/alien
+                            [<cabin1_id> <cabin2_id> ... <cabinN_id>]
+                        """
                 );
                 System.out.print("> ");
             }
 
             case WAIT_SHIELD -> {
-                gameInfo(board, ship);
+                this.printGameInfo(board, ship, state);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to activate shields!", Chroma.YELLOW_BOLD);
                 System.out.println(
                         """
-                                ENTER a battery component from which to use a battery
-                                in order to activate the shield you wish to activate
-                                [<battery_id> <shield_id>]
-                                """
+                            ENTER a battery component from which to use a battery
+                            in order to activate the shield or press enter to not activate it
+                            [<battery_id>]
+                        """
                 );
                 System.out.print("> ");
             }
 
             case WAIT_BOOLEAN -> {
-                gameInfo(board, ship);
+                this.printGameInfo(board, ship, state);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to take the reward!", Chroma.YELLOW_BOLD);
-                System.out.println("true/fase?");
+                System.out.println("true/false?");
                 System.out.print("> ");
             }
 
             case WAIT_INDEX -> {
-                gameInfo(board, ship);
+                this.printGameInfo(board, ship, state);
 
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to land on a planet!", Chroma.YELLOW_BOLD);
                 System.out.println(
                         """
-                                ENTER the index of the planet you wish to land on
-                                (indexes from top to bottom. For example: 0,1,...,4)
-                                """
+                            ENTER the index of the planet you wish to land on
+                            (indexes from top to bottom. For example: 0,1,...,4)
+                        """
                 );
                 System.out.print("> ");
             }
 
-            case WAIT -> Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
+            case WAIT, DONE -> Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
+
+            case END -> {
+                System.out.println("GAME FINISHED");
+                System.out.println(board.toString(client.getUsername(), state));
+            }
 
         }
     }
 
-    private void gameInfo(Board board, Ship ship) {
-        board.getPlayers().stream()
-                .filter(e -> !e.getKey().getUsername().equals(client.getUsername()))
-                .forEach(e -> {
-                    Chroma.println(e.getKey().getUsername() + "'s ship:\n", Chroma.YELLOW);
-                    System.out.println(e.getKey().getShip());
-                });
-
-        Chroma.println("\nYOUR ship:\n", Chroma.YELLOW_BOLD);
-        System.out.println(ship);
-
-        System.out.println(board);
+    private void printGameInfo(Board board, Ship ship, PlayerState state) {
+        board.getPlayersByPos().stream()
+                .filter(player -> !player.getUsername().equals(client.getUsername()))
+                .forEach(player -> System.out.println(player.getShip().toString(player.getUsername(), state)) );
 
         if (board.getPlayers().stream()
                 .noneMatch(e -> client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.DRAW_CARD)) {
             System.out.println(board.getCardPile().get(board.getCardPilePos()));
         }
+
+        System.out.println(board.toString(client.getUsername(), state));
+        System.out.println(ship.toString(client.getUsername(), state));
     }
 
 }

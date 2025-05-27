@@ -129,7 +129,8 @@ public class Lobby implements Serializable {
         if (!players.isEmpty())
             master = master.equals(username) ? players.get(new Random().nextInt(players.size())) : master;
 
-        if (this.state == LobbyState.IN_GAME) this.game.playerLeft(username);
+        if (this.state == LobbyState.IN_GAME)
+            this.game.leaveGame(username);
     }
 
     /**
@@ -154,7 +155,8 @@ public class Lobby implements Serializable {
     }
 
     public void endGame() {
-        // todo
+        this.state = LobbyState.GAME_ENDED;
+        this.game.endGame();
     }
 
 }

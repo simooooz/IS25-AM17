@@ -92,15 +92,20 @@ public class ModelFacade {
             component.rotateComponent(ship);
     }
 
-    public List<Card> lookCardPile(String username, int deckIndex) {
+    public void lookCardPile(String username, int deckIndex) {
         if (deckIndex < 0 || deckIndex > 2) throw new IllegalArgumentException("Invalid deck index");
+        else if (PlayerState.LOOK_CARD_PILE.getDeckIndex().containsValue(deckIndex)) throw new IllegalArgumentException("Another player is already looking this card pile");
+
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
+        ship.getHandComponent().ifPresent(c -> c.releaseComponent(board, ship));
 
-        ship.getHandComponent().ifPresent(Component::weldComponent);
+        playersState.put(username, PlayerState.LOOK_CARD_PILE);
+        PlayerState.LOOK_CARD_PILE.getDeckIndex().put(username, deckIndex);
+    }
 
-        int startingDeckIndex = deckIndex == 0 ? 0 : (deckIndex == 1 ? 3 : 6);
-        int endingDeckIndex = startingDeckIndex + 3;
-        return board.getCardPile().subList(startingDeckIndex, endingDeckIndex); // TODO capiamo il getter
+    public void releaseCardPile(String username) {
+        playersState.put(username, PlayerState.BUILD);
+        PlayerState.LOOK_CARD_PILE.getDeckIndex().remove(username);
     }
 
     public void moveHourglass(String username) {
@@ -108,7 +113,7 @@ public class ModelFacade {
             board.getPlayersByPos().stream()
                     .filter(player -> player.getUsername().equals(username))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Player " + username + " has not finished"));
+                    .orElseThrow(() -> new IllegalArgumentException("You can't rotate hourglass because you haven't finished to build your ship"));
 
         board.getTimeManagement().startTimer(this);
     }
@@ -118,6 +123,7 @@ public class ModelFacade {
         ship.getHandComponent().ifPresent(c -> c.releaseComponent(board, ship));
 
         board.moveToBoard(board.getPlayerEntityByUsername(username), learnerMode);
+        playersState.put(username, PlayerState.WAIT);
 
         if (arePlayersReady())
             moveStateAfterBuilding();
@@ -125,19 +131,11 @@ public class ModelFacade {
 
     public boolean isPlayerReady(String username) {
         return board.getStartingDeck().stream()
-            .noneMatch(p -> p.getUsername().equals(username));
+                .noneMatch(p -> p.getUsername().equals(username));
     }
 
     private boolean arePlayersReady() {
         return board.getStartingDeck().isEmpty();
-    }
-
-    public void playerJoined(String username) {
-        // todo
-    }
-
-    public void playerLeft(String username) {
-        // todo this.board.removePlayer(username);
     }
 
     public void moveStateAfterBuilding() {
@@ -201,7 +199,7 @@ public class ModelFacade {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) { // Check if next players have to choose alien
             PlayerData player = board.getPlayers().get(playerIndex).getKey();
             List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class)
-                .stream().filter(c -> !c.getIsStarting()).toList();
+                    .stream().filter(c -> !c.getIsStarting()).toList();
 
             for (CabinComponent cabin : cabins) {
                 if (!cabin.getLinkedNeighbors(player.getShip()).stream()
@@ -319,7 +317,7 @@ public class ModelFacade {
         if (finish) { board.pickNewCard(this); }
     }
 
-    public void getIndex(String username, int value) {
+    public void getIndex(String username, Integer value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         boolean finish = card.doCommandEffects(PlayerState.WAIT_INDEX, value, this, board, username);
         if (finish) { board.pickNewCard(this); }
@@ -336,6 +334,13 @@ public class ModelFacade {
         player.endFlight();
         if (isDrawPhase) {
             board.moveToStartingDeck(player);
+        }
+    }
+
+    public void endGame() {
+        for (PlayerData player : board.getPlayersByPos()) {
+            board.moveToStartingDeck(player);
+            playersState.put(player.getUsername(), PlayerState.END);
         }
     }
 
