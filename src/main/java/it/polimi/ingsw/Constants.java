@@ -1,6 +1,9 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.network.messages.*;
+
+import java.util.List;
 
 public abstract class Constants {
 
@@ -36,6 +39,34 @@ public abstract class Constants {
         centeredText.append(" ".repeat(rightPadding));
 
         return centeredText.toString();
+    }
+
+    public static String displayComponents(List<Component> components, int componentsPerRow) {
+        StringBuilder output = new StringBuilder();
+
+        for (int rowStart = 0; rowStart < components.size(); rowStart += componentsPerRow) {
+            int rowEnd = Math.min(rowStart + componentsPerRow, components.size());
+
+            // Collect all component for this row
+            String[][] rowComponentLines = new String[rowEnd - rowStart][];
+
+            for (int i = 0; i < rowEnd - rowStart; i++)
+                rowComponentLines[i] = components.get(rowStart + i).toString().split("\n");
+
+            // Print the row line by line
+            int height = rowComponentLines[0].length;
+            for (int lineIndex = 0; lineIndex < height; lineIndex++) {
+                for (int compIndex = 0; compIndex < rowComponentLines.length; compIndex++) {
+                    output.append(rowComponentLines[compIndex][lineIndex]);
+
+                    // Add spacing between components, except after the last one
+                    if (compIndex < rowComponentLines.length - 1)
+                        output.append("  ");
+                }
+                output.append("\n");
+            }
+        }
+        return output.toString();
     }
 
     // Socket only

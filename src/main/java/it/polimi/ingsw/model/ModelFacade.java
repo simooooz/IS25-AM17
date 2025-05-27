@@ -111,9 +111,9 @@ public class ModelFacade {
     public void moveHourglass(String username) {
         if (board.getTimeManagement().getHourglassPos() == 1)
             board.getPlayersByPos().stream()
-                .filter(player -> player.getUsername().equals(username))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("You can't rotate hourglass because you haven't finished to build your ship"));
+                    .filter(player -> player.getUsername().equals(username))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("You can't rotate hourglass because you haven't finished to build your ship"));
 
         board.getTimeManagement().startTimer(this);
     }
@@ -123,6 +123,7 @@ public class ModelFacade {
         ship.getHandComponent().ifPresent(c -> c.releaseComponent(board, ship));
 
         board.moveToBoard(board.getPlayerEntityByUsername(username), learnerMode);
+        playersState.put(username, PlayerState.WAIT);
 
         if (arePlayersReady())
             moveStateAfterBuilding();
@@ -130,7 +131,7 @@ public class ModelFacade {
 
     public boolean isPlayerReady(String username) {
         return board.getStartingDeck().stream()
-            .noneMatch(p -> p.getUsername().equals(username));
+                .noneMatch(p -> p.getUsername().equals(username));
     }
 
     private boolean arePlayersReady() {
@@ -198,7 +199,7 @@ public class ModelFacade {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) { // Check if next players have to choose alien
             PlayerData player = board.getPlayers().get(playerIndex).getKey();
             List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class)
-                .stream().filter(c -> !c.getIsStarting()).toList();
+                    .stream().filter(c -> !c.getIsStarting()).toList();
 
             for (CabinComponent cabin : cabins) {
                 if (!cabin.getLinkedNeighbors(player.getShip()).stream()
@@ -316,7 +317,7 @@ public class ModelFacade {
         if (finish) { board.pickNewCard(this); }
     }
 
-    public void getIndex(String username, int value) {
+    public void getIndex(String username, Integer value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
         boolean finish = card.doCommandEffects(PlayerState.WAIT_INDEX, value, this, board, username);
         if (finish) { board.pickNewCard(this); }

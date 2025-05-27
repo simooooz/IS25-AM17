@@ -167,7 +167,7 @@ public class GameController {
         model.getBoolean(username, value);
     }
 
-    public void getIndex(String username, int value) {
+    public void getIndex(String username, Integer value) {
         if (model.getPlayerState(username) != PlayerState.WAIT_INDEX) throw new IllegalStateException("State is not WAIT_INDEX");
         model.getIndex(username, value);
     }

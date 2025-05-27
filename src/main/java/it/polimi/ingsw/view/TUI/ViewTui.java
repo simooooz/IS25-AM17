@@ -1,7 +1,9 @@
 package it.polimi.ingsw.view.TUI;
 
+import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 
@@ -147,12 +149,13 @@ public class ViewTui {
      * @param input provided by the user to influence the game logic
      */
     private void handleInGame(String input) {
-        switch (client.getGameController().getState(client.getUsername())) {
-            case BUILD -> {
+        PlayerState state = client.getGameController().getState(client.getUsername());
+
+        switch (state) {
+            case BUILD, LOOK_CARD_PILE -> {
                 String[] commands = input.trim().split(" ");
                 switch (commands[0]) {
                     case "pick" -> {
-                        ;
                         if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
                             client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
                         revertRotation();
@@ -249,10 +252,10 @@ public class ViewTui {
                             throw new IllegalArgumentException(e.getMessage());
                         }
                     }
-                    case "look-at-cards" -> {
+                    case "look-cards" -> {
                         int deckIndex = Integer.parseInt(commands[1]);
                         if (deckIndex < 1 || deckIndex > 3)
-                            throw new IllegalArgumentException("Deck index out of bounds");
+                            throw new IllegalArgumentException("Deck index not valid");
 
                         if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", otherwise don't change it
                             client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
@@ -272,11 +275,15 @@ public class ViewTui {
                     default -> throw new IllegalArgumentException("Command not valid. Please try again.");
                 }
             }
-            case CHECK -> {
+            case CHECK, WAIT_REMOVE_CREW -> {
                 List<Integer> ids = Arrays.stream(input.split(" "))
                         .map(Integer::parseInt)
                         .toList();
-                client.send(MessageType.CHECK_SHIP, ids);
+
+                if (state == PlayerState.CHECK)
+                    client.send(MessageType.CHECK_SHIP, ids);
+                else
+                    client.send(MessageType.REMOVE_CREW, ids);
             }
             case WAIT_ALIEN -> {
                 String[] commands = input.split(" ");
@@ -299,15 +306,72 @@ public class ViewTui {
             }
             case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
             case DRAW_CARD -> client.send(MessageType.DRAW_CARD);
-            case WAIT_CANNONS -> {}
-            case WAIT_ENGINES -> {}
-            case WAIT_GOODS -> {}
-            case WAIT_REMOVE_GOODS -> {}
+            case WAIT_CANNONS, WAIT_ENGINES -> {
+                List<Integer> cannonComponentsIds = new ArrayList<>();
+                List<Integer> batteriesIds = new ArrayList<>();
+
+                if (input.split("-").length > 0) {
+                    String[] commands = input.split("-")[0].split(" ");
+                    cannonComponentsIds = Arrays.stream(commands)
+                            .map(Integer::parseInt)
+                            .toList();
+                    commands = input.split("-")[1].split(" ");
+                    batteriesIds = Arrays.stream(commands)
+                            .map(Integer::parseInt)
+                            .toList();
+                }
+                if (state == PlayerState.WAIT_CANNONS)
+                    client.send(MessageType.ACTIVATE_CANNONS, batteriesIds, cannonComponentsIds);
+                else
+                    client.send(MessageType.ACTIVATE_ENGINES, batteriesIds, cannonComponentsIds);
+            }
+            case WAIT_GOODS, WAIT_REMOVE_GOODS -> {
+                String[] parts = input.split("-");
+
+                String[] commandList = parts[0].trim().split(" ");
+                Map<Integer, List<ColorType>> newDisposition = new HashMap<>();
+
+                List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.toString().toUpperCase()).toList();
+                Integer currentId = null;
+                for (String value : commandList) {
+                    if (colors.contains(value.toUpperCase()))
+                        newDisposition.get(currentId).add(ColorType.valueOf(value.toUpperCase()));
+                    else {
+                        currentId = Integer.parseInt(value);
+                        newDisposition.put(currentId, new ArrayList<>());
+                    }
+                }
+
+                List<Integer> batteriesIds = new ArrayList<>();
+                if (state == PlayerState.WAIT_REMOVE_GOODS) {
+                    batteriesIds = Arrays.stream(parts[1].trim().split(" "))
+                            .map(Integer::parseInt)
+                            .toList();
+                }
+                client.send(MessageType.UPDATE_GOODS, newDisposition, batteriesIds);
+
+            }
             case WAIT_ROLL_DICES -> client.send(MessageType.ROLL_DICES);
-            case WAIT_REMOVE_CREW -> {}
-            case WAIT_SHIELD -> {}
-            case WAIT_BOOLEAN -> {}
-            case WAIT_INDEX -> {}
+            case WAIT_SHIELD -> {
+                Integer id;
+                if (input.trim().isEmpty())
+                    id = null;
+                else
+                    id = Integer.parseInt(input);
+                client.send(MessageType.ACTIVATE_SHIELD, id);
+            }
+            case WAIT_BOOLEAN -> {
+                Boolean value = Boolean.parseBoolean(input);
+                client.send(MessageType.GET_BOOLEAN, value);
+            }
+            case WAIT_INDEX -> {
+                Integer index;
+                if (input.trim().isEmpty())
+                    index = null;
+                else
+                    index = Integer.parseInt(input);
+                client.send(MessageType.GET_INDEX, index);
+            }
         }
     }
 
