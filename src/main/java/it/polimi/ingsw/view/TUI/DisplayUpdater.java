@@ -100,7 +100,7 @@ public class DisplayUpdater implements Runnable {
                 Chroma.println(
                         "[pick <id>]                  - pick a component\n" +
                                 "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
-                                "[release]                    - release the picked component\n" +
+                                "[release <id>]                    - release the picked component\n" +
                                 (client.getGameController().getModel().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
 
                                 "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +

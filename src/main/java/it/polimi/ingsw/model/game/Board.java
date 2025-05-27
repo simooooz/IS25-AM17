@@ -228,8 +228,10 @@ public class Board {
             case BUILD -> {
                 sb.append(Constants.displayComponents(commonComponents, 10));
 
-                sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
-                sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
+                if (!learnerMode) {
+                    sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
+                    sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
+                }
 
                 for (PlayerData player : startingDeck)
                     sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
@@ -244,8 +246,10 @@ public class Board {
                 cardPile.subList(startingDeckIndex, endingDeckIndex).forEach(card -> sb.append(card).append("\n") );
                 // todo CHANGE with displayCards
 
-                sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
-                sb.append("\nTime left: ").append(timeManagement.getTimeLeft());
+                if (!learnerMode) {
+                    sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
+                    sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
+                }
 
                 for (PlayerData player : startingDeck)
                     sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
