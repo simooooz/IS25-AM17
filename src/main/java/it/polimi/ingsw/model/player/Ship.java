@@ -205,10 +205,10 @@ public class Ship {
 
         switch (state) {
             case BUILD -> {
-                output.append(Chroma.color("\nreserves: ", Chroma.GREY_BOLD)).append(Chroma.color(reserves.isEmpty() ? "none" : Constants.displayComponents(reserves, 2), Chroma.GREY_BOLD)).append("\n\n");
+                output.append(Chroma.color("\nreserves:\n", Chroma.GREY_BOLD)).append(Chroma.color(reserves.isEmpty() ? "none" : Constants.displayComponents(reserves, 2), Chroma.GREY_BOLD)).append("\n\n");
                 output.append(Chroma.color(username + "'s ship:\n", Chroma.YELLOW_BOLD));
                 printShip(output);
-                output.append("\nyour hand: ").append(handComponent.isEmpty() ? "empty" : handComponent.get());
+                output.append("\nyour hand:\n").append(handComponent.isEmpty() ? "empty" : handComponent.get());
             }
             case LOOK_CARD_PILE, CHECK, DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, DONE -> {
                 output.append(Chroma.color(username + "'s ship:\n", Chroma.YELLOW_BOLD));
