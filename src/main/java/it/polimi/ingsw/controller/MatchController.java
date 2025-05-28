@@ -62,9 +62,10 @@ public class MatchController {
                 .findFirst();
         if (lobbyEntry.isPresent()) throw new PlayerAlreadyInException("Player is already in another lobby");
 
-        String gameID = UUID.randomUUID().toString();
-        Lobby lobby = new Lobby(gameID, name, username, maxPlayers, learnerMode);
-        lobbies.put(gameID, lobby);
+        if (lobbies.containsKey(name)) throw new IllegalArgumentException("Lobby name already exists, choose another one");
+
+        Lobby lobby = new Lobby(name, username, maxPlayers, learnerMode);
+        lobbies.put(name, lobby);
 
         lobby.addPlayer(username); // Join in the newly created lobby
         return lobby;

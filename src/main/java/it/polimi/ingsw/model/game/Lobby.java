@@ -5,7 +5,6 @@ import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 import it.polimi.ingsw.network.User;
-import it.polimi.ingsw.network.messages.MessageType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,15 +20,11 @@ public class Lobby implements Serializable {
     /**
      * unique id for the lobby
      */
-    private final String uuid;
+    private final String id;
     /**
      * {@link LobbyState}
      */
     private LobbyState state;
-    /**
-     * lobby name
-     */
-    private final String name;
     /**
      * learner flag
      */
@@ -52,16 +47,14 @@ public class Lobby implements Serializable {
     /**
      * Constructor
      *
-     * @param gameID      lobby's ID
-     * @param name        lobby's name
+     * @param name        lobby's id
      * @param master      master's username
      * @param maxPlayers  max players allowed in a lobby
      * @param learnerMode true if is a test flight
      */
-    public Lobby(String gameID, String name, String master, int maxPlayers, boolean learnerMode) {
+    public Lobby(String name, String master, int maxPlayers, boolean learnerMode) {
         this.state = LobbyState.WAITING;
-        this.uuid = gameID;
-        this.name = name;
+        this.id = name;
         this.master = master;
         this.learnerMode = learnerMode;
 
@@ -74,7 +67,7 @@ public class Lobby implements Serializable {
     }
 
     public String getGameID() {
-        return uuid;
+        return id;
     }
 
     public List<String> getPlayers() {
