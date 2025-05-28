@@ -24,7 +24,7 @@ public class Ship {
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
-    public Ship(boolean isLearner) {
+    public Ship(boolean isLearner, Component startingCabin) {
         this.dashboard = new Optional[Constants.SHIP_ROWS][Constants.SHIP_COLUMNS];
         this.discards = new ArrayList<>();
         this.reserves = new ArrayList<>();
@@ -45,6 +45,8 @@ public class Ship {
                 this.dashboard[row][col] = Optional.empty();
             }
         }
+
+        startingCabin.insertComponent(this, 2, 3, 0, true, isLearner);
     }
 
     public Optional<Component>[][] getDashboard() {
@@ -147,11 +149,18 @@ public class Ship {
     }
 
     public boolean checkShip() {
+        boolean valid = true;
+        int components = 0;
+
         for (Optional<Component>[] row : dashboard)
             for (Optional<Component> component : row)
-                if (component.isPresent() && !component.get().checkComponent(this))
-                    return false;
-        return true;
+                if (component.isPresent()) {
+                    components++;
+                    if (!component.get().checkComponent(this))
+                        valid = false;
+                }
+
+        return valid || components == 1;
     }
 
     public List<List<Component>> calcShipParts() {

@@ -14,6 +14,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.view.TUI.Chroma;
 
 
+import java.sql.Array;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.Collectors;
@@ -35,11 +36,6 @@ public class Board {
     public Board(List<String> usernames, boolean learnerMode) {
         this.learnerMode = learnerMode;
         this.startingDeck = new ArrayList<>();
-        for (String username : usernames)
-            this.startingDeck.add(new PlayerData(username, learnerMode));
-
-        this.players = new ArrayList<>();
-        this.timeManagement = learnerMode ? null : new Time();
 
         ComponentFactory componentFactory = new ComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
@@ -47,6 +43,13 @@ public class Board {
         this.cardPile = new ArrayList<>(new CardFactory(learnerMode).getCards());
         this.cardPilePos = 0;
         this.availableGoods = new HashMap<>();
+
+        List<ColorType> colors = Arrays.stream(ColorType.values()).toList();
+        for (int i = 0; i < usernames.size(); i++)
+            this.startingDeck.add(new PlayerData(usernames.get(i), learnerMode, componentFactory.getStartingCabins().get(colors.get(i))));
+
+        this.players = new ArrayList<>();
+        this.timeManagement = learnerMode ? null : new Time();
     }
 
     public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
@@ -100,7 +103,7 @@ public class Board {
 
     public void pickNewCard(ModelFacade model) {
         cardPilePos++;
-        if (cardPilePos == cardPile.size()) // All cards are resolved
+        if (cardPilePos == cardPile.size() || players.isEmpty()) // All cards are resolved or there are no more players
             model.endGame();
         else { // Change card
             for (PlayerData p : getPlayersByPos())

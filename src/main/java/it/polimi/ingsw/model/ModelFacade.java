@@ -172,8 +172,11 @@ public class ModelFacade {
     public void checkShip(String username, List<Integer> toRemove) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
 
-        for (int componentId : toRemove)
-            board.getMapIdComponents().get(componentId).affectDestroy(ship);
+        for (int componentId : toRemove) {
+            Component component = board.getMapIdComponents().get(componentId);
+            if (component == null) throw new ComponentNotValidException("Invalid component id");
+            component.affectDestroy(ship);
+        }
 
         if (ship.checkShip()) {// If now ship is ready
             playersState.put(username, PlayerState.WAIT);
@@ -338,10 +341,8 @@ public class ModelFacade {
     }
 
     public void endGame() {
-        for (PlayerData player : board.getPlayersByPos()) {
-            board.moveToStartingDeck(player);
-            playersState.put(player.getUsername(), PlayerState.END);
-        }
+        for (String username : usernames)
+            playersState.put(username, PlayerState.END);
     }
 
     public boolean isLearnerMode() {

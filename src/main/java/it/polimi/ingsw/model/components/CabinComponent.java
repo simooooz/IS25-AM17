@@ -78,7 +78,15 @@ public class CabinComponent extends Component {
 
     @Override
     public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld, boolean learnerMode) {
-        super.insertComponent(ship, row, col, rotations, weld, learnerMode);
+        if (isStarting) {
+            this.showComponent();
+            this.x = col;
+            this.y = row;
+            ship.getDashboard()[row][col] = Optional.of(this);
+            this.weldComponent();
+        }
+        else
+            super.insertComponent(ship, row, col, rotations, weld, learnerMode);
         setHumans(2, ship);
     }
 

@@ -77,8 +77,15 @@ public class Component {
     }
 
     public void affectDestroy(Ship ship) {
-        ship.getDashboard(y, x).ifPresent(ship.getDiscards()::add);
+        if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
+            throw new ComponentNotValidException("Component isn't in dashboard");
+
+        ship.getDiscards().add(this);
         ship.getDashboard()[y][x] = Optional.empty();
+    }
+
+    public void showComponent() {
+        this.shown = true;
     }
 
     /**

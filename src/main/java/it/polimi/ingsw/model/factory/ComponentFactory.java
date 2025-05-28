@@ -4,6 +4,7 @@ package it.polimi.ingsw.model.factory;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.properties.DirectionType;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,13 +18,24 @@ public class ComponentFactory {
 
     private final List<Component> components;
     private final Map<Integer, Component> componentsMap;
+    private final Map<ColorType, Component> startingCabins;
 
     public ComponentFactory() {
         this.components = new ArrayList<>();
         this.componentsMap = new HashMap<>();
+        this.startingCabins = new HashMap<>();
 
         JSONObject componentsJson = loadJsonConfig();
         JSONArray componentsArray = componentsJson.getJSONArray("components");
+        JSONArray startingCabinsArray = componentsJson.getJSONArray("startingCabins");
+
+        List<ColorType> colors = List.of(ColorType.values());
+        for (int i = 0; i < startingCabinsArray.length(); i++) {
+            JSONObject componentJson = startingCabinsArray.getJSONObject(i);
+            Component component = createComponent(componentJson);
+            startingCabins.put(colors.get(i), component);
+            componentsMap.put(componentJson.getInt("id"), component);
+        }
 
         for (int i = 0; i < componentsArray.length(); i++) {
             JSONObject componentJson = componentsArray.getJSONObject(i);
@@ -35,6 +47,10 @@ public class ComponentFactory {
 
     public List<Component> getComponents(){
         return components;
+    }
+
+    public Map<ColorType, Component> getStartingCabins() {
+        return startingCabins;
     }
 
     private JSONObject loadJsonConfig() {
@@ -50,7 +66,6 @@ public class ComponentFactory {
     public Map<Integer, Component> getComponentsMap() {
         return new HashMap<>(componentsMap);
     }
-
 
     private Component createComponent(JSONObject componentJson) {
         int id = componentJson.getInt("id");

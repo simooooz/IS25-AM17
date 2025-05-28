@@ -1,21 +1,19 @@
 package it.polimi.ingsw.model.player;
 
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.model.components.Component;
 
 public class PlayerData {
 
-    private final ColorType color;
     private final String username;
     private final Ship ship;
     private int credits;
     private boolean endedInAdvance;
 
-    public PlayerData(String username, boolean isLearner) {
+    public PlayerData(String username, boolean isLearner, Component startingCabin) {
         this.username = username;
-        this.ship = new Ship(isLearner);
         this.credits = 0;
-        this.color = null;
         this.endedInAdvance = false;
+        this.ship = new Ship(isLearner, startingCabin);
     }
 
     @Override
@@ -23,10 +21,6 @@ public class PlayerData {
         if (o == null || getClass() != o.getClass()) return false;
         PlayerData that = (PlayerData) o;
         return username.equals(that.username);
-    }
-
-    public ColorType getColor() {
-        return color;
     }
 
     public String getUsername() {
