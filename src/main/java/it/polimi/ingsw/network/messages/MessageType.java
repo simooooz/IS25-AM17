@@ -100,6 +100,13 @@ public enum MessageType {
             client.setState(UserState.IN_GAME);
             client.setGameController(new GameController(castedMessage.getArg1().getPlayers(), castedMessage.getArg1().isLearnerMode()));
             client.getGameController().startMatch();
+
+            // Test only
+            switch (client.getLobby().getGameID()) {
+                case "test-1" -> client.getGameController().startTest(1);
+                case "test-2" -> client.getGameController().startTest(2);
+            }
+
         }
     },
 

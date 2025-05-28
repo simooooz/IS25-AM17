@@ -33,18 +33,42 @@ public abstract class ServerBasis {
         user.notifyLobbyEvent(MessageType.CREATE_LOBBY_OK, lobby.getPlayers());
     }
 
-    public static void joinLobby(User user, String lobbyName) throws LobbyNotFoundException, PlayerAlreadyInException {
-        if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
-        Lobby lobby = MatchController.getInstance().joinGame(user.getUsername(), lobbyName);
-        user.setLobby(lobby);
-        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_LOBBY_OK, lobby.getPlayers());
+    public static void joinLobby(User client, String lobbyName) throws LobbyNotFoundException, PlayerAlreadyInException {
+        if (client.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
+        Lobby lobby = MatchController.getInstance().joinGame(client.getUsername(), lobbyName);
+        client.setLobby(lobby);
+        if (lobby.getState() == LobbyState.IN_GAME) {
+            client.notifyLobbyEvent(MessageType.GAME_STARTED_OK, lobby.getPlayers());
+            List<Integer> cardPile = client.getGameController().getModel().getBoard().getCardPile().stream().map(Card::getId).toList();
+            client.notifyGameEvent(MessageType.SET_SHUFFLED_DECK, cardPile);
+
+            // Test only
+            switch (client.getLobby().getGameID()) {
+                case "test-1" -> client.getGameController().startTest(1);
+                case "test-2" -> client.getGameController().startTest(2);
+            }
+        }
+        else
+            client.notifyLobbyEvent(MessageType.JOIN_LOBBY_OK, lobby.getPlayers());
     }
 
-    public static void joinRandomLobby(User user, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
-        if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
-        Lobby lobby = MatchController.getInstance().joinRandomGame(user.getUsername(), learnerMode);
-        user.setLobby(lobby);
-        user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_RANDOM_LOBBY_OK, lobby.getPlayers());
+    public static void joinRandomLobby(User client, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
+        if (client.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
+        Lobby lobby = MatchController.getInstance().joinRandomGame(client.getUsername(), learnerMode);
+        client.setLobby(lobby);
+        if (lobby.getState() == LobbyState.IN_GAME) {
+            client.notifyLobbyEvent(MessageType.GAME_STARTED_OK, lobby.getPlayers());
+            List<Integer> cardPile = client.getGameController().getModel().getBoard().getCardPile().stream().map(Card::getId).toList();
+            client.notifyGameEvent(MessageType.SET_SHUFFLED_DECK, cardPile);
+
+            // Test only
+            switch (client.getLobby().getGameID()) {
+                case "test-1" -> client.getGameController().startTest(1);
+                case "test-2" -> client.getGameController().startTest(2);
+            }
+        }
+        else
+            client.notifyLobbyEvent(MessageType.JOIN_LOBBY_OK, lobby.getPlayers());
     }
 
     public static void leaveGame(User client) {
