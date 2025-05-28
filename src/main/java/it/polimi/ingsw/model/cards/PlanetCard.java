@@ -21,8 +21,8 @@ public class PlanetCard extends Card{
 
     private int playerIndex;
 
-    public PlanetCard(int level, boolean isLearner, List<Planet> planets, int days) {
-        super(level, isLearner);
+    public PlanetCard(int id, int level, boolean isLearner, List<Planet> planets, int days) {
+        super(id, level, isLearner);
         this.planets = planets;
         this.days = days;
     }

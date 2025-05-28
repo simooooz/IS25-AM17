@@ -3,11 +3,13 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
+import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.model.game.LobbyState;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.model.game.objects.Dice;
 import it.polimi.ingsw.network.messages.MessageType;
 
 import java.util.ArrayList;
@@ -45,17 +47,17 @@ public abstract class ServerBasis {
         user.notifyLobbyEvent(lobby.getState() == LobbyState.IN_GAME ? MessageType.GAME_STARTED_OK : MessageType.JOIN_RANDOM_LOBBY_OK, lobby.getPlayers());
     }
 
-    public static void leaveGame(User user) {
+    public static void leaveGame(User client) {
         // TODO check state
         // TODO gestire situazione lobby si elimina perché ci sono < 2 giocatori
-        MatchController.getInstance().leaveGame(user.getUsername());
+        MatchController.getInstance().leaveGame(client.getUsername());
 
-        List<String> playersToNotify = new ArrayList<>(user.getLobby().getPlayers());
-        playersToNotify.add(user.getUsername());
-        user.notifyLobbyEvent(MessageType.LEAVE_GAME_OK, playersToNotify);
+        List<String> playersToNotify = new ArrayList<>(client.getLobby().getPlayers());
+        playersToNotify.add(client.getUsername());
+        client.notifyLobbyEvent(MessageType.LEAVE_GAME_OK, playersToNotify);
 
-        user.setLobby(null);
-        user.setGameController(null); // Giusto?
+        client.setLobby(null);
+        client.setGameController(null); // Giusto?
     }
 
     public static void pickComponent(User client, Integer id) {
@@ -97,7 +99,7 @@ public abstract class ServerBasis {
     public static void lookCardPile(User client, Integer pileIndex) {
         if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
         client.getGameController().lookCardPile(client.getUsername(), pileIndex);
-        client.notifyGameEvent(MessageType.LOOK_CARD_PILE);
+        client.notifyGameEvent(MessageType.LOOK_CARD_PILE, pileIndex);
     }
 
     public static void moveHourglass(User client) {
@@ -132,6 +134,12 @@ public abstract class ServerBasis {
 
     public static void drawCard(User client) {
         if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+
+        if (client.getGameController().getModel().getBoard().getCardPilePos() == 0) {
+            List<Integer> cardPile = client.getGameController().getModel().getBoard().getCardPile().stream().map(Card::getId).toList();
+            client.notifyGameEvent(MessageType.SET_SHUFFLED_DECK, cardPile);
+        }
+
         client.getGameController().drawCard(client.getUsername());
         client.notifyGameEvent(MessageType.DRAW_CARD);
     }
@@ -168,8 +176,9 @@ public abstract class ServerBasis {
 
     public static void rollDices(User client) {
         if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().rollDices(client.getUsername());
-        client.notifyGameEvent(MessageType.ROLL_DICES);
+        int value = Dice.roll() + Dice.roll();
+        client.getGameController().rollDices(client.getUsername(), value);
+        client.notifyGameEvent(MessageType.ROLL_DICES, value);
     }
 
     public static void getBoolean(User client, Boolean value) {

@@ -23,8 +23,8 @@ public class CombatZoneCard extends Card {
     private int playerIndex;
     private SimpleEntry<SimpleEntry<Character, Optional<PlayerData>>, Double> worst;
 
-    public CombatZoneCard(int level, boolean isLearner, List<SimpleEntry<CriteriaType, PenaltyCombatZone>> warLines) {
-        super(level, isLearner);
+    public CombatZoneCard(int id, int level, boolean isLearner, List<SimpleEntry<CriteriaType, PenaltyCombatZone>> warLines) {
+        super(id, level, isLearner);
         this.warLines = warLines;
     }
 

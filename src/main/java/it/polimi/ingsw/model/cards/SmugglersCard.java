@@ -21,8 +21,8 @@ public class SmugglersCard extends Card {
     private boolean defeated;
     private int playerIndex;
 
-    public SmugglersCard(int level, boolean isLearner, int smugglersFirePower, int penalty, Map<ColorType, Integer> reward, int days) {
-        super(level, isLearner);
+    public SmugglersCard(int id, int level, boolean isLearner, int smugglersFirePower, int penalty, Map<ColorType, Integer> reward, int days) {
+        super(id, level, isLearner);
         this.smugglersFirePower = smugglersFirePower;
         this.penalty = penalty;
         this.reward = reward;

@@ -12,8 +12,8 @@ import java.util.List;
 
 public class EpidemicCard extends Card {
 
-    public EpidemicCard(int level, boolean isLearner) {
-        super(level, isLearner);
+    public EpidemicCard(int id, int level, boolean isLearner) {
+        super(id, level, isLearner);
     }
 
     @Override

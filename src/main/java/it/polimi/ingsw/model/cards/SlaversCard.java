@@ -21,8 +21,8 @@ public class SlaversCard extends Card {
     private boolean slaversDefeated;
     private int playerIndex;
 
-    public SlaversCard(int level, boolean isLearner, int crew, int credits, int days, int slaversFirePower) {
-        super(level, isLearner);
+    public SlaversCard(int id, int level, boolean isLearner, int crew, int credits, int days, int slaversFirePower) {
+        super(id, level, isLearner);
         this.crew = crew;
         this.credits = credits;
         this.days = days;

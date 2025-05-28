@@ -10,8 +10,8 @@ import java.util.List;
 
 public class StardustCard extends Card {
 
-    public StardustCard(int level, boolean isLearner) {
-        super(level, isLearner);
+    public StardustCard(int id, int level, boolean isLearner) {
+        super(id, level, isLearner);
     }
 
     @Override

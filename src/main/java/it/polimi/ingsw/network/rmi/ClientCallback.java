@@ -54,6 +54,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
     @Override
     public void notifyGameEvent(MessageType eventType, String username, Object... args) throws RemoteException {
         switch (eventType) {
+            case SET_SHUFFLED_DECK -> client.getGameController().setShuffledCardPile((List<Integer>) args[0]);
             case PICK_COMPONENT -> client.getGameController().pickComponent(username, (Integer) args[0]);
             case RELEASE_COMPONENT -> client.getGameController().releaseComponent(username, (Integer) args[0]);
             case RESERVE_COMPONENT -> client.getGameController().reserveComponent(username, (Integer) args[0]);
@@ -72,7 +73,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             case ACTIVATE_SHIELD -> client.getGameController().activateShield(username, (Integer) args[0]);
             case UPDATE_GOODS -> client.getGameController().updateGoods(username, (Map<Integer, List<ColorType>>) args[0], (List<Integer>) args[1]);
             case REMOVE_CREW -> client.getGameController().removeCrew(username, (List<Integer>) args[0]);
-            case ROLL_DICES -> client.getGameController().rollDices(username);
+            case ROLL_DICES -> client.getGameController().rollDices(username, (Integer) args[0]);
             case GET_BOOLEAN -> client.getGameController().getBoolean(username, (Boolean) args[0]);
             case GET_INDEX -> client.getGameController().getIndex(username, (Integer) args[0]);
             case END_FLIGHT -> client.getGameController().endFlight(username);

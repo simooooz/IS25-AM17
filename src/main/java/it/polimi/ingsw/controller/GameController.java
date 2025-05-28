@@ -1,14 +1,12 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.ModelFacade;
-import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +34,10 @@ public class GameController {
 
     public void startMatch() {
         model.startMatch();
+    }
+
+    public void setShuffledCardPile(List<Integer> ids) {
+        model.setShuffledCardPile(ids);
     }
 
     public void pickComponent(String username, int componentId) {

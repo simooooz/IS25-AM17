@@ -28,8 +28,8 @@ public class PiratesCard extends Card{
     private int cannonIndex;
     private int coord;
 
-    public PiratesCard(int level, boolean isLearner, int piratesFirePower, int credits, int days, List<CannonFire> cannonFires) {
-        super(level, isLearner);
+    public PiratesCard(int id, int level, boolean isLearner, int piratesFirePower, int credits, int days, List<CannonFire> cannonFires) {
+        super(id, level, isLearner);
         this.piratesFirePower = piratesFirePower;
         this.credits = credits;
         this.days = days;

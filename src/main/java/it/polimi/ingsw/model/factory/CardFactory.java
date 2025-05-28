@@ -24,17 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class CardFactory {
 
-    private final List<Card> cards;
-
+    private final List<Card> cardPile;
 
     public CardFactory(boolean learnerMode) {
-        // Costruttore che genera il mazzo dalle carte nel JSON
-        this.cards = new ArrayList<>();
+        this.cardPile = new ArrayList<>();
         List<Card> level1Cards = new ArrayList<>();
         List<Card> level2Cards = new ArrayList<>();
 
@@ -49,24 +46,37 @@ public class CardFactory {
             else if (card.getLevel() == 2)
                 level2Cards.add(card);
         }
+
         Collections.shuffle(level1Cards);
         Collections.shuffle(level2Cards);
-        if(!learnerMode) {
+
+        if (!learnerMode) {
             for (int i = 0; i < 12; i++) {
                 if ((i + 1) % 3 == 0)
-                    cards.add(level1Cards.get(i));
+                    cardPile.add(level1Cards.get(i));
                 else
-                    cards.add(level2Cards.get(i));
+                    cardPile.add(level2Cards.get(i));
             }
         }
-        else {
-            cards.addAll(level1Cards.stream().filter(Card::getIsLearner).toList());
-        }
+        else
+            cardPile.addAll(level1Cards.stream().filter(Card::getIsLearner).toList());
+
     }
 
-    // Metodo per ottenere la lista di carte
     public List<Card> getCards() {
-        return cards;
+        return cardPile;
+    }
+
+    public List<Card> getAllCards() {
+        List<Card> allCards = new ArrayList<>();
+        JSONObject deckJson = loadJsonConfig();
+        JSONArray cardsArray = deckJson.getJSONArray("cards");
+        for (int i = 0; i < cardsArray.length(); i++) {
+            JSONObject cardJson = cardsArray.getJSONObject(i);
+            Card card = createCard(cardJson);
+            allCards.add(card);
+        }
+        return allCards;
     }
 
     private JSONObject loadJsonConfig() {
@@ -75,13 +85,13 @@ public class CardFactory {
             return new JSONObject(jsonContent);
         } catch (IOException e) {
             System.err.println("Errore nel caricamento del file JSON: " + e.getMessage());
-            return new JSONObject(); // Restituisce un JSON vuoto
+            return new JSONObject();
         }
     }
 
-    // Generate single card
     private Card createCard(JSONObject cardJson) {
         String type = cardJson.getString("type");
+        int id = cardJson.getInt("id");
         int level = cardJson.getInt("level");
         boolean isLearner = cardJson.getBoolean("isLearner");
 
@@ -91,7 +101,7 @@ public class CardFactory {
                 int slaversCredits = cardJson.optInt("credits", 0);
                 int slaversDays = cardJson.optInt("days", 0);
                 int slaverFirePower = cardJson.optInt("firePower", 0);
-                return new SlaversCard(level, isLearner, slaversCrew, slaversCredits, slaversDays, slaverFirePower);
+                return new SlaversCard(id, level, isLearner, slaversCrew, slaversCredits, slaversDays, slaverFirePower);
 
             case "SmugglersCard":
                 int smugFirePower = cardJson.optInt("firePower", 0);
@@ -102,7 +112,7 @@ public class CardFactory {
                     rewards.put(ColorType.valueOf(color.toUpperCase()), rewardsJson.getInt(color));
                 }
                 int smugDays = cardJson.optInt("days", 0);
-                return new SmugglersCard(level, isLearner, smugFirePower, smugLostGoods, rewards, smugDays);
+                return new SmugglersCard(id, level, isLearner, smugFirePower, smugLostGoods, rewards, smugDays);
 
             case "PiratesCard":
                 int pirateFirePower = cardJson.optInt("piratesFirePower", 0);
@@ -116,16 +126,16 @@ public class CardFactory {
                     DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.getString("directionFrom"));
                     piratesCannonFires.add(new CannonFire(isBig, directionFrom));
                 }
-                return new PiratesCard(level, isLearner, pirateFirePower, pirateCredits, pirateDays, piratesCannonFires);
+                return new PiratesCard(id, level, isLearner, pirateFirePower, pirateCredits, pirateDays, piratesCannonFires);
 
             case "StardustCard":
-                return new StardustCard(level, isLearner);
+                return new StardustCard(id, level, isLearner);
 
             case "OpenSpaceCard":
-                return new OpenSpaceCard(level, isLearner);
+                return new OpenSpaceCard(id, level, isLearner);
 
             case "EpidemicCard":
-                return new EpidemicCard(level, isLearner);
+                return new EpidemicCard(id, level, isLearner);
 
             case "MeteorSwarmCard":
                 JSONArray meteorsArray = cardJson.optJSONArray("meteors");
@@ -136,7 +146,7 @@ public class CardFactory {
                     DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.getString("directionFrom"));
                     meteors.add(new Meteor(isBig, directionFrom));
                 }
-                return new MeteorSwarmCard(level, isLearner, meteors);
+                return new MeteorSwarmCard(id, level, isLearner, meteors);
 
             case "StrayBigMeteorsCard":
                 JSONArray meteorsBigArray = cardJson.optJSONArray("cannonFires");
@@ -147,13 +157,13 @@ public class CardFactory {
                     DirectionType directionFrom = DirectionType.valueOf(meteorsJson.getString("directionFrom"));
                     meteorsBig.add(new Meteor(isBig, directionFrom));
                 }
-                return new MeteorSwarmCard(level, isLearner, meteorsBig);
+                return new MeteorSwarmCard(id, level, isLearner, meteorsBig);
 
             case "AbandonedShipCard":
                 int abandonedShipCrew = cardJson.optInt("crew", 0);
                 int abandonedShipCredits = cardJson.optInt("credits", 0);
                 int abandonedShipDays = cardJson.optInt("days", 0);
-                return new AbandonedShipCard(level, isLearner, abandonedShipCrew, abandonedShipCredits, abandonedShipDays);
+                return new AbandonedShipCard(id, level, isLearner, abandonedShipCrew, abandonedShipCredits, abandonedShipDays);
 
             case "AbandonedStationCard":
                 int crew = cardJson.getInt("crew");
@@ -163,7 +173,7 @@ public class CardFactory {
                 for (String color : goodsJson.keySet()) {
                     goods.put(ColorType.valueOf(color.toUpperCase()), goodsJson.getInt(color));
                 }
-                return new AbandonedStationCard(level, isLearner, crew, stationDays, goods);
+                return new AbandonedStationCard(id, level, isLearner, crew, stationDays, goods);
 
             case "PlanetCard":
                 JSONArray planetsJsonArray = cardJson.optJSONArray("planets");
@@ -179,7 +189,7 @@ public class CardFactory {
                     planets.add(planet);
                 }
                 int days = cardJson.optInt("days", 0);
-                return new PlanetCard(level, isLearner, planets, days);
+                return new PlanetCard(id, level, isLearner, planets, days);
 
             case "CombactZoneCard":
                 JSONArray combactArray = cardJson.optJSONArray("warLines");
@@ -209,11 +219,11 @@ public class CardFactory {
                     }
                     combact.add(new AbstractMap.SimpleEntry<>(criteria, penalty));
                 }
-                return new CombatZoneCard(level, isLearner, combact);
+                return new CombatZoneCard(id, level, isLearner, combact);
 
             default:
                 throw new IllegalArgumentException("Unknown card type: " + type);
         }
     }
-}
 
+}

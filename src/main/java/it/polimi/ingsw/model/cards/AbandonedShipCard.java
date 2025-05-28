@@ -19,8 +19,8 @@ public class AbandonedShipCard extends Card {
     private List<PlayerData> players;
     private boolean shipConquered;
 
-    public AbandonedShipCard(int level, boolean isLearner, int crew, int credits, int days) {
-        super(level, isLearner);
+    public AbandonedShipCard(int id, int level, boolean isLearner, int crew, int credits, int days) {
+        super(id, level, isLearner);
         this.crew = crew;
         this.credits = credits;
         this.days = days;

@@ -1,6 +1,7 @@
 {
   "cards": [
     {
+      "id": 1,
       "type": "SlaversCard",
       "level": 1,
       "isLearner": false,
@@ -10,6 +11,7 @@
       "firePower": 6
     },
     {
+      "id": 2,
       "type": "SmugglersCard",
       "level": 1,
       "isLearner": true,
@@ -23,6 +25,7 @@
       "days": 1
     },
     {
+      "id": 3,
       "type": "PiratesCard",
       "level": 1,
       "isLearner": false,
@@ -45,31 +48,37 @@
       ]
     },
     {
+      "id": 4,
       "type": "StardustCard",
       "level": 1,
       "isLearner": true
     },
     {
+      "id": 5,
       "type": "OpenSpaceCard",
       "level": 1,
       "isLearner": true
     },
     {
+      "id": 6,
       "type": "OpenSpaceCard",
       "level": 1,
       "isLearner": false
     },
     {
+      "id": 7,
       "type": "OpenSpaceCard",
       "level": 1,
       "isLearner": false
     },
     {
+      "id": 8,
       "type": "OpenSpaceCard",
       "level": 1,
       "isLearner": false
     },
     {
+      "id": 9,
       "type": "MeteorSwarmCard",
       "level": 1,
       "isLearner": true,
@@ -89,6 +98,7 @@
       ]
     },
     {
+      "id": 10,
       "type": "MeteorSwarmCard",
       "level": 1,
       "isLearner": false,
@@ -116,6 +126,7 @@
       ]
     },
     {
+      "id": 11,
       "type": "MeteorSwarmCard",
       "level": 1,
       "isLearner": false,
@@ -135,6 +146,7 @@
       ]
     },
     {
+      "id": 12,
       "type": "PlanetCard",
       "level": 1,
       "isLearner": false,
@@ -176,6 +188,7 @@
       "days": 3
     },
     {
+      "id": 14,
       "type": "PlanetCard",
       "level": 1,
       "isLearner": true,
@@ -206,6 +219,7 @@
       "days": 2
     },
     {
+      "id": 15,
       "type": "PlanetCard",
       "level": 1,
       "isLearner": false,
@@ -230,6 +244,7 @@
       "days": 3
     },
     {
+      "id": 16,
       "type": "PlanetCard",
       "level": 1,
       "isLearner": false,
@@ -260,6 +275,7 @@
       "days": 1
     },
     {
+      "id": 17,
       "type": "CombactZoneCard",
       "level": 1,
       "isLearner": true,
@@ -299,6 +315,7 @@
       ]
     },
     {
+      "id": 18,
       "type": "AbandonedShipCard",
       "level": 1,
       "isLearner": false,
@@ -307,6 +324,7 @@
       "days": 1
     },
     {
+      "id": 19,
       "type": "AbandonedShipCard",
       "level": 1,
       "isLearner": true,
@@ -315,6 +333,7 @@
       "days": 1
     },
     {
+      "id": 20,
       "type": "AbandonedStationCard",
       "level": 1,
       "isLearner": true,
@@ -326,6 +345,7 @@
           }
     },
     {
+      "id": 21,
       "type": "AbandonedStationCard",
       "level": 1,
       "isLearner": false,
@@ -336,6 +356,7 @@
           }
     },
     {
+      "id": 22,
       "type": "SlaversCard",
       "level": 2,
       "isLearner": false,
@@ -345,6 +366,7 @@
       "firePower": 7
     },
     {
+      "id": 23,
       "type": "SmugglersCard",
       "level": 2,
       "isLearner": false,
@@ -357,6 +379,7 @@
       "days": 1
     },
     {
+      "id": 24,
       "type": "PiratesCard",
       "level": 2,
       "isLearner": false,
@@ -379,31 +402,37 @@
       ]
     },
     {
+      "id": 25,
       "type": "StardustCard",
       "level": 2,
       "isLearner": false
     },
     {
+      "id": 26,
       "type": "EpidemicCard",
       "level": 2,
       "isLearner": false
     },
     {
+      "id": 27,
       "type": "OpenSpaceCard",
       "level": 2,
       "isLearner": false
     },
     {
+      "id": 28,
       "type": "OpenSpaceCard",
       "level": 2,
       "isLearner": false
     },
     {
+      "id": 29,
       "type": "OpenSpaceCard",
       "level": 2,
       "isLearner": false
     },
     {
+      "id": 30,
       "type": "MeteorSwarmCard",
       "level": 2,
       "isLearner": false,
@@ -431,6 +460,7 @@
       ]
     },
     {
+      "id": 31,
       "type": "MeteorSwarmCard",
       "level": 2,
       "isLearner": false,
@@ -458,6 +488,7 @@
       ]
     },
     {
+      "id": 32,
       "type": "MeteorSwarmCard",
       "level": 2,
       "isLearner": false,
@@ -481,6 +512,7 @@
       ]
     },
     {
+      "id": 33,
       "type": "MeteorSwarmCard",
       "level": 2,
       "isLearner": false,
@@ -508,6 +540,7 @@
       ]
     },
     {
+      "id": 34,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -540,6 +573,7 @@
       "days": 4
     },
     {
+      "id": 35,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -562,6 +596,7 @@
       "days": 3
     },
     {
+      "id": 36,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -601,6 +636,7 @@
       "days": 2
     },
     {
+      "id": 37,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -630,6 +666,7 @@
       "days": 3
     },
     {
+      "id": 38,
       "type": "CombactZoneCard",
       "level": 2,
       "isLearner": false,
@@ -677,6 +714,7 @@
       ]
     },
     {
+      "id": 39,
       "type": "AbandonedShipCard",
       "level": 2,
       "isLearner": false,
@@ -685,6 +723,7 @@
       "days": 1
     },
     {
+      "id": 40,
       "type": "AbandonedShipCard",
       "level": 2,
       "isLearner": false,
@@ -693,6 +732,7 @@
       "days": 2
     },
     {
+      "id": 41,
       "type": "AbandonedStationCard",
       "level": 2,
       "isLearner": false,
@@ -704,6 +744,7 @@
           }
     },
     {
+      "id": 42,
       "type": "AbandonedStationCard",
       "level": 1,
       "isLearner": false,
@@ -907,30 +948,6 @@
       "type": "CargoHoldsComponent",
       "connectors": ["DOUBLE", "EMPTY", "SINGLE", "DOUBLE"],
       "number": 3
-    },
-    {
-      "id": 32,
-      "type": "CabinComponent",
-      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
-      "isStarting": true
-    },
-    {
-      "id": 33,
-      "type": "CabinComponent",
-      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
-      "isStarting": true
-    },
-    {
-      "id": 34,
-      "type": "CabinComponent",
-      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
-      "isStarting": true
-    },
-    {
-      "id": 35,
-      "type": "CabinComponent",
-      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
-      "isStarting": true
     },
     {
       "id": 36,
@@ -1709,6 +1726,32 @@
       "type": "ShieldComponent",
       "connectors": ["EMPTY", "DOUBLE", "DOUBLE", "UNIVERSAL"],
       "directionsProtected": ["NORTH", "EAST"]
+    }
+  ],
+  "startingCabins": [
+    {
+      "id": 32,
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
+    },
+    {
+      "id": 33,
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
+    },
+    {
+      "id": 34,
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
+    },
+    {
+      "id": 35,
+      "type": "CabinComponent",
+      "connectors": ["UNIVERSAL", "UNIVERSAL", "UNIVERSAL", "UNIVERSAL"],
+      "isStarting": true
     }
   ]
 }

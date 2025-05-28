@@ -19,8 +19,8 @@ public class MeteorSwarmCard extends Card{
     private int meteorIndex;
     private int coord;
 
-    public MeteorSwarmCard(int level, boolean isLearner, List<Meteor> meteors) {
-        super(level, isLearner);
+    public MeteorSwarmCard(int id, int level, boolean isLearner, List<Meteor> meteors) {
+        super(id, level, isLearner);
         this.meteors = meteors;
     }
 

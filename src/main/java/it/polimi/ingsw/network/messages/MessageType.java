@@ -103,6 +103,14 @@ public enum MessageType {
         }
     },
 
+    SET_SHUFFLED_DECK {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, List<Integer>> castedMessage = (DoubleArgMessage<String, List<Integer>>) message;
+            client.getGameController().setShuffledCardPile(castedMessage.getArg2());
+        }
+    },
+
     LEAVE_GAME {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -381,8 +389,8 @@ public enum MessageType {
 
         @Override
         public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            client.getGameController().rollDices(castedMessage.getArg1());
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().rollDices(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 

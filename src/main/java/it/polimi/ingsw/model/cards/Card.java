@@ -10,22 +10,25 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.Constants;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 abstract public class Card {
 
+    private final int id;
     private final int level;
     private final boolean isLearner;
 
-    public Card(int level, boolean isLearner) {
+    public Card(int id, int level, boolean isLearner) {
+        this.id = id;
         this.level = level;
         this.isLearner = isLearner;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getLevel() {

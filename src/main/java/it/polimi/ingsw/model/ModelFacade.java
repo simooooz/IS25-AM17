@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
+import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -13,6 +14,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ModelFacade {
@@ -43,6 +45,17 @@ public class ModelFacade {
 
         if (!learnerMode)
             board.getTimeManagement().startTimer(this);
+    }
+
+    public void setShuffledCardPile(List<Integer> ids) {
+        Map<Integer, Card> cardMap = new CardFactory(learnerMode)
+            .getAllCards().stream()
+            .collect(Collectors.toMap(Card::getId, card -> card));
+        List<Card> shuffledCards = ids.stream().map(cardMap::get).toList();
+
+        board.getCardPile().clear();
+        for (Card card : shuffledCards)
+            board.getCardPile().add(card);
     }
 
     public void pickComponent(String username, int componentId) {
@@ -307,9 +320,10 @@ public class ModelFacade {
         if (finish) { board.pickNewCard(this); }
     }
 
-    public void rollDices(String username) {
+    public void rollDices(String username, Integer value) {
         Card card = board.getCardPile().get(board.getCardPilePos());
-        Command command = new RollDicesCommand(this, board, username);
+        RollDicesCommand command = new RollDicesCommand(this, board, username, value);
+
         boolean finish = command.execute(card);
         if (finish) { board.pickNewCard(this); }
     }

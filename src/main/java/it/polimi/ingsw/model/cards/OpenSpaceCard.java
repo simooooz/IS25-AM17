@@ -16,8 +16,8 @@ public class OpenSpaceCard extends Card {
     private int playerIndex;
     private Map<PlayerData, Integer> enginesActivated = new HashMap<>();
 
-    public OpenSpaceCard(int level, boolean isLearner) {
-        super(level, isLearner);
+    public OpenSpaceCard(int id, int level, boolean isLearner) {
+        super(id, level, isLearner);
     }
 
     @Override

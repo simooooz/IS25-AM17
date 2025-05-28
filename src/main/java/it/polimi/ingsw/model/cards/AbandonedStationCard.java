@@ -21,8 +21,8 @@ public class AbandonedStationCard extends Card{
     private int playerIndex;
     private boolean shipConquered;
 
-    public AbandonedStationCard(int level, boolean isLearner, int crew, int days, Map<ColorType, Integer> goods) {
-        super(level, isLearner);
+    public AbandonedStationCard(int id, int level, boolean isLearner, int crew, int days, Map<ColorType, Integer> goods) {
+        super(id, level, isLearner);
         this.crew = crew;
         this.days = days;
         this.goods = goods;
