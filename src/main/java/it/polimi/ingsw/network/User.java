@@ -98,7 +98,7 @@ public class User {
     }
 
     public String getUsername() {
-        return username;
+        return username != null ? username : "";
     }
 
     public boolean setUsername(String username) {

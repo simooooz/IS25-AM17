@@ -159,9 +159,9 @@ public class GameController {
         model.removeCrew(username, cabinsIds);
     }
 
-    public void rollDices(String username) {
+    public void rollDices(String username, Integer value) {
         if (model.getPlayerState(username) != PlayerState.WAIT_ROLL_DICES) throw new IllegalStateException("State is not WAIT_ROLL_DICES");
-        model.rollDices(username);
+        model.rollDices(username, value);
     }
 
     public void getBoolean(String username, boolean value) {
