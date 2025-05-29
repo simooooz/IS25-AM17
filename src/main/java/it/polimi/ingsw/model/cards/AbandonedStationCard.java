@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,5 +151,18 @@ public class AbandonedStationCard extends Card{
 
     }
 
+    @Override
+    public void printCardInfo(ModelFacade model, Board board) {
+        for (PlayerData player : board.getPlayersByPos()) {
+            PlayerState state = model.getPlayerState(player.getUsername());
+
+            switch (state) {
+                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
+                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
+                case WAIT_BOOLEAN -> Chroma.println("- " + player.getUsername() + " is choosing if visit station or not", Chroma.YELLOW_BOLD);
+                case WAIT_GOODS -> Chroma.println("- " + player.getUsername() + " is adding goods", Chroma.YELLOW_BOLD);
+            }
+        }
+    }
 
 }

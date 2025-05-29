@@ -7,7 +7,9 @@ import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 
+Upimport java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -18,7 +20,7 @@ import java.util.stream.IntStream;
 public class ViewTui {
 
     private final Client client;
-    private final Scanner scanner;
+    private final BufferedReader reader;
 
     private final DisplayUpdater displayUpdater;
     private final BlockingQueue<String> networkMessageQueue = new LinkedBlockingQueue<>();
@@ -33,7 +35,7 @@ public class ViewTui {
      */
     public ViewTui(Client client) {
         this.client = client;
-        this.scanner = new Scanner(System.in);
+        this.reader = new BufferedReader(new InputStreamReader(System.in));
         this.displayUpdater = new DisplayUpdater(this.client);
     }
 
@@ -254,7 +256,7 @@ public class ViewTui {
                     }
                     case "look-cards" -> {
                         int deckIndex = Integer.parseInt(commands[1]);
-                        if (deckIndex < 1 || deckIndex > 3)
+                        if (deckIndex < 0 || deckIndex > 2)
                             throw new IllegalArgumentException("Deck index not valid");
 
                         if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", otherwise don't change it
@@ -286,22 +288,24 @@ public class ViewTui {
                     client.send(MessageType.REMOVE_CREW, ids);
             }
             case WAIT_ALIEN -> {
-                String[] commands = input.split(" ");
-                Integer[] ids = IntStream.range(0, commands.length)
-                        .filter(i -> i % 2 == 0)
-                        .mapToObj(i -> Integer.parseInt(commands[i]))
-                        .toArray(Integer[]::new);
-                AlienType[] aliens = IntStream.range(0, commands.length)
-                        .filter(i -> i % 2 == 1)
-                        .mapToObj(i -> Objects.equals(commands[i], "cannon") ? AlienType.CANNON : AlienType.ENGINE)
-                        .toArray(AlienType[]::new);
-
-                if (ids.length != aliens.length)
-                    throw new IllegalArgumentException("Command not valid. Please try again.");
-
                 Map<Integer, AlienType> alienMap = new HashMap<>();
-                for (int i = 0; i < ids.length; i++)
-                    alienMap.put(ids[i], aliens[i]);
+                if (!input.isBlank()) {
+                    String[] commands = input.split(" ");
+                    Integer[] ids = IntStream.range(0, commands.length)
+                            .filter(i -> i % 2 == 0)
+                            .mapToObj(i -> Integer.parseInt(commands[i]))
+                            .toArray(Integer[]::new);
+                    AlienType[] aliens = IntStream.range(0, commands.length)
+                            .filter(i -> i % 2 == 1)
+                            .mapToObj(i -> Objects.equals(commands[i], "cannon") ? AlienType.CANNON : AlienType.ENGINE)
+                            .toArray(AlienType[]::new);
+
+                    if (ids.length != aliens.length)
+                        throw new IllegalArgumentException("Command not valid. Please try again.");
+
+                    for (int i = 0; i < ids.length; i++)
+                        alienMap.put(ids[i], aliens[i]);
+                }
                 client.send(MessageType.CHOOSE_ALIEN, alienMap);
             }
             case WAIT_SHIP_PART -> client.send(MessageType.CHOOSE_SHIP_PART, Integer.parseInt(input));
@@ -331,7 +335,7 @@ public class ViewTui {
                 String[] commandList = parts[0].trim().split(" ");
                 Map<Integer, List<ColorType>> newDisposition = new HashMap<>();
 
-                List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.toString().toUpperCase()).toList();
+                List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.name().toUpperCase()).toList();
                 Integer currentId = null;
                 for (String value : commandList) {
                     if (colors.contains(value.toUpperCase()))
@@ -353,10 +357,8 @@ public class ViewTui {
             }
             case WAIT_ROLL_DICES -> client.send(MessageType.ROLL_DICES);
             case WAIT_SHIELD -> {
-                Integer id;
-                if (input.trim().isEmpty())
-                    id = null;
-                else
+                Integer id = null;
+                if (!input.isBlank())
                     id = Integer.parseInt(input);
                 client.send(MessageType.ACTIVATE_SHIELD, id);
             }
@@ -402,12 +404,13 @@ public class ViewTui {
     public void displayError(String message) {
         Chroma.println(message, Chroma.RED);
         System.out.print("> ");
+        System.out.flush();
     }
 
     /**
      * Shows the title screen.
      */
-    public void start() {
+    public void start() throws IOException {
         clear();
         System.out.println("Welcome to");
         Chroma.println(
@@ -422,7 +425,7 @@ public class ViewTui {
                         """, Chroma.ORANGE
         );
         System.out.println("Press ENTER to continue...");
-        scanner.nextLine();
+        reader.readLine();
         displayUpdater.updateDisplay();
 
         Thread displayThread = new Thread(displayUpdater);
@@ -439,11 +442,12 @@ public class ViewTui {
                 break;
             }
 
-            String input = scanner.nextLine();
+            System.out.flush();
+            String input = reader.readLine();
             processUserInput(input);
         }
 
-        this.scanner.close();
+        this.reader.close();
     }
 
     public void handleDisconnect() {

@@ -4,10 +4,10 @@ import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.Client;
-import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.Chroma;
 
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -38,7 +38,12 @@ public class RMIClient extends Client {
 
             // Start sending ping
             scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
-            this.viewTui.start();
+            try {
+                this.viewTui.start();
+            } catch (IOException e) {
+                // TODO change
+                e.printStackTrace();
+            }
 
         } catch (NotBoundException | RemoteException e) {
             System.err.println("[RMI CLIENT] Could not connect to " + host + ":" + port);

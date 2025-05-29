@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,6 +146,20 @@ public class AbandonedShipCard extends Card {
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);
+    }
+
+    @Override
+    public void printCardInfo(ModelFacade model, Board board) {
+        for (PlayerData player : board.getPlayersByPos()) {
+            PlayerState state = model.getPlayerState(player.getUsername());
+
+            switch (state) {
+                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
+                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
+                case WAIT_BOOLEAN -> Chroma.println("- " + player.getUsername() + " is choosing if visit ship or not", Chroma.YELLOW_BOLD);
+                case WAIT_REMOVE_CREW -> Chroma.println("- " + player.getUsername() + " is removing crew", Chroma.YELLOW_BOLD);
+            }
+        }
     }
 
 }

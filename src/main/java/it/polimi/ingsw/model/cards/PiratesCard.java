@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -235,6 +236,25 @@ public class PiratesCard extends Card{
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);
+    }
+
+    @Override
+    public void printCardInfo(ModelFacade model, Board board) {
+        for (PlayerData player : board.getPlayersByPos()) {
+            PlayerState state = model.getPlayerState(player.getUsername());
+            String def = defeatedPlayers.contains(player) ? "(defeated)" : "";
+
+            switch (state) {
+                case DONE -> Chroma.println("- " + player.getUsername() + " has done " + def, Chroma.YELLOW_BOLD);
+                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting " + def, Chroma.YELLOW_BOLD);
+                case WAIT_BOOLEAN -> Chroma.println("- " + player.getUsername() + " is choosing if take the reward or not", Chroma.YELLOW_BOLD);
+                case WAIT_SHIELD -> Chroma.println("- " + player.getUsername() + " is choosing if activate a shield or not " + def, Chroma.YELLOW_BOLD);
+                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate double cannons or not " + def, Chroma.YELLOW_BOLD);
+                case WAIT_ROLL_DICES -> Chroma.println("- " + player.getUsername() + " is rolling dices " + def, Chroma.YELLOW_BOLD);
+                case WAIT_SHIP_PART -> Chroma.println("- " + player.getUsername() + " might have lost part of his ship " + def, Chroma.YELLOW_BOLD);
+            }
+        }
+        Chroma.println("Pirates are" + (piratesDefeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
     }
 
 }

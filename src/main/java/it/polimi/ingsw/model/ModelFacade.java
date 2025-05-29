@@ -262,7 +262,7 @@ public class ModelFacade {
         if (finish) { board.pickNewCard(this); }
     }
 
-    public void nextCard() {
+    public void drawCard() {
         if (board.getCardPilePos() < board.getCardPile().size()) {
             Card card = board.getCardPile().get(board.getCardPilePos());
             boolean finished = card.startCard(this, this.board);

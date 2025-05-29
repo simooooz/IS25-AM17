@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -227,5 +228,25 @@ public class CombatZoneCard extends Card {
         return String.join("\n", cardLines);
     }
 
+    @Override
+    public void printCardInfo(ModelFacade model, Board board) {
+        for (PlayerData player : board.getPlayersByPos()) {
+            PlayerState state = model.getPlayerState(player.getUsername());
+
+            switch (state) {
+                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
+                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
+                case WAIT_SHIP_PART -> Chroma.println("- " + player.getUsername() + " is choosing which part of ship to keep", Chroma.YELLOW_BOLD);
+                case WAIT_SHIELD -> Chroma.println("- " + player.getUsername() + " is choosing if activate a shield or not", Chroma.YELLOW_BOLD);
+                case WAIT_REMOVE_GOODS -> Chroma.println("- " + player.getUsername() + " has to pay his penalty (removing goods)", Chroma.YELLOW_BOLD);
+                case WAIT_REMOVE_CREW -> Chroma.println("- " + player.getUsername() + " has to pay his penalty (removing crew)", Chroma.YELLOW_BOLD);
+                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate double cannons or not", Chroma.YELLOW_BOLD);
+                case WAIT_ENGINES -> Chroma.println("- " + player.getUsername() + " is choosing if activate double engines or not", Chroma.YELLOW_BOLD);
+                case WAIT_ROLL_DICES -> Chroma.println("- " + player.getUsername() + " is rolling dices", Chroma.YELLOW_BOLD);
+            }
+        }
+        Chroma.println("Fighting at war line n." + (warLineIndex+1), Chroma.YELLOW_BOLD);
+        worst.getKey().getValue().ifPresent(p -> Chroma.println("Actually the worst player is " + p.getUsername() + " with a score of " + worst.getValue(), Chroma.YELLOW_BOLD));
+    }
 
 }

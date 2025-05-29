@@ -23,12 +23,21 @@ public class DisplayUpdater implements Runnable {
     public void run() {
         while (!Thread.interrupted()) {
             try {
-                String message = client.getViewTui().getNetworkMessageQueue().poll();
-                if (message != null && !message.equals("ERROR")) {
+                boolean hasMessages = false;
+                String message;
+
+                while ((message = client.getViewTui().getNetworkMessageQueue().poll()) != null) {
+                    if (!message.equals("ERROR"))
+                        hasMessages = true;
+                }
+
+                if (hasMessages) {
                     client.getViewTui().clear();
                     updateDisplay();
+                    System.out.flush();
                 }
-                Thread.sleep(100);
+
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 // Nothing to do
             }
@@ -100,12 +109,11 @@ public class DisplayUpdater implements Runnable {
                 Chroma.println(
                         "[pick <id>]                  - pick a component\n" +
                                 "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
-                                "[release <id>]                    - release the picked component\n" +
+                                "[release <id>]               - release the picked component\n" +
                                 (client.getGameController().getModel().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
-
                                 "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
                                 "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
-                                "[look-cards <id>]         - view specific card pile (1, 2 or 3)\n" +
+                                "[look-cards <id>]            - view specific card pile (0, 1 or 2)\n" +
                                 "[ready]                      - end building phase",
                         Chroma.BLUE
                 );
@@ -184,14 +192,16 @@ public class DisplayUpdater implements Runnable {
             case WAIT_GOODS -> {
                 this.printGameInfo(board, ship, state);
 
-                System.out.println("prompt to write");
+                System.out.println("Invia la nuova configurazione di merci");
+                System.out.println("<cargo id> <RED BLUE YELLOW> ...");
                 System.out.print("> ");
             }
 
             case WAIT_REMOVE_GOODS -> {
                 this.printGameInfo(board, ship, state);
 
-                System.out.println("prompt to write");
+                System.out.println("Devi rimuovere delle merci, invia la nuova configurazione");
+                System.out.println("<cargo id> <RED BLUE YELLOW> - <battery id>");
                 System.out.print("> ");
             }
 
@@ -251,10 +261,26 @@ public class DisplayUpdater implements Runnable {
                 System.out.print("> ");
             }
 
-            case WAIT, DONE -> Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
+            case WAIT, DONE -> {
+                boolean inGame = board.getStartingDeck().stream()
+                        .noneMatch(p -> client.getGameController().getModel().getPlayerState(p.getUsername()) != PlayerState.END)
+                        && board.getPlayersByPos().stream()
+                        .noneMatch(p -> client.getGameController().getModel().getPlayerState(p.getUsername()) == PlayerState.WAIT_ALIEN);
+
+                if (inGame)
+                    printGameInfo(board, ship, state);
+
+                Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
+            }
 
             case END -> {
-                System.out.println("GAME FINISHED");
+                Chroma.println("GAME FINISHED", Chroma.GREEN_BOLD);
+
+                if (board.getCardPilePos() > 0) {
+                    Chroma.println("Previous card", Chroma.GREY_BOLD);
+                    System.out.println(board.getCardPile().get(board.getCardPilePos()-1));
+                }
+
                 System.out.println(board.toString(client.getUsername(), state));
             }
 
@@ -262,13 +288,16 @@ public class DisplayUpdater implements Runnable {
     }
 
     private void printGameInfo(Board board, Ship ship, PlayerState state) {
-        board.getPlayersByPos().stream()
-                .filter(player -> !player.getUsername().equals(client.getUsername()))
-                .forEach(player -> System.out.println(player.getShip().toString(player.getUsername(), state)) );
+        if (board.getCardPilePos() > 0) {
+            Chroma.println("Previous card", Chroma.GREY_BOLD);
+            System.out.println(board.getCardPile().get(board.getCardPilePos()-1));
+        }
 
         if (board.getPlayers().stream()
                 .noneMatch(e -> client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.DRAW_CARD)) {
+            Chroma.println("\nActual card", Chroma.GREY_BOLD);
             System.out.println(board.getCardPile().get(board.getCardPilePos()));
+            board.getCardPile().get(board.getCardPilePos()).printCardInfo(client.getGameController().getModel(), board);
         }
 
         System.out.println(board.toString(client.getUsername(), state));

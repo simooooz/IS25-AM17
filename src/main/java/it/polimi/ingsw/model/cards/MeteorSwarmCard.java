@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.properties.DirectionType;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,12 +72,12 @@ public class MeteorSwarmCard extends Card{
             }
 
             targets.stream()
-                .filter(c -> c instanceof CannonComponent)
-                .map(c -> (CannonComponent) c)
-                .filter(c -> c.getDirection() == meteors.get(meteorIndex).getDirectionFrom())
-                .filter(cannonComponent -> cannonComponent.equals(chosenCannon))
-                .findFirst()
-                .orElseThrow(() -> new  IllegalArgumentException("Cannon component not found in target coordinates"));
+                    .filter(c -> c instanceof CannonComponent)
+                    .map(c -> (CannonComponent) c)
+                    .filter(c -> c.getDirection() == meteors.get(meteorIndex).getDirectionFrom())
+                    .filter(cannonComponent -> cannonComponent.equals(chosenCannon))
+                    .findFirst()
+                    .orElseThrow(() -> new  IllegalArgumentException("Cannon component not found in target coordinates"));
         }
     }
 
@@ -171,7 +172,25 @@ public class MeteorSwarmCard extends Card{
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);
+    }
 
+    @Override
+    public void printCardInfo(ModelFacade model, Board board) {
+        for (PlayerData player : board.getPlayersByPos()) {
+            PlayerState state = model.getPlayerState(player.getUsername());
+
+            switch (state) {
+                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
+                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
+                case WAIT_SHIP_PART -> Chroma.println("- " + player.getUsername() + " is choosing which part of ship to keep", Chroma.YELLOW_BOLD);
+                case WAIT_SHIELD -> Chroma.println("- " + player.getUsername() + " is choosing if activate a shield or not", Chroma.YELLOW_BOLD);
+                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate a double cannon or not", Chroma.YELLOW_BOLD);
+                case WAIT_ROLL_DICES -> Chroma.println("- " + player.getUsername() + " is rolling dices", Chroma.YELLOW_BOLD);
+            }
+        }
+
+        if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
+            Chroma.println("Meteor n." + (meteorIndex+1) + " is hitting at coord: " + coord, Chroma.YELLOW_BOLD);
     }
 
 }

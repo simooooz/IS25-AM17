@@ -3,7 +3,6 @@ package it.polimi.ingsw.network.socket.client;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.exceptions.ClientException;
-import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
 
@@ -39,7 +38,12 @@ public class ClientSocket extends Client {
         heartbeatThread.start();
 
         listenLoop = new ListenLoopOfClient(this);
-        this.viewTui.start();
+        try {
+            this.viewTui.start();
+        } catch (IOException e) {
+            // TODO change
+            e.printStackTrace();
+        }
     }
 
     private void connect(String ip, int port) {

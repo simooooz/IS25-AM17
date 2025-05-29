@@ -61,6 +61,9 @@ abstract public class Card {
 
     }
 
+    public void printCardInfo(ModelFacade model, Board board) {
+    }
+
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> rewards, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
         if (commandType != PlayerState.WAIT_GOODS) return;
 

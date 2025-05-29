@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,12 +26,13 @@ public class PlanetCard extends Card{
         super(id, level, isLearner);
         this.planets = planets;
         this.days = days;
+        this.landedPlayers = new HashMap<>();
+
     }
 
     @Override
     public boolean startCard(ModelFacade model, Board board){
         this.playerIndex = 0;
-        this.landedPlayers = new HashMap<>();
 
         for (PlayerData player: board.getPlayersByPos())
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);
@@ -154,4 +156,20 @@ public class PlanetCard extends Card{
 
         return String.join("\n", cardLines);
     }
+
+    @Override
+    public void printCardInfo(ModelFacade model, Board board) {
+        for (PlayerData player : board.getPlayersByPos()) {
+            PlayerState state = model.getPlayerState(player.getUsername());
+            String landInfo = landedPlayers.containsKey(player) ? "(landed at planet n." + landedPlayers.get(player)+1 + ")" : "(not landed)";
+
+            switch (state) {
+                case DONE -> Chroma.println("- " + player.getUsername() + " has done " + landInfo, Chroma.YELLOW_BOLD);
+                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
+                case WAIT_GOODS -> Chroma.println("- " + player.getUsername() + " is collecting the reward (updating goods) " + landInfo, Chroma.YELLOW_BOLD);
+                case WAIT_INDEX -> Chroma.println("- " + player.getUsername() + " is choosing the planet", Chroma.YELLOW_BOLD);
+            }
+        }
+    }
+
 }

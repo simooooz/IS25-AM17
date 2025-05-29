@@ -131,7 +131,7 @@ public class GameController {
 
     public void drawCard(String username) {
         if (model.getPlayerState(username) != PlayerState.DRAW_CARD) throw new IllegalStateException("State is not DRAW_CARD");
-        model.nextCard();
+        model.drawCard();
     }
 
     public void activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {

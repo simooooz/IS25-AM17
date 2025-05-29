@@ -261,11 +261,11 @@ public class Board {
             }
 
             case DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, DONE -> {
-                sb.append(Chroma.color("Cards resolved so far " + getCardPilePos() + "/" + getCardPile().size(), Chroma.GREY_BOLD)).append("\n");
+                sb.append(Chroma.color("\nCards resolved so far " + getCardPilePos() + "/" + getCardPile().size(), Chroma.GREY_BOLD)).append("\n");
 
-                sb.append("Players in game:\n");
+                sb.append("\nPlayers in game:\n");
                 for (SimpleEntry<PlayerData, Integer> entry : players)
-                    sb.append("  ").append(entry.getKey().getUsername()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
+                    sb.append("- ").append(entry.getKey().getUsername()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
 
                 if (!startingDeck.isEmpty()) {
                     sb.append("Starting deck:\n");

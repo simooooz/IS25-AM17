@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.*;
 
@@ -203,6 +204,23 @@ public class SmugglersCard extends Card {
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);
+    }
+
+    @Override
+    public void printCardInfo(ModelFacade model, Board board) {
+        for (PlayerData player : board.getPlayersByPos()) {
+            PlayerState state = model.getPlayerState(player.getUsername());
+
+            switch (state) {
+                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
+                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
+                case WAIT_BOOLEAN -> Chroma.println("- " + player.getUsername() + " is choosing if take the reward or not", Chroma.YELLOW_BOLD);
+                case WAIT_GOODS -> Chroma.println("- " + player.getUsername() + " is collecting the reward (updating goods)", Chroma.YELLOW_BOLD);
+                case WAIT_REMOVE_GOODS -> Chroma.println("- " + player.getUsername() + " has to pay his penalty (removing goods)", Chroma.YELLOW_BOLD);
+                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate double cannons or not", Chroma.YELLOW_BOLD);
+            }
+        }
+        Chroma.println("Smugglers are" + (defeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
     }
 
 }
