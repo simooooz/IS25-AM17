@@ -101,7 +101,7 @@ public class GameController {
 
     public void moveHourglass(String username) {
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+        else if (model.getPlayerState(username) != PlayerState.BUILD && model.getPlayerState(username) != PlayerState.WAIT) throw new IllegalStateException("State is not BUILDING or WAIT");
         else if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
 
         model.moveHourglass(username);

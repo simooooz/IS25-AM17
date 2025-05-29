@@ -191,6 +191,8 @@ public class MeteorSwarmCard extends Card{
 
         if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
             Chroma.println("Meteor n." + (meteorIndex+1) + " is hitting at coord: " + coord, Chroma.YELLOW_BOLD);
+        else if (meteorIndex > 0)
+            Chroma.println("Previous meteor n." + (meteorIndex) + " has come at coord: " + coord, Chroma.YELLOW_BOLD);
     }
 
 }

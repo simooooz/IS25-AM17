@@ -17,7 +17,7 @@ import java.util.Map;
 public class PlanetCard extends Card{
 
     private final List<Planet> planets;
-    private Map<PlayerData, Planet> landedPlayers;
+    private final Map<PlayerData, Planet> landedPlayers;
     private final int days;
 
     private int playerIndex;
@@ -82,8 +82,8 @@ public class PlanetCard extends Card{
         if (commandType == PlayerState.WAIT_INDEX) {
             if (value == null) // Players doesn't land
                 model.setPlayerState(username, PlayerState.DONE);
-            else if (value >= planets.size() || value < 0) // Invalid index
-                throw new RuntimeException("Index not valid");
+            else if (value >= planets.size() || value < 0 || landedPlayers.containsValue(planets.get(value))) // Invalid index
+                throw new IllegalArgumentException("Planet not valid or already occupied");
             else { // Land
                 PlayerData player = board.getPlayerEntityByUsername(username);
                 landedPlayers.put(player, planets.get(value));

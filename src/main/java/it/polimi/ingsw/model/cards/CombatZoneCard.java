@@ -22,11 +22,14 @@ public class CombatZoneCard extends Card {
     private final List<SimpleEntry<CriteriaType, PenaltyCombatZone>> warLines;
     private int warLineIndex;
     private int playerIndex;
-    private SimpleEntry<SimpleEntry<Character, Optional<PlayerData>>, Double> worst;
+    private final SimpleEntry<SimpleEntry<Character, Optional<PlayerData>>, Double> worst;
 
     public CombatZoneCard(int id, int level, boolean isLearner, List<SimpleEntry<CriteriaType, PenaltyCombatZone>> warLines) {
         super(id, level, isLearner);
         this.warLines = warLines;
+
+        SimpleEntry<Character, Optional<PlayerData>> temp = new SimpleEntry<>('a', Optional.empty());
+        this.worst = new SimpleEntry<>(temp, 0.0);
     }
 
     @Override
@@ -39,8 +42,6 @@ public class CombatZoneCard extends Card {
         else {
             this.warLineIndex = 0;
             this.playerIndex = 0;
-            SimpleEntry<Character, Optional<PlayerData>> temp = new SimpleEntry<>('a', Optional.empty());
-            this.worst = new SimpleEntry<>(temp, 0.0);
 
             for (PlayerData player : board.getPlayersByPos())
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT);

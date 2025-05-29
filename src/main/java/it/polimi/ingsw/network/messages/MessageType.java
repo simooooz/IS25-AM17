@@ -2,9 +2,11 @@ package it.polimi.ingsw.network.messages;
 
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.model.game.LobbyState;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.UserState;
+import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
 import it.polimi.ingsw.network.socket.server.Server;
@@ -24,10 +26,14 @@ public enum MessageType {
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
             boolean success = Server.setUsername(user, castedMessage.getArg1());
-            if (success)
-                user.send(new SingleArgMessage<>(MessageType.USERNAME_OK, castedMessage.getArg1()));
-            else
-                user.send(new ZeroArgMessage(MessageType.USERNAME_ALREADY_TAKEN));
+            try {
+                if (success)
+                    user.sendObject(new SingleArgMessage<>(MessageType.USERNAME_OK, castedMessage.getArg1()));
+                else
+                    user.sendObject(new ZeroArgMessage(MessageType.USERNAME_ALREADY_TAKEN));
+            } catch (ServerException e) {
+                // Everything should be closed
+            }
         }
     },
     USERNAME_OK {
@@ -128,8 +134,11 @@ public enum MessageType {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
-            if (castedMessage.getArg1().hasPlayer(client.getUsername()))
-                client.setLobby(castedMessage.getArg1());
+            String leftPlayer = client.getLobby().getPlayers().stream().filter(u -> !castedMessage.getArg1().getPlayers().contains(u)).findFirst().orElseThrow(() -> new RuntimeException("Unknown left player"));
+            if (!leftPlayer.equals(client.getUsername())) {
+                client.getLobby().setGame(client.getGameController());
+                client.getLobby().removePlayer(leftPlayer);
+            }
             else {
                 client.setLobby(null);
                 client.setGameController(null);

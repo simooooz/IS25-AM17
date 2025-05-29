@@ -7,10 +7,9 @@ import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 
-Upimport java.io.BufferedReader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Scanner;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -66,6 +65,9 @@ public class ViewTui {
                     handleInGame(input);
                     break;
             }
+        } catch (NumberFormatException e) {
+            Chroma.println("Command not valid. Please try again.", Chroma.RED);
+            System.out.print("> ");
         } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
             Chroma.println(e.getMessage(), Chroma.RED);
             System.out.print("> ");
@@ -79,17 +81,17 @@ public class ViewTui {
         clear();
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
 
-        String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
+        String lobbyName = InputUtility.requestString("Insert lobby name\n> ", true, 3, 18);
         if (lobbyName == null) {
             displayUpdater.updateDisplay();
             return;
         }
-        Integer maxPlayers = InputUtility.requestInt("Number of players (2-4): ", true, 2, 4);
+        Integer maxPlayers = InputUtility.requestInt("Insert the number of players (2-4)\n> ", true, 2, 4);
         if (maxPlayers == null) {
             displayUpdater.updateDisplay();
             return;
         }
-        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false): ", true);
+        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false)\n> ", true);
         if (learnerFlight == null) {
             displayUpdater.updateDisplay();
             return;
@@ -105,7 +107,7 @@ public class ViewTui {
         clear();
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
 
-        String lobbyName = InputUtility.requestString("Name of the lobby: ", true, 3, 18);
+        String lobbyName = InputUtility.requestString("Insert lobby name\n> ", true, 3, 18);
         if (lobbyName == null) {
             displayUpdater.updateDisplay();
             return;
@@ -121,7 +123,7 @@ public class ViewTui {
         clear();
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
 
-        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false): ", true);
+        Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false)\n> ", true);
         if (learnerFlight == null) {
             displayUpdater.updateDisplay();
             return;
@@ -139,7 +141,7 @@ public class ViewTui {
     private void handleInLobby(String input) {
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
         if (input.equals("q")) {
-            boolean sure = InputUtility.requestBoolean("You sure? (y/n) ", false);
+            boolean sure = InputUtility.requestBoolean("You sure? (y/n)\n> ", false);
             if (sure)
                 client.send(MessageType.LEAVE_GAME);
         }
@@ -152,6 +154,15 @@ public class ViewTui {
      */
     private void handleInGame(String input) {
         PlayerState state = client.getGameController().getState(client.getUsername());
+
+        if (input.equals("q")) {
+            boolean sure = InputUtility.requestBoolean("You sure? (y/n)\n> ", false);
+            if (sure)
+                client.send(MessageType.LEAVE_GAME);
+            else
+                System.out.print("> ");
+            return;
+        }
 
         switch (state) {
             case BUILD, LOOK_CARD_PILE -> {
@@ -266,6 +277,7 @@ public class ViewTui {
 
                         client.send(MessageType.LOOK_CARD_PILE, deckIndex);
                     }
+                    case "rotate-hourglass" -> client.send(MessageType.MOVE_HOURGLASS);
                     case "ready" -> {
                         if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
                             client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
@@ -290,7 +302,7 @@ public class ViewTui {
             case WAIT_ALIEN -> {
                 Map<Integer, AlienType> alienMap = new HashMap<>();
                 if (!input.isBlank()) {
-                    String[] commands = input.split(" ");
+                    String[] commands = input.trim().split(" ");
                     Integer[] ids = IntStream.range(0, commands.length)
                             .filter(i -> i % 2 == 0)
                             .mapToObj(i -> Integer.parseInt(commands[i]))
@@ -314,7 +326,7 @@ public class ViewTui {
                 List<Integer> cannonComponentsIds = new ArrayList<>();
                 List<Integer> batteriesIds = new ArrayList<>();
 
-                if (input.split("-").length > 0) {
+                if (!input.isBlank() && input.trim().split("-").length > 0) {
                     String[] commands = input.split("-")[0].split(" ");
                     cannonComponentsIds = Arrays.stream(commands)
                             .map(Integer::parseInt)
@@ -330,30 +342,30 @@ public class ViewTui {
                     client.send(MessageType.ACTIVATE_ENGINES, batteriesIds, cannonComponentsIds);
             }
             case WAIT_GOODS, WAIT_REMOVE_GOODS -> {
-                String[] parts = input.split("-");
-
-                String[] commandList = parts[0].trim().split(" ");
                 Map<Integer, List<ColorType>> newDisposition = new HashMap<>();
+                List<Integer> batteriesIds = new ArrayList<>();
+                if (!input.isBlank()) {
+                    String[] parts = input.split("-");
+                    String[] commandList = parts[0].trim().split(" ");
 
-                List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.name().toUpperCase()).toList();
-                Integer currentId = null;
-                for (String value : commandList) {
-                    if (colors.contains(value.toUpperCase()))
-                        newDisposition.get(currentId).add(ColorType.valueOf(value.toUpperCase()));
-                    else {
-                        currentId = Integer.parseInt(value);
-                        newDisposition.put(currentId, new ArrayList<>());
+                    List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.name().toUpperCase()).toList();
+                    Integer currentId = null;
+                    for (String value : commandList) {
+                        if (colors.contains(value.toUpperCase()))
+                            newDisposition.get(currentId).add(ColorType.valueOf(value.toUpperCase()));
+                        else {
+                            currentId = Integer.parseInt(value);
+                            newDisposition.put(currentId, new ArrayList<>());
+                        }
+                    }
+
+                    if (state == PlayerState.WAIT_REMOVE_GOODS) {
+                        batteriesIds = Arrays.stream(parts[1].trim().split(" "))
+                                .map(Integer::parseInt)
+                                .toList();
                     }
                 }
-
-                List<Integer> batteriesIds = new ArrayList<>();
-                if (state == PlayerState.WAIT_REMOVE_GOODS) {
-                    batteriesIds = Arrays.stream(parts[1].trim().split(" "))
-                            .map(Integer::parseInt)
-                            .toList();
-                }
                 client.send(MessageType.UPDATE_GOODS, newDisposition, batteriesIds);
-
             }
             case WAIT_ROLL_DICES -> client.send(MessageType.ROLL_DICES);
             case WAIT_SHIELD -> {
@@ -367,14 +379,21 @@ public class ViewTui {
                 client.send(MessageType.GET_BOOLEAN, value);
             }
             case WAIT_INDEX -> {
-                Integer index;
-                if (input.trim().isEmpty())
-                    index = null;
-                else
+                Integer index = null;
+                if (!input.isBlank())
                     index = Integer.parseInt(input);
                 client.send(MessageType.GET_INDEX, index);
             }
+            case WAIT, DONE -> {
+                String[] commands = input.trim().split(" ");
+                switch (commands[0]) {
+                    case "rotate-hourglass" -> client.send(MessageType.MOVE_HOURGLASS);
+                    case "ship" -> {}
+                    default -> throw new IllegalArgumentException("Command not valid. Please try again.");
+                }
+            }
         }
+
     }
 
     private void revertRotation() {
@@ -424,7 +443,7 @@ public class ViewTui {
                          ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
                         """, Chroma.ORANGE
         );
-        System.out.println("Press ENTER to continue...");
+        System.out.print("Press ENTER to continue...");
         reader.readLine();
         displayUpdater.updateDisplay();
 
@@ -433,21 +452,12 @@ public class ViewTui {
         displayThread.start();
 
         while (true) {
-
-            try {
-                this.waitLatch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Chroma.println("Input thread interrupted during wait", Chroma.RED);
-                break;
-            }
-
             System.out.flush();
             String input = reader.readLine();
             processUserInput(input);
         }
 
-        this.reader.close();
+        // this.reader.close();
     }
 
     public void handleDisconnect() {

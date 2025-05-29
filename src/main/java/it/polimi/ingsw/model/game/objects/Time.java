@@ -3,6 +3,8 @@ package it.polimi.ingsw.model.game.objects;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,7 +29,7 @@ public class Time {
 
     private void rotateHourglass() {
         if (hourglassPos > 0) {
-            timeLeft = 60;
+            timeLeft = 15;
             hourglassPos--;
         }
     }
@@ -35,17 +37,21 @@ public class Time {
     public void startTimer(ModelFacade model) {
         if (timeLeft != 0) throw new RuntimeException("Time left is not 0");
         rotateHourglass();
-        timer.scheduleAtFixedRate(new TimerTask() {
+
+        TimerTask currentTask = new TimerTask() {
             public void run() {
                 if (timeLeft == 1) {
-                    timer.cancel();
-                    if (hourglassPos == 0)
-                        for (PlayerData player : model.getBoard().getStartingDeck())
+                    this.cancel();
+                    if (hourglassPos == 0) {
+                        List<PlayerData> players = new ArrayList<>(model.getBoard().getStartingDeck());
+                        for (PlayerData player : players)
                             model.setReady(player.getUsername());
+                    }
                 }
                 timeLeft -= 1;
             }
-        }, 1000, 1000);
+        };
+        this.timer.scheduleAtFixedRate(currentTask, 1000, 1000);
     }
 
 }

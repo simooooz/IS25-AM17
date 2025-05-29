@@ -127,18 +127,7 @@ public class MatchController {
         Lobby lobby = lobbyEntry.get().getValue();
         lobby.removePlayer(username);
         if (lobby.toDelete())
-            this.delete(lobby);
-    }
-
-    /**
-     * Handles the elimination of the lobby/game
-     *
-     * @param lobby to delete
-     */
-    private void delete(Lobby lobby) {
-        lobbies.remove(lobby.getGameID());
-        if (lobby.getState() == LobbyState.IN_GAME)
-            lobby.endGame();
+            lobbies.remove(lobby.getGameID());
     }
 
     /**

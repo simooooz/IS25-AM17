@@ -23,7 +23,7 @@ public class PiratesCard extends Card{
     private final List<CannonFire> cannonFires;
 
     private List<PlayerData> players;
-    private List<PlayerData> defeatedPlayers;
+    private final List<PlayerData> defeatedPlayers;
     private boolean piratesDefeated;
     private int playerIndex;
     private int cannonIndex;
@@ -35,6 +35,8 @@ public class PiratesCard extends Card{
         this.credits = credits;
         this.days = days;
         this.cannonFires = cannonFires;
+
+        this.defeatedPlayers = new ArrayList<>();
     }
 
     @Override
@@ -42,7 +44,6 @@ public class PiratesCard extends Card{
         this.piratesDefeated = false;
         this.playerIndex = 0;
         this.cannonIndex = 0;
-        this.defeatedPlayers = new ArrayList<>();
         this.players = new ArrayList<>(board.getPlayersByPos());
 
         for (PlayerData player : players) {
@@ -255,6 +256,12 @@ public class PiratesCard extends Card{
             }
         }
         Chroma.println("Pirates are" + (piratesDefeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
+
+        if (piratesDefeated && board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
+            Chroma.println("Cannon fire n." + (cannonIndex+1) + " is hitting at coord: " + coord, Chroma.YELLOW_BOLD);
+        else if (cannonIndex > 0)
+            Chroma.println("Previous cannon fire n." + (cannonIndex) + " has come at coord: " + coord, Chroma.YELLOW_BOLD);
+
     }
 
 }

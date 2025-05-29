@@ -250,7 +250,7 @@ public class Board {
                 // todo CHANGE with displayCards
 
                 if (!learnerMode) {
-                    sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
+                    sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos()).append(timeManagement.getHourglassPos() == 0 ? " (last!)" : "");
                     sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
                 }
 

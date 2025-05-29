@@ -62,6 +62,10 @@ public class Lobby implements Serializable {
         this.players = new ArrayList<>();
     }
 
+    public void setGame(GameController game) {
+        this.game = game;
+    }
+
     public LobbyState getState() {
         return state;
     }
@@ -122,7 +126,9 @@ public class Lobby implements Serializable {
         if (!players.isEmpty())
             master = master.equals(username) ? players.get(new Random().nextInt(players.size())) : master;
 
-        if (this.state == LobbyState.IN_GAME)
+        if (toDelete())
+            this.endGame();
+        else if (this.state == LobbyState.IN_GAME)
             this.game.leaveGame(username);
     }
 
