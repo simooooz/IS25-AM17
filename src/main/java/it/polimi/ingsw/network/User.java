@@ -21,12 +21,11 @@ public class User {
     private final static List<User> users = new ArrayList<>();
 
     protected final String connectionCode;
-    private String username;
+    protected String username;
     private GameController gameController;
     private UserState state;
     private Lobby lobby;
 
-    private final boolean isRMI;
     private final ClientCallbackInterface callback;
     private long lastPing; // RMI only
 
@@ -38,7 +37,6 @@ public class User {
         this.lobby = null;
 
         this.callback = callback;
-        this.isRMI = isRMI;
         if (isRMI) {
             lastPing = System.currentTimeMillis();
         }
@@ -53,21 +51,7 @@ public class User {
     public void notifyGameEvent(MessageType gameEvent, Object... args) {
         for (String playerToNotify : lobby.getPlayers()) {
             User userToNotify = User.getUser(playerToNotify);
-            if (userToNotify.isRMI) {
-                try {
-                    userToNotify.getCallback().notifyGameEvent(gameEvent, username, args);
-                } catch (RemoteException e) {
-                    // Error while notifying an update to a client
-                    // Just ignore it
-                }
-            }
-            else {
-                Object[] newArgs = new Object[args.length + 1];
-                newArgs[0] = username;
-                System.arraycopy(args, 0, newArgs, 1, args.length);
-                Message message = Constants.createMessage(gameEvent, newArgs);
-                ((ClientHandler) userToNotify).send(message);
-            }
+            userToNotify.sendGameEvent(gameEvent, this.username, args);
         }
     }
 
@@ -76,16 +60,25 @@ public class User {
     public void notifyLobbyEvent(MessageType lobbyEvent, List<String> playersToNotify) {
         for (String username : playersToNotify) {
             User player = User.getUser(username);
-            if (player.isRMI) {
-                try {
-                    player.getCallback().updateLobbyStatus(lobbyEvent, this.lobby);
-                } catch (RemoteException e) {
-                    // Error while notifying an update to a client
-                    // Just ignore it
-                }
-            }
-            else
-                ((ClientHandler) player).send(new SingleArgMessage<>(lobbyEvent, this.lobby));
+            player.sendLobbyEvent(lobbyEvent, this.lobby);
+        }
+    }
+
+    public void sendGameEvent(MessageType gameEvent, String username, Object... args) {
+        try {
+            this.getCallback().notifyGameEvent(gameEvent, username, args);
+        } catch (RemoteException e) {
+            // Error while notifying an update to a client
+            // Just ignore it
+        }
+    }
+
+    public void sendLobbyEvent(MessageType lobbyEvent, Lobby lobby) {
+        try {
+            this.getCallback().updateLobbyStatus(lobbyEvent, lobby);
+        } catch (RemoteException e) {
+            // Error while notifying an update to a client
+            // Just ignore it
         }
     }
 
