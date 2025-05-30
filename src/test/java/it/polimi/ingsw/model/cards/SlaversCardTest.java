@@ -45,17 +45,9 @@ class SlaversCardTest {
         controller.pickComponent("Simone", 52);
         controller.insertComponent("Simone", 52, 2, 2, 0, true);
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-
         controller.pickComponent("Davide", 53);
         controller.rotateComponent("Davide", 53, 1);
         controller.insertComponent("Davide", 53, 2, 2, 0, true);
-
-        controller.pickComponent("Davide", 33);
-        controller.rotateComponent("Davide", 33, 2);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
     }
 
@@ -84,7 +76,7 @@ class SlaversCardTest {
         board.movePlayer(p1, 9);
         board.movePlayer(p2, 9);
 
-        SlaversCard slaversCard = new SlaversCard(2, false, 5, 5, 1, 1);
+        SlaversCard slaversCard = new SlaversCard(0, 2, false, 5, 5, 1, 1);
         board.getCardPile().clear();
         board.getCardPile().add(slaversCard);
 
@@ -120,7 +112,7 @@ class SlaversCardTest {
         board.movePlayer(p1, 9);
         board.movePlayer(p2, 9);
 
-        SlaversCard slaversCard = new SlaversCard(2, false, 2, 5, 1, 1);
+        SlaversCard slaversCard = new SlaversCard(0, 2, false, 2, 5, 1, 1);
         board.getCardPile().clear();
         board.getCardPile().add(slaversCard);
 

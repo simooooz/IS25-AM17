@@ -42,9 +42,6 @@ class MeteorSwarmCardTest {
         p2 = board.getPlayerEntityByUsername("Davide");
         p3 = board.getPlayerEntityByUsername("Tommaso");
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
         controller.pickComponent("Simone", 132);
         controller.insertComponent("Simone", 132, 1, 1, 0, true);
 
@@ -59,20 +56,11 @@ class MeteorSwarmCardTest {
         controller.pickComponent("Simone", 148);
         controller.insertComponent("Simone", 148, 2, 2, 0, true);
 
-
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
         controller.pickComponent("Davide", 28);
         controller.insertComponent("Davide", 28, 2, 4, 0, true);
 
-
-        controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
-
         controller.pickComponent("Tommaso", 22);
         controller.insertComponent("Tommaso", 22, 2, 4, 0, true);
-
 
     }
 
@@ -96,7 +84,7 @@ class MeteorSwarmCardTest {
         Meteor meteor1 = new Meteor(false, DirectionType.EAST);
         meteors.add(meteor1);
 
-        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
@@ -127,7 +115,7 @@ class MeteorSwarmCardTest {
         Meteor meteor1 = new Meteor(false, DirectionType.WEST);
         meteors.add(meteor1);
 
-        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
@@ -158,7 +146,7 @@ class MeteorSwarmCardTest {
         Meteor meteor1 = new Meteor(false, DirectionType.NORTH);
         meteors.add(meteor1);
 
-        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
@@ -191,7 +179,7 @@ class MeteorSwarmCardTest {
         Meteor meteor1 = new Meteor(true, DirectionType.EAST);
         meteors.add(meteor1);
 
-        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
@@ -222,7 +210,7 @@ class MeteorSwarmCardTest {
         Meteor meteor1 = new Meteor(true, DirectionType.NORTH);
         meteors.add(meteor1);
 
-        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
@@ -288,7 +276,7 @@ class MeteorSwarmCardTest {
         meteors.add(meteor2);
         meteors.add(meteor3);
 
-        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 
@@ -351,7 +339,7 @@ class MeteorSwarmCardTest {
         meteors.add(meteor1);
         meteors.add(meteor1);
 
-        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(2, false, meteors);
+        MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
 

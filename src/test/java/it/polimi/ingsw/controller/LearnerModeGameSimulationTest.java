@@ -51,10 +51,6 @@ public class LearnerModeGameSimulationTest {
         controller.rotateComponent("Tommaso", 44, 3);
         controller.insertComponent("Tommaso", 44, 2, 2, 0, true);
 
-        controller.pickComponent("Tommaso", 33);
-        controller.rotateComponent("Tommaso", 33, 3);
-        controller.insertComponent("Tommaso", 33, 2, 3, 0, true);
-
         controller.pickComponent("Tommaso", 115);
         controller.rotateComponent("Tommaso", 115, 1);
         controller.insertComponent("Tommaso", 115, 2, 5, 0, true);
@@ -115,10 +111,6 @@ public class LearnerModeGameSimulationTest {
         controller.pickComponent("Simone", 149);
         controller.rotateComponent("Simone", 149, 3);
         controller.insertComponent("Simone", 149, 2, 2, 0, true);
-
-        controller.pickComponent("Simone", 32);
-        controller.rotateComponent("Simone", 32, 3);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
 
         controller.pickComponent("Simone", 63);
         controller.rotateComponent("Simone", 63, 3);
@@ -189,10 +181,6 @@ public class LearnerModeGameSimulationTest {
         controller.rotateComponent("Demetrio", 65, 0);
         controller.insertComponent("Demetrio", 65, 2, 2, 0, true);
 
-        controller.pickComponent("Demetrio", 34);
-        controller.rotateComponent("Demetrio", 34, 0);
-        controller.insertComponent("Demetrio", 34, 2, 3, 0, true);
-
         controller.pickComponent("Demetrio", 24);
         controller.rotateComponent("Demetrio", 24, 2);
         controller.insertComponent("Demetrio", 24, 2, 4, 0, true);
@@ -261,10 +249,6 @@ public class LearnerModeGameSimulationTest {
         controller.pickComponent("Davide", 15);
         controller.rotateComponent("Davide", 15, 3);
         controller.insertComponent("Davide", 15, 2, 2, 0, true);
-
-        controller.pickComponent("Davide", 35);
-        controller.rotateComponent("Davide", 35, 3);
-        controller.insertComponent("Davide", 35, 2, 3, 0, true);
 
         controller.pickComponent("Davide", 148);
         controller.rotateComponent("Davide", 148, 0);
@@ -344,19 +328,19 @@ public class LearnerModeGameSimulationTest {
         List<Card> cardDeck = controller.getModel().getBoard().getCardPile();
         cardDeck.clear();
 
-        MeteorSwarmCard card1 = new MeteorSwarmCard(1, true, new ArrayList<>(List.of(new Meteor(true, NORTH), new Meteor(false, WEST), new Meteor(false, EAST))));
+        MeteorSwarmCard card1 = new MeteorSwarmCard(0, 1, true, new ArrayList<>(List.of(new Meteor(true, NORTH), new Meteor(false, WEST), new Meteor(false, EAST))));
         cardDeck.add(card1);
 
-        AbandonedStationCard card2 = new AbandonedStationCard(1, true, 5, 1, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1)));
+        AbandonedStationCard card2 = new AbandonedStationCard(0, 1, true, 5, 1, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1)));
         cardDeck.add(card2);
 
-        SmugglersCard card3 = new SmugglersCard(1, true, 4, 2, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1, ColorType.BLUE, 1)), 1);
+        SmugglersCard card3 = new SmugglersCard(0, 1, true, 4, 2, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1, ColorType.BLUE, 1)), 1);
         cardDeck.add(card3);
 
-        OpenSpaceCard card4 = new OpenSpaceCard(1, true);
+        OpenSpaceCard card4 = new OpenSpaceCard(0, 1, true);
         cardDeck.add(card4);
 
-        AbandonedShipCard card5 = new AbandonedShipCard(1, true, 3, 4, 1);
+        AbandonedShipCard card5 = new AbandonedShipCard(0, 1, true, 3, 4, 1);
         cardDeck.add(card5);
 
         PenaltyCombatZone penalty1 = new CountablePenaltyZone(3, MalusType.DAYS);
@@ -366,16 +350,16 @@ public class LearnerModeGameSimulationTest {
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CREW, penalty1));
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.ENGINE, penalty2));
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CANNON, penalty3));
-        CombatZoneCard card6 = new CombatZoneCard(1, true, damages);
+        CombatZoneCard card6 = new CombatZoneCard(0, 1, true, damages);
         cardDeck.add(card6);
 
         Planet p1 = new Planet(new HashMap<>(Map.of(ColorType.RED, 2)));
         Planet p2 = new Planet(new HashMap<>(Map.of(ColorType.RED, 1, ColorType.BLUE, 2)));
         Planet p3 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1)));
-        PlanetCard card7 = new PlanetCard(1, true, new ArrayList<>(List.of(p1, p2, p3)), 2);
+        PlanetCard card7 = new PlanetCard(0, 1, true, new ArrayList<>(List.of(p1, p2, p3)), 2);
         cardDeck.add(card7);
 
-        StardustCard card8 = new StardustCard(1, true);
+        StardustCard card8 = new StardustCard(0, 1, true);
         cardDeck.add(card8);
 
 
@@ -529,7 +513,7 @@ public class LearnerModeGameSimulationTest {
 
         controller.getIndex("Davide", 1);
 
-        controller.getIndex("Demetrio", -1);
+        controller.getIndex("Demetrio", null);
 
         controller.getIndex("Simone", 0);
 
@@ -594,7 +578,7 @@ public class LearnerModeGameSimulationTest {
 
         // Final Ranking
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking(true);
+        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking();
 
         assertEquals(11, finalRank.stream().filter(p -> p.getUsername().equals("Simone")).findFirst().orElseThrow().getCredits());
         assertEquals(9, finalRank.stream().filter(p -> p.getUsername().equals("Tommaso")).findFirst().orElseThrow().getCredits());

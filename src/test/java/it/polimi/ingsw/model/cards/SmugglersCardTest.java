@@ -54,10 +54,6 @@ class SmugglersCardTest {
         controller.pickComponent("Simone", 17);
         controller.insertComponent("Simone", 17, 1, 2, 0, true);
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-
         controller.pickComponent("Davide", 38);
         controller.rotateComponent("Davide", 38, 2);
         controller.insertComponent("Davide", 38, 1, 2, 0, true);
@@ -69,9 +65,6 @@ class SmugglersCardTest {
         controller.pickComponent("Davide", 53);
         controller.rotateComponent("Davide", 53, 1);
         controller.insertComponent("Davide", 53, 2, 2, 0, true);
-
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
 
         rewards = new HashMap<>();
         rewards.put(ColorType.RED, 2);
@@ -102,7 +95,7 @@ class SmugglersCardTest {
         board.movePlayer(p1, 9);
         board.movePlayer(p2, 9);
 
-        SmugglersCard smugglersCard = new SmugglersCard(2, false, 1, 5, rewards, 1);
+        SmugglersCard smugglersCard = new SmugglersCard(0, 2, false, 1, 5, rewards, 1);
         board.getCardPile().clear();
         board.getCardPile().add(smugglersCard);
 
@@ -142,7 +135,7 @@ class SmugglersCardTest {
         board.movePlayer(p1, 9);
         board.movePlayer(p2, 9);
 
-        SmugglersCard smugglersCard = new SmugglersCard(2, false, 2, 2, rewards, 1);
+        SmugglersCard smugglersCard = new SmugglersCard(0, 2, false, 2, 2, rewards, 1);
         board.getCardPile().clear();
         board.getCardPile().add(smugglersCard);
 

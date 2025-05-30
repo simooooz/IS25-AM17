@@ -36,16 +36,9 @@ class EpidemicCardTest {
         p2 = board.getPlayerEntityByUsername("Davide");
 
 
-        EpidemicCard epidemicCard = new EpidemicCard(2, false);
+        EpidemicCard epidemicCard = new EpidemicCard(0, 2, false);
         board.getCardPile().clear();
         board.getCardPile().add(epidemicCard);
-
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
 
     }
 

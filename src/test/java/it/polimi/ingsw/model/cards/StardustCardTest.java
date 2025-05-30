@@ -52,10 +52,6 @@ class StardustCardTest {
         controller.pickComponent("Simone", 52);
         controller.insertComponent("Simone", 52, 2, 2, 0, true);
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-
         controller.pickComponent("Davide", 5);
         controller.rotateComponent("Davide", 5, 3);
         controller.insertComponent("Davide", 5, 1, 1, 0, true);
@@ -65,13 +61,6 @@ class StardustCardTest {
 
         controller.pickComponent("Davide", 132);
         controller.insertComponent("Davide", 132, 2, 2, 0, true);
-
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
-
-        controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
         controller.pickComponent("Tommaso", 136);
         controller.insertComponent("Tommaso", 136, 2, 4, 0, true);
@@ -95,7 +84,7 @@ class StardustCardTest {
     @Test
     void testShouldCheckPlayersPosAfterCardEffect() {
 
-        StardustCard stardustCard = new StardustCard(2, false);
+        StardustCard stardustCard = new StardustCard(0, 2, false);
         board.getCardPile().clear();
         board.getCardPile().add(stardustCard);
 

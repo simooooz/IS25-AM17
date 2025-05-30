@@ -44,16 +44,6 @@ class PiratesCardTest {
         p2.setCredits(40);
         p3.setCredits(30);
 
-
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
-        controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
-
     }
 
     @AfterEach
@@ -94,7 +84,7 @@ class PiratesCardTest {
         board.movePlayer(p3, 10);
 
 
-        PiratesCard piratesCard = new PiratesCard(2, false, 1, 4, 3, cannonFires);
+        PiratesCard piratesCard = new PiratesCard(0, 2, false, 1, 4, 3, cannonFires);
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
 
@@ -147,7 +137,7 @@ class PiratesCardTest {
         board.movePlayer(p3, 10);
 
 
-        PiratesCard piratesCard = new PiratesCard(2, false, 3, 5, 3, cannonFires);
+        PiratesCard piratesCard = new PiratesCard(0, 2, false, 3, 5, 3, cannonFires);
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
 
@@ -208,7 +198,7 @@ class PiratesCardTest {
         CannonFire c1 = new CannonFire(false, NORTH);
         CannonFire c2 = new CannonFire(true, EAST);
         cannonFires = new ArrayList<>(List.of(c1, c2));
-        PiratesCard piratesCard = new PiratesCard(2, false, 1, 5, 3, cannonFires);
+        PiratesCard piratesCard = new PiratesCard(0, 2, false, 1, 5, 3, cannonFires);
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
 

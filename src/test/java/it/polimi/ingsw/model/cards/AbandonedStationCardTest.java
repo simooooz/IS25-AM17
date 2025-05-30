@@ -53,10 +53,6 @@ class AbandonedStationCardTest {
         controller.rotateComponent("Simone", 67, 1);
         controller.insertComponent("Simone", 67, 3, 4, 0, true);
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-
         controller.pickComponent("Davide", 39);
         controller.rotateComponent("Davide", 39, 3);
         controller.insertComponent("Davide", 39, 2, 4, 0, true);
@@ -64,10 +60,6 @@ class AbandonedStationCardTest {
         controller.pickComponent("Davide", 68);
         controller.rotateComponent("Davide", 68, 1);
         controller.insertComponent("Davide", 68, 3, 4, 0, true);
-
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
 
         controller.setReady("Simone");
         controller.setReady("Davide");
@@ -89,7 +81,7 @@ class AbandonedStationCardTest {
 
     @Test
     void testShouldNotUpdateIfCrewNotEnough() {
-        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 10, 5, cardGoods);
+        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(0, 2, false, 10, 5, cardGoods);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
@@ -101,7 +93,7 @@ class AbandonedStationCardTest {
 
     @Test
     void testShouldCheckIfTheParameterAreUpdate() {
-        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 2, 5, cardGoods);
+        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(0, 2, false, 2, 5, cardGoods);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 
@@ -121,7 +113,7 @@ class AbandonedStationCardTest {
 
     @Test
     void testShouldCheckIfTheCardIsUsedBySecondPlayer() {
-        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(2, false, 2, 2, cardGoods);
+        AbandonedStationCard abandonedStationCard = new AbandonedStationCard(0, 2, false, 2, 2, cardGoods);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
 

@@ -48,10 +48,6 @@ class OpenSpaceCardTest {
         controller.pickComponent("Simone", 75);
         controller.insertComponent("Simone", 75, 3, 2, 0, true);
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-
         controller.pickComponent("Davide", 15);
         controller.rotateComponent("Davide",15, 1);
         controller.insertComponent("Davide", 15, 2, 2, 0, true);
@@ -69,29 +65,17 @@ class OpenSpaceCardTest {
         controller.pickComponent("Davide", 85);
         controller.insertComponent("Davide", 85, 3, 3, 0, true);
 
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
-
         controller.pickComponent("Tommaso", 41);
         controller.insertComponent("Tommaso", 41, 2, 2, 0, true);
 
         controller.pickComponent("Tommaso", 77);
         controller.insertComponent("Tommaso", 77, 3, 2, 0, true);
 
-        controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
-
-
         controller.pickComponent("Giovanni", 6);
         controller.insertComponent("Giovanni", 6, 2, 2, 0, true);
 
         controller.pickComponent("Giovanni", 38);
         controller.insertComponent("Giovanni", 38, 3, 2, 0, true);
-
-        controller.pickComponent("Giovanni", 35);
-        controller.insertComponent("Giovanni", 35, 2, 3, 0, true);
-
 
         controller.setReady("Giovanni");
         controller.setReady("Tommaso");
@@ -104,7 +88,7 @@ class OpenSpaceCardTest {
         board.movePlayer(p2, 14);
 
 
-        OpenSpaceCard openSpaceCard = new OpenSpaceCard(2, false);
+        OpenSpaceCard openSpaceCard = new OpenSpaceCard(0, 2, false);
         board.getCardPile().clear();
         board.getCardPile().add(openSpaceCard);
 

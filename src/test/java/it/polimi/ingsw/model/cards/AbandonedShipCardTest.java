@@ -48,10 +48,6 @@ class AbandonedShipCardTest {
         controller.pickComponent("Simone", 59);
         controller.insertComponent("Simone", 59, 2, 2, 0, true);
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-
         controller.pickComponent("Davide", 136);
         controller.insertComponent("Davide", 136, 3, 1, 0, true);
 
@@ -62,16 +58,9 @@ class AbandonedShipCardTest {
         controller.pickComponent("Davide", 44);
         controller.insertComponent("Davide", 44, 2, 1, 0, true);
 
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
-
         controller.pickComponent("Tommaso", 117);
         controller.rotateComponent("Tommaso", 117, 3);
         controller.insertComponent("Tommaso", 117, 1, 3, 0, true);
-
-        controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
 
         controller.setReady("Simone");
         controller.setReady("Davide");
@@ -97,7 +86,7 @@ class AbandonedShipCardTest {
 
     @Test
     void testShouldNotUpdateCardIfCrewNotEnough() {
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 10, 0, 0);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 10, 0, 0);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
@@ -110,7 +99,7 @@ class AbandonedShipCardTest {
 
     @Test
     void testShouldCheckIfTheParameterAreUpdateWithHuman() {
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 2, 6, 7);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 2, 6, 7);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
@@ -127,7 +116,7 @@ class AbandonedShipCardTest {
 
     @Test
     void testShouldCheckIfTheParameterAreUpdateWithHumanAndAlien() {
-    AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 2, 6, 7);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 2, 6, 7);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
@@ -137,14 +126,14 @@ class AbandonedShipCardTest {
 
         controller.removeCrew("Simone", new ArrayList<>(List.of(32, 37)));
 
-    assertEquals(1, p1.getShip().getCrew());
-    assertEquals(56, p1.getCredits());
-    assertEquals(6, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
+        assertEquals(1, p1.getShip().getCrew());
+        assertEquals(56, p1.getCredits());
+        assertEquals(6, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p1)).findFirst().orElseThrow().getValue());
     }
 
     @Test
     void testShouldCheckIfTheCardIsUsedBySecondPlayer() {
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 4, 6, 2);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 4, 6, 2);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 
@@ -164,7 +153,7 @@ class AbandonedShipCardTest {
 
     @Test
     void testShouldCheckIfTheCardIsUsedByThirdPlayer() {
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(2, false, 1, 6, 2);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 1, 6, 2);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
 

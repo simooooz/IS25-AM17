@@ -39,16 +39,6 @@ class PlanetCardTest {
         p2 = board.getPlayerEntityByUsername("Davide");
         p3 = board.getPlayerEntityByUsername("Tommaso");
 
-        controller.pickComponent("Simone", 32);
-        controller.insertComponent("Simone", 32, 2, 3, 0, true);
-
-        controller.pickComponent("Davide", 33);
-        controller.insertComponent("Davide", 33, 2, 3, 0, true);
-
-        controller.pickComponent("Tommaso", 34);
-        controller.insertComponent("Tommaso", 34, 2, 3, 0, true);
-
-
         Map<ColorType, Integer> rewards1 = new HashMap<>();
         rewards1.put(ColorType.RED, 2);
         rewards1.put(ColorType.GREEN, 1);
@@ -57,7 +47,7 @@ class PlanetCardTest {
         rewards2.put(ColorType.YELLOW, 1);
         List<Planet> planetList = new ArrayList<>(List.of(new Planet(rewards1), new Planet(rewards2), new Planet(rewards1)));
 
-        PlanetCard planetCard = new PlanetCard(2, true, planetList, 3);
+        PlanetCard planetCard = new PlanetCard(0, 2, true, planetList, 3);
         board.getCardPile().clear();
         board.getCardPile().add(planetCard);
 
@@ -94,9 +84,9 @@ class PlanetCardTest {
         // player1 lands on first planet
         controller.getIndex("Simone", 0);
 
-        controller.getIndex("Davide", -1);
+        controller.getIndex("Davide", null);
 
-        controller.getIndex("Tommaso", -1);
+        controller.getIndex("Tommaso", null);
 
         //P1 response
         Map<Integer, List<ColorType>> cargoMap = new HashMap<>();

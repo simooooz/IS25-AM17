@@ -69,9 +69,6 @@ public class GameSimulationTest {
         controller.rotateComponent("Tommaso", 38, 1);
         controller.insertComponent("Tommaso", 38, 2, 2, 0, true);
 
-        controller.pickComponent("Tommaso", 32);
-        controller.insertComponent("Tommaso", 32, 2, 3, 0, true);
-
         controller.pickComponent("Tommaso", 63);
         controller.insertComponent("Tommaso", 63, 2, 4, 0, true);
 
@@ -164,9 +161,6 @@ public class GameSimulationTest {
         controller.pickComponent("Simone", 56);
         controller.insertComponent("Simone", 56, 2, 2, 0, true);
 
-        controller.pickComponent("Simone", 33);
-        controller.insertComponent("Simone", 33, 2, 3, 0, true);
-
         controller.pickComponent("Simone", 58);
         controller.rotateComponent("Simone", 58, 2);
         controller.insertComponent("Simone", 58, 2, 4, 0, true);
@@ -246,9 +240,6 @@ public class GameSimulationTest {
         controller.pickComponent("Davide", 148);
         controller.rotateComponent("Davide", 148, 2);
         controller.insertComponent("Davide", 148, 2, 2, 0, true);
-
-        controller.pickComponent("Davide", 34);
-        controller.insertComponent("Davide", 34, 2, 3, 0, true);
 
         controller.pickComponent("Davide", 142);
         controller.rotateComponent("Davide", 142, 2);
@@ -365,11 +356,11 @@ public class GameSimulationTest {
 
         List<Card> cardDeck = controller.getModel().getBoard().getCardPile();
         cardDeck.clear();
-        SlaversCard card1 = new SlaversCard(2, false, 4, 8, 2, 7);
+        SlaversCard card1 = new SlaversCard(0, 2, false, 4, 8, 2, 7);
         cardDeck.add(card1);
-        AbandonedShipCard card2 = new AbandonedShipCard(1, true, 3, 4, 1);
+        AbandonedShipCard card2 = new AbandonedShipCard(0, 1, true, 3, 4, 1);
         cardDeck.add(card2);
-        AbandonedStationCard card3 = new AbandonedStationCard(1, true, 5, 1, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1)));
+        AbandonedStationCard card3 = new AbandonedStationCard(0, 1, true, 5, 1, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1)));
         cardDeck.add(card3);
         PenaltyCombatZone penalty1 = new CountablePenaltyZone(4, MalusType.DAYS);
         PenaltyCombatZone penalty2 = new CountablePenaltyZone(3, MalusType.GOODS);
@@ -378,29 +369,29 @@ public class GameSimulationTest {
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CANNON, penalty1));
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.ENGINE, penalty2));
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CREW, penalty3));
-        CombatZoneCard card4 = new CombatZoneCard(2, false, damages);
+        CombatZoneCard card4 = new CombatZoneCard(0, 2, false, damages);
         cardDeck.add(card4);
-        MeteorSwarmCard card5 = new MeteorSwarmCard(2, false, new ArrayList<>(List.of(new Meteor(false, NORTH), new Meteor(false, NORTH), new Meteor(true, WEST), new Meteor(false, WEST), new Meteor(false, WEST))));
+        MeteorSwarmCard card5 = new MeteorSwarmCard(0, 2, false, new ArrayList<>(List.of(new Meteor(false, NORTH), new Meteor(false, NORTH), new Meteor(true, WEST), new Meteor(false, WEST), new Meteor(false, WEST))));
         cardDeck.add(card5);
         Planet p1 = new Planet(new HashMap<>(Map.of(ColorType.GREEN, 2)));
         Planet p2 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1)));
         Planet p3 = new Planet(new HashMap<>(Map.of(ColorType.BLUE, 3)));
-        PlanetCard card6 = new PlanetCard(1, false, new ArrayList<>(List.of(p1, p2, p3)), 1);
+        PlanetCard card6 = new PlanetCard(0, 1, false, new ArrayList<>(List.of(p1, p2, p3)), 1);
         cardDeck.add(card6);
-        SmugglersCard card7 = new SmugglersCard(2, false, 8, 3, new HashMap<>(Map.of(ColorType.RED, 1, ColorType.YELLOW, 2)),1);
+        SmugglersCard card7 = new SmugglersCard(0, 2, false, 8, 3, new HashMap<>(Map.of(ColorType.RED, 1, ColorType.YELLOW, 2)),1);
         cardDeck.add(card7);
-        MeteorSwarmCard card8 = new MeteorSwarmCard(2, false, new ArrayList<>(List.of(new Meteor(true, NORTH), new Meteor(true, NORTH), new Meteor(false, SOUTH), new Meteor(false, SOUTH))));
+        MeteorSwarmCard card8 = new MeteorSwarmCard(0, 2, false, new ArrayList<>(List.of(new Meteor(true, NORTH), new Meteor(true, NORTH), new Meteor(false, SOUTH), new Meteor(false, SOUTH))));
         cardDeck.add(card8);
-        OpenSpaceCard card9 = new OpenSpaceCard(2, false);
+        OpenSpaceCard card9 = new OpenSpaceCard(0, 2, false);
         cardDeck.add(card9);
         p1 = new Planet(new HashMap<>(Map.of(ColorType.GREEN, 4)));
         p2 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 2)));
         p3 = new Planet(new HashMap<>(Map.of(ColorType.BLUE, 4)));
-        PlanetCard card10 = new PlanetCard(1, false, new ArrayList<>(List.of(p1, p2, p3)), 3);
+        PlanetCard card10 = new PlanetCard(0, 1, false, new ArrayList<>(List.of(p1, p2, p3)), 3);
         cardDeck.add(card10);
-        StardustCard card11 = new StardustCard(1, true);
+        StardustCard card11 = new StardustCard(0, 1, true);
         cardDeck.add(card11);
-        PiratesCard card12 = new PiratesCard(2, false, 6, 7, 2, new ArrayList<>(List.of(new CannonFire(true, NORTH), new CannonFire(false, NORTH), new CannonFire(true, NORTH))));
+        PiratesCard card12 = new PiratesCard(0, 2, false, 6, 7, 2, new ArrayList<>(List.of(new CannonFire(true, NORTH), new CannonFire(false, NORTH), new CannonFire(true, NORTH))));
         cardDeck.add(card12);
 
         // Card 1
@@ -677,7 +668,7 @@ public class GameSimulationTest {
         finish = card12.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 11, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
         if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking(false);
+        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking();
 
         assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().countExposedConnectors());
         assertEquals(9, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().countExposedConnectors());
@@ -736,10 +727,6 @@ public class GameSimulationTest {
         controller.pickComponent("Tommaso", 31);
         controller.rotateComponent("Tommaso", 31, 3);
         controller.insertComponent("Tommaso", 31, 2, 2, 0, true);
-
-        controller.pickComponent("Tommaso", 33);
-        controller.rotateComponent("Tommaso", 33, 3);
-        controller.insertComponent("Tommaso", 33, 2, 3, 0, true);
 
         controller.pickComponent("Tommaso", 18);
         controller.rotateComponent("Tommaso", 18, 3);
@@ -841,10 +828,6 @@ public class GameSimulationTest {
         controller.pickComponent("Simone", 12);
         controller.rotateComponent("Simone", 12, 3);
         controller.insertComponent("Simone", 12, 2, 2, 0, true);
-
-        controller.pickComponent("Simone", 34);
-        controller.rotateComponent("Simone", 34, 1);
-        controller.insertComponent("Simone", 34, 2, 3, 0, true);
 
         controller.pickComponent("Simone", 65);
         controller.rotateComponent("Simone", 65, 2);
@@ -951,10 +934,6 @@ public class GameSimulationTest {
         controller.rotateComponent("Demetrio", 27, 1);
         controller.insertComponent("Demetrio", 27, 2, 2, 0, true);
 
-        controller.pickComponent("Demetrio", 32);
-        controller.rotateComponent("Demetrio", 32, 0);
-        controller.insertComponent("Demetrio", 32, 2, 3, 0, true);
-
         controller.pickComponent("Demetrio", 151);
         controller.rotateComponent("Demetrio", 151, 1);
         controller.insertComponent("Demetrio", 151, 2, 4, 0, true);
@@ -1060,10 +1039,6 @@ public class GameSimulationTest {
         controller.rotateComponent("Davide", 58, 0);
         controller.insertComponent("Davide", 58, 2, 2, 0, true);
 
-        controller.pickComponent("Davide", 35);
-        controller.rotateComponent("Davide", 35, 0);
-        controller.insertComponent("Davide", 35, 2, 3, 0, true);
-
         controller.pickComponent("Davide", 4);
         controller.rotateComponent("Davide", 4, 3);
         controller.insertComponent("Davide", 4, 2, 4, 0, true);
@@ -1155,21 +1130,21 @@ public class GameSimulationTest {
 
         List<Card> cardDeck = controller.getModel().getBoard().getCardPile();
         cardDeck.clear();
-        EpidemicCard card1 = new EpidemicCard(2, false);
+        EpidemicCard card1 = new EpidemicCard(0, 2, false);
         cardDeck.add(card1);
-        PiratesCard card2 = new PiratesCard(2, false, 6, 7, 2, new ArrayList<>(List.of(new CannonFire(true, NORTH), new CannonFire(false, NORTH), new CannonFire(true, NORTH))));
+        PiratesCard card2 = new PiratesCard(0, 2, false, 6, 7, 2, new ArrayList<>(List.of(new CannonFire(true, NORTH), new CannonFire(false, NORTH), new CannonFire(true, NORTH))));
         cardDeck.add(card2);
         Planet p1 = new Planet(new HashMap<>(Map.of(ColorType.RED, 2)));
         Planet p2 = new Planet(new HashMap<>(Map.of(ColorType.GREEN, 4)));
-        PlanetCard card3 = new PlanetCard(2, false, new ArrayList<>(List.of(p1, p2)), 3);
+        PlanetCard card3 = new PlanetCard(0, 2, false, new ArrayList<>(List.of(p1, p2)), 3);
         cardDeck.add(card3);
-        AbandonedStationCard card4 = new AbandonedStationCard(1, true, 5, 1, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1)));
+        AbandonedStationCard card4 = new AbandonedStationCard(0, 1, true, 5, 1, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1)));
         cardDeck.add(card4);
-        StardustCard card5 = new StardustCard(2, false);
+        StardustCard card5 = new StardustCard(0, 2, false);
         cardDeck.add(card5);
-        MeteorSwarmCard card6 = new MeteorSwarmCard(2, false, new ArrayList<>(List.of(new Meteor(false, NORTH), new Meteor(false, NORTH), new Meteor(true, WEST), new Meteor(false, WEST), new Meteor(false, WEST))));
+        MeteorSwarmCard card6 = new MeteorSwarmCard(0, 2, false, new ArrayList<>(List.of(new Meteor(false, NORTH), new Meteor(false, NORTH), new Meteor(true, WEST), new Meteor(false, WEST), new Meteor(false, WEST))));
         cardDeck.add(card6);
-        SmugglersCard card7 = new SmugglersCard(1, true, 4, 2, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1, ColorType.BLUE, 2)),1);
+        SmugglersCard card7 = new SmugglersCard(0, 1, true, 4, 2, new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1, ColorType.BLUE, 2)),1);
         cardDeck.add(card7);
         PenaltyCombatZone penalty1 = new CountablePenaltyZone(4, MalusType.DAYS);
         PenaltyCombatZone penalty2 = new CountablePenaltyZone(3, MalusType.GOODS);
@@ -1178,22 +1153,22 @@ public class GameSimulationTest {
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CANNON, penalty1));
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.ENGINE, penalty2));
         damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CREW, penalty3));
-        CombatZoneCard card8 = new CombatZoneCard(2, false, damages);
+        CombatZoneCard card8 = new CombatZoneCard(0, 2, false, damages);
         cardDeck.add(card8);
         Planet p3 = new Planet(new HashMap<>(Map.of(ColorType.RED, 1, ColorType.YELLOW, 1)));
         Planet p4 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1, ColorType.GREEN, 1, ColorType.BLUE, 1)));
         Planet p5 = new Planet(new HashMap<>(Map.of(ColorType.GREEN, 2)));
         Planet p6 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1)));
-        PlanetCard card9 = new PlanetCard(2, false, new ArrayList<>(List.of(p3, p4, p5, p6)), 2);
+        PlanetCard card9 = new PlanetCard(0, 2, false, new ArrayList<>(List.of(p3, p4, p5, p6)), 2);
         cardDeck.add(card9);
-        OpenSpaceCard card10 = new OpenSpaceCard(1, false);
+        OpenSpaceCard card10 = new OpenSpaceCard(0, 1, false);
         cardDeck.add(card10);
         Planet p7 = new Planet(new HashMap<>(Map.of(ColorType.RED, 2)));
         Planet p8 = new Planet(new HashMap<>(Map.of(ColorType.RED, 1, ColorType.BLUE, 2)));
         Planet p9 = new Planet(new HashMap<>(Map.of(ColorType.YELLOW, 1)));
-        PlanetCard card11 = new PlanetCard(2, false, new ArrayList<>(List.of(p7, p8, p9)), 2);
+        PlanetCard card11 = new PlanetCard(0, 2, false, new ArrayList<>(List.of(p7, p8, p9)), 2);
         cardDeck.add(card11);
-        AbandonedShipCard card12 = new AbandonedShipCard(2, false, 5, 8, 2);
+        AbandonedShipCard card12 = new AbandonedShipCard(0, 2, false, 5, 8, 2);
         cardDeck.add(card12);
 
 
@@ -1468,7 +1443,7 @@ public class GameSimulationTest {
         assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getShip().countExposedConnectors());
 
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking(false);
+        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking();
 
         assertEquals(2, finalRank.stream().filter(p -> p.getUsername().equals("Simone")).findFirst().orElseThrow().getCredits());
         assertEquals(17, finalRank.stream().filter(p -> p.getUsername().equals("Tommaso")).findFirst().orElseThrow().getCredits());
