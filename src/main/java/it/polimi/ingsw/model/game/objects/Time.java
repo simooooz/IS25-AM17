@@ -29,7 +29,7 @@ public class Time {
 
     private void rotateHourglass() {
         if (hourglassPos > 0) {
-            timeLeft = 15;
+            timeLeft = 60;
             hourglassPos--;
         }
     }

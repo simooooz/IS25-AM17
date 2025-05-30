@@ -345,13 +345,13 @@ public class ViewTui {
                 Map<Integer, List<ColorType>> newDisposition = new HashMap<>();
                 List<Integer> batteriesIds = new ArrayList<>();
                 if (!input.isBlank()) {
-                    String[] parts = input.split("-");
-                    String[] commandList = parts[0].trim().split(" ");
+                    String[] parts = input.trim().split("-");
+                    String[] firstCommandList = parts[0].trim().split(" ");
 
                     List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.name().toUpperCase()).toList();
                     Integer currentId = null;
-                    for (String value : commandList) {
-                        if (colors.contains(value.toUpperCase()))
+                    for (String value : firstCommandList) {
+                        if (colors.contains(value.toUpperCase()) && newDisposition.containsKey(currentId))
                             newDisposition.get(currentId).add(ColorType.valueOf(value.toUpperCase()));
                         else {
                             currentId = Integer.parseInt(value);
@@ -359,7 +359,7 @@ public class ViewTui {
                         }
                     }
 
-                    if (state == PlayerState.WAIT_REMOVE_GOODS) {
+                    if (state == PlayerState.WAIT_REMOVE_GOODS && !parts[1].isBlank()) {
                         batteriesIds = Arrays.stream(parts[1].trim().split(" "))
                                 .map(Integer::parseInt)
                                 .toList();
