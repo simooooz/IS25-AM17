@@ -3,94 +3,39 @@ package it.polimi.ingsw.model.cards;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.CannonFire;
-import it.polimi.ingsw.model.cards.utils.Meteor;
-import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class PiratesCard extends Card{
+public class PiratesCard extends EnemiesCard {
 
-    private final int piratesFirePower;
     private final int credits;
-    private final int days;
     private final List<CannonFire> cannonFires;
 
-    private List<PlayerData> players;
     private final List<PlayerData> defeatedPlayers;
-    private boolean piratesDefeated;
-    private int playerIndex;
     private int cannonIndex;
     private int coord;
 
     public PiratesCard(int id, int level, boolean isLearner, int piratesFirePower, int credits, int days, List<CannonFire> cannonFires) {
-        super(id, level, isLearner);
-        this.piratesFirePower = piratesFirePower;
+        super(id, level, isLearner, days, piratesFirePower);
         this.credits = credits;
-        this.days = days;
         this.cannonFires = cannonFires;
-
         this.defeatedPlayers = new ArrayList<>();
     }
 
     @Override
     public boolean startCard(ModelFacade model, Board board) {
-        this.piratesDefeated = false;
-        this.playerIndex = 0;
         this.cannonIndex = 0;
-        this.players = new ArrayList<>(board.getPlayersByPos());
-
-        for (PlayerData player : players) {
-            model.setPlayerState(player.getUsername(), PlayerState.WAIT);
-        }
-        return autoCheckPlayers(model, board);
+        return super.startCard(model, board);
     }
 
-    private boolean autoCheckPlayers(ModelFacade model, Board board) {
-        for (; playerIndex < players.size(); playerIndex++) {
-            PlayerData player = players.get(playerIndex);
-
-            double freeCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
-                    .filter(cannon -> !cannon.getIsDouble())
-                    .mapToDouble(CannonComponent::calcPower).sum();
-            if (freeCannonsPower > 0 && player.getShip().getCannonAlien())
-                freeCannonsPower += 2;
-
-            double doubleCannonsPower = player.getShip().getComponentByType(CannonComponent.class).stream()
-                    .filter(CannonComponent::getIsDouble)
-                    .mapToDouble(CannonComponent::calcPower)
-                    .boxed()
-                    .sorted(Comparator.reverseOrder())
-                    .limit(player.getShip().getBatteries())
-                    .mapToDouble(v -> v)
-                    .sum();
-
-            if (piratesDefeated)
-                model.setPlayerState(player.getUsername(), PlayerState.DONE);
-            else if (freeCannonsPower > piratesFirePower) { // User wins automatically
-                model.setPlayerState(player.getUsername(), PlayerState.WAIT_BOOLEAN);
-                piratesDefeated = true;
-                return false;
-            }
-            else if (freeCannonsPower == piratesFirePower && doubleCannonsPower == 0) // User draws automatically
-                model.setPlayerState(player.getUsername(), PlayerState.DONE);
-            else if (freeCannonsPower + doubleCannonsPower >= piratesFirePower) { // User could win
-                model.setPlayerState(player.getUsername(), PlayerState.WAIT_CANNONS);
-                return false;
-            }
-            else { // User loses automatically
-                defeatedPlayers.add(player);
-                model.setPlayerState(player.getUsername(), PlayerState.DONE);
-            }
-        }
-
-        // Check if everyone has finished
+    @Override
+    public boolean calcHasDone(ModelFacade model, Board board) {
         boolean hasDone = true;
         for (PlayerData player : players)
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
@@ -117,6 +62,13 @@ public class PiratesCard extends Card{
     }
 
     @Override
+    public boolean defeatedMalus(ModelFacade model, PlayerData player) {
+        defeatedPlayers.add(player);
+        model.setPlayerState(player.getUsername(), PlayerState.DONE);
+        return false;
+    }
+
+    @Override
     public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_ROLL_DICES) {
             this.coord = value;
@@ -133,12 +85,12 @@ public class PiratesCard extends Card{
     @Override
     public boolean doCommandEffects(PlayerState commandType, Double value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_CANNONS) {
-            if (value > piratesFirePower && !piratesDefeated) { // Ask if user wants to redeem rewards
+            if (value > enemyFirePower && !enemiesDefeated) { // Ask if user wants to redeem rewards
                 model.setPlayerState(username, PlayerState.WAIT_BOOLEAN);
-                piratesDefeated = true;
+                enemiesDefeated = true;
                 return false;
             }
-            else if (value >= piratesFirePower) { // Tie or pirates already defeated
+            else if (value >= enemyFirePower) { // Tie or pirates already defeated
                 model.setPlayerState(username, PlayerState.DONE);
             }
             else { // Player is defeated
@@ -209,7 +161,7 @@ public class PiratesCard extends Card{
         String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
         cardLines.add(divider);
 
-        String firePowerRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(piratesFirePower + " 💥", 20) +
+        String firePowerRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(enemyFirePower + " 💥", 20) +
                 "\u2009"  + "\u200A" + vBorder + " ";
         cardLines.add(firePowerRow);
 
@@ -255,9 +207,9 @@ public class PiratesCard extends Card{
                 case WAIT_SHIP_PART -> Chroma.println("- " + player.getUsername() + " might have lost part of his ship " + def, Chroma.YELLOW_BOLD);
             }
         }
-        Chroma.println("Pirates are" + (piratesDefeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
+        Chroma.println("Pirates are" + (enemiesDefeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
 
-        if (piratesDefeated && board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
+        if (enemiesDefeated && board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
             Chroma.println("Cannon fire n." + (cannonIndex+1) + " is hitting at coord: " + coord, Chroma.YELLOW_BOLD);
         else if (cannonIndex > 0)
             Chroma.println("Previous cannon fire n." + (cannonIndex) + " has come at coord: " + coord, Chroma.YELLOW_BOLD);
