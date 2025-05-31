@@ -1,6 +1,8 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.model.ModelFacadeAdvancedMode;
+import it.polimi.ingsw.model.ModelFacadeLearnerMode;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.objects.AlienType;
@@ -20,7 +22,6 @@ public class GameController {
      * {@link ModelFacade} ref: exposed methods for interacting with the model
      */
     private final ModelFacade model;
-    private final boolean learnerMode;
 
     /**
      * Constructor
@@ -28,8 +29,7 @@ public class GameController {
      * @param usernames players' usernames in the game
      */
     public GameController(List<String> usernames, boolean learnerMode) {
-        this.model = new ModelFacade(usernames, learnerMode);
-        this.learnerMode = learnerMode;
+        this.model = learnerMode ? new ModelFacadeLearnerMode(usernames) : new ModelFacadeAdvancedMode(usernames);
     }
 
     public void startMatch() {
@@ -60,8 +60,6 @@ public class GameController {
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
-        else if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
-
         model.reserveComponent(username, componentId);
     }
 
@@ -94,16 +92,12 @@ public class GameController {
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new IllegalStateException("Player is already ready");
-        else if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
-
         model.lookCardPile(username, deckIndex);
     }
 
     public void moveHourglass(String username) {
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD && model.getPlayerState(username) != PlayerState.WAIT) throw new IllegalStateException("State is not BUILDING or WAIT");
-        else if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
-
         model.moveHourglass(username);
     }
 
@@ -175,7 +169,6 @@ public class GameController {
     }
 
     public void endFlight(String username) {
-        if (learnerMode) throw new IllegalArgumentException("Match is in learner mode");
         model.endFlight(username);
     }
 

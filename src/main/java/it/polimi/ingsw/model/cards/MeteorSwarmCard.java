@@ -44,11 +44,8 @@ public class MeteorSwarmCard extends Card{
 
         if (hasDone) {
             meteorIndex++;
-            if (meteorIndex >= meteors.size()) {
-                if (!model.isLearnerMode())
-                    endCard(board);
+            if (meteorIndex >= meteors.size())
                 return true;
-            }
             else {
                 for (PlayerData player : board.getPlayersByPos())
                     model.setPlayerState(player.getUsername(), PlayerState.WAIT);

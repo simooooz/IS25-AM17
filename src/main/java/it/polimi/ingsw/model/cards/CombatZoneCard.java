@@ -34,11 +34,8 @@ public class CombatZoneCard extends Card {
 
     @Override
     public boolean startCard(ModelFacade model, Board board) {
-        if (board.getPlayersByPos().size() < 2) {
-            if (!model.isLearnerMode())
-                endCard(board);
+        if (board.getPlayersByPos().size() < 2)
             return true;
-        }
         else {
             this.warLineIndex = 0;
             this.playerIndex = 0;
@@ -75,11 +72,8 @@ public class CombatZoneCard extends Card {
 
         if (hasDone && worst.getKey().getValue().isEmpty()) { // Malus already applied, go to the next line
             warLineIndex++;
-            if (warLineIndex >= warLines.size()) {
-                if (!model.isLearnerMode())
-                    endCard(board);
+            if (warLineIndex >= warLines.size())
                 return true;
-            }
             else {
                 for (PlayerData player : board.getPlayersByPos())
                     model.setPlayerState(player.getUsername(), PlayerState.WAIT);

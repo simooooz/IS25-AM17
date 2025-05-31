@@ -23,8 +23,8 @@ public class ShieldComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld, boolean learnerMode) {
-        super.insertComponent(ship, row, col, rotations, weld, learnerMode);
+    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld) {
+        super.insertComponent(ship, row, col, rotations, weld);
         for (DirectionType direction : directionsProtected)
             ship.getProtectedSides().add(direction);
     }

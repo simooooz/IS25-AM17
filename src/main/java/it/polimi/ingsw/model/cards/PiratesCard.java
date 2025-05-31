@@ -41,17 +41,11 @@ public class PiratesCard extends EnemiesCard {
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
-        if (hasDone && defeatedPlayers.isEmpty()) {
-            if (!model.isLearnerMode())
-                endCard(board);
+        if (hasDone && defeatedPlayers.isEmpty())
             return true;
-        }
         else if (hasDone) {
-            if (cannonIndex >= cannonFires.size()) {
-                if (!model.isLearnerMode())
-                    endCard(board);
+            if (cannonIndex >= cannonFires.size())
                 return true;
-            }
             else {
                 for (PlayerData player : defeatedPlayers)
                     model.setPlayerState(player.getUsername(), PlayerState.WAIT);

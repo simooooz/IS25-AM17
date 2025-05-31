@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.player;
 
-import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.model.game.Board;
 
 public class PlayerData {
 
@@ -9,11 +10,11 @@ public class PlayerData {
     private int credits;
     private boolean endedInAdvance;
 
-    public PlayerData(String username, boolean isLearner, Component startingCabin) {
+    public PlayerData(String username, Ship ship) {
         this.username = username;
         this.credits = 0;
         this.endedInAdvance = false;
-        this.ship = new Ship(isLearner, startingCabin);
+        this.ship = ship;
     }
 
     @Override
@@ -46,4 +47,10 @@ public class PlayerData {
     public boolean hasEndedInAdvance() {
         return endedInAdvance;
     }
+
+    public void setReady(Board board) {
+        ship.getHandComponent().ifPresent(c -> c.releaseComponent(board, ship));
+        board.moveToBoard(this);
+    }
+
 }

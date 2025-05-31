@@ -70,12 +70,6 @@ public class Component {
         return areConnectorsCompatible(conn1, conn2) && conn1 != ConnectorType.EMPTY && conn2 != ConnectorType.EMPTY;
     }
 
-    public static boolean validPositions(int row, int col, boolean learnerMode) {
-        if (learnerMode)
-            return !((col < 1 || col > 5) || (row < 0 || row > 5) || (row == 0 && col == 1) || (row == 0 && col == 2) || (row == 0 && col == 4) || (row == 0 && col == 5) || (row == 1 && col == 1) || (row == 1 && col == 5) || (row == 4 && col == 3));
-        return !((col < 0 || col > 6) || (row < 0 || row > 5) || (row == 0 && col == 0) || (row == 0 && col == 1) || (row == 0 && col == 3) || (row == 0 && col == 5) || (row == 0 && col == 6) || (row == 1 && col == 0) || (row == 1 && col == 6) || (row == 4 && col == 3));
-    }
-
     public void affectDestroy(Ship ship) {
         if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
             throw new ComponentNotValidException("Component isn't in dashboard");
@@ -150,7 +144,7 @@ public class Component {
         ship.getReserves().add(this);
     }
 
-    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld, boolean learnerMode) {
+    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld) {
         if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) // Component is in hand
             ship.setHandComponent(null);
         else if (ship.getReserves().contains(this)) { // Component is in reserves, weld it
@@ -164,7 +158,7 @@ public class Component {
         else
             throw new ComponentNotValidException("Component to insert isn't in hand or in reserves");
 
-        if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
+        if (!ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("The position where to insert it is not valid"); // Check if new position is valid
         else if (!shown)
             throw new ComponentNotValidException("Component is hidden");
@@ -185,12 +179,12 @@ public class Component {
         inserted = true;
     }
 
-    public void moveComponent(Ship ship, int row, int col, boolean learnerMode) {
+    public void moveComponent(Ship ship, int row, int col) {
         if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
             throw new ComponentNotValidException("Component isn't in dashboard");
         else if (inserted)
             throw new ComponentNotValidException("Component already welded");
-        else if (!Component.validPositions(row, col, learnerMode) || ship.getDashboard(row, col).isPresent())
+        else if (!ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("New position isn't valid or is already occupied"); // Check if new position is valid
 
         ship.getDashboard()[y][x] = Optional.empty();

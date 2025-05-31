@@ -11,9 +11,8 @@ import it.polimi.ingsw.view.TUI.Chroma;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Ship {
+public abstract class Ship {
     private final Optional<Component>[][] dashboard;
-    private final boolean isLearner;
     private final List<Component> discards;
     private final List<Component> reserves;
     private Optional<Component> handComponent;
@@ -24,7 +23,7 @@ public class Ship {
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
-    public Ship(boolean isLearner, Component startingCabin) {
+    public Ship(Component startingCabin) {
         this.dashboard = new Optional[Constants.SHIP_ROWS][Constants.SHIP_COLUMNS];
         this.discards = new ArrayList<>();
         this.reserves = new ArrayList<>();
@@ -38,7 +37,6 @@ public class Ship {
             this.goods.put(c, 0);
         }
         this.protectedSides = new ArrayList<>();
-        this.isLearner = isLearner;
 
         for (int row = 0; row < Constants.SHIP_ROWS; row++) {
             for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
@@ -46,7 +44,7 @@ public class Ship {
             }
         }
 
-        startingCabin.insertComponent(this, 2, 3, 0, true, isLearner);
+        startingCabin.insertComponent(this, 2, 3, 0, true);
     }
 
     public Optional<Component>[][] getDashboard() {
@@ -245,20 +243,12 @@ public class Ship {
                 for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
                     Optional<Component> componentOpt = getDashboard(row, col);
 
-                    boolean isPlayable = Component.validPositions(row, col, isLearner);
                     if (componentOpt.isPresent()) {
                         String[] cellLines = componentOpt.get().toString().split("\n");
                         output.append(" ").append(cellLines[componentRow]).append(" ");
                     }
                     else {
-                        String bgColor;
-
-                        if (isPlayable)
-                            bgColor = isLearner ? Chroma.BLUE_BACKGROUND : Chroma.PURPLE_BACKGROUND;
-                        else if (!isLearner && (row == 0 && (col == 5 || col == 6)))
-                            bgColor = Chroma.DARKPURPLE_BACKGROUND;
-                        else
-                            bgColor = Chroma.RESET;
+                        String bgColor = getShipBgColor(row, col);
 
                         if (componentRow == 0)
                             output.append(Chroma.color("  ┌─────────┐  ", bgColor));
@@ -282,5 +272,9 @@ public class Ship {
             output.append(String.format("       %-2d      ", col + 4));
         output.append("\n");
     }
+
+    public abstract boolean validPositions(int row, int col);
+
+    public abstract String getShipBgColor(int row, int col);
 
 }

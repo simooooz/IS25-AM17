@@ -6,7 +6,6 @@ import it.polimi.ingsw.model.cards.commands.*;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
-import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
@@ -14,20 +13,16 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ModelFacade {
+public abstract class ModelFacade {
 
-    private final Board board;
+    protected Board board;
     private final List<String> usernames;
-    private final Map<String, PlayerState> playersState;
-    private final boolean learnerMode;
+    protected final Map<String, PlayerState> playersState;
 
-    public ModelFacade(List<String> usernames, boolean learnerMode) {
+    public ModelFacade(List<String> usernames) {
         this.usernames = usernames;
-        this.learnerMode = learnerMode;
-        this.board = new Board(usernames, learnerMode);
         this.playersState = new HashMap<>();
     }
 
@@ -42,20 +37,11 @@ public class ModelFacade {
     public void startMatch() {
         for (String username : usernames)
             playersState.put(username, PlayerState.BUILD);
-
-        if (!learnerMode)
-            board.getTimeManagement().startTimer(this);
+        board.startMatch(this);
     }
 
     public void setShuffledCardPile(List<Integer> ids) {
-        Map<Integer, Card> cardMap = new CardFactory(learnerMode)
-            .getAllCards().stream()
-            .collect(Collectors.toMap(Card::getId, card -> card));
-        List<Card> shuffledCards = ids.stream().map(cardMap::get).toList();
-
-        board.getCardPile().clear();
-        for (Card card : shuffledCards)
-            board.getCardPile().add(card);
+        board.setShuffledCardPile(ids);
     }
 
     public void pickComponent(String username, int componentId) {
@@ -83,14 +69,14 @@ public class ModelFacade {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
-        component.insertComponent(ship, row, col, rotations, weld, learnerMode);
+        component.insertComponent(ship, row, col, rotations, weld);
     }
 
     public void moveComponent(String username, int componentId, int row, int col) {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
-        component.moveComponent(ship, row, col, learnerMode);
+        component.moveComponent(ship, row, col);
     }
 
     public void rotateComponent(String username, int componentId, int num) {
@@ -122,20 +108,12 @@ public class ModelFacade {
     }
 
     public void moveHourglass(String username) {
-        if (board.getTimeManagement().getHourglassPos() == 1)
-            board.getPlayersByPos().stream()
-                    .filter(player -> player.getUsername().equals(username))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("You can't rotate hourglass because you haven't finished to build your ship"));
-
-        board.getTimeManagement().startTimer(this);
+        board.moveHourglass(username, this);
     }
 
     public void setReady(String username) {
-        Ship ship = board.getPlayerEntityByUsername(username).getShip();
-        ship.getHandComponent().ifPresent(c -> c.releaseComponent(board, ship));
-
-        board.moveToBoard(board.getPlayerEntityByUsername(username), learnerMode);
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        player.setReady(board);
         playersState.put(username, PlayerState.WAIT);
 
         if (arePlayersReady())
@@ -160,26 +138,16 @@ public class ModelFacade {
             else
                 playersState.put(player.getUsername(), PlayerState.WAIT);
 
-        for (PlayerData player : board.getPlayersByPos())
-            if (board.getPlayersByPos().get(0).equals(player))
-                if(!learnerMode)
-                    board.movePlayer(player, 6 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
-                else
-                    board.movePlayer(player, 4 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
-            else if (board.getPlayersByPos().get(1).equals(player))
-                if(!learnerMode)
-                    board.movePlayer(player, 3 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
-                else
-                    board.movePlayer(player, 2 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
-            else if (board.getPlayersByPos().get(2).equals(player))
-                board.movePlayer(player, 1 - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+        for (PlayerData player : board.getPlayersByPos()) {
+            int index = board.getPlayersByPos().indexOf(player);
+            if (index == 0 || index == 1 || index == 2)
+                board.movePlayer(player, board.getBoardOrderPos()[index] - board.getPlayers().stream().filter(entry -> entry.getKey().equals(player)).findFirst().orElseThrow().getValue());
+        }
 
-        board.shuffleCards(learnerMode);
+        board.shuffleCards();
 
-        if (areShipsReady() && !learnerMode)
+        if (areShipsReady())
             manageChooseAlienPhase(0);
-        else if (areShipsReady())
-            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
     }
 
     public void checkShip(String username, List<Integer> toRemove) {
@@ -191,14 +159,13 @@ public class ModelFacade {
             component.affectDestroy(ship);
         }
 
-        if (ship.checkShip()) {// If now ship is ready
+        if (ship.checkShip()) { // If now ship is ready
             playersState.put(username, PlayerState.WAIT);
-            board.moveToBoard(board.getPlayerEntityByUsername(username), learnerMode);
+            board.moveToBoard(board.getPlayerEntityByUsername(username));
         }
-        if (areShipsReady() && !learnerMode)
+
+        if (areShipsReady())
             manageChooseAlienPhase(0);
-        else if (areShipsReady())
-            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
     }
 
     private boolean areShipsReady() {
@@ -208,30 +175,6 @@ public class ModelFacade {
             if (playersState.get(player.getUsername()) != PlayerState.WAIT)
                 return false;
         return true;
-    }
-
-    private void manageChooseAlienPhase(int playerIndex) {
-        boolean phaseDone = true;
-        for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) { // Check if next players have to choose alien
-            PlayerData player = board.getPlayers().get(playerIndex).getKey();
-            List<CabinComponent> cabins = player.getShip().getComponentByType(CabinComponent.class)
-                    .stream().filter(c -> !c.getIsStarting()).toList();
-
-            for (CabinComponent cabin : cabins) {
-                if (!cabin.getLinkedNeighbors(player.getShip()).stream()
-                        .filter(c -> c instanceof OddComponent)
-                        .toList().isEmpty()
-                ) { // There is a cabin with an odd near odd component => player has to choose and phase isn't done
-                    phaseDone = false;
-                    playersState.put(player.getUsername(), PlayerState.WAIT_ALIEN);
-                    break;
-                }
-            }
-            if (!phaseDone) break;
-        }
-
-        if (phaseDone)
-            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
     }
 
     public void chooseAlien(String username, Map<Integer, AlienType> aliensIds) {
@@ -359,9 +302,7 @@ public class ModelFacade {
             playersState.put(username, PlayerState.END);
     }
 
-    public boolean isLearnerMode() {
-        return learnerMode;
-    }
+    protected abstract void manageChooseAlienPhase(int playerIndex);
 
     /**
      * only for tests
@@ -369,4 +310,5 @@ public class ModelFacade {
     public Board getBoard() {
         return board;
     }
+
 }

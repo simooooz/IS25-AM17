@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.PlayerState;
@@ -9,47 +8,39 @@ import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.ComponentFactory;
 import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.view.TUI.Chroma;
 
 
-import java.sql.Array;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Board {
+public abstract class Board {
 
-    private final List<SimpleEntry<PlayerData, Integer>> players;
-    private final List<Component> commonComponents;
-    private final List<PlayerData> startingDeck;
-    private final List<Card> cardPile;
-    private int cardPilePos;
-    private final Time timeManagement;
+    protected final ComponentFactory componentFactory;
+    protected CardFactory cardFactory;
+
     private final Map<Integer, Component> mapIdComponents;
-    private final Map<ColorType, Integer> availableGoods;
-    private final boolean learnerMode;
+    protected final List<Component> commonComponents;
 
-    public Board(List<String> usernames, boolean learnerMode) {
-        this.learnerMode = learnerMode;
-        this.startingDeck = new ArrayList<>();
+    protected final List<SimpleEntry<PlayerData, Integer>> players;
+    protected final List<PlayerData> startingDeck;
 
-        ComponentFactory componentFactory = new ComponentFactory();
+    protected final List<Card> cardPile;
+    protected int cardPilePos;
+
+    public Board() {
+        this.componentFactory = new ComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
         this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
-        this.cardPile = new ArrayList<>(new CardFactory(learnerMode).getCards());
-        this.cardPilePos = 0;
-        this.availableGoods = new HashMap<>();
 
-        List<ColorType> colors = Arrays.stream(ColorType.values()).toList();
-        for (int i = 0; i < usernames.size(); i++)
-            this.startingDeck.add(new PlayerData(usernames.get(i), learnerMode, componentFactory.getStartingCabins().get(colors.get(i))));
-
+        this.startingDeck = new ArrayList<>();
         this.players = new ArrayList<>();
-        this.timeManagement = learnerMode ? null : new Time();
+
+        this.cardPile = new ArrayList<>();
+        this.cardPilePos = 0;
     }
 
     public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
@@ -85,20 +76,6 @@ public class Board {
 
     public int getCardPilePos() {
         return cardPilePos;
-    }
-
-    public Time getTimeManagement() {
-        return timeManagement;
-    }
-
-    public Map<ColorType, Integer> getAvailableGoods() {
-        return availableGoods;
-    }
-
-    public void shuffleCards(boolean learnerMode) {
-        do {
-            Collections.shuffle(cardPile);
-        } while (cardPile.getFirst().getLevel() == 2 && !learnerMode);
     }
 
     public void pickNewCard(ModelFacade model) {
@@ -155,16 +132,12 @@ public class Board {
         startingDeck.add(player);
     }
 
-    public void moveToBoard(PlayerData player, boolean learnerMode) {
+    public void moveToBoard(PlayerData player) {
         startingDeck.stream()
                 .filter(p -> p.equals(player))
                 .findFirst()
                 .orElseThrow(PlayerNotFoundException::new);
-        int pos;
-        if(!learnerMode)
-            pos = players.isEmpty() ? 6 : (players.size() == 1 ? 3 : (players.size() == 2 ? 1 : 0));
-        else
-            pos = players.isEmpty() ? 4 : (players.size() == 1 ? 2 : (players.size() == 2 ? 1 : 0));
+        int pos = getBoardOrderPos()[players.size()];
         players.add(new SimpleEntry<>(player, pos));
 
         players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
@@ -177,8 +150,7 @@ public class Board {
                 this.getStartingDeck().stream()
         ).toList();
 
-        int[] credits = learnerMode ? new int[]{4, 3, 2, 1} : new int[]{8, 6, 4, 2} ;
-
+        int[] credits = getRankingCreditsValues();
 
         Map<ColorType, Integer> CREDIT_MULTIPLIERS = Map.of(
                 ColorType.RED, 4,
@@ -217,70 +189,35 @@ public class Board {
                 .toArray();
         players.stream()
                 .filter(p -> p.getShip().countExposedConnectors() == Arrays.stream(exposedConnectors).min().orElseThrow())
-                .forEach(p -> p.setCredits(p.getCredits() + (learnerMode ? 2 : 4)));
+                .forEach(p -> p.setCredits(p.getCredits() + getRankingMostBeautifulShipReward()));
 
         return players.stream()
                 .sorted(Comparator.comparingInt(PlayerData::getCredits).reversed())
                 .toList();
     }
 
-    public String toString(String username, PlayerState state) {
-        StringBuilder sb = new StringBuilder();
+    public void setShuffledCardPile(List<Integer> ids) {
+        Map<Integer, Card> cardMap = this.cardFactory
+                .getAllCards().stream()
+                .collect(Collectors.toMap(Card::getId, card -> card));
+        List<Card> shuffledCards = ids.stream().map(cardMap::get).toList();
 
-        switch (state) {
-            case BUILD -> {
-                sb.append(Constants.displayComponents(commonComponents, 10));
-
-                if (!learnerMode) {
-                    sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
-                    sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
-                }
-
-                for (PlayerData player : startingDeck)
-                    sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
-                for (SimpleEntry<PlayerData, Integer> entry : players)
-                    sb.append("- ").append(entry.getKey().getUsername()).append(Chroma.color(" READY\n", Chroma.GREEN));
-            }
-
-            case LOOK_CARD_PILE -> {
-                int deckIndex = PlayerState.LOOK_CARD_PILE.getDeckIndex().get(username);
-                int startingDeckIndex = deckIndex == 0 ? 0 : (deckIndex == 1 ? 3 : 6);
-                int endingDeckIndex = startingDeckIndex + 3;
-                cardPile.subList(startingDeckIndex, endingDeckIndex).forEach(card -> sb.append(card).append("\n") );
-                // todo CHANGE with displayCards
-
-                if (!learnerMode) {
-                    sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos()).append(timeManagement.getHourglassPos() == 0 ? " (last!)" : "");
-                    sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
-                }
-
-                for (PlayerData player : startingDeck)
-                    sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
-                for (SimpleEntry<PlayerData, Integer> entry : players)
-                    sb.append("- ").append(entry.getKey().getUsername()).append(Chroma.color(" READY\n", Chroma.GREEN));
-            }
-
-            case DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, DONE -> {
-                sb.append(Chroma.color("\nCards resolved so far " + getCardPilePos() + "/" + getCardPile().size(), Chroma.GREY_BOLD)).append("\n");
-
-                sb.append("\nPlayers in game:\n");
-                for (SimpleEntry<PlayerData, Integer> entry : players)
-                    sb.append("- ").append(entry.getKey().getUsername()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
-
-                if (!startingDeck.isEmpty()) {
-                    sb.append("Starting deck:\n");
-                    for (PlayerData player : startingDeck)
-                        sb.append("  ").append(player.getUsername()).append(" | ").append("$").append(player.getCredits()).append("\n");
-                }
-            }
-
-            case END -> {
-                sb.append("\nRanking:\n");
-                for (PlayerData player : this.getRanking())
-                    sb.append("-  ").append(player.getUsername()).append(" $").append(player.getCredits()).append("\n");
-            }
-        }
-        return sb.toString();
+        cardPile.clear();
+        cardPile.addAll(shuffledCards);
     }
+
+    public abstract void shuffleCards();
+
+    public abstract void startMatch(ModelFacade model);
+
+    public abstract void moveHourglass(String username, ModelFacade model);
+
+    public abstract int[] getBoardOrderPos();
+
+    protected abstract int[] getRankingCreditsValues();
+
+    protected abstract int getRankingMostBeautifulShipReward();
+
+    public abstract String toString(String username, PlayerState state);
 
 }

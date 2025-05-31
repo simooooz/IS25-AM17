@@ -41,7 +41,7 @@ abstract public class Card {
 
     public abstract boolean startCard(ModelFacade model, Board board);
 
-    protected void endCard(Board board) {
+    public void endCard(Board board) {
         List<PlayerData> players = board.getPlayersByPos();
 
         for (PlayerData player : players)

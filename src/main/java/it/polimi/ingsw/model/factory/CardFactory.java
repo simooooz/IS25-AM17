@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.factory;
 
-
 import it.polimi.ingsw.model.cards.SlaversCard;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,60 +25,19 @@ import java.nio.file.Files;
 import java.util.*;
 
 
-public class CardFactory {
+public abstract class CardFactory {
 
-    private final List<Card> cardPile;
+    protected final List<Card> cardPile;
 
-    public CardFactory(boolean learnerMode) {
+    public CardFactory() {
         this.cardPile = new ArrayList<>();
-        List<Card> level1Cards = new ArrayList<>();
-        List<Card> level2Cards = new ArrayList<>();
-
-        JSONObject deckJson = loadJsonConfig();
-        JSONArray cardsArray = deckJson.getJSONArray("cards");
-
-        for (int i = 0; i < cardsArray.length(); i++) {
-            JSONObject cardJson = cardsArray.getJSONObject(i);
-            Card card = createCard(cardJson);
-            if (card.getLevel() == 1)
-                level1Cards.add(card);
-            else if (card.getLevel() == 2)
-                level2Cards.add(card);
-        }
-
-        Collections.shuffle(level1Cards);
-        Collections.shuffle(level2Cards);
-
-        if (!learnerMode) {
-            for (int i = 0; i < 12; i++) {
-                if ((i + 1) % 3 == 0)
-                    cardPile.add(level1Cards.get(i));
-                else
-                    cardPile.add(level2Cards.get(i));
-            }
-        }
-        else
-            cardPile.addAll(level1Cards.stream().filter(Card::getIsLearner).toList());
-
     }
 
     public List<Card> getCards() {
         return cardPile;
     }
 
-    public List<Card> getAllCards() {
-        List<Card> allCards = new ArrayList<>();
-        JSONObject deckJson = loadJsonConfig();
-        JSONArray cardsArray = deckJson.getJSONArray("cards");
-        for (int i = 0; i < cardsArray.length(); i++) {
-            JSONObject cardJson = cardsArray.getJSONObject(i);
-            Card card = createCard(cardJson);
-            allCards.add(card);
-        }
-        return allCards;
-    }
-
-    private JSONObject loadJsonConfig() {
+    protected JSONObject loadJsonConfig() {
         try {
             String jsonContent = new String(Files.readAllBytes(new File("src/main/java/it/polimi/ingsw/model/resources/factory.json").toPath()));
             return new JSONObject(jsonContent);
@@ -89,7 +47,7 @@ public class CardFactory {
         }
     }
 
-    private Card createCard(JSONObject cardJson) {
+    protected Card createCard(JSONObject cardJson) {
         String type = cardJson.getString("type");
         int id = cardJson.getInt("id");
         int level = cardJson.getInt("level");
@@ -225,5 +183,7 @@ public class CardFactory {
                 throw new IllegalArgumentException("Unknown card type: " + type);
         }
     }
+
+    public abstract List<Card> getAllCards();
 
 }

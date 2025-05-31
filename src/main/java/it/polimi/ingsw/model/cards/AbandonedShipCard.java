@@ -59,13 +59,7 @@ public class AbandonedShipCard extends Card {
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
-        if (hasDone) {
-            if (!model.isLearnerMode())
-                endCard(board);
-            return true;
-        }
-
-        return false;
+        return hasDone;
     }
 
     @Override

@@ -64,8 +64,6 @@ public class OpenSpaceCard extends Card {
             for (PlayerData player : board.getPlayersByPos())
                 board.movePlayer(player, enginesActivated.get(player));
 
-            if (!model.isLearnerMode())
-                endCard(board);
             return true;
         }
         return false;
@@ -86,7 +84,7 @@ public class OpenSpaceCard extends Card {
     }
 
     @Override
-    protected void endCard(Board board) {
+    public void endCard(Board board) {
         for (PlayerData player : board.getPlayersByPos())
             if (enginesActivated.get(player) == 0)
                 board.moveToStartingDeck(player);

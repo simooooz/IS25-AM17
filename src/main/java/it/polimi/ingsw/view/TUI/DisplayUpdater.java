@@ -111,8 +111,8 @@ public class DisplayUpdater implements Runnable {
                             "[pick <id>]                  - pick a component\n" +
                             "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
                             "[release <id>]               - release the picked component\n" +
-                            (client.getGameController().getModel().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
-                            (client.getGameController().getModel().isLearnerMode() ? "" : "[rotate-hourglass]           - rotate the hourglass\n") +
+                            (client.getLobby().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
+                            (client.getLobby().isLearnerMode() ? "" : "[rotate-hourglass]           - rotate the hourglass\n") +
                             "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
                             "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
                             "[look-cards <id>]            - view specific card pile (0, 1 or 2)\n" +
@@ -323,7 +323,7 @@ public class DisplayUpdater implements Runnable {
                 Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                        (!inGame && !client.getGameController().getModel().isLearnerMode() ? "[rotate-hourglass]                 - rotate the hourglass\n" : "") +
+                        (!inGame && !client.getLobby().isLearnerMode() ? "[rotate-hourglass]                 - rotate the hourglass\n" : "") +
                             "[ship <username>]                  - view <username>'s ship",
                         Chroma.BLUE
                 );
