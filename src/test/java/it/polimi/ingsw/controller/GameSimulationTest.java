@@ -1414,7 +1414,7 @@ public class GameSimulationTest {
 
         controller.getBoolean("Davide", true);
 
-        controller.removeCrew("Davide", new ArrayList<>(List.of(45, 45, 41, 51, 35)));
+        controller.removeCrew("Davide", new ArrayList<>(List.of(45, 45, 41, 51, 34)));
 
         assertEquals(-2, controller.getModel().getBoard().getPlayers()
                 .stream()
