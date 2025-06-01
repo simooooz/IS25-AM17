@@ -37,7 +37,6 @@ public class CardFactoryAdvancedMode extends CardFactory {
             else
                 cardPile.add(level2Cards.get(i));
         }
-        cardPile.addAll(level1Cards.stream().filter(Card::getIsLearner).toList());
     }
 
     @Override

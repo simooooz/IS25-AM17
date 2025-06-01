@@ -17,7 +17,7 @@ public class CardFactoryLearnerMode extends CardFactory {
 
         for (int i = 0; i < cardsArray.length(); i++) {
             JSONObject cardJson = cardsArray.getJSONObject(i);
-            if (cardJson.getString("type").equals("LEARNER"))
+            if (cardJson.getBoolean("isLearner"))
                 cardPile.add(createCard(cardJson));
         }
     }
