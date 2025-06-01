@@ -2,6 +2,8 @@ package it.polimi.ingsw.network.socket.client;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.Client;
+import it.polimi.ingsw.network.discovery.DiscoveryClient;
+import it.polimi.ingsw.network.discovery.ServerInfo;
 import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -25,14 +27,8 @@ public class ClientSocket extends Client {
     private HeartbeatThread heartbeatThread;
     private ListenLoopOfClient listenLoop;
 
-    /**
-     * Constructor
-     *
-     * @param host
-     * @param port
-     */
-    public ClientSocket(String host, int port) {
-        this.connect(host, port);
+    public ClientSocket() {
+        this.connect();
 
         heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
@@ -46,14 +42,17 @@ public class ClientSocket extends Client {
         }
     }
 
-    private void connect(String ip, int port) {
+    private void connect() {
         try {
-            this.socket = new Socket(ip, port);
+            ServerInfo serverInfo = DiscoveryClient.findServer();
+            if (serverInfo == null) throw new ClientException();
+
+            this.socket = new Socket(Constants.DEFAULT_HOST, Constants.DEFAULT_SOCKET_PORT);
             this.output = new ObjectOutputStream(socket.getOutputStream());
             this.input = new ObjectInputStream(socket.getInputStream());
             this.socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
-        } catch (IOException e) {
-            System.out.println("Could not connect to " + ip + ":" + port);
+        } catch (ClientException | IOException e) {
+            System.out.println("[CLIENT SOCKET] Could not find or connect to server");
             System.exit(-1);
             // TODO capiamo forse system exit dopo un po' di retry
         }

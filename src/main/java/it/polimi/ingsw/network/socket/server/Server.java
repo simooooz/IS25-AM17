@@ -111,6 +111,38 @@ public class Server extends ServerBasis implements Runnable {
         System.out.println("[SOCKET SERVER] Connection " + connectionCode + " closed");
     }
 
+    public void stop() {
+        Thread.currentThread().interrupt();
+
+        // Close all active client connections
+        synchronized (this.connections) {
+            for (String connectionCode : this.connections.keySet()) {
+                ClientHandler conn = this.connections.get(connectionCode);
+                if (conn != null) {
+                    User.removeUser(conn); // TODO da cambiare e mettere inattivo
+                    conn.close();
+                    System.out.println("[SOCKET SERVER] Connection " + connectionCode + " closed");
+                }
+            }
+            this.connections.clear();
+        }
+
+        // Close the server socket
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+                System.out.println("[SOCKET SERVER] Server socket closed");
+            }
+        } catch (IOException e) {
+            System.err.println("[SOCKET SERVER] Error while closing server socket: " + e.getMessage());
+        }
+
+        // Reset the singleton instance
+        instance = null;
+
+        System.out.println("[SOCKET SERVER] Server shutdown completed");
+    }
+
     @Override
     public void run() {
         while (!Thread.interrupted()) {

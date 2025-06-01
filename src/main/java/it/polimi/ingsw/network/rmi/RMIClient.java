@@ -4,6 +4,9 @@ import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.game.objects.AlienType;
 import it.polimi.ingsw.model.game.objects.ColorType;
 import it.polimi.ingsw.network.Client;
+import it.polimi.ingsw.network.discovery.DiscoveryClient;
+import it.polimi.ingsw.network.discovery.ServerInfo;
+import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.Chroma;
 
@@ -27,10 +30,13 @@ public class RMIClient extends Client {
     private ClientCallback clientCallback;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public RMIClient(String host, int port) {
+    public RMIClient() {
         this.sessionCode = UUID.randomUUID().toString();
         try {
-            Registry registry = LocateRegistry.getRegistry(host, port);
+            ServerInfo serverInfo = DiscoveryClient.findServer();
+            if (serverInfo == null) throw new ClientException();
+
+            Registry registry = LocateRegistry.getRegistry(serverInfo.ipAddress, serverInfo.rmiPort);
             server = (RMIServerInterface) registry.lookup("ServerRMI");
 
             clientCallback = new ClientCallback(this);
@@ -45,8 +51,8 @@ public class RMIClient extends Client {
                 e.printStackTrace();
             }
 
-        } catch (NotBoundException | RemoteException e) {
-            System.err.println("[RMI CLIENT] Could not connect to " + host + ":" + port);
+        } catch (ClientException | NotBoundException | RemoteException e) {
+            System.err.println("[RMI CLIENT] Could not find or connect to server");
             System.exit(-1);
         }
     }

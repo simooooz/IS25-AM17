@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.TUI;
 
 import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.network.discovery.DiscoveryServer;
 import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.rmi.RMIClient;
 import it.polimi.ingsw.network.rmi.RMIServer;
@@ -18,9 +19,9 @@ public class Main {
             int clientType = InputUtility.requestInt("Press 1 to choose socket client or 2 for RMI: ", false, 1, 2);
 
             if (clientType == 1)
-                new ClientSocket(Constants.DEFAULT_HOST, Constants.DEFAULT_SOCKET_PORT);
+                new ClientSocket();
             else if (clientType == 2)
-                new RMIClient(Constants.DEFAULT_HOST, Constants.DEFAULT_RMI_PORT);
+                new RMIClient();
             else
                 System.exit(-1);
 
@@ -29,6 +30,18 @@ public class Main {
             try {
                 Server.getInstance(Constants.DEFAULT_SOCKET_PORT);
                 RMIServer.getInstance(Constants.DEFAULT_RMI_PORT);
+                DiscoveryServer.getInstance();
+
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        Server.getInstance().stop();
+                        RMIServer.getInstance().stop();
+                        DiscoveryServer.getInstance().stop();
+                    } catch (ServerException e) {
+                        // Ignore it
+                    }
+                }));
+
             } catch (ServerException _) {
                 System.exit(-1);
             }

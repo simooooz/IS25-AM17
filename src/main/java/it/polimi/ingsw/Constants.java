@@ -13,6 +13,11 @@ public abstract class Constants {
     public static final int HEARTBEAT_INTERVAL = 2000;
     public static final int SOCKET_TIMEOUT = 4000;
 
+    public static final int DISCOVERY_PORT = 4040;
+    public static final String DISCOVERY_MESSAGE = "GALAXY_TRUCKER_SERVER_DISCOVERY";
+    public static final String DISCOVERY_RESPONSE = "GALAXY_TRUCKER_SERVER_FOUND";
+    public static final int DISCOVERY_TIMEOUT = 5000;
+
     public static final int SHIP_ROWS = 5;
     public static final int SHIP_COLUMNS = 7;
 

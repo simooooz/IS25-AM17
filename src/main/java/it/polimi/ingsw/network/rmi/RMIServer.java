@@ -62,7 +62,7 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
         return instance;
     }
 
-    public void unregisterServer() {
+    public void stop() {
         scheduler.shutdownNow();
         if (registry != null) {
             try {
