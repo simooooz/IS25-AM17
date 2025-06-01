@@ -46,6 +46,7 @@ public class DiscoveryClient {
                             int rmiPort = Integer.parseInt(parts[3]);
 
                             serverInfo = new ServerInfo(ip, socketPort, rmiPort);
+                            break;
                         }
                     }
                 } catch (SocketTimeoutException e) {
