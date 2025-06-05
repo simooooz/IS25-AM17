@@ -1,0 +1,98 @@
+/* Container principale */
+.main-container {
+    -fx-background-color: linear-gradient(to bottom, #ecf0f1, #bdc3c7);
+    -fx-padding: 30;
+}
+
+/* Stili per i campi di testo */
+.text-field {
+    -fx-font-size: 14px;
+    -fx-padding: 12 16;
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 3, 0, 0, 1);
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+    -fx-border-width: 2;
+}
+
+/* Stili per i bottoni normali */
+.button {
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-padding: 12 20;
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+    -fx-scale-y: 1.05;
+    -fx-scale-x: 1.05;
+}
+
+.button:pressed {
+    -fx-background-color: #21618c;
+    -fx-scale-y: 0.95;
+    -fx-scale-x: 0.95;
+}
+
+/* Stili per i toggle button */
+.toggle-button {
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-padding: 10 16;
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #d5dbdb;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-border-color: #229954;
+}
+
+/* Stili per le label */
+.label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Stili per bottoni secondari */
+.button.secondary {
+    -fx-background-color: #95a5a6;
+}
+
+.button.secondary:hover {
+    -fx-background-color: #7f8c8d;
+}
+
+/* Stili per bottoni di pericolo */
+.button.danger {
+    -fx-background-color: #e74c3c;
+}
+
+.button.danger:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* Animazioni fluide */
+.button, .toggle-button {
+    -fx-transition: all 0.2s ease;
+}

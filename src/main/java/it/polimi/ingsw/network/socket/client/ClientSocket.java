@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.discovery.ServerInfo;
 import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.view.UserInterface;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,22 +24,42 @@ public class ClientSocket extends Client {
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
-
     private HeartbeatThread heartbeatThread;
     private ListenLoopOfClient listenLoop;
 
+    private final UserInterface userInterface;
+    private final boolean autoStartInterface;
+
+    // Costruttore per TUI (comportamento originale)
     public ClientSocket() {
+        this(null, true);
+    }
+
+    // Costruttore per GUI o uso personalizzato
+    public ClientSocket(UserInterface userInterface, boolean autoStart) {
+        this.userInterface = userInterface;
+        this.autoStartInterface = autoStart;
+
         this.connect();
+
+        // Verifica se la connessione è riuscita prima di avviare i thread
+        if (this.socket == null || !this.socket.isConnected()) {
+            System.out.println("[CLIENT SOCKET] Connection failed, not starting threads");
+            return;
+        }
 
         heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
 
         listenLoop = new ListenLoopOfClient(this);
-        try {
-            this.viewTui.start();
-        } catch (IOException e) {
-            // TODO change
-            e.printStackTrace();
+
+        // Avvia l'interfaccia solo se richiesto e se è TUI
+        if (autoStartInterface && userInterface == null) {
+            try {
+                this.viewTui.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -53,21 +74,32 @@ public class ClientSocket extends Client {
             this.socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
         } catch (ClientException | IOException e) {
             System.out.println("[CLIENT SOCKET] Could not find or connect to server");
+
+            // Se c'è un'interfaccia personalizzata (GUI), notifica l'errore invece di terminare
+            if (userInterface != null) {
+                userInterface.displayError("Impossibile connettersi al server. Verifica che il server sia avviato.");
+                return;
+            }
+
+            // Solo per la TUI mantieni il comportamento originale
             System.exit(-1);
-            // TODO capiamo forse system exit dopo un po' di retry
         }
+    }
+
+    public boolean isConnected() {
+        return socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     @Override
     public void closeConnection() {
         if (this.socket == null) return; // Already closed
 
-        if (this.listenLoop.isAlive()) {
+        if (this.listenLoop != null && this.listenLoop.isAlive()) {
             this.listenLoop.interrupt();
             this.listenLoop = null;
         }
 
-        if (this.heartbeatThread.isAlive()) {
+        if (this.heartbeatThread != null && this.heartbeatThread.isAlive()) {
             this.heartbeatThread.interrupt();
             this.heartbeatThread = null;
         }
@@ -125,7 +157,6 @@ public class ClientSocket extends Client {
             this.sendObject(message);
         } catch (ClientException e) {
             System.err.println("[CLIENT SOCKET] Error while sending message: " + e.getMessage());
-            // Everything should be closed
         }
     }
 
@@ -133,15 +164,24 @@ public class ClientSocket extends Client {
         try {
             message.execute(this);
 
-            try {
-                viewTui.getNetworkMessageQueue().put(message.getMessageType().name());
-            } catch (InterruptedException e) {
-                // Just ignore it
+            // Se è presente un'interfaccia personalizzata (GUI), usa quella
+            if (userInterface != null) {
+                userInterface.displayUpdate(message);
+            } else {
+                // Altrimenti usa la TUI (comportamento originale)
+                try {
+                    viewTui.getNetworkMessageQueue().put(message.getMessageType().name());
+                } catch (InterruptedException e) {
+                    // Just ignore it
+                }
             }
 
         } catch (RuntimeException e) {
-            viewTui.displayError(e.getMessage());
+            if (userInterface != null) {
+                userInterface.displayError(e.getMessage());
+            } else {
+                viewTui.displayError(e.getMessage());
+            }
         }
     }
-
 }

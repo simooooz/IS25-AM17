@@ -9,6 +9,7 @@ import java.io.Serializable;
 public abstract class Message implements Serializable {
 
     private final MessageType messageType;
+    private Object arguments;
 
     public Message(MessageType messageType) {
         this.messageType = messageType;
@@ -17,6 +18,8 @@ public abstract class Message implements Serializable {
     public MessageType getMessageType() {
         return messageType;
     }
+
+    public Object getArguments() {return arguments;}
 
     public void execute(ClientHandler user) {
         // If this code is executed it means that message is not handled by a subclass

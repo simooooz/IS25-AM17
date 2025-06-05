@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:controller="it.polimi.ingsw.view.GUI.MainController"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      spacing="30" alignment="CENTER"
+      prefHeight="600.0" prefWidth="800.0"
+      styleClass="main-container">
+
+    <!-- Header -->
+    <VBox spacing="10" alignment="CENTER">
+        <Label fx:id="title"
+               style="-fx-font-weight: 700; -fx-text-fill: #2c3e50;"
+               text="GALAXY TRUCKER">
+            <font>
+                <Font size="28.0" />
+            </font>
+        </Label>
+
+        <Label fx:id="command_text"
+               text="Welcome to Galaxy Trucker"
+               style="-fx-font-size: 16px; -fx-text-fill: #34495e;"
+               wrapText="true"
+               textAlignment="CENTER" />
+
+        <Label fx:id="result_text"
+               text=""
+               style="-fx-font-size: 14px;"
+               wrapText="true"
+               textAlignment="CENTER" />
+    </VBox>
+
+    <!-- Contenuto dinamico con padding -->
+    <VBox fx:id="vbox"
+          spacing="15"
+          alignment="CENTER"
+          style="-fx-padding: 20;"
+          VBox.vgrow="ALWAYS"/>
+
+</VBox>
