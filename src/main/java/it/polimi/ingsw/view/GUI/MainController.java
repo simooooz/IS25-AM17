@@ -1,9 +1,9 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.network.messages.MessageType;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,6 +23,9 @@ public class MainController implements MessageHandler {
     @FXML private Label command_text;
     @FXML private Label result_text;
 
+    // Cache della Scene per evitare problemi di null
+    private Scene cachedScene;
+
     @FXML
     public void initialize() {
         TextField input = new TextField();
@@ -31,7 +34,9 @@ public class MainController implements MessageHandler {
             if (event.getCode() == KeyCode.ENTER) {
                 String username = input.getText().trim();
                 if (username.length() < 3 || username.length() > 18) {
-                    result_text.setText("Username must be between 3 and 18 characters");
+                    if (result_text != null) {
+                        result_text.setText("Username must be between 3 and 18 characters");
+                    }
                     event.consume();
                     return;
                 }
@@ -39,104 +44,104 @@ public class MainController implements MessageHandler {
             }
         });
 
-        vbox.getChildren().add(input);
-        command_text.setText("Welcome to Galaxy Trucker\nFirst of all type an username");
+        if (vbox != null) {
+            vbox.getChildren().add(input);
+        }
+        if (command_text != null) {
+            command_text.setText("Welcome to Galaxy Trucker\nFirst of all type an username");
+        }
+
+        // Cache della Scene
+        Platform.runLater(() -> {
+            cacheScene();
+            if (cachedScene == null) {
+                Platform.runLater(this::cacheScene);
+            }
+        });
+    }
+
+    private void cacheScene() {
+        if (vbox != null && vbox.getScene() != null) {
+            cachedScene = vbox.getScene();
+        } else if (command_text != null && command_text.getScene() != null) {
+            cachedScene = command_text.getScene();
+        } else if (result_text != null && result_text.getScene() != null) {
+            cachedScene = result_text.getScene();
+        }
     }
 
     public void setLobbySelection() {
+        if (vbox == null) return;
+
         HBox hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(10);
 
         Button createLobbyButton = new Button();
         createLobbyButton.setText("Create lobby");
-        createLobbyButton.setOnMouseClicked(event -> loadCreateLobbyView());
+        createLobbyButton.setOnMouseClicked(event -> navigateToScene("/fxml/createLobby.fxml", CreateLobbyController.class));
 
         Button joinLobbyButton = new Button();
         joinLobbyButton.setText("Join lobby");
-        joinLobbyButton.setOnMouseClicked(event -> loadJoinLobbyView());
+        joinLobbyButton.setOnMouseClicked(event -> navigateToScene("/fxml/joinLobby.fxml", JoinLobbyController.class));
 
         Button joinRandomLobbyButton = new Button();
         joinRandomLobbyButton.setText("Join random lobby");
-        joinRandomLobbyButton.setOnMouseClicked(event -> loadJoinRandomLobbyView());
+        joinRandomLobbyButton.setOnMouseClicked(event -> navigateToScene("/fxml/joinRandomLobby.fxml", JoinRandomLobbyController.class));
 
         hbox.getChildren().addAll(createLobbyButton, joinLobbyButton, joinRandomLobbyButton);
         vbox.getChildren().add(hbox);
     }
 
-    private void loadCreateLobbyView() {
+    // Metodo unificato per la navigazione
+    private <T extends MessageHandler> void navigateToScene(String fxmlPath, Class<T> controllerClass) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/createLobby.fxml"));
-            Parent createLobbyView = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent view = loader.load();
 
-            CreateLobbyController createLobbyController = loader.getController();
-            MessageDispatcher.getInstance().unregisterHandler(this); // Rimuovi questo handler
-            MessageDispatcher.getInstance().registerHandler(createLobbyController);
+            T controller = loader.getController();
+            MessageDispatcher.getInstance().unregisterHandler(this);
+            MessageDispatcher.getInstance().registerHandler(controller);
 
-            // Sostituisci la vista corrente
-            Scene scene = vbox.getScene();
-            scene.setRoot(createLobbyView);
+            Scene scene = getCurrentScene();
+            if (scene != null) {
+                scene.setRoot(view);
+            } else {
+                System.err.println("Could not get current scene for navigation to " + fxmlPath);
+                showError("Navigation error");
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
-            result_text.setText("Error loading create lobby view");
+            showError("Error loading view: " + fxmlPath);
         }
     }
 
-    private void loadJoinLobbyView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/joinLobby.fxml"));
-            Parent joinLobbyView = loader.load();
-
-            JoinLobbyController joinLobbyController = loader.getController();
-            MessageDispatcher.getInstance().unregisterHandler(this); // Rimuovi questo handler
-            MessageDispatcher.getInstance().registerHandler(joinLobbyController);
-
-            // Sostituisci la vista corrente
-            Scene scene = vbox.getScene();
-            scene.setRoot(joinLobbyView);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            result_text.setText("Error loading join lobby view");
+    // Metodo helper per ottenere la Scene in modo sicuro
+    private Scene getCurrentScene() {
+        // Prima prova la cache
+        if (cachedScene != null) {
+            return cachedScene;
         }
+
+        // Poi prova i componenti FXML e aggiorna la cache
+        if (vbox != null && vbox.getScene() != null) {
+            cachedScene = vbox.getScene();
+            return cachedScene;
+        } else if (command_text != null && command_text.getScene() != null) {
+            cachedScene = command_text.getScene();
+            return cachedScene;
+        } else if (result_text != null && result_text.getScene() != null) {
+            cachedScene = result_text.getScene();
+            return cachedScene;
+        }
+
+        return null;
     }
 
-    private void loadJoinRandomLobbyView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/joinRandomLobby.fxml"));
-            Parent joinRandomLobbyView = loader.load();
-
-            JoinRandomLobbyController joinRandomLobbyController = loader.getController();
-            MessageDispatcher.getInstance().unregisterHandler(this); // Rimuovi questo handler
-            MessageDispatcher.getInstance().registerHandler(joinRandomLobbyController);
-
-            // Sostituisci la vista corrente
-            Scene scene = vbox.getScene();
-            scene.setRoot(joinRandomLobbyView);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            result_text.setText("Error loading join random lobby view");
-        }
-    }
-
-    private void loadGameView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
-            Parent gameView = loader.load();
-
-            BuildController gameController = loader.getController();
-            MessageDispatcher.getInstance().unregisterHandler(this); // Rimuovi questo handler
-            MessageDispatcher.getInstance().registerHandler(gameController);
-
-            // Sostituisci la vista corrente
-            Scene scene = vbox.getScene();
-            scene.setRoot(gameView);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            result_text.setText("Error loading game view");
+    private void showError(String message) {
+        if (result_text != null) {
+            result_text.setText(message);
         }
     }
 
@@ -144,30 +149,10 @@ public class MainController implements MessageHandler {
     public void handleMessage(MessageType eventType, String username, Object... args) {
         switch (eventType) {
             case USERNAME_OK -> {
-                javafx.application.Platform.runLater(() -> setLobbySelection());
-            }
-            case CREATE_LOBBY_OK -> {
-                // Puoi gestire la creazione della lobby qui se necessario
-                javafx.application.Platform.runLater(() -> {
-                    System.out.println("Lobby created successfully from MainController");
-                });
-            }
-            case JOIN_LOBBY_OK -> {
-                // Gestisce il join della lobby
-                javafx.application.Platform.runLater(() -> {
-                    System.out.println("Joined lobby successfully from MainController");
-                    // Potresti caricare una vista della lobby/waiting room
-                });
-            }
-            case JOIN_RANDOM_LOBBY_OK -> {
-                // Gestisce il join random della lobby
-                javafx.application.Platform.runLater(() -> {
-                    System.out.println("Joined random lobby successfully from MainController");
-                    // Potresti caricare una vista della lobby/waiting room
-                });
+                Platform.runLater(() -> setLobbySelection());
             }
             case GAME_STARTED_OK -> {
-                javafx.application.Platform.runLater(() -> loadGameView());
+                Platform.runLater(() -> navigateToScene("/fxml/game.fxml", BuildController.class));
             }
         }
     }

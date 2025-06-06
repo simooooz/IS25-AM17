@@ -1,11 +1,13 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.network.messages.MessageType;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 
@@ -18,9 +20,38 @@ public class CreateLobbyController implements MessageHandler {
     @FXML private ToggleButton btnLearnerMode;
     @FXML private ToggleButton btnAdvancedMode;
     @FXML private Label errorLabel;
+    @FXML private VBox vbox;
+    @FXML private Label result_text;
 
     @FXML private ToggleGroup playersGroup;
     @FXML private ToggleGroup modeGroup;
+
+    // Cache della Scene per evitare problemi di null
+    private Scene cachedScene;
+
+    @FXML
+    public void initialize() {
+        // Salva un riferimento alla Scene quando diventa disponibile
+        Platform.runLater(() -> {
+            cacheScene();
+            // Retry se non è ancora disponibile
+            if (cachedScene == null) {
+                Platform.runLater(this::cacheScene);
+            }
+        });
+    }
+
+    private void cacheScene() {
+        if (lobbyNameField != null && lobbyNameField.getScene() != null) {
+            cachedScene = lobbyNameField.getScene();
+        } else if (errorLabel != null && errorLabel.getScene() != null) {
+            cachedScene = errorLabel.getScene();
+        } else if (vbox != null && vbox.getScene() != null) {
+            cachedScene = vbox.getScene();
+        } else if (btn2Players != null && btn2Players.getScene() != null) {
+            cachedScene = btn2Players.getScene();
+        }
+    }
 
     @FXML
     private void handleCreateLobby() {
@@ -49,42 +80,84 @@ public class CreateLobbyController implements MessageHandler {
 
     @FXML
     private void handleBack() {
-        try {
-            // Torna alla schermata principale
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/preGame.fxml"));
-            Parent mainView = loader.load();
-
-            MainController mainController = loader.getController();
-            MessageDispatcher.getInstance().unregisterHandler(this); // Rimuovi questo handler
-            MessageDispatcher.getInstance().registerHandler(mainController); // Registra il main controller
-
-            Scene scene = lobbyNameField.getScene();
-            scene.setRoot(mainView);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Error returning to main menu");
-        }
+        navigateToScene("/fxml/preGame.fxml", MainController.class);
     }
 
     private void showError(String message) {
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
+        if (errorLabel != null) {
+            errorLabel.setText(message);
+            errorLabel.setVisible(true);
+        }
     }
+
+    // Metodo unificato per la navigazione
+    private <T extends MessageHandler> void navigateToScene(String fxmlPath, Class<T> controllerClass) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent view = loader.load();
+
+            T controller = loader.getController();
+            MessageDispatcher.getInstance().unregisterHandler(this);
+            MessageDispatcher.getInstance().registerHandler(controller);
+
+            Scene scene = getCurrentScene();
+            if (scene != null) {
+                scene.setRoot(view);
+            } else {
+                System.err.println("Could not get current scene for navigation to " + fxmlPath);
+                showError("Navigation error");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Error loading view: " + fxmlPath);
+        }
+    }
+
+    // Metodo helper per ottenere la Scene in modo sicuro
+    private Scene getCurrentScene() {
+        // Prima prova la cache
+        if (cachedScene != null) {
+            return cachedScene;
+        }
+
+        // Poi prova i componenti FXML e aggiorna la cache
+        if (lobbyNameField != null && lobbyNameField.getScene() != null) {
+            cachedScene = lobbyNameField.getScene();
+            return cachedScene;
+        } else if (errorLabel != null && errorLabel.getScene() != null) {
+            cachedScene = errorLabel.getScene();
+            return cachedScene;
+        } else if (vbox != null && vbox.getScene() != null) {
+            cachedScene = vbox.getScene();
+            return cachedScene;
+        } else if (btn2Players != null && btn2Players.getScene() != null) {
+            cachedScene = btn2Players.getScene();
+            return cachedScene;
+        } else if (btnLearnerMode != null && btnLearnerMode.getScene() != null) {
+            cachedScene = btnLearnerMode.getScene();
+            return cachedScene;
+        }
+
+        return null;
+    }
+
+    // Modifica nel metodo handleMessage di CreateLobbyController
 
     @Override
     public void handleMessage(MessageType eventType, String username, Object... args) {
         switch (eventType) {
             case CREATE_LOBBY_OK -> {
-                // Lobby creata con successo, potresti navigare a una nuova vista
-                javafx.application.Platform.runLater(() -> {
-                    // Opzionalmente potresti caricare una vista "waiting room" o tornare al menu
+                Platform.runLater(() -> {
                     System.out.println("Lobby created successfully!");
+                    // NON reinoltrare il messaggio - lascia che il WaitingRoomController
+                    // gestisca il proprio stato tramite i dati del client
+                    navigateToScene("/fxml/waitingRoom.fxml", WaitingRoomController.class);
                 });
             }
             case ERROR -> {
                 if (args.length > 0) {
-                    javafx.application.Platform.runLater(() -> showError(args[0].toString()));
+                    Platform.runLater(() -> showError(args[0].toString()));
                 }
             }
         }

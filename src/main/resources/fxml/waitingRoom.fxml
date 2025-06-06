@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.polimi.ingsw.view.GUI.WaitingRoomController"
+      alignment="CENTER" spacing="30.0" prefHeight="600.0" prefWidth="800.0"
+      style="-fx-background-color: #2c3e50; -fx-padding: 50;">
+
+    <!-- Title -->
+    <Label text="Waiting Room" textFill="WHITE" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
+
+    <!-- Lobby Info Section -->
+    <VBox alignment="CENTER" spacing="15.0">
+        <Label fx:id="lobbyNameLabel" text="Lobby: [Name]" textFill="WHITE"
+               style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+        <HBox alignment="CENTER" spacing="30.0">
+            <Label fx:id="gameModeLabel" text="Mode: Learner" textFill="#3498db"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Label fx:id="maxPlayersLabel" text="Max Players: 4" textFill="#e67e22"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Players Section -->
+    <VBox alignment="CENTER" spacing="20.0">
+        <Label text="Players" textFill="WHITE" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+        <!-- Players List -->
+        <VBox fx:id="playersContainer" alignment="CENTER" spacing="10.0"
+              style="-fx-background-color: #34495e; -fx-background-radius: 10; -fx-padding: 20;"
+              prefWidth="400.0" maxWidth="400.0">
+
+            <!-- Placeholder per i giocatori - verrà popolato dinamicamente -->
+            <Label fx:id="playerCountLabel" text="1/4 players" textFill="#bdc3c7"
+                   style="-fx-font-size: 14px; -fx-font-style: italic;"/>
+        </VBox>
+    </VBox>
+
+    <!-- Status Section -->
+    <VBox alignment="CENTER" spacing="10.0">
+        <Label fx:id="statusLabel" text="Waiting for players to join..."
+               textFill="#f39c12" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+        <!-- Loading indicator (optional) -->
+        <HBox alignment="CENTER" spacing="5.0" fx:id="loadingIndicator">
+            <Label text="●" textFill="#3498db" style="-fx-font-size: 20px;">
+                <font><Font size="16.0"/></font>
+            </Label>
+            <Label text="●" textFill="#2980b9" style="-fx-font-size: 20px;">
+                <font><Font size="16.0"/></font>
+            </Label>
+            <Label text="●" textFill="#1abc9c" style="-fx-font-size: 20px;">
+                <font><Font size="16.0"/></font>
+            </Label>
+        </HBox>
+    </VBox>
+
+    <!-- Action Buttons -->
+    <HBox alignment="CENTER" spacing="30.0">
+        <Button text="Leave Lobby" prefWidth="120.0" prefHeight="45.0"
+                style="-fx-font-size: 16px; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5;"
+                onAction="#handleLeaveLobby"/>
+    </HBox>
+
+</VBox>
