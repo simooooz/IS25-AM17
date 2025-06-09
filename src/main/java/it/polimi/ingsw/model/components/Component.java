@@ -366,4 +366,7 @@ public class Component {
         );
     }
 
+    public int getId() {
+        return id;
+    }
 }
