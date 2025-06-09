@@ -101,24 +101,24 @@ public class CabinComponent extends Component {
     public List<String> icon() {
         if (this.humans == 0 && alien.isEmpty())
             return new ArrayList<>(List.of(
-                " " + Chroma.color("│     │", Chroma.GREY_BOLD) + " ",
-                " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
+                Chroma.color("│ 👨🏻‍🚀\t" + " 👽\t│", Chroma.GREY_BOLD),
+                Chroma.color("└─────────┘", Chroma.GREY_BOLD))
             );
         else if (this.humans == 1)
             return new ArrayList<>(List.of(
-                " " + Chroma.color("│ " + "\u2009" + "👨🏻‍🚀" + "\u2009" + " │", Chroma.GREY_BOLD) + " ",
-                " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
+                Chroma.color("│   " + "👨🏻‍🚀" + "  \t│", Chroma.GREY_BOLD),
+                Chroma.color("└─────────┘", Chroma.GREY_BOLD))
             );
         else if (this.humans == 2)
             return new ArrayList<>(List.of(
-                " " + Chroma.color("│" + "👨🏻‍🚀" + "\u200A" + "\u200A"+ "👨🏻‍🚀" + "│", Chroma.GREY_BOLD) + " ",
-                " " + Chroma.color("└─────┘", Chroma.GREY_BOLD) + " ")
+                Chroma.color("│ 👨🏻‍🚀\t" + " 👨🏻‍🚀\t│", Chroma.GREY_BOLD),
+                Chroma.color("└─────────┘", Chroma.GREY_BOLD))
             );
         else {
             String color = getAlien().orElseThrow().equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
             return new ArrayList<>(List.of(
-                " " + Chroma.color("│ " + "\u2009" + "👽" + "\u2009" + " │", color) + " ",
-                " " + Chroma.color("└─────┘", color) + " ")
+                Chroma.color("│   " + "👽" + "  \t│", color),
+                Chroma.color("└─────────┘", color))
             );
         }
     }

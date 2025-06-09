@@ -51,8 +51,8 @@ public class OddComponent extends Component {
     public List<String> icon() {
         String color = type.equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
         return new ArrayList<>(List.of(
-            " " + Chroma.color("│ " + "\u2009" + "🛸" + "\u2009" + " │", color) + " ",
-            " " + Chroma.color("└─────┘", color) + " "));
+                Chroma.color("│   " + "🛸" + "  \t│", color),
+                Chroma.color("└─────────┘", color)));
     }
 
 }

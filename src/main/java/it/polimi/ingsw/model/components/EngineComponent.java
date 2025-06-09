@@ -53,9 +53,9 @@ public class EngineComponent extends Component {
             case SOUTH -> arrow = "⬇️️";
         }
         return new ArrayList<>(List.of(
-                getIsDouble() ? Chroma.color("│🚀" + "\u200A" + arrow + "\u200A" + "🚀│", Chroma.ORANGE)
-                        : Chroma.color("│ 🚀" + "\u200A" + "\u200A" + "\u200A" + arrow + " │", Chroma.ORANGE),
-                Chroma.color("└───────┘", Chroma.ORANGE)
+                getIsDouble() ? Chroma.color("│ 🚀\t" + " 🚀\t│", Chroma.ORANGE)
+                        : Chroma.color("│   " + "🚀" + "  \t│", Chroma.ORANGE),
+                Chroma.color("└   " + arrow + "  \t┘", Chroma.ORANGE)
         ));
     }
 
