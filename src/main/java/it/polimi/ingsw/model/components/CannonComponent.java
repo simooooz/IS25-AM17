@@ -58,9 +58,9 @@ public class CannonComponent extends Component {
             case SOUTH -> arrow = "⬇️️";
         }
         return new ArrayList<>(List.of(
-                getIsDouble() ? Chroma.color("│🔥" + "\u200A" + arrow + "\u200A" + "🔥│", Chroma.PURPLE)
-                        : Chroma.color("│ 🔥" + "\u200A" + "\u200A" + "\u200A" + arrow + " │", Chroma.PURPLE),
-                Chroma.color("└───────┘", Chroma.PURPLE)
+                Chroma.color("┌   " + arrow + "  \t┐", Chroma.PURPLE),
+                getIsDouble() ? Chroma.color("│ 🔥\t" + " 🔥\t│", Chroma.PURPLE)
+                        : Chroma.color("│   " + "🔥" + "  \t│", Chroma.PURPLE)
         ));
     }
 

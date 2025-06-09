@@ -239,25 +239,22 @@ public class Component {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-
         List<String> componentLines = new ArrayList<>();
         if (!shown) {
-            String topBorder = " " + angles[0] + Constants.repeat(hBorder, 9) + angles[1] + " ";
+            String topBorder = " " + angles[0] + Constants.repeat(hBorder, 11) + angles[1] + " ";
             componentLines.add(topBorder);
 
             String leftBorder = "";
-            leftBorder = " " + vBorder +
-                    (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
-                    : inTheMiddle(String.valueOf(this.id), 9)) + vBorder + " ";
+            leftBorder = " " + vBorder + inTheMiddle(String.valueOf(this.id), 11) + vBorder + " ";
             componentLines.add(leftBorder);
 
-            leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
+            leftBorder = " " + vBorder + Constants.repeat(" ", 11) + vBorder + " ";
             componentLines.add(leftBorder);
 
-            leftBorder = " " + vBorder + Constants.repeat(" ", 9) + vBorder + " ";
+            leftBorder = " " + vBorder + Constants.repeat(" ", 11) + vBorder + " ";
             componentLines.add(leftBorder);
 
-            String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 9) + angles[3] + " ";
+            String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 11) + angles[3] + " ";
             componentLines.add(bottomBorder);
 
             return String.join("\n", componentLines);
@@ -267,13 +264,13 @@ public class Component {
             String topBorder = " " + angles[0];
 
             if (connectors[0] == ConnectorType.EMPTY)
-                topBorder = topBorder + Constants.repeat(hBorder, 9) + angles[1] + " ";
+                topBorder = topBorder + Constants.repeat(hBorder, 11) + angles[1] + " ";
             else if (connectors[0]==ConnectorType.SINGLE)
-                topBorder = topBorder + Constants.repeat(hBorder, 4) + "┴" + Constants.repeat(hBorder, 4) + angles[1] + " ";
+                topBorder = topBorder + Constants.repeat(hBorder, 5) + "┴" + Constants.repeat(hBorder, 5) + angles[1] + " ";
             else if (connectors[0]==ConnectorType.DOUBLE)
-                topBorder = topBorder + hBorder + "┴" + Constants.repeat(hBorder, 5) + "┴" + hBorder + angles[1] + " ";
+                topBorder = topBorder + hBorder + "┴" + Constants.repeat(hBorder, 7) + "┴" + hBorder + angles[1] + " ";
             else if (connectors[0]==ConnectorType.UNIVERSAL)
-                topBorder = topBorder + hBorder + "┴" + Constants.repeat(hBorder, 2) + "┴" + Constants.repeat(hBorder, 2) + "┴" + hBorder + angles[1] + " ";
+                topBorder = topBorder + hBorder + "┴" + Constants.repeat(hBorder, 3) + "┴" + Constants.repeat(hBorder, 3) + "┴" + hBorder + angles[1] + " ";
             componentLines.add(topBorder);
 
             // Second Riga
@@ -283,22 +280,18 @@ public class Component {
                     leftBorder = " " + vBorder;
                     switch (connectors[1]) {
                         case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder +
-                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
-                                : inTheMiddle(String.valueOf(this.id), 9)) + vBorder + " ";
+                                inTheMiddle(String.valueOf(this.id), 11) + vBorder + " ";
                         case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder +
-                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
-                                : inTheMiddle(String.valueOf(this.id), 9)) + "├" + hBorder;
+                                inTheMiddle(String.valueOf(this.id), 11) + "├" + hBorder;
                     }
                 }
                 case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> {
                     leftBorder = hBorder + "┤";
                     switch (connectors[1]) {
                         case ConnectorType.EMPTY, ConnectorType.SINGLE -> leftBorder = leftBorder +
-                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
-                                : inTheMiddle(String.valueOf(this.id), 9)) + vBorder + " ";
+                                inTheMiddle(String.valueOf(this.id), 11) + vBorder + " ";
                         case ConnectorType.DOUBLE, ConnectorType.UNIVERSAL -> leftBorder = leftBorder +
-                                (String.valueOf(id).length() == 2 ? "   " + "\u2004" + this.id + "\u2004" + "   "
-                                : inTheMiddle(String.valueOf(this.id), 9)) + "├" + hBorder;
+                                inTheMiddle(String.valueOf(this.id), 11) + "├" + hBorder;
                     }
                 }
             }
@@ -345,13 +338,13 @@ public class Component {
             // Fifth Riga
             String bottomBorder = " " + angles[2];
             if (connectors[2] == ConnectorType.EMPTY)
-                bottomBorder = bottomBorder + Constants.repeat(hBorder, 9) + angles[3] + " ";
+                bottomBorder = bottomBorder + Constants.repeat(hBorder, 11) + angles[3] + " ";
             else if (connectors[2]==ConnectorType.SINGLE)
-                bottomBorder = bottomBorder + Constants.repeat(hBorder, 4) + "┬" + Constants.repeat(hBorder, 4) + angles[3] + " ";
+                bottomBorder = bottomBorder + Constants.repeat(hBorder, 5) + "┬" + Constants.repeat(hBorder, 5) + angles[3] + " ";
             else if (connectors[2]==ConnectorType.DOUBLE)
-                bottomBorder = bottomBorder + hBorder + "┬" + Constants.repeat(hBorder, 5) + "┬" + hBorder +angles[3] + " ";
+                bottomBorder = bottomBorder + hBorder + "┬" + Constants.repeat(hBorder, 7) + "┬" + hBorder +angles[3] + " ";
             else if (connectors[2]==ConnectorType.UNIVERSAL)
-                bottomBorder = bottomBorder + hBorder + "┬" + Constants.repeat(hBorder, 2) + "┬" + Constants.repeat(hBorder, 2) + "┬" + hBorder + angles[3] + " ";
+                bottomBorder = bottomBorder + hBorder + "┬" + Constants.repeat(hBorder, 3) + "┬" + Constants.repeat(hBorder, 3) + "┬" + hBorder + angles[3] + " ";
             componentLines.add(bottomBorder);
 
             return String.join("\n", componentLines);

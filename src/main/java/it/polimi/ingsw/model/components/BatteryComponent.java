@@ -49,15 +49,9 @@ public class BatteryComponent extends Component {
 
     @Override
     public List<String> icon() {
-        String text = "";
-        switch (getBatteries()) {
-            case 0 -> text = Constants.repeat(" ", 9);
-            case 1 -> text = "   " + "\u2009" + "🔋" + "\u2009" + "   ";
-            case 2 -> text = "  🔋" + "\u200A" + "\u200A" + "\u200A" + "🔋  ";
-            case 3 -> text = " 🔋" + "\u200A" + "🔋" + "\u200A" + "🔋 ";
-        }
+        String battery = "\uD83D\uDD0B";
         return new ArrayList<>(List.of(
-                text,
-                "   " + getBatteries() + "/" + (isTriple ? 3 : 2) + "   "));
+                "    " + battery + "   \t ",
+                "    " + getBatteries() + "/" + (isTriple ? 3 : 2) + "    "));
     }
 }

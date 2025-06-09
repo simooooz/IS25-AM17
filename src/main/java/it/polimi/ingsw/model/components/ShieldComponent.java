@@ -47,23 +47,24 @@ public class ShieldComponent extends Component {
     @Override
     public List<String> icon() {
         List<String> icon = new ArrayList<>();
+        icon.add("    " + "🛡️" + "   \t ");
         if (directionsProtected[0] == DirectionType.NORTH || directionsProtected[1] == DirectionType.NORTH) {
             if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
-                icon.add(" ⬆️"+ "\u200A" + "🛡️" + "\u200A" + "➡️ ");
+
+                icon.add("  ⬆️\t" + " ➡️\t ");
             }
             else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add(" ⬅️"+ "\u200A" + "🛡️" + "\u200A" + "⬆️️️ ");
+                icon.add("  ⬅️\t" + " ⬆️\t ");
             }
         }
         else if (directionsProtected[0] == DirectionType.SOUTH || directionsProtected[1] == DirectionType.SOUTH){
             if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
-                icon.add(" ⬇️"+ "\u200A" + "🛡️" + "\u200A" + "➡️ ");
+                icon.add("  ⬇️\t" + " ➡️\t ");
             }
             else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add(" ⬅️" + "\u200A" + "🛡️" + "\u200A" + "⬇️️️ ");
+                icon.add("  ⬅️\t" + " ⬇️\t ");
             }
         }
-        icon.add(Constants.repeat(" ", 9));
 
         return icon;
     }

@@ -227,35 +227,36 @@ public abstract class Ship {
     }
 
     private void printShip(StringBuilder output) {
-        output.append("   ");
+        output.append("    ");
         for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
-            output.append(Chroma.color(String.format("       %-2d      ", col + 4), Chroma.RESET));
+            output.append(Chroma.color(String.format("       %-2d       ", col + 4), Chroma.RESET));
         output.append("\n");
 
         for (int row = 0; row < Constants.SHIP_ROWS; row++) {
             for (int componentRow = 0; componentRow < 5; componentRow++) {
 
                 if (componentRow == 2) // Row label
-                    output.append((row + 5)).append("  ");
+                    output.append((row + 5)).append("   ");
                 else
-                    output.append("   ");
+                    output.append("    ");
 
                 for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
                     Optional<Component> componentOpt = getDashboard(row, col);
 
                     if (componentOpt.isPresent()) {
                         String[] cellLines = componentOpt.get().toString().split("\n");
-                        output.append(" ").append(cellLines[componentRow]).append(" ");
+                        output.append(cellLines[componentRow]).append(" ");
                     }
                     else {
                         String bgColor = getShipBgColor(row, col);
 
                         if (componentRow == 0)
-                            output.append(Chroma.color("  ┌─────────┐  ", bgColor));
-                        else if (componentRow == 4)
-                            output.append(Chroma.color("  └─────────┘  ", bgColor));
+                            output.append(Chroma.color(" ┌───────────┐ ", bgColor)).append(" ");
+                        else if (componentRow == 4) {
+                            output.append(Chroma.color(" └───────────┘ ", bgColor)).append(" ");
+                        }
                         else
-                            output.append(Chroma.color("  │         │  ", bgColor));
+                            output.append(Chroma.color(" │           │ ", bgColor)).append(" ");
                     }
 
                 }
@@ -265,11 +266,13 @@ public abstract class Ship {
 
                 output.append("\n");
             }
+
+            output.append("\n");
         }
 
-        output.append("   ");
+        output.append("    ");
         for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
-            output.append(String.format("       %-2d      ", col + 4));
+            output.append(Chroma.color(String.format("       %-2d       ", col + 4), Chroma.RESET));
         output.append("\n");
     }
 
