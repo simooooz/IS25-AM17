@@ -62,6 +62,7 @@ public abstract class Constants {
             // Print the row line by line
             int height = rowComponentLines[0].length;
             for (int lineIndex = 0; lineIndex < height; lineIndex++) {
+                output.append("    ");
                 for (int compIndex = 0; compIndex < rowComponentLines.length; compIndex++) {
                     output.append(rowComponentLines[compIndex][lineIndex]);
 
@@ -81,27 +82,47 @@ public abstract class Constants {
         for (int rowStart = 0; rowStart < cards.size(); rowStart += componentsPerRow) {
             int rowEnd = Math.min(rowStart + componentsPerRow, cards.size());
 
-            // Collect all component for this row
+            // Collect all components for this row and find max height in row
             String[][] rowComponentLines = new String[rowEnd - rowStart][];
+            int rowMaxHeight = 0;
 
-            for (int i = 0; i < rowEnd - rowStart; i++)
+            for (int i = 0; i < rowEnd - rowStart; i++) {
                 rowComponentLines[i] = cards.get(rowStart + i).toString().split("\n");
+                rowMaxHeight = Math.max(rowMaxHeight, rowComponentLines[i].length);
+            }
+
+            // Pad each component to max height
+            for (int i = 0; i < rowComponentLines.length; i++) {
+                if (rowComponentLines[i].length < rowMaxHeight) {
+                    String[] padded = new String[rowMaxHeight];
+                    System.arraycopy(rowComponentLines[i], 0, padded, 0, rowComponentLines[i].length);
+                    // Fill remaining lines with empty strings of appropriate length
+                    int lineLength = rowComponentLines[i].length > 0 ? rowComponentLines[i][0].length() : 0;
+                    String emptyLine = " ".repeat(lineLength);
+                    for (int j = rowComponentLines[i].length; j < rowMaxHeight; j++) {
+                        padded[j] = emptyLine;
+                    }
+                    rowComponentLines[i] = padded;
+                }
+            }
 
             // Print the row line by line
-            int height = rowComponentLines[0].length;
-            for (int lineIndex = 0; lineIndex < height; lineIndex++) {
+            for (int lineIndex = 0; lineIndex < rowMaxHeight; lineIndex++) {
+                output.append("    ");  // Initial indentation
                 for (int compIndex = 0; compIndex < rowComponentLines.length; compIndex++) {
                     output.append(rowComponentLines[compIndex][lineIndex]);
 
                     // Add spacing between components, except after the last one
-                    if (compIndex < rowComponentLines.length - 1)
-                        output.append("  ");
+                    if (compIndex < rowComponentLines.length - 1) {
+                        output.append("        ");
+                    }
                 }
                 output.append("\n");
             }
         }
         return output.toString();
     }
+
 
     // Socket only
     public static Message createMessage(MessageType gameEvent, Object... args) {

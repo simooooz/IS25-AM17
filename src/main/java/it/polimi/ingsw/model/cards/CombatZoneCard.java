@@ -182,42 +182,42 @@ public class CombatZoneCard extends Card {
         List<String> cardLines = new ArrayList<>();
 
         // Title box
-        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
         cardLines.add(topBorder);
 
-        String title = " " + vBorder + Constants.inTheMiddle("Combat Zone" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        String title = vBorder + Constants.inTheMiddle("Combat Zone" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
         cardLines.add(title);
 
         // First row divider
-        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
         cardLines.add(divider);
 
-        String firstRow = " " + vBorder + "  "  +
-                warLines.getFirst().getKey().toString() + "        "  + "\u2009" + "\u200A" +
-                warLines.getFirst().getValue().toString() + "  " +
-                vBorder + " ";
+        String firstRow = vBorder + "  "  +
+                warLines.getFirst().getKey().toString() + "        " +
+                warLines.getFirst().getValue().toString() + "\t   " +
+                vBorder;
         cardLines.add(firstRow);
 
         // Second row divider
         cardLines.add(divider);
 
-        String secondRow = " " + vBorder + "  "  +
-                warLines.get(1).getKey().toString() + "        "  + "\u2009" + "\u200A" +
-                warLines.get(1).getValue().toString() + "  " +
-                vBorder + " ";
+        String secondRow = vBorder + "  "  +
+                warLines.get(1).getKey().toString() + "        " +
+                warLines.get(1).getValue().toString() + "\t   " +
+                vBorder;
         cardLines.add(secondRow);
 
         // Third row divider
         cardLines.add(divider);
 
-        String thirdRow = " " + vBorder + "  "  +
-                warLines.get(2).getKey().toString() + " "  +
-                warLines.get(2).getValue().toString() + " " + "\u2009" +
-                vBorder + " ";
+        String thirdRow = vBorder + "  "  +
+                warLines.get(2).getKey().toString() + "        "  +
+                warLines.get(2).getValue().toString() + "\t   " +
+                vBorder;
         cardLines.add(thirdRow);
 
         // Bottom border
-        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        String bottomBorder = angles[2] + Constants.repeat(hBorder, 22) + angles[3];
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);

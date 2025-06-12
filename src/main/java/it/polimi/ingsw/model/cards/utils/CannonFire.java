@@ -38,16 +38,17 @@ public class CannonFire {
 
     @Override
     public String toString() {
+        String fire = "\uD83D\uDD25";
         String arrow = "";
         switch (directionFrom) {
-            case NORTH: arrow = "⬇️"; break;
-            case SOUTH: arrow = "⬆️"; break;
-            case EAST: arrow = "⬅️"; break;
-            case WEST: arrow = "➡️"; break;
+            case NORTH: arrow = "↓"; break;
+            case SOUTH: arrow = "↑"; break;
+            case EAST: arrow = "←"; break;
+            case WEST: arrow = "→"; break;
 
         }
-        return  (isBig ? Constants.inTheMiddle("\u2002" + "🔥🔥  ", 7)
-                : Constants.inTheMiddle(" 🔥  ", 7)) + " " + arrow;
+        return  (isBig ? Constants.inTheMiddle(fire + fire + " ", 7)
+                : Constants.inTheMiddle(fire + " ", 7)) + arrow;
     }
 }
 

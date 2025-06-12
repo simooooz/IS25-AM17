@@ -64,20 +64,7 @@ public class BoardLearnerMode extends Board {
 
         switch (state) {
             case BUILD -> {
-                sb.append(Constants.displayComponents(commonComponents, 10));
-
-                for (PlayerData player : startingDeck)
-                    sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
-                for (AbstractMap.SimpleEntry<PlayerData, Integer> entry : players)
-                    sb.append("- ").append(entry.getKey().getUsername()).append(Chroma.color(" READY\n", Chroma.GREEN));
-            }
-
-            case LOOK_CARD_PILE -> {
-                int deckIndex = PlayerState.LOOK_CARD_PILE.getDeckIndex().get(username);
-                int startingDeckIndex = deckIndex == 0 ? 0 : (deckIndex == 1 ? 3 : 6);
-                int endingDeckIndex = startingDeckIndex + 3;
-                cardPile.subList(startingDeckIndex, endingDeckIndex).forEach(card -> sb.append(card).append("\n") );
-                // todo CHANGE with displayCards
+                sb.append(Constants.displayComponents(commonComponents, 8));
 
                 for (PlayerData player : startingDeck)
                     sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));

@@ -84,13 +84,13 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     @Override
     public String toString() {
         String fires = "";
-        for (int i = 0; i < cannonFires.size(); i++) {
+        for (int i = 0; i <= cannonFires.size(); i++) {
             if (i == 0)
-                fires = fires + "   " + cannonFires.get(i).toString() + "\u2009" + "   │\n";
-            else if (i == cannonFires.size() - 1)
-                fires = fires + " │          "  + "\u200A" + cannonFires.get(i).toString() + "  ";
+                fires = fires + "\t   │\n";
+            else if (i == cannonFires.size())
+                fires = fires + "│       " + cannonFires.get(i-1).toString();
             else {
-                fires = fires + " │          " + "\u200A" + cannonFires.get(i).toString() + "\u2009" + "   │\n";
+                fires = fires + "│       " + cannonFires.get(i-1).toString() + "\t   │\n";
             }
         }
 

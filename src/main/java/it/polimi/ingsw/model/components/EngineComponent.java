@@ -47,15 +47,15 @@ public class EngineComponent extends Component {
     public List<String> icon() {
         String arrow = "";
         switch (this.direction) {
-            case NORTH -> arrow = "⬆️";
-            case EAST -> arrow = "➡️";
-            case WEST -> arrow = "⬅️️";
-            case SOUTH -> arrow = "⬇️️";
+            case SOUTH: arrow = "↓"; break;
+            case NORTH: arrow = "↑"; break;
+            case WEST: arrow = "←"; break;
+            case EAST: arrow = "→"; break;
         }
         return new ArrayList<>(List.of(
-                getIsDouble() ? Chroma.color("│ 🚀\t" + " 🚀\t│", Chroma.ORANGE)
+                getIsDouble() ? Chroma.color("│  🚀" + "🚀\t│", Chroma.ORANGE)
                         : Chroma.color("│   " + "🚀" + "  \t│", Chroma.ORANGE),
-                Chroma.color("└   " + arrow + "  \t┘", Chroma.ORANGE)
+                Chroma.color("└    " + arrow + "    ┘", Chroma.ORANGE)
         ));
     }
 

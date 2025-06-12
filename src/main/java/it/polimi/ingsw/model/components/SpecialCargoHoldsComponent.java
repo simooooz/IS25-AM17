@@ -54,33 +54,38 @@ public class SpecialCargoHoldsComponent extends Component {
         String text = "";
         if (getNumber() == 2) {
             if (goods.size() == 1)
-                text = " " + goods.getFirst().toString() + "   " + Chroma.color("   " , Chroma.WHITE_BACKGROUND) + " ";
+                text = goods.getFirst().toString() + "   " + Chroma.color("   " , getColor());
             else if (goods.size() == 2)
-                text = " " + goods.getFirst().toString() + "   " + goods.get(1).toString() + " ";
+                text = goods.getFirst().toString() + "   " + goods.get(1).toString();
             else
-                text = " " + Chroma.color("   " , Chroma.WHITE_BACKGROUND) + "   " + Chroma.color("   " , Chroma.WHITE_BACKGROUND) + " ";
+                text = Chroma.color("  " , getColor()) + "   " + Chroma.color("  " , getColor());
         }
         else if (getNumber() == 3) {
             if (goods.size() == 1)
-                text = goods.getFirst().toString() + " " + Chroma.color("   " , Chroma.WHITE_BACKGROUND) + " " + Chroma.color("  " , Chroma.WHITE_BACKGROUND);
+                text = goods.getFirst().toString() + " " + Chroma.color("  " , getColor()) + " " + Chroma.color("  " , getColor());
             else if (goods.size() == 2)
-                text =  goods.getFirst().toString() + " "   + goods.get(1).toString() + " " + Chroma.color("   " , Chroma.WHITE_BACKGROUND);
+                text = goods.getFirst().toString() + " "   + goods.get(1).toString() + "  " + Chroma.color("  " , getColor());
             else if (goods.size() == 3)
-                text = goods.getFirst().toString() + " "  + goods.get(1).toString() + " "+ goods.get(2).toString();
+                text = goods.getFirst().toString() + " "  + goods.get(1).toString() + " " + goods.get(2).toString();
             else
-                text = Chroma.color("   " , Chroma.WHITE_BACKGROUND) + " " + Chroma.color("   " , Chroma.WHITE_BACKGROUND) + " " + Chroma.color("  " , Chroma.WHITE_BACKGROUND);
+                text = Chroma.color("  " , getColor()) + " " + Chroma.color("  " , getColor()) + " " + Chroma.color("  " , getColor());
         }
         else {
             if (goods.size() == 1)
-                text = "    " + goods.getFirst().toString() + "    ";
+                text = goods.getFirst().toString();
             else
-                text = "    "  + Chroma.color("   " , Chroma.WHITE_BACKGROUND) + "    ";
+                text = Chroma.color("  " , getColor());
         }
 
+
         return new ArrayList<>(List.of(
-            text,
+            Constants.inTheMiddle(text, 11),
             "    " + goods.size() + "/" + getNumber() + "    "
         ));
+    }
+    
+    public String getColor() {
+        return Chroma.GREY_BACKGROUND;
     }
 
 }

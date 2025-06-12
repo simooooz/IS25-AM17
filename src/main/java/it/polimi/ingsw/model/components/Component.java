@@ -145,6 +145,11 @@ public class Component {
     }
 
     public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld) {
+        if (!ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
+            throw new ComponentNotValidException("The position where to insert it is not valid"); // Check if new position is valid
+        else if (!shown)
+            throw new ComponentNotValidException("Component is hidden");
+
         if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) // Component is in hand
             ship.setHandComponent(null);
         else if (ship.getReserves().contains(this)) { // Component is in reserves, weld it
@@ -157,11 +162,6 @@ public class Component {
         }
         else
             throw new ComponentNotValidException("Component to insert isn't in hand or in reserves");
-
-        if (!ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
-            throw new ComponentNotValidException("The position where to insert it is not valid"); // Check if new position is valid
-        else if (!shown)
-            throw new ComponentNotValidException("Component is hidden");
 
         for (int i=0; i<rotations; i++)
             rotateComponent(ship);
@@ -353,9 +353,9 @@ public class Component {
 
     public List<String> icon() {
         return new ArrayList<>(List.of(
-            Constants.repeat(" ", 9),
-            Constants.repeat(" ", 9),
-            Constants.repeat(" ", 9))
+            Constants.repeat(" ", 11),
+            Constants.repeat(" ", 11),
+            Constants.repeat(" ", 11))
         );
     }
 

@@ -81,7 +81,7 @@ public class BoardAdvancedMode extends Board {
 
         switch (state) {
             case BUILD -> {
-                sb.append(Constants.displayComponents(commonComponents, 10));
+                sb.append(Constants.displayComponents(commonComponents, 8));
 
                 sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos());
                 sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");
@@ -96,8 +96,7 @@ public class BoardAdvancedMode extends Board {
                 int deckIndex = PlayerState.LOOK_CARD_PILE.getDeckIndex().get(username);
                 int startingDeckIndex = deckIndex == 0 ? 0 : (deckIndex == 1 ? 3 : 6);
                 int endingDeckIndex = startingDeckIndex + 3;
-                cardPile.subList(startingDeckIndex, endingDeckIndex).forEach(card -> sb.append(card).append("\n") );
-                // todo CHANGE with displayCards
+                sb.append(Constants.displayCards(cardPile.subList(startingDeckIndex, endingDeckIndex), 3));
 
                 sb.append("\nHourglass position: ").append(timeManagement.getHourglassPos()).append(timeManagement.getHourglassPos() == 0 ? " (last!)" : "");
                 sb.append("\nTime left: ").append(timeManagement.getTimeLeft()).append("\n");

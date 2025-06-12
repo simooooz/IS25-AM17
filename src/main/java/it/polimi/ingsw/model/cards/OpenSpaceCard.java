@@ -103,22 +103,22 @@ public class OpenSpaceCard extends Card {
         List<String> cardLines = new ArrayList<>();
 
         // Title box
-        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
         cardLines.add(topBorder);
 
-        String title = " " + vBorder + Constants.inTheMiddle("Open Space" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        String title = vBorder + Constants.inTheMiddle("Open Space" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
         cardLines.add(title);
 
         // First row divider
-        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
         cardLines.add(divider);
 
-        String row = " " + vBorder + "     🚀  " + "\u200A" + "⬆️" + "\u200A" + "  📅     " + vBorder + "";
+        String row = vBorder + "     🚀   " + "↑" + "   📅\t   "+ vBorder;
         cardLines.add(row);
 
 
         // Bottom border
-        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        String bottomBorder = angles[2] + Constants.repeat(hBorder, 22) + angles[3];
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.TUI;
 
+import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.cards.PlayerState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
@@ -347,7 +348,7 @@ public class DisplayUpdater implements Runnable {
     private void printGameInfo(Board board, Ship ship, PlayerState state) {
         if (board.getCardPilePos() > 0) {
             Chroma.println("Previous card", Chroma.GREY_BOLD);
-            System.out.println(board.getCardPile().get(board.getCardPilePos()-1));
+            System.out.println(Constants.displayCards(new ArrayList<>(List.of(board.getCardPile().get(board.getCardPilePos()-1))), 1));
         }
 
         System.out.println(board.toString(client.getUsername(), state));
@@ -356,7 +357,7 @@ public class DisplayUpdater implements Runnable {
         if (board.getPlayers().stream()
                 .noneMatch(e -> client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.DRAW_CARD)) {
             Chroma.println("\nActual card", Chroma.GREY_BOLD);
-            System.out.println(board.getCardPile().get(board.getCardPilePos()));
+            System.out.println(Constants.displayCards(new ArrayList<>(List.of(board.getCardPile().get(board.getCardPilePos()))), 1));
             board.getCardPile().get(board.getCardPilePos()).printCardInfo(client.getGameController().getModel(), board);
         }
     }

@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.components.utils.ConnectorType;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.properties.DirectionType;
+import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,22 +48,22 @@ public class ShieldComponent extends Component {
     @Override
     public List<String> icon() {
         List<String> icon = new ArrayList<>();
-        icon.add("    " + "🛡️" + "   \t ");
+        icon.add("    " + "🛡️" + "  \t ");
         if (directionsProtected[0] == DirectionType.NORTH || directionsProtected[1] == DirectionType.NORTH) {
             if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
 
-                icon.add("  ⬆️\t" + " ➡️\t ");
+                icon.add(Chroma.color("   ↑   →   ", Chroma.BLUE_BOLD));
             }
             else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add("  ⬅️\t" + " ⬆️\t ");
+                icon.add(Chroma.color("   ←   ↑   ", Chroma.BLUE_BOLD));
             }
         }
         else if (directionsProtected[0] == DirectionType.SOUTH || directionsProtected[1] == DirectionType.SOUTH){
             if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
-                icon.add("  ⬇️\t" + " ➡️\t ");
+                icon.add(Chroma.color("   ↓   →   ", Chroma.BLUE_BOLD));
             }
             else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add("  ⬅️\t" + " ⬇️\t ");
+                icon.add(Chroma.color("   ←   ↓   ", Chroma.BLUE_BOLD));
             }
         }
 

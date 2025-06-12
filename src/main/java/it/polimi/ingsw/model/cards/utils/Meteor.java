@@ -68,13 +68,13 @@ public class Meteor {
     public String toString() {
         String arrow = "";
         switch (directionFrom) {
-            case NORTH: arrow = "⬇️"; break;
-            case SOUTH: arrow = "⬆️"; break;
-            case EAST: arrow = "⬅️"; break;
-            case WEST: arrow = "➡️"; break;
+            case NORTH: arrow = "↓"; break;
+            case SOUTH: arrow = "↑"; break;
+            case EAST: arrow = "←"; break;
+            case WEST: arrow = "→"; break;
 
         }
-        return  (isBig ? Constants.inTheMiddle("\u2002" + "☄️☄️  ", 7)
-                : Constants.inTheMiddle("  ☄️  ", 7)) + " " + arrow;
+        return  (isBig ? Constants.inTheMiddle("☄️☄️ ", 7)
+                : Constants.inTheMiddle("☄️ ", 7)) + arrow;
     }
 }

@@ -109,18 +109,18 @@ public class AbandonedStationCard extends Card{
         List<String> cardLines = new ArrayList<>();
 
         // Title box
-        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
         cardLines.add(topBorder);
 
-        String title = " " + vBorder + Constants.inTheMiddle("AbandonedStation" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        String title = vBorder + Constants.inTheMiddle("Abandoned Station" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
         cardLines.add(title);
 
         // First row divider
-        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
         cardLines.add(divider);
 
-        String crewRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(crew + " 👨‍🚀", 23) +
-                "\u2009"  + "\u200A" + vBorder + " ";
+        String crewRow = vBorder + "         " + days + " 👨" + "\t   " + vBorder;
+
         cardLines.add(crewRow);
         cardLines.add(divider);
 
@@ -129,16 +129,15 @@ public class AbandonedStationCard extends Card{
             for (int k = 0; k < goods.get(c); k++)
                 good = good + c.toString() + "  ";
         }
-        String goodsRow = " " + vBorder + Constants.inTheMiddle(good, 21) + vBorder + " ";
+        String goodsRow = vBorder + Constants.inTheMiddle(good, 22) + vBorder;
         cardLines.add(goodsRow);
         cardLines.add(divider);
 
-        String dayRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(days + " 📅", 20) +
-                "\u2009" + "\u200A" + vBorder + " ";
+        String dayRow = vBorder + "         " + days + " 📅" + "\t   " + vBorder;
         cardLines.add(dayRow);
 
         // Bottom border
-        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        String bottomBorder = angles[2] + Constants.repeat(hBorder, 22) + angles[3];
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);

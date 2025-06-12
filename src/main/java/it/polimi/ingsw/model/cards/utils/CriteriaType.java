@@ -22,7 +22,7 @@ public enum CriteriaType {
 
         @Override
         public String toString() {
-            return "↓ 👨‍🚀";
+            return "↓ 👨";
         }
     },
 

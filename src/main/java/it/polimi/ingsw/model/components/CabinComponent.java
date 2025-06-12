@@ -99,21 +99,12 @@ public class CabinComponent extends Component {
 
     @Override
     public List<String> icon() {
-        if (this.humans == 0 && alien.isEmpty())
+        if (alien.isEmpty()) {
             return new ArrayList<>(List.of(
-                Chroma.color("│ 👨🏻‍🚀\t" + " 👽\t│", Chroma.GREY_BOLD),
-                Chroma.color("└─────────┘", Chroma.GREY_BOLD))
+                    Chroma.color("│   " + "👨" + "  \t│", Chroma.GREY_BOLD),
+                    Chroma.color("└─  " + getHumans() + "/2  ─┘", Chroma.GREY_BOLD))
             );
-        else if (this.humans == 1)
-            return new ArrayList<>(List.of(
-                Chroma.color("│   " + "👨🏻‍🚀" + "  \t│", Chroma.GREY_BOLD),
-                Chroma.color("└─────────┘", Chroma.GREY_BOLD))
-            );
-        else if (this.humans == 2)
-            return new ArrayList<>(List.of(
-                Chroma.color("│ 👨🏻‍🚀\t" + " 👨🏻‍🚀\t│", Chroma.GREY_BOLD),
-                Chroma.color("└─────────┘", Chroma.GREY_BOLD))
-            );
+        }
         else {
             String color = getAlien().orElseThrow().equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
             return new ArrayList<>(List.of(

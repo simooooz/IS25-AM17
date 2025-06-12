@@ -44,6 +44,7 @@ public class Chroma {
     public static final String BLUE_BACKGROUND = "\033[48;5;25m";
     public static final String DARKBLUE_BACKGROUND = "\033[48;5;18m";
     public static final String YELLOW_BACKGROUND = "\033[43m";
+    public static final String GREY_BACKGROUND = "\033[48;5;245m";
 
     public static final String ORANGE_BACKGROUND = "\033[48;5;214m";
     public static final String PURPLE_BACKGROUND = "\033[48;5;97m";

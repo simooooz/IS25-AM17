@@ -145,41 +145,37 @@ public class PiratesCard extends EnemiesCard {
         List<String> cardLines = new ArrayList<>();
 
         // Title box
-        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
         cardLines.add(topBorder);
 
-        String title = " " + vBorder + Constants.inTheMiddle("Pirates" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        String title = vBorder + Constants.inTheMiddle("Pirates" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
         cardLines.add(title);
 
         // First row divider
-        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
         cardLines.add(divider);
-
-        String firePowerRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(enemyFirePower + " 💥", 20) +
-                "\u2009"  + "\u200A" + vBorder + " ";
+        String firePowerRow = vBorder + "         " + enemyFirePower + " 💥" + "\t   " + vBorder;
         cardLines.add(firePowerRow);
 
         cardLines.add(divider);
 
         for (CannonFire c : cannonFires) {
-            String meteorRow = " " + vBorder + "     " + c.toString() +"\u200A" + "\u2005" + "     " + vBorder + " ";
+            String meteorRow = vBorder + "       " + c.toString() + "\t   " + vBorder;
             cardLines.add(meteorRow);
         }
 
         cardLines.add(divider);
 
-        String creditRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(credits + " 💲", 20) +
-                "\u2009"  + "\u200A" + vBorder + " ";
+        String creditRow = vBorder + "         " + credits + " 💲" + "\t   " + vBorder;
         cardLines.add(creditRow);
 
         cardLines.add(divider);
 
-        String dayRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(days + " 📅", 20) +
-                "\u2009"  + "\u200A" + vBorder + " ";
+        String dayRow = vBorder + "         " + days + " 📅" + "\t   " + vBorder;
         cardLines.add(dayRow);
 
         // Bottom border
-        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        String bottomBorder = angles[2] + Constants.repeat(hBorder, 22) + angles[3];
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);

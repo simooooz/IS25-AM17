@@ -55,7 +55,7 @@ public class ComponentFactory {
 
     private JSONObject loadJsonConfig() {
         try {
-            String jsonContent = new String(Files.readAllBytes(new File("src/main/java/it/polimi/ingsw/model/resources/factory.json").toPath()));
+            String jsonContent = new String(getClass().getResourceAsStream("/factory.json").readAllBytes());
             return new JSONObject(jsonContent);
         } catch (IOException e) {
             System.err.println("Error while loading JSON file: " + e.getMessage());

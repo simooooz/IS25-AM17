@@ -109,34 +109,31 @@ public class AbandonedShipCard extends Card {
         List<String> cardLines = new ArrayList<>();
 
         // Title box
-        String topBorder = " " + angles[0] + Constants.repeat(hBorder, 21) + angles[1] + " ";
+        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
         cardLines.add(topBorder);
 
-        String title = " " + vBorder + Constants.inTheMiddle("AbandonedShip" + (getIsLearner() ? "(L)" : ""), 21) + vBorder + " ";
+        String title = vBorder + Constants.inTheMiddle("Abandoned Ship" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
         cardLines.add(title);
 
         // First row divider
-        String divider = " " + leftDivider + Constants.repeat(hBorder, 21) + rightDivider + " ";
+        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
         cardLines.add(divider);
 
-        String crewRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(crew + " 🧑🏻‍🚀❌", 24) +
-                "\u2009"  + vBorder + " ";
+        String crewRow = vBorder + "        " + crew + " 👨❌" +"\t   " + vBorder;
         cardLines.add(crewRow);
 
         cardLines.add(divider);
 
-        String creditRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(credits + " 💲", 20) +
-                "\u2009"  + "\u200A" + vBorder + " ";
+        String creditRow = vBorder + "         " + credits + " 💲" + "\t   " + vBorder;
         cardLines.add(creditRow);
 
         cardLines.add(divider);
 
-        String dayRow = " " + vBorder + "\u2009" + Constants.inTheMiddle(days + " 📅", 20) +
-                "\u2009"  + "\u200A" + vBorder + " ";
+        String dayRow = vBorder + "         " + days + " 📅" + "\t   " + vBorder;
         cardLines.add(dayRow);
 
         // Bottom border
-        String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 21) + angles[3] + " ";
+        String bottomBorder = angles[2] + Constants.repeat(hBorder, 22) + angles[3];
         cardLines.add(bottomBorder);
 
         return String.join("\n", cardLines);
