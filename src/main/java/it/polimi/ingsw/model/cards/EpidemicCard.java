@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -54,39 +53,6 @@ public class EpidemicCard extends Card {
             cabin.setHumans(cabin.getHumans() - 1, playerData.getShip());
         else if (cabin.getAlien().isPresent())
             cabin.setAlien(null, playerData.getShip());
-    }
-
-    @Override
-    public String toString() {
-        String hBorder = "─";
-        String vBorder = "│";
-        String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
-        String leftDivider = "├";
-        String rightDivider = "┤";
-
-        List<String> cardLines = new ArrayList<>();
-
-        // Title box
-        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
-        cardLines.add(topBorder);
-
-        String title = vBorder + Constants.inTheMiddle("Epidemic" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
-        cardLines.add(title);
-
-        // First row divider
-        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
-        cardLines.add(divider);
-
-        String row = vBorder + "     👨  " + " " + "❌" + " " + "  👽\t   "+ vBorder;
-        cardLines.add(row);
-
-
-        // Bottom border
-        String bottomBorder =  angles[2] + Constants.repeat(hBorder, 22) + angles[3];
-        cardLines.add(bottomBorder);
-
-        return String.join("\n", cardLines);
     }
 
 }

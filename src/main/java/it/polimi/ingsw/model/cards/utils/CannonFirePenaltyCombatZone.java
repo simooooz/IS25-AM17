@@ -1,7 +1,8 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.ingsw.model.ModelFacade;
-import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -11,9 +12,9 @@ import java.util.Optional;
 
 public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
-    private final List<CannonFire> cannonFires;
-    private int coord;
-    private int cannonIndex;
+    @JsonProperty private final List<CannonFire> cannonFires;
+    @JsonProperty private int coord;
+    @JsonProperty private int cannonIndex;
 
     public CannonFirePenaltyCombatZone(List<CannonFire> cannonFires) {
         this.cannonFires = cannonFires;
@@ -30,7 +31,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             PlayerData player = board.getPlayerEntityByUsername(username);
             this.coord = value;
 
-            PlayerState newState = cannonFires.get(cannonIndex).hit(player.getShip(), coord);
+            PlayerState newState = cannonFires.get(cannonIndex).hit(player, coord);
             if (newState == PlayerState.DONE && cannonIndex < cannonFires.size() - 1) { // Cannot go in done if it's not really finished because is a sub-state.
                 newState = PlayerState.WAIT_ROLL_DICES;
                 cannonIndex++;
@@ -50,7 +51,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             if (!value) { // Component destroyed
                 Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
                 target.ifPresent(component -> {
-                    PlayerState newState = component.destroyComponent(player.getShip()); // DONE or WAIT_SHIP_PART
+                    PlayerState newState = component.destroyComponent(player); // DONE or WAIT_SHIP_PART
                     model.setPlayerState(player.getUsername(), newState);
                 });
             }
@@ -80,23 +81,5 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
         else
             throw new RuntimeException("Command type not valid in doCommandEffects");
     }
-
-    @Override
-    public String toString() {
-        String fires = "";
-        for (int i = 0; i <= cannonFires.size(); i++) {
-            if (i == 0)
-                fires = fires + "\t   │\n";
-            else if (i == cannonFires.size())
-                fires = fires + "│       " + cannonFires.get(i-1).toString();
-            else {
-                fires = fires + "│       " + cannonFires.get(i-1).toString() + "\t   │\n";
-            }
-        }
-
-        return fires;
-    }
-
-
 
 }

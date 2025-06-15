@@ -1,28 +1,31 @@
 package it.polimi.ingsw.model.cards.utils;
 
-import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.cards.PlayerState;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.Component;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
+import it.polimi.ingsw.common.model.enums.DirectionType;
 
 
 import java.util.List;
 import java.util.Optional;
 
 public class Meteor {
-    private final boolean isBig;
-    private final DirectionType directionFrom;
+
+    @JsonProperty private final boolean isBig;
+    @JsonProperty private final DirectionType directionFrom;
 
     public Meteor(boolean isBig, DirectionType directionFrom) {
         this.isBig = isBig;
         this.directionFrom = directionFrom;
     }
 
-    public PlayerState hit(Ship ship, int coord) {
+    public PlayerState hit(PlayerData player, int coord) {
         if (coord > 10 || coord < 4) return PlayerState.DONE; // Miss
+        Ship ship = player.getShip();
 
         List<Component> targets = getTargets(ship, coord);// Find hit component
         if (targets.isEmpty()) return PlayerState.DONE; // Miss
@@ -53,7 +56,7 @@ public class Meteor {
             }
 
         }
-        return target.destroyComponent(ship); // Destroy component
+        return target.destroyComponent(player); // Destroy component
     }
 
     public List<Component> getTargets(Ship ship, int coord) {
@@ -64,17 +67,4 @@ public class Meteor {
         return directionFrom;
     }
 
-    @Override
-    public String toString() {
-        String arrow = "";
-        switch (directionFrom) {
-            case NORTH: arrow = "↓"; break;
-            case SOUTH: arrow = "↑"; break;
-            case EAST: arrow = "←"; break;
-            case WEST: arrow = "→"; break;
-
-        }
-        return  (isBig ? Constants.inTheMiddle("☄️☄️ ", 7)
-                : Constants.inTheMiddle("☄️ ", 7)) + arrow;
-    }
 }

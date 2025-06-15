@@ -1,13 +1,15 @@
 package it.polimi.ingsw.model.cards.utils;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.ingsw.model.ModelFacade;
-import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
 public class CountablePenaltyZone extends PenaltyCombatZone {
-    private final int penaltyNumber;
-    private final MalusType penaltyType;
+
+    @JsonProperty private final int penaltyNumber;
+    @JsonProperty private final MalusType penaltyType;
 
     public CountablePenaltyZone(int penaltyNumber, MalusType penaltyType) {
         this.penaltyNumber = penaltyNumber;
@@ -20,13 +22,14 @@ public class CountablePenaltyZone extends PenaltyCombatZone {
     }
 
     @Override
+    @JsonProperty
     public int getPenaltyNumber() {
         return penaltyNumber;
     }
 
-    @Override
-    public String toString() {
-        return penaltyNumber + " " + penaltyType.toString();
+    @JsonProperty
+    public MalusType getPenaltyType() {
+        return penaltyType;
     }
 
 }

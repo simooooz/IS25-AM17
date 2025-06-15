@@ -1,5 +1,9 @@
 package it.polimi.ingsw.model.cards;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;
@@ -7,7 +11,7 @@ import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.GoodNotValidException;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
@@ -15,11 +19,29 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
 
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = AbandonedShipCard.class, name = "ABANDONED_SHIP"),
+        @JsonSubTypes.Type(value = AbandonedStationCard.class, name = "ABANDONED_STATION"),
+        @JsonSubTypes.Type(value = CombatZoneCard.class, name = "COMBAT_ZONE"),
+        @JsonSubTypes.Type(value = EpidemicCard.class, name = "EPIDEMIC"),
+        @JsonSubTypes.Type(value = MeteorSwarmCard.class, name = "METEOR_SWARM"),
+        @JsonSubTypes.Type(value = OpenSpaceCard.class, name = "OPEN_SPACE"),
+        @JsonSubTypes.Type(value = PiratesCard.class, name = "PIRATES"),
+        @JsonSubTypes.Type(value = PlanetCard.class, name = "PLANET"),
+        @JsonSubTypes.Type(value = SlaversCard.class, name = "SLAVERS"),
+        @JsonSubTypes.Type(value = SmugglersCard.class, name = "SMUGGLERS"),
+        @JsonSubTypes.Type(value = StardustCard.class, name = "STARDUST")
+})
 abstract public class Card {
 
-    private final int id;
-    private final int level;
-    private final boolean isLearner;
+    @JsonProperty private final int id;
+    @JsonProperty private final int level;
+    @JsonProperty private final boolean isLearner;
 
     public Card(int id, int level, boolean isLearner) {
         this.id = id;
@@ -59,9 +81,6 @@ abstract public class Card {
             if (player.hasEndedInAdvance())
                 board.moveToStartingDeck(player);
 
-    }
-
-    public void printCardInfo(ModelFacade model, Board board) {
     }
 
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> rewards, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {

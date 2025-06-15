@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.cards;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.game.Board;
@@ -11,11 +13,11 @@ import java.util.List;
 
 public abstract class EnemiesCard extends Card {
 
-    protected final int days;
-    protected final int enemyFirePower;
+    @JsonProperty protected final int days;
+    @JsonProperty protected final int enemyFirePower;
 
     protected List<PlayerData> players;
-    protected boolean enemiesDefeated;
+    @JsonProperty protected boolean enemiesDefeated;
     protected int playerIndex;
 
     public EnemiesCard(int id, int level, boolean isLearner, int days, int enemyFirePower) {

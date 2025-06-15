@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.cards.utils;
 
-import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.components.CannonComponent;
 import it.polimi.ingsw.model.components.EngineComponent;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -18,11 +18,6 @@ public enum CriteriaType {
                 worst.setValue((double) player.getShip().getCrew());
             }
             return PlayerState.DONE;
-        }
-
-        @Override
-        public String toString() {
-            return "↓ 👨";
         }
     },
 
@@ -55,11 +50,6 @@ public enum CriteriaType {
                 return PlayerState.DONE;
             }
         }
-
-        @Override
-        public String toString() {
-            return "↓ 💥";
-        }
     },
 
     ENGINE {
@@ -87,11 +77,6 @@ public enum CriteriaType {
                 worst.setValue(freeEnginesPower);
                 return PlayerState.DONE;
             }
-        }
-
-        @Override
-        public String toString() {
-            return "↓ 🚀";
         }
     };
 

@@ -1,21 +1,18 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.components.EngineComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.view.TUI.Chroma;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class OpenSpaceCard extends Card {
 
     private int playerIndex;
-    private Map<PlayerData, Integer> enginesActivated = new HashMap<>();
+    private Map<String, Integer> enginesActivated = new HashMap<>();
 
     public OpenSpaceCard(int id, int level, boolean isLearner) {
         super(id, level, isLearner);
@@ -53,7 +50,7 @@ public class OpenSpaceCard extends Card {
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT_ENGINES);
                 return false;
             } else {
-                enginesActivated.put(player, singleEnginesPower);
+                enginesActivated.put(player.getUsername(), singleEnginesPower);
                 model.setPlayerState(player.getUsername(), PlayerState.DONE);
             }
         }
@@ -62,7 +59,7 @@ public class OpenSpaceCard extends Card {
         if (playerIndex >= board.getPlayersByPos().size()) {
 
             for (PlayerData player : board.getPlayersByPos())
-                board.movePlayer(player, enginesActivated.get(player));
+                board.movePlayer(player, enginesActivated.get(player.getUsername()));
 
             return true;
         }
@@ -73,9 +70,7 @@ public class OpenSpaceCard extends Card {
     public boolean doCommandEffects(PlayerState commandType, Integer power, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_ENGINES) {
             model.setPlayerState(username, PlayerState.DONE);
-
-            PlayerData player = board.getPlayerEntityByUsername(username);
-            enginesActivated.put(player, power);
+            enginesActivated.put(username, power);
 
             playerIndex++;
             return autoCheckPlayers(model, board);
@@ -86,55 +81,9 @@ public class OpenSpaceCard extends Card {
     @Override
     public void endCard(Board board) {
         for (PlayerData player : board.getPlayersByPos())
-            if (enginesActivated.get(player) == 0)
+            if (enginesActivated.get(player.getUsername()) == 0)
                 board.moveToStartingDeck(player);
         super.endCard(board);
-    }
-
-    @Override
-    public String toString() {
-        String hBorder = "─";
-        String vBorder = "│";
-        String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
-        String leftDivider = "├";
-        String rightDivider = "┤";
-
-        List<String> cardLines = new ArrayList<>();
-
-        // Title box
-        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
-        cardLines.add(topBorder);
-
-        String title = vBorder + Constants.inTheMiddle("Open Space" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
-        cardLines.add(title);
-
-        // First row divider
-        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
-        cardLines.add(divider);
-
-        String row = vBorder + "     🚀   " + "↑" + "   📅\t   "+ vBorder;
-        cardLines.add(row);
-
-
-        // Bottom border
-        String bottomBorder = angles[2] + Constants.repeat(hBorder, 22) + angles[3];
-        cardLines.add(bottomBorder);
-
-        return String.join("\n", cardLines);
-    }
-
-    @Override
-    public void printCardInfo(ModelFacade model, Board board) {
-        for (PlayerData player : board.getPlayersByPos()) {
-            PlayerState state = model.getPlayerState(player.getUsername());
-
-            switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_ENGINES -> Chroma.println("- " + player.getUsername() + " is choosing if activate double engines or not", Chroma.YELLOW_BOLD);
-            }
-        }
     }
 
 }

@@ -1,11 +1,13 @@
 package it.polimi.ingsw.model.cards.utils;
 
-import it.polimi.ingsw.model.game.objects.ColorType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.ingsw.common.model.enums.ColorType;
 
 import java.util.Map;
 
 public class Planet {
-    private final Map<ColorType, Integer> rewards;
+
+    @JsonProperty private final Map<ColorType, Integer> rewards;
 
     public Planet(Map<ColorType, Integer> rewards) {
         this.rewards = rewards;
