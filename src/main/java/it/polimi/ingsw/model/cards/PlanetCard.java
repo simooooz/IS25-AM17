@@ -1,24 +1,23 @@
 package it.polimi.ingsw.model.cards;
 
-import it.polimi.ingsw.Constants;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.utils.Planet;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.view.TUI.Chroma;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class PlanetCard extends Card{
 
-    private final List<Planet> planets;
-    private final Map<PlayerData, Planet> landedPlayers;
-    private final int days;
+    @JsonProperty private final List<Planet> planets;
+    @JsonProperty private final Map<String, Planet> landedPlayers;
+    @JsonProperty private final int days;
 
     private int playerIndex;
 
@@ -68,7 +67,7 @@ public class PlanetCard extends Card{
 
         if (hasLandedAndSetGoods) { // Card finished
             for (PlayerData player : board.getPlayersByPos().reversed())
-                if (landedPlayers.containsKey(player))
+                if (landedPlayers.containsKey(player.getUsername()))
                     board.movePlayer(player, days * -1);
             return true;
         }
@@ -84,7 +83,7 @@ public class PlanetCard extends Card{
                 throw new IllegalArgumentException("Planet not valid or already occupied");
             else { // Land
                 PlayerData player = board.getPlayerEntityByUsername(username);
-                landedPlayers.put(player, planets.get(value));
+                landedPlayers.put(username, planets.get(value));
                 model.setPlayerState(username, PlayerState.WAIT);
             }
             playerIndex++;
@@ -105,68 +104,7 @@ public class PlanetCard extends Card{
     @Override
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> r, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
-        super.doSpecificCheck(commandType, landedPlayers.get(player).getRewards(), deltaGood, batteries, username, board);
-    }
-
-    @Override
-    public String toString() {
-        String hBorder = "─";
-        String vBorder = "│";
-        String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
-        String leftDivider = "├";
-        String rightDivider = "┤";
-
-        List<String> cardLines = new ArrayList<>();
-
-        // Title box
-        String topBorder = angles[0] + Constants.repeat(hBorder, 22) + angles[1];
-        cardLines.add(topBorder);
-
-        String title = vBorder + Constants.inTheMiddle("Planets" + (getIsLearner() ? " (L)" : ""), 22) + vBorder;
-        cardLines.add(title);
-
-        // First row divider
-        String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
-        cardLines.add(divider);
-
-        //Planets
-
-        for (Planet p : planets) {
-            String goods = "  ";
-            for (ColorType c : p.getRewards().keySet()) {
-                for (int k = 0; k < p.getRewards().get(c); k++)
-                    goods =  goods + c.toString() + "  ";
-            }
-            String row = vBorder + Constants.inTheMiddle(goods, 22) + vBorder;
-            cardLines.add(row);
-            cardLines.add(divider);
-        }
-
-        String dayRow = vBorder + "         " + days + " 📅" + "\t   " + vBorder;
-        cardLines.add(dayRow);
-
-
-        // Bottom border
-        String bottomBorder = angles[2] + Constants.repeat(hBorder, 22) + angles[3];
-        cardLines.add(bottomBorder);
-
-        return String.join("\n", cardLines);
-    }
-
-    @Override
-    public void printCardInfo(ModelFacade model, Board board) {
-        for (PlayerData player : board.getPlayersByPos()) {
-            PlayerState state = model.getPlayerState(player.getUsername());
-            String landInfo = landedPlayers.containsKey(player) ? "(landed at planet n." + landedPlayers.get(player)+1 + ")" : "(not landed)";
-
-            switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done " + landInfo, Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_GOODS -> Chroma.println("- " + player.getUsername() + " is collecting the reward (updating goods) " + landInfo, Chroma.YELLOW_BOLD);
-                case WAIT_INDEX -> Chroma.println("- " + player.getUsername() + " is choosing the planet", Chroma.YELLOW_BOLD);
-            }
-        }
+        super.doSpecificCheck(commandType, landedPlayers.get(username).getRewards(), deltaGood, batteries, username, board);
     }
 
 }
