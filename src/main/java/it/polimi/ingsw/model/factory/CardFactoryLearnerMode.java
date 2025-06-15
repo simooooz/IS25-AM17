@@ -1,10 +1,6 @@
 package it.polimi.ingsw.model.factory;
 
-import it.polimi.ingsw.model.cards.Card;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
 
 
 public class CardFactoryLearnerMode extends CardFactory {
@@ -12,18 +8,14 @@ public class CardFactoryLearnerMode extends CardFactory {
     public CardFactoryLearnerMode() {
         super();
 
-        JSONObject deckJson = loadJsonConfig();
-        JSONArray cardsArray = deckJson.getJSONArray("cards");
+        JsonNode deckJson = loadJsonConfig();
+        JsonNode cardsArray = deckJson.get("cards");
 
-        for (int i = 0; i < cardsArray.length(); i++) {
-            JSONObject cardJson = cardsArray.getJSONObject(i);
-            if (cardJson.getBoolean("isLearner"))
+        for (int i = 0; i < cardsArray.size(); i++) {
+            JsonNode cardJson = cardsArray.get(i);
+            if (cardJson.get("isLearner").asBoolean())
                 cardPile.add(createCard(cardJson));
         }
-    }
-
-    public List<Card> getAllCards() {
-        return cardPile;
     }
 
 }

@@ -1,17 +1,16 @@
 package it.polimi.ingsw.model.factory;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.model.components.*;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.properties.DirectionType;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.common.model.enums.DirectionType;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 
 public class ComponentFactory {
@@ -25,23 +24,23 @@ public class ComponentFactory {
         this.componentsMap = new HashMap<>();
         this.startingCabins = new HashMap<>();
 
-        JSONObject componentsJson = loadJsonConfig();
-        JSONArray componentsArray = componentsJson.getJSONArray("components");
-        JSONArray startingCabinsArray = componentsJson.getJSONArray("startingCabins");
+        JsonNode componentsJson = loadJsonConfig();
+        JsonNode componentsArray = componentsJson.get("components");
+        JsonNode startingCabinsArray = componentsJson.get("startingCabins");
 
         List<ColorType> colors = List.of(ColorType.values());
-        for (int i = 0; i < startingCabinsArray.length(); i++) {
-            JSONObject componentJson = startingCabinsArray.getJSONObject(i);
+        for (int i = 0; i < startingCabinsArray.size(); i++) {
+            JsonNode componentJson = startingCabinsArray.get(i);
             Component component = createComponent(componentJson);
             startingCabins.put(colors.get(i), component);
-            componentsMap.put(componentJson.getInt("id"), component);
+            componentsMap.put(componentJson.get("id").asInt(), component);
         }
 
-        for (int i = 0; i < componentsArray.length(); i++) {
-            JSONObject componentJson = componentsArray.getJSONObject(i);
+        for (int i = 0; i < componentsArray.size(); i++) {
+            JsonNode componentJson = componentsArray.get(i);
             Component component = createComponent(componentJson);
             components.add(component);
-            componentsMap.put(componentJson.getInt("id"), component);
+            componentsMap.put(componentJson.get("id").asInt(), component);
         }
     }
 
@@ -53,13 +52,12 @@ public class ComponentFactory {
         return startingCabins;
     }
 
-    private JSONObject loadJsonConfig() {
+    private JsonNode loadJsonConfig() {
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String jsonContent = new String(getClass().getResourceAsStream("/factory.json").readAllBytes());
-            return new JSONObject(jsonContent);
+            return objectMapper.readTree(new File("src/main/resources/factory.json"));
         } catch (IOException e) {
-            System.err.println("Error while loading JSON file: " + e.getMessage());
-            return new JSONObject(); // Return an empty JSON
+            throw new RuntimeException("Unable to load config file");
         }
     }
 
@@ -67,55 +65,56 @@ public class ComponentFactory {
         return new HashMap<>(componentsMap);
     }
 
-    private Component createComponent(JSONObject componentJson) {
-        int id = componentJson.getInt("id");
-        String type = componentJson.getString("type");
-        JSONArray connectorsArray = componentJson.getJSONArray("connectors");
-        ConnectorType[] connectors = new ConnectorType[connectorsArray.length()];
-        for (int i = 0; i < connectorsArray.length(); i++) {
-            connectors[i] = (ConnectorType.valueOf(connectorsArray.getString(i)));
+    @SuppressWarnings("Duplicates")
+    private Component createComponent(JsonNode componentJson) {
+        int id = componentJson.get("id").asInt();
+        String type = componentJson.get("type").asText();
+        JsonNode connectorsArray = componentJson.get("connectors");
+        ConnectorType[] connectors = new ConnectorType[connectorsArray.size()];
+        for (int i = 0; i < connectorsArray.size(); i++) {
+            connectors[i] = (ConnectorType.valueOf(connectorsArray.get(i).asText()));
         }
 
         switch(type) {
             case "BatteryComponent":
-                boolean isTriple = componentJson.optBoolean("isTriple", false);
+                boolean isTriple = componentJson.get("isTriple").booleanValue();;
                 return new BatteryComponent(id, connectors, isTriple);
 
             case "CargoHoldsComponent":
-                int numberCargo = componentJson.optInt("number", 0);
+                int numberCargo = componentJson.get("number").asInt();
                 return new CargoHoldsComponent(id, connectors, numberCargo);
 
             case "CabinComponent":
-                boolean isStartingCabin = componentJson.optBoolean("isStarting", false);
+                boolean isStartingCabin = componentJson.get("isStarting").booleanValue();;
                 return new CabinComponent(id, connectors, isStartingCabin);
 
             case "Component":
                 return new Component(id, connectors);
 
             case "SpecialCargoHoldsComponent":
-                int numberSpecialCargo = componentJson.optInt("number", 0);
+                int numberSpecialCargo = componentJson.get("number").asInt();
                 return new SpecialCargoHoldsComponent(id, connectors, numberSpecialCargo);
 
             case "EngineComponent":
-                DirectionType engineDirection = DirectionType.valueOf(componentJson.getString("direction"));
-                boolean engineIsDouble = componentJson.optBoolean("isDouble", false);
+                DirectionType engineDirection = DirectionType.valueOf(componentJson.get("direction").asText());
+                boolean engineIsDouble = componentJson.get("isDouble").booleanValue();;
                 return new EngineComponent(id, connectors, engineDirection, engineIsDouble);
 
             case "CannonComponent":
-                DirectionType cannonDirection = DirectionType.valueOf(componentJson.getString("direction"));
-                boolean cannonIsDouble = componentJson.optBoolean("isDouble", false);
+                DirectionType cannonDirection = DirectionType.valueOf(componentJson.get("direction").asText());
+                boolean cannonIsDouble = componentJson.get("isDouble").booleanValue();
                 return new CannonComponent(id, connectors, cannonDirection, cannonIsDouble);
 
             case "ShieldComponent":
-                JSONArray directionArray = componentJson.getJSONArray("directionsProtected");
-                DirectionType[] direction = new DirectionType[directionArray.length()];
-                for (int i = 0; i < directionArray.length(); i++) {
-                    direction[i] = (DirectionType.valueOf(directionArray.getString(i)));
+                JsonNode directionArray = componentJson.get("directionsProtected");
+                DirectionType[] direction = new DirectionType[directionArray.size()];
+                for (int i = 0; i < directionArray.size(); i++) {
+                    direction[i] = (DirectionType.valueOf(directionArray.get(i).asText()));
                 }
                 return new ShieldComponent(id, connectors, direction);
 
             case "OddComponent":
-                AlienType alienType = AlienType.valueOf(componentJson.getString("typeAlien"));
+                AlienType alienType = AlienType.valueOf(componentJson.get("typeAlien").asText());
                 return new OddComponent(id, connectors, alienType);
 
             default:

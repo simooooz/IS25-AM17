@@ -1,8 +1,7 @@
 package it.polimi.ingsw.model.factory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import it.polimi.ingsw.model.cards.Card;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,11 +15,11 @@ public class CardFactoryAdvancedMode extends CardFactory {
         List<Card> level1Cards = new ArrayList<>();
         List<Card> level2Cards = new ArrayList<>();
 
-        JSONObject deckJson = loadJsonConfig();
-        JSONArray cardsArray = deckJson.getJSONArray("cards");
+        JsonNode deckJson = loadJsonConfig();
+        JsonNode cardsArray = deckJson.get("cards");
 
-        for (int i = 0; i < cardsArray.length(); i++) {
-            JSONObject cardJson = cardsArray.getJSONObject(i);
+        for (int i = 0; i < cardsArray.size(); i++) {
+            JsonNode cardJson = cardsArray.get(i);
             Card card = createCard(cardJson);
             if (card.getLevel() == 1)
                 level1Cards.add(card);
@@ -37,19 +36,6 @@ public class CardFactoryAdvancedMode extends CardFactory {
             else
                 cardPile.add(level2Cards.get(i));
         }
-    }
-
-    @Override
-    public List<Card> getAllCards() {
-        List<Card> allCards = new ArrayList<>();
-        JSONObject deckJson = loadJsonConfig();
-        JSONArray cardsArray = deckJson.getJSONArray("cards");
-        for (int i = 0; i < cardsArray.length(); i++) {
-            JSONObject cardJson = cardsArray.getJSONObject(i);
-            Card card = createCard(cardJson);
-            allCards.add(card);
-        }
-        return allCards;
     }
 
 }

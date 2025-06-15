@@ -1,13 +1,15 @@
 package it.polimi.ingsw.model.factory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.model.cards.SlaversCard;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.utils.*;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 
-import it.polimi.ingsw.model.properties.DirectionType;
+import it.polimi.ingsw.common.model.enums.DirectionType;
 import it.polimi.ingsw.model.cards.AbandonedShipCard;
 import it.polimi.ingsw.model.cards.AbandonedStationCard;
 import it.polimi.ingsw.model.cards.CombatZoneCard;
@@ -21,13 +23,13 @@ import it.polimi.ingsw.model.cards.StardustCard;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 
 
 public abstract class CardFactory {
 
     protected final List<Card> cardPile;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public CardFactory() {
         this.cardPile = new ArrayList<>();
@@ -37,51 +39,51 @@ public abstract class CardFactory {
         return cardPile;
     }
 
-    protected JSONObject loadJsonConfig() {
+    protected JsonNode loadJsonConfig() {
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String jsonContent = new String(getClass().getResourceAsStream("/factory.json").readAllBytes());
-            return new JSONObject(jsonContent);
+            return objectMapper.readTree(new File("src/main/resources/factory.json"));
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento del file JSON: " + e.getMessage());
-            return new JSONObject();
+            throw new RuntimeException("Unable to load config file");
         }
     }
 
-    protected Card createCard(JSONObject cardJson) {
-        String type = cardJson.getString("type");
-        int id = cardJson.getInt("id");
-        int level = cardJson.getInt("level");
-        boolean isLearner = cardJson.getBoolean("isLearner");
+    protected Card createCard(JsonNode cardJson) {
+        String type = cardJson.get("type").asText();
+        int id = cardJson.get("id").asInt();
+        int level = cardJson.get("level").asInt();
+        boolean isLearner = cardJson.get("isLearner").asBoolean();
 
         switch (type) {
             case "SlaversCard":
-                int slaversCrew = cardJson.optInt("crew", 0);
-                int slaversCredits = cardJson.optInt("credits", 0);
-                int slaversDays = cardJson.optInt("days", 0);
-                int slaverFirePower = cardJson.optInt("firePower", 0);
+                int slaversCrew = cardJson.get("crew").asInt();
+                int slaversCredits = cardJson.get("credits").asInt();
+                int slaversDays = cardJson.get("days").asInt();
+                int slaverFirePower = cardJson.get("firePower").asInt();
                 return new SlaversCard(id, level, isLearner, slaversCrew, slaversCredits, slaversDays, slaverFirePower);
 
             case "SmugglersCard":
-                int smugFirePower = cardJson.optInt("firePower", 0);
-                int smugLostGoods = cardJson.optInt("lostGoods", 0);
-                JSONObject rewardsJson = cardJson.getJSONObject("rewards");
+                int smugFirePower = cardJson.get("firePower").asInt();
+                int smugLostGoods = cardJson.get("lostGoods").asInt();
+                JsonNode rewardsJson = cardJson.get("rewards");
                 Map<ColorType, Integer> rewards = new HashMap<>();
-                for (String color : rewardsJson.keySet()) {
-                    rewards.put(ColorType.valueOf(color.toUpperCase()), rewardsJson.getInt(color));
+                for (Iterator<String> it = rewardsJson.fieldNames(); it.hasNext(); ) {
+                    String color = it.next();
+                    rewards.put(ColorType.valueOf(color.toUpperCase()), rewardsJson.get(color).asInt());
                 }
-                int smugDays = cardJson.optInt("days", 0);
+                int smugDays = cardJson.get("days").asInt();
                 return new SmugglersCard(id, level, isLearner, smugFirePower, smugLostGoods, rewards, smugDays);
 
             case "PiratesCard":
-                int pirateFirePower = cardJson.optInt("piratesFirePower", 0);
-                int pirateCredits = cardJson.optInt("credits", 0);
-                int pirateDays = cardJson.optInt("days", 0);
-                JSONArray piratesCannonFiresArray = cardJson.optJSONArray("cannonFires");
+                int pirateFirePower = cardJson.get("piratesFirePower").asInt();
+                int pirateCredits = cardJson.get("credits").asInt();
+                int pirateDays = cardJson.get("days").asInt();
+                JsonNode piratesCannonFiresArray = cardJson.get("cannonFires");
                 List<CannonFire> piratesCannonFires = new ArrayList<>();
-                for (int i = 0; i < piratesCannonFiresArray.length(); i++) {
-                    JSONObject cannonFireJson = piratesCannonFiresArray.getJSONObject(i);
-                    boolean isBig = cannonFireJson.getBoolean("isBig");
-                    DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.getString("directionFrom"));
+                for (int i = 0; i < piratesCannonFiresArray.size(); i++) {
+                    JsonNode cannonFireJson = piratesCannonFiresArray.get(i);
+                    boolean isBig = cannonFireJson.get("isBig").asBoolean();
+                    DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.get("directionFrom").asText());
                     piratesCannonFires.add(new CannonFire(isBig, directionFrom));
                 }
                 return new PiratesCard(id, level, isLearner, pirateFirePower, pirateCredits, pirateDays, piratesCannonFires);
@@ -96,79 +98,81 @@ public abstract class CardFactory {
                 return new EpidemicCard(id, level, isLearner);
 
             case "MeteorSwarmCard":
-                JSONArray meteorsArray = cardJson.optJSONArray("meteors");
+                JsonNode meteorsArray = cardJson.get("meteors");
                 List<Meteor> meteors = new ArrayList<>();
-                for (int i = 0; i < meteorsArray.length(); i++) {
-                    JSONObject cannonFireJson = meteorsArray.getJSONObject(i);
-                    boolean isBig = cannonFireJson.getBoolean("isBig");
-                    DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.getString("directionFrom"));
+                for (int i = 0; i < meteorsArray.size(); i++) {
+                    JsonNode cannonFireJson = meteorsArray.get(i);
+                    boolean isBig = cannonFireJson.get("isBig").asBoolean();
+                    DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.get("directionFrom").asText());
                     meteors.add(new Meteor(isBig, directionFrom));
                 }
                 return new MeteorSwarmCard(id, level, isLearner, meteors);
 
             case "StrayBigMeteorsCard":
-                JSONArray meteorsBigArray = cardJson.optJSONArray("cannonFires");
+                JsonNode meteorsBigArray = cardJson.get("cannonFires");
                 List<Meteor> meteorsBig = new ArrayList<>();
-                for (int i = 0; i < meteorsBigArray.length(); i++) {
-                    JSONObject meteorsJson = meteorsBigArray.getJSONObject(i);
-                    boolean isBig = meteorsJson.getBoolean("isBig");
-                    DirectionType directionFrom = DirectionType.valueOf(meteorsJson.getString("directionFrom"));
+                for (int i = 0; i < meteorsBigArray.size(); i++) {
+                    JsonNode meteorsJson = meteorsBigArray.get(i);
+                    boolean isBig = meteorsJson.get("isBig").asBoolean();
+                    DirectionType directionFrom = DirectionType.valueOf(meteorsJson.get("directionFrom").asText());
                     meteorsBig.add(new Meteor(isBig, directionFrom));
                 }
                 return new MeteorSwarmCard(id, level, isLearner, meteorsBig);
 
             case "AbandonedShipCard":
-                int abandonedShipCrew = cardJson.optInt("crew", 0);
-                int abandonedShipCredits = cardJson.optInt("credits", 0);
-                int abandonedShipDays = cardJson.optInt("days", 0);
+                int abandonedShipCrew = cardJson.get("crew").asInt();
+                int abandonedShipCredits = cardJson.get("credits").asInt();
+                int abandonedShipDays = cardJson.get("days").asInt();
                 return new AbandonedShipCard(id, level, isLearner, abandonedShipCrew, abandonedShipCredits, abandonedShipDays);
 
             case "AbandonedStationCard":
-                int crew = cardJson.getInt("crew");
-                int stationDays = cardJson.getInt("days");
-                JSONObject goodsJson = cardJson.getJSONObject("goods");
+                int crew = cardJson.get("crew").asInt();
+                int stationDays = cardJson.get("days").asInt();
+                JsonNode goodsJson = cardJson.get("goods");
                 Map<ColorType, Integer> goods = new HashMap<>();
-                for (String color : goodsJson.keySet()) {
-                    goods.put(ColorType.valueOf(color.toUpperCase()), goodsJson.getInt(color));
+                for (Iterator<String> it = goodsJson.fieldNames(); it.hasNext(); ) {
+                    String color = it.next();
+                    goods.put(ColorType.valueOf(color.toUpperCase()), goodsJson.get(color).asInt());
                 }
                 return new AbandonedStationCard(id, level, isLearner, crew, stationDays, goods);
 
             case "PlanetCard":
-                JSONArray planetsJsonArray = cardJson.optJSONArray("planets");
+                JsonNode planetsJsonArray = cardJson.get("planets");
                 List<Planet> planets = new ArrayList<>();
-                for (int i = 0; i < planetsJsonArray.length(); i++) {
-                    JSONObject planetJson = planetsJsonArray.getJSONObject(i);
-                    JSONObject rewardsJsonPlanet = planetJson.getJSONObject("rewards");
+                for (int i = 0; i < planetsJsonArray.size(); i++) {
+                    JsonNode planetJson = planetsJsonArray.get(i);
+                    JsonNode rewardsJsonPlanet = planetJson.get("rewards");
                     Map<ColorType, Integer> rewardsPlanet = new HashMap<>();
-                    for (String color : rewardsJsonPlanet.keySet()) {
-                        rewardsPlanet.put(ColorType.valueOf(color.toUpperCase()), rewardsJsonPlanet.getInt(color));
+                    for (Iterator<String> it = rewardsJsonPlanet.fieldNames(); it.hasNext(); ) {
+                        String color = it.next();
+                        rewardsPlanet.put(ColorType.valueOf(color.toUpperCase()), rewardsJsonPlanet.get(color).asInt());
                     }
                     Planet planet = new Planet(rewardsPlanet);
                     planets.add(planet);
                 }
-                int days = cardJson.optInt("days", 0);
+                int days = cardJson.get("days").asInt();
                 return new PlanetCard(id, level, isLearner, planets, days);
 
             case "CombactZoneCard":
-                JSONArray combactArray = cardJson.optJSONArray("warLines");
+                JsonNode combactArray = cardJson.get("warLines");
                 List<AbstractMap.SimpleEntry<CriteriaType, PenaltyCombatZone>> combact = new ArrayList<>();
-                for (int i = 0; i < combactArray.length(); i++) {
-                    JSONObject combactJson = combactArray.getJSONObject(i);
-                    CriteriaType criteria = CriteriaType.valueOf(combactJson.getString("CriteriaType"));
-                    JSONObject penaltyJson = combactJson.getJSONObject("PenaltyCombatZone");
-                    String penaltyType = penaltyJson.getString("type");
+                for (int i = 0; i < combactArray.size(); i++) {
+                    JsonNode combactJson = combactArray.get(i);
+                    CriteriaType criteria = CriteriaType.valueOf(combactJson.get("CriteriaType").asText());
+                    JsonNode penaltyJson = combactJson.get("PenaltyCombatZone");
+                    String penaltyType = penaltyJson.get("type").asText();
                     PenaltyCombatZone penalty;
                     if (penaltyType.equals("CountablePenaltyZone")) {
-                        int penaltyNumber = penaltyJson.getInt("penaltyNumber");
-                        MalusType malusType = MalusType.valueOf(penaltyJson.getString("MalusType"));
+                        int penaltyNumber = penaltyJson.get("penaltyNumber").asInt();
+                        MalusType malusType = MalusType.valueOf(penaltyJson.get("MalusType").asText());
                         penalty = new CountablePenaltyZone(penaltyNumber, malusType);
                     } else if (penaltyType.equals("CannonFirePenaltyCombatZone")) {
-                        JSONArray cannonFiresArray = penaltyJson.getJSONArray("cannonFires");
+                        JsonNode cannonFiresArray = penaltyJson.get("cannonFires");
                         List<CannonFire> cannonFires = new ArrayList<>();
-                        for (int j = 0; j < cannonFiresArray.length(); j++) {
-                            JSONObject cannonFireJson = cannonFiresArray.getJSONObject(j);
-                            boolean isBig = cannonFireJson.getBoolean("isBig");
-                            DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.getString("directionFrom"));
+                        for (int j = 0; j < cannonFiresArray.size(); j++) {
+                            JsonNode cannonFireJson = cannonFiresArray.get(j);
+                            boolean isBig = cannonFireJson.get("isBig").asBoolean();
+                            DirectionType directionFrom = DirectionType.valueOf(cannonFireJson.get("directionFrom").asText());
                             cannonFires.add(new CannonFire(isBig, directionFrom));
                         }
                         penalty = new CannonFirePenaltyCombatZone(cannonFires);
@@ -184,6 +188,24 @@ public abstract class CardFactory {
         }
     }
 
-    public abstract List<Card> getAllCards();
+    public static String serializeCard(Card card) {
+        try {
+            return mapper.writeValueAsString(card);
+        } catch (JsonProcessingException e) {
+            // TODO che faccio?
+            e.printStackTrace();
+            throw new RuntimeException("Errore serializzazione carta: " + e.getMessage(), e);
+        }
+    }
+
+    public static String serializeCardList(List<Card> cards) {
+        try {
+            JavaType listType = mapper.getTypeFactory().constructCollectionType(List.class, Card.class);
+            return mapper.writerFor(listType).writeValueAsString(cards);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Errore serializzazione carta: " + e.getMessage(), e);
+        }
+    }
 
 }
