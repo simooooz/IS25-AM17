@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model.components.utils;
+package it.polimi.ingsw.common.model.enums;
 
 public enum ConnectorType {
     SINGLE,

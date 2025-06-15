@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model.game;
+package it.polimi.ingsw.common.model.enums;
 
 public enum LobbyState {
     WAITING,

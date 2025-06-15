@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model.cards;
+package it.polimi.ingsw.common.model.enums;
 
 import java.util.HashMap;
 import java.util.Map;

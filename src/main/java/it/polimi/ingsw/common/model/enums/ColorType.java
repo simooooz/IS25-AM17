@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model.game.objects;
+package it.polimi.ingsw.common.model.enums;
 
 import it.polimi.ingsw.view.TUI.Chroma;
 
