@@ -1,15 +1,19 @@
 package it.polimi.ingsw.network.rmi;
 
-import it.polimi.ingsw.controller.GameController;
-import it.polimi.ingsw.model.game.Lobby;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.client.model.ClientEventBus;
+import it.polimi.ingsw.client.model.cards.ClientCard;
+import it.polimi.ingsw.client.model.factory.ClientCardFactory;
+import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,79 +25,71 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
         this.client = client;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void updateLobbyStatus(MessageType lobbyEvent, Lobby lobby) throws RemoteException {
-        client.setLobby(lobby);
-        switch (lobbyEvent) {
-            case CREATE_LOBBY_OK, JOIN_LOBBY_OK, JOIN_RANDOM_LOBBY_OK -> client.setState(UserState.IN_LOBBY);
-            case LEAVE_GAME_OK -> {
-                String leftPlayer = client.getLobby().getPlayers().stream().filter(u -> !lobby.getPlayers().contains(u)).findFirst().orElseThrow(() -> new RuntimeException("Unknown left player"));
-                if (!leftPlayer.equals(client.getUsername())) {
-                    client.getLobby().setGame(client.getGameController());
-                    client.getLobby().removePlayer(leftPlayer);
-                }
+    public void notifyGameEvent(MessageType eventType, Object... args) throws RemoteException {
+        switch (eventType) {
+            case BATCH_START -> ClientEventBus.getInstance().startBatch();
+            case BATCH_END -> ClientEventBus.getInstance().endBatch();
+
+            case USERNAME_OK_EVENT -> {
+                client.setUsername((String) args[0]);
+                client.setState(UserState.LOBBY_SELECTION);
+            }
+            case CREATED_LOBBY_EVENT -> {
+                client.setLobby(new ClientLobby((String) args[0], (List<String>) args[1], (Boolean) args[2], (Integer) args[3]));
+                client.setState(UserState.IN_LOBBY);
+            }
+            case JOINED_LOBBY_EVENT -> {
+                client.getLobby().addPlayer((String) args[0]);
+            }
+            case LEFT_LOBBY_EVENT -> {
+                if (!args[0].equals(client.getUsername()))
+                    client.getLobby().removePlayer((String) args[0]);
                 else {
                     client.setLobby(null);
-                    client.setGameController(null);
                     client.setState(UserState.LOBBY_SELECTION);
                 }
             }
-            case GAME_STARTED_OK -> {
-                client.setState(UserState.IN_GAME);
-                client.setGameController(new GameController(lobby.getPlayers(), lobby.isLearnerMode()));
-                client.getGameController().startMatch();
 
-                // Test only
-                switch (client.getLobby().getGameID()) {
-                    case "test-1" -> client.getGameController().startTest(1);
-                    case "test-2" -> client.getGameController().startTest(2);
+            case MATCH_STARTED_EVENT -> {
+                client.getLobby().initGame();
+                client.setState(UserState.IN_GAME);
+            }
+            case FLIGHT_ENDED_EVENT -> client.getGameController().flightEnded((String) args[0]);
+            case PLAYERS_STATE_UPDATED_EVENT -> client.getGameController().playersStateUpdated((Map<String, PlayerState>) args[0]);
+            case COMPONENT_PICKED_EVENT -> client.getGameController().componentPicked((String) args[0], (Integer) args[1]);
+            case COMPONENT_RELEASED_EVENT -> client.getGameController().componentReleased((String) args[0], (Integer) args[1]);
+            case COMPONENT_RESERVED_EVENT -> client.getGameController().componentReserved((String) args[0], (Integer) args[1]);
+            case COMPONENT_INSERTED_EVENT -> client.getGameController().componentInserted((String) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+            case COMPONENT_MOVED_EVENT -> client.getGameController().componentMoved((String) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+            case COMPONENT_ROTATED_EVENT -> client.getGameController().componentRotated((Integer) args[0], (Integer) args[1]);
+            case COMPONENT_DESTROYED_EVENT -> client.getGameController().componentDestroyed((String) args[0], (Integer) args[1]);
+            case CARD_PILE_LOOKED_EVENT -> {
+                if (args[2] == null)
+                    client.getGameController().cardPileLooked((String) args[0], (Integer) args[1]);
+                else {
+                    List<ClientCard> cards = ClientCardFactory.deserializeCardList((String) args[2]);
+                    client.getGameController().cardPileLooked((String) args[0], (Integer) args[1], cards);
                 }
             }
+            case CARD_PILE_RELEASED_EVENT -> client.getGameController().cardPileReleased((String) args[0]);
+            case HOURGLASS_MOVED_EVENT -> client.getGameController().hourglassMoved();
+            case PLAYERS_POSITION_UPDATED_EVENT -> client.getGameController().playersPositionUpdated((List<String>) args[0], (List<AbstractMap.SimpleEntry<String, Integer>>) args[1]);
+            case CARD_REVEALED_EVENT -> {
+                ClientCard card = ClientCardFactory.deserializeCard((String) args[0]);
+                client.getGameController().cardRevealed(card);
+            }
+            case CARD_UPDATED_EVENT -> {
+                ClientCard card = ClientCardFactory.deserializeCard((String) args[0]);
+                client.getGameController().cardUpdated(card);
+            }
+            case BATTERIES_UPDATED_EVENT -> client.getGameController(). batteriesUpdated((Integer) args[0], (Integer) args[1]);
+            case GOODS_UPDATED_EVENT -> client.getGameController().goodsUpdated((Integer) args[0], (List<ColorType>) args[1]);
+            case CREW_UPDATED_EVENT -> client.getGameController().crewUpdated((Integer) args[0], (Integer) args[1], (AlienType) args[2]);
+            case CREDITS_UPDATED_EVENT -> client.getGameController().creditsUpdated((String) args[0], (Integer) args[1]);
         }
 
-        // Send update to Display Updater thread
-        try {
-            client.getViewTui().getNetworkMessageQueue().put(lobbyEvent.name());
-        } catch (InterruptedException e) {
-            // Just ignore it
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void notifyGameEvent(MessageType eventType, String username, Object... args) throws RemoteException {
-        switch (eventType) {
-            case SET_SHUFFLED_DECK -> client.getGameController().setShuffledCardPile((List<Integer>) args[0]);
-            case PICK_COMPONENT -> client.getGameController().pickComponent(username, (Integer) args[0]);
-            case RELEASE_COMPONENT -> client.getGameController().releaseComponent(username, (Integer) args[0]);
-            case RESERVE_COMPONENT -> client.getGameController().reserveComponent(username, (Integer) args[0]);
-            case INSERT_COMPONENT -> client.getGameController().insertComponent(username, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3], true);
-            case MOVE_COMPONENT -> client.getGameController().moveComponent(username, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
-            case ROTATE_COMPONENT -> client.getGameController().rotateComponent(username, (Integer) args[0], (Integer) args[1]);
-            case LOOK_CARD_PILE -> client.getGameController().lookCardPile(username, (Integer) args[0]);
-            case MOVE_HOURGLASS -> client.getGameController().moveHourglass(username);
-            case SET_READY -> client.getGameController().setReady(username);
-            case CHECK_SHIP -> client.getGameController().checkShip(username, (List<Integer>) args[0]);
-            case CHOOSE_ALIEN -> client.getGameController().chooseAlien(username, (Map<Integer, AlienType>) args[0]);
-            case CHOOSE_SHIP_PART -> client.getGameController().chooseShipPart(username, (Integer) args[0]);
-            case DRAW_CARD -> client.getGameController().drawCard(username);
-            case ACTIVATE_CANNONS -> client.getGameController().activateCannons(username, (List<Integer>) args[0], (List<Integer>) args[1]);
-            case ACTIVATE_ENGINES -> client.getGameController().activateEngines(username, (List<Integer>) args[0], (List<Integer>) args[1]);
-            case ACTIVATE_SHIELD -> client.getGameController().activateShield(username, (Integer) args[0]);
-            case UPDATE_GOODS -> client.getGameController().updateGoods(username, (Map<Integer, List<ColorType>>) args[0], (List<Integer>) args[1]);
-            case REMOVE_CREW -> client.getGameController().removeCrew(username, (List<Integer>) args[0]);
-            case ROLL_DICES -> client.getGameController().rollDices(username, (Integer) args[0]);
-            case GET_BOOLEAN -> client.getGameController().getBoolean(username, (Boolean) args[0]);
-            case GET_INDEX -> client.getGameController().getIndex(username, (Integer) args[0]);
-            case END_FLIGHT -> client.getGameController().endFlight(username);
-        }
-
-        // Send update to Display Updater thread
-        try {
-            client.getViewTui().getNetworkMessageQueue().put(eventType.name());
-        } catch (InterruptedException e) {
-            // Just ignore it
-        }
     }
 
     @Override

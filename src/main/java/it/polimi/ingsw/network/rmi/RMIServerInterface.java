@@ -1,8 +1,7 @@
 package it.polimi.ingsw.network.rmi;
 
-import it.polimi.ingsw.model.game.Lobby;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -17,7 +16,7 @@ public interface RMIServerInterface extends Remote {
 
     void ping(String sessionCode) throws RemoteException;
 
-    boolean setUsernameHandler(String sessionCode, String username) throws RemoteException;
+    void setUsernameHandler(String sessionCode, String username) throws RemoteException;
 
     void createLobbyHandler(String sessionCode, String name, Integer maxPlayers, Boolean learnerMode) throws RemoteException;
 

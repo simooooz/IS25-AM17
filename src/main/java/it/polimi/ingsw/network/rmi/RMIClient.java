@@ -42,19 +42,9 @@ public class RMIClient extends Client {
             clientCallback = new ClientCallback(this);
             server.registerClient(sessionCode, clientCallback);
 
-            // Start sending ping
-            scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
-            try {
-                this.viewTui.start();
-            } catch (IOException e) {
-                // TODO change
-                e.printStackTrace();
-            }
-
-        } catch (ClientException | NotBoundException | RemoteException e) {
-            System.err.println("[RMI CLIENT] Could not find or connect to server");
-            System.exit(-1);
-        }
+        // Start sending ping
+        scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
+        this.viewTui.start();
     }
 
     private void sendPing() {
@@ -85,7 +75,7 @@ public class RMIClient extends Client {
     public void send(MessageType messageType, Object... args) {
         try {
             switch (messageType) {
-                case SET_USERNAME -> sendSetUsername((String) args[0]);
+                case SET_USERNAME -> server.setUsernameHandler(sessionCode, (String) args[0]);
                 case CREATE_LOBBY -> server.createLobbyHandler(sessionCode, (String) args[0], (Integer) args[1], (Boolean) args[2]);
                 case JOIN_LOBBY -> server.joinLobbyHandler(sessionCode, (String) args[0]);
                 case JOIN_RANDOM_LOBBY -> server.joinRandomLobbyHandler(sessionCode, (Boolean) args[0]);
@@ -116,24 +106,6 @@ public class RMIClient extends Client {
         } catch (RemoteException | RuntimeException e) {
             viewTui.displayError(e.getMessage());
         }
-    }
-
-    private void sendSetUsername(String username) throws RemoteException {
-        boolean done = server.setUsernameHandler(sessionCode, username);
-        if (done)
-            setUsername(username);
-        else {
-            Chroma.println("Username already taken", Chroma.RED);
-            System.out.print("> ");
-        }
-
-        // Send update to Display Updater thread
-        try {
-            viewTui.getNetworkMessageQueue().put(MessageType.USERNAME_OK.name());
-        } catch (InterruptedException e) {
-            // Just ignore it
-        }
-
     }
 
 }

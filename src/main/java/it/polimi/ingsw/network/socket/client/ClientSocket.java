@@ -24,43 +24,18 @@ public class ClientSocket extends Client {
     private Socket socket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
+
     private HeartbeatThread heartbeatThread;
     private ListenLoopOfClient listenLoop;
 
-    private final UserInterface userInterface;
-    private final boolean autoStartInterface;
-
-    // Costruttore per TUI (comportamento originale)
     public ClientSocket() {
-        this(null, true);
-    }
-
-    // Costruttore per GUI o uso personalizzato
-    public ClientSocket(UserInterface userInterface, boolean autoStart) {
-        this.userInterface = userInterface;
-        this.autoStartInterface = autoStart;
-
         this.connect();
-
-        // Verifica se la connessione è riuscita prima di avviare i thread
-        if (this.socket == null || !this.socket.isConnected()) {
-            System.out.println("[CLIENT SOCKET] Connection failed, not starting threads");
-            return;
-        }
 
         heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
 
         listenLoop = new ListenLoopOfClient(this);
-
-        // Avvia l'interfaccia solo se richiesto e se è TUI
-        if (autoStartInterface && userInterface == null) {
-            try {
-                this.viewTui.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        this.viewTui.start();
     }
 
     private void connect() {
@@ -157,31 +132,16 @@ public class ClientSocket extends Client {
             this.sendObject(message);
         } catch (ClientException e) {
             System.err.println("[CLIENT SOCKET] Error while sending message: " + e.getMessage());
+            // Everything should be closed
         }
     }
 
     public void receive(Message message) {
         try {
             message.execute(this);
-
-            // Se è presente un'interfaccia personalizzata (GUI), usa quella
-            if (userInterface != null) {
-                userInterface.displayUpdate(message);
-            } else {
-                // Altrimenti usa la TUI (comportamento originale)
-                try {
-                    viewTui.getNetworkMessageQueue().put(message.getMessageType().name());
-                } catch (InterruptedException e) {
-                    // Just ignore it
-                }
-            }
-
         } catch (RuntimeException e) {
-            if (userInterface != null) {
-                userInterface.displayError(e.getMessage());
-            } else {
-                viewTui.displayError(e.getMessage());
-            }
+            viewTui.displayError(e.getMessage());
         }
     }
+
 }

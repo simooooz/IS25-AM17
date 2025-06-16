@@ -1,13 +1,11 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.game.Lobby;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.network.ServerBasis;
 import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
-import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.User;
 
 import java.rmi.NoSuchObjectException;
@@ -117,12 +115,12 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
 
     @Override
     public void unregisterClient(String sessionCode) {
-        // TODO non rimuovi ma set inattivo
         User.removeUser(getUserInRmiSessions(sessionCode));
         synchronized (sessions) {
             sessions.remove(sessionCode);
         }
         System.out.println("[RMI SERVER] Session: " + sessionCode + " closed");
+        // TODO devo notificare agli altri client che è uscito
     }
 
     @Override
@@ -134,8 +132,9 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     // Returns a boolean value
     // true if username has been set, otherwise false
     @Override
-    public boolean setUsernameHandler(String sessionCode, String username) throws RemoteException {
-        return setUsername(getUserInRmiSessions(sessionCode), username);
+    public void setUsernameHandler(String sessionCode, String username) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        setUsername(user, username);
     }
 
     // Returns GameID
@@ -294,4 +293,5 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
         User user = getUserInRmiSessions(sessionCode);
         endFlight(user);
     }
+
 }

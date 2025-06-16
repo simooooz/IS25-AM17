@@ -1,17 +1,18 @@
 package it.polimi.ingsw.network.messages;
 
-import it.polimi.ingsw.controller.GameController;
-import it.polimi.ingsw.model.game.Lobby;
-import it.polimi.ingsw.model.game.LobbyState;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.client.model.ClientEventBus;
+import it.polimi.ingsw.client.model.cards.ClientCard;
+import it.polimi.ingsw.client.model.factory.ClientCardFactory;
+import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.network.UserState;
-import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
 import it.polimi.ingsw.network.socket.server.Server;
-import it.polimi.ingsw.view.TUI.Chroma;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
 
@@ -21,32 +22,34 @@ public enum MessageType {
 
     ERROR,
 
+    BATCH_START {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            ClientEventBus.getInstance().startBatch();
+        }
+    },
+
+    BATCH_END {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            ClientEventBus.getInstance().endBatch();
+        }
+    },
+
     SET_USERNAME {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            boolean success = Server.setUsername(user, castedMessage.getArg1());
-            try {
-                if (success)
-                    user.sendObject(new SingleArgMessage<>(MessageType.USERNAME_OK, castedMessage.getArg1()));
-                else
-                    user.sendObject(new ZeroArgMessage(MessageType.USERNAME_ALREADY_TAKEN));
-            } catch (ServerException e) {
-                // Everything should be closed
-            }
+            Server.setUsername(user, castedMessage.getArg1());
         }
     },
-    USERNAME_OK {
+
+    USERNAME_OK_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
             client.setUsername(castedMessage.getArg1());
-        }
-    },
-    USERNAME_ALREADY_TAKEN {
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            Chroma.println("Username already taken", Chroma.RED);
+            client.setState(UserState.LOBBY_SELECTION);
         }
     },
 
@@ -57,11 +60,12 @@ public enum MessageType {
             Server.createLobby(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
         }
     },
-    CREATE_LOBBY_OK {
+
+    CREATED_LOBBY_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
-            client.setLobby(castedMessage.getArg1());
+            QuadrupleArgMessage<String, List<String>, Boolean, Integer> castedMessage = (QuadrupleArgMessage<String, List<String>, Boolean, Integer>) message;
+            client.setLobby(new ClientLobby(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4()));
             client.setState(UserState.IN_LOBBY);
         }
     },
@@ -73,14 +77,6 @@ public enum MessageType {
             Server.joinRandomLobby(user, castedMessage.getArg1());
         }
     },
-    JOIN_RANDOM_LOBBY_OK {
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
-            client.setLobby(castedMessage.getArg1());
-            client.setState(UserState.IN_LOBBY);
-        }
-    },
 
     JOIN_LOBBY {
         @Override
@@ -89,38 +85,12 @@ public enum MessageType {
             Server.joinLobby(user, castedMessage.getArg1());
         }
     },
-    JOIN_LOBBY_OK {
+
+    JOINED_LOBBY_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
-            client.setLobby(castedMessage.getArg1());
-            client.setState(UserState.IN_LOBBY);
-        }
-    },
-
-    GAME_STARTED_OK {
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
-            client.setLobby(castedMessage.getArg1());
-            client.setState(UserState.IN_GAME);
-            client.setGameController(new GameController(castedMessage.getArg1().getPlayers(), castedMessage.getArg1().isLearnerMode()));
-            client.getGameController().startMatch();
-
-            // Test only
-            switch (client.getLobby().getGameID()) {
-                case "test-1" -> client.getGameController().startTest(1);
-                case "test-2" -> client.getGameController().startTest(2);
-            }
-
-        }
-    },
-
-    SET_SHUFFLED_DECK {
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, List<Integer>> castedMessage = (DoubleArgMessage<String, List<Integer>>) message;
-            client.getGameController().setShuffledCardPile(castedMessage.getArg2());
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            client.getLobby().addPlayer(castedMessage.getArg1());
         }
     },
 
@@ -130,20 +100,33 @@ public enum MessageType {
             Server.leaveGame(user);
         }
     },
-    LEAVE_GAME_OK {
+
+    LEFT_LOBBY_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<Lobby> castedMessage = (SingleArgMessage<Lobby>) message;
-            String leftPlayer = client.getLobby().getPlayers().stream().filter(u -> !castedMessage.getArg1().getPlayers().contains(u)).findFirst().orElseThrow(() -> new RuntimeException("Unknown left player"));
-            if (!leftPlayer.equals(client.getUsername())) {
-                client.getLobby().setGame(client.getGameController());
-                client.getLobby().removePlayer(leftPlayer);
-            }
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            if (!castedMessage.getArg1().equals(client.getUsername()))
+                client.getLobby().removePlayer(castedMessage.getArg1());
             else {
                 client.setLobby(null);
-                client.setGameController(null);
                 client.setState(UserState.LOBBY_SELECTION);
             }
+        }
+    },
+
+    MATCH_STARTED_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            client.getLobby().initGame();
+            client.setState(UserState.IN_GAME);
+        }
+    },
+
+    PLAYERS_STATE_UPDATED_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<Map<String, PlayerState>> castedMessage = (SingleArgMessage<Map<String, PlayerState>>) message;
+            client.getGameController().playersStateUpdated(castedMessage.getArg1());
         }
     },
 
@@ -153,11 +136,13 @@ public enum MessageType {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.pickComponent(user, castedMessage.getArg1());
         }
+    },
 
+    COMPONENT_PICKED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
             DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().pickComponent(castedMessage.getArg1(), castedMessage.getArg2());
+            client.getGameController().componentPicked(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -167,14 +152,15 @@ public enum MessageType {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.releaseComponent(user, castedMessage.getArg1());
         }
+    },
 
+    COMPONENT_RELEASED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
             DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().releaseComponent(castedMessage.getArg1(), castedMessage.getArg2());
+            client.getGameController().componentReleased(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
-
 
     RESERVE_COMPONENT {
         @Override
@@ -182,11 +168,13 @@ public enum MessageType {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.reserveComponent(user, castedMessage.getArg1());
         }
+    },
 
+    COMPONENT_RESERVED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
             DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().reserveComponent(castedMessage.getArg1(), castedMessage.getArg2());
+            client.getGameController().componentReserved(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -196,11 +184,13 @@ public enum MessageType {
             QuadrupleArgMessage<Integer, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<Integer, Integer, Integer, Integer>) message;
             Server.insertComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
         }
+    },
 
+    COMPONENT_INSERTED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            QuintupleArgMessage<String, Integer, Integer, Integer, Integer> castedMessage = (QuintupleArgMessage<String, Integer, Integer, Integer, Integer>) message;
-            client.getGameController().insertComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4(), castedMessage.getArg5(), true);
+            QuadrupleArgMessage<String, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<String, Integer, Integer, Integer>) message;
+            client.getGameController().componentInserted(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
         }
     },
 
@@ -210,11 +200,13 @@ public enum MessageType {
             QuadrupleArgMessage<Integer, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<Integer, Integer, Integer, Integer>) message;
             Server.moveComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
         }
+    },
 
+    COMPONENT_MOVED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            QuintupleArgMessage<String, Integer, Integer, Integer, Integer> castedMessage = (QuintupleArgMessage<String, Integer, Integer, Integer, Integer>) message;
-            client.getGameController().moveComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4(), castedMessage.getArg5());
+            QuadrupleArgMessage<String, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<String, Integer, Integer, Integer>) message;
+            client.getGameController().componentMoved(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
         }
     },
 
@@ -224,11 +216,21 @@ public enum MessageType {
             DoubleArgMessage<Integer, Integer> castedMessage = (DoubleArgMessage<Integer, Integer>) message;
             Server.rotateComponent(user, castedMessage.getArg1(), castedMessage.getArg2());
         }
+    },
 
+    COMPONENT_ROTATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            TripleArgMessage<String, Integer, Integer> castedMessage = (TripleArgMessage<String, Integer, Integer>) message;
-            client.getGameController().rotateComponent(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+            DoubleArgMessage<Integer, Integer> castedMessage = (DoubleArgMessage<Integer, Integer>) message;
+            client.getGameController().componentRotated(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
+    COMPONENT_DESTROYED_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().componentDestroyed(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -238,11 +240,26 @@ public enum MessageType {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.lookCardPile(user, castedMessage.getArg1());
         }
+    },
 
+    CARD_PILE_LOOKED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().lookCardPile(castedMessage.getArg1(), castedMessage.getArg2());
+            TripleArgMessage<String, Integer, String> castedMessage = (TripleArgMessage<String, Integer, String>) message;
+            if (castedMessage.getArg3() == null)
+                client.getGameController().cardPileLooked(castedMessage.getArg1(), castedMessage.getArg2());
+            else {
+                List<ClientCard> cards = ClientCardFactory.deserializeCardList(castedMessage.getArg3());
+                client.getGameController().cardPileLooked(castedMessage.getArg1(), castedMessage.getArg2(), cards);
+            }
+        }
+    },
+
+    CARD_PILE_RELEASED_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            client.getGameController().cardPileReleased(castedMessage.getArg1());
         }
     },
 
@@ -251,11 +268,12 @@ public enum MessageType {
         public void execute(ClientHandler user, Message message) {
             Server.moveHourglass(user);
         }
+    },
 
+    HOURGLASS_MOVED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            client.getGameController().moveHourglass(castedMessage.getArg1());
+            client.getGameController().hourglassMoved();
         }
     },
 
@@ -263,12 +281,6 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             Server.setReady(user);
-        }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            client.getGameController().setReady(castedMessage.getArg1());
         }
     },
 
@@ -278,12 +290,6 @@ public enum MessageType {
             SingleArgMessage<List<Integer>> castedMessage = (SingleArgMessage<List<Integer>>) message;
             Server.checkShip(user, castedMessage.getArg1());
         }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, List<Integer>> castedMessage = (DoubleArgMessage<String, List<Integer>>) message;
-            client.getGameController().checkShip(castedMessage.getArg1(), castedMessage.getArg2());
-        }
     },
 
     CHOOSE_ALIEN {
@@ -291,12 +297,6 @@ public enum MessageType {
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Map<Integer, AlienType>> castedMessage = (SingleArgMessage<Map<Integer, AlienType>>) message;
             Server.chooseAlien(user, castedMessage.getArg1());
-        }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, Map<Integer, AlienType>> castedMessage = (DoubleArgMessage<String, Map<Integer, AlienType>>) message;
-            client.getGameController().chooseAlien(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -306,11 +306,13 @@ public enum MessageType {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.chooseShipPart(user, castedMessage.getArg1());
         }
+    },
 
+    PLAYERS_POSITION_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().chooseShipPart(castedMessage.getArg1(), castedMessage.getArg2());
+            DoubleArgMessage<List<String>, List<SimpleEntry<String, Integer>>> castedMessage = (DoubleArgMessage<List<String>, List<SimpleEntry<String, Integer>>>) message;
+            client.getGameController().playersPositionUpdated(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -319,11 +321,23 @@ public enum MessageType {
         public void execute(ClientHandler user, Message message) {
             Server.drawCard(user);
         }
+    },
 
+    CARD_REVEALED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            client.getGameController().drawCard(castedMessage.getArg1());
+            ClientCard card = ClientCardFactory.deserializeCard(castedMessage.getArg1()); // TODO spostare dalla factory ad un metodo nel network
+            client.getGameController().cardRevealed(card);
+        }
+    },
+
+    CARD_UPDATED_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            ClientCard card = ClientCardFactory.deserializeCard(castedMessage.getArg1());
+            client.getGameController().cardUpdated(card);
         }
     },
 
@@ -333,12 +347,6 @@ public enum MessageType {
             DoubleArgMessage<List<Integer>, List<Integer>> castedMessage = (DoubleArgMessage<List<Integer>, List<Integer>>) message;
             Server.activateCannons(user, castedMessage.getArg1(), castedMessage.getArg2());
         }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            TripleArgMessage<String, List<Integer>, List<Integer>> castedMessage = (TripleArgMessage<String, List<Integer>, List<Integer>>) message;
-            client.getGameController().activateCannons(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
-        }
     },
 
     ACTIVATE_ENGINES {
@@ -346,12 +354,6 @@ public enum MessageType {
         public void execute(ClientHandler user, Message message) {
             DoubleArgMessage<List<Integer>, List<Integer>> castedMessage = (DoubleArgMessage<List<Integer>, List<Integer>>) message;
             Server.activateEngines(user, castedMessage.getArg1(), castedMessage.getArg2());
-        }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            TripleArgMessage<String, List<Integer>, List<Integer>> castedMessage = (TripleArgMessage<String, List<Integer>, List<Integer>>) message;
-            client.getGameController().activateEngines(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
         }
     },
 
@@ -361,11 +363,13 @@ public enum MessageType {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.activateShield(user, castedMessage.getArg1());
         }
+    },
 
+    BATTERIES_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().activateShield(castedMessage.getArg1(), castedMessage.getArg2());
+            DoubleArgMessage<Integer, Integer> castedMessage = (DoubleArgMessage<Integer, Integer>) message;
+            client.getGameController().batteriesUpdated(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -375,11 +379,13 @@ public enum MessageType {
             DoubleArgMessage<Map<Integer, List<ColorType>>, List<Integer>> castedMessage = (DoubleArgMessage<Map<Integer, List<ColorType>>, List<Integer>>) message;
             Server.updateGoods(user, castedMessage.getArg1(), castedMessage.getArg2());
         }
+    },
 
+    GOODS_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            TripleArgMessage<String, Map<Integer, List<ColorType>>, List<Integer>> castedMessage = (TripleArgMessage<String, Map<Integer, List<ColorType>>, List<Integer>>) message;
-            client.getGameController().updateGoods(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+            DoubleArgMessage<Integer, List<ColorType>> castedMessage = (DoubleArgMessage<Integer, List<ColorType>>) message;
+            client.getGameController().goodsUpdated(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -389,11 +395,21 @@ public enum MessageType {
             SingleArgMessage<List<Integer>> castedMessage = (SingleArgMessage<List<Integer>>) message;
             Server.removeCrew(user, castedMessage.getArg1());
         }
+    },
 
+    CREW_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, List<Integer>> castedMessage = (DoubleArgMessage<String, List<Integer>>) message;
-            client.getGameController().removeCrew(castedMessage.getArg1(), castedMessage.getArg2());
+            TripleArgMessage<Integer, Integer, AlienType> castedMessage = (TripleArgMessage<Integer, Integer, AlienType>) message;
+            client.getGameController().crewUpdated(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+        }
+    },
+
+    CREDITS_UPDATED_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
+            client.getGameController().creditsUpdated(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -401,12 +417,6 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             Server.rollDices(user);
-        }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().rollDices(castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -416,12 +426,6 @@ public enum MessageType {
             SingleArgMessage<Boolean> castedMessage = (SingleArgMessage<Boolean>) message;
             Server.getBoolean(user, castedMessage.getArg1());
         }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, Boolean> castedMessage = (DoubleArgMessage<String, Boolean>) message;
-            client.getGameController().getBoolean(castedMessage.getArg1(), castedMessage.getArg2());
-        }
     },
 
     GET_INDEX {
@@ -430,12 +434,6 @@ public enum MessageType {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
             Server.getIndex(user, castedMessage.getArg1());
         }
-
-        @Override
-        public void execute(ClientSocket client, Message message) {
-            DoubleArgMessage<String, Integer> castedMessage = (DoubleArgMessage<String, Integer>) message;
-            client.getGameController().getIndex(castedMessage.getArg1(), castedMessage.getArg2());
-        }
     },
 
     END_FLIGHT {
@@ -443,11 +441,13 @@ public enum MessageType {
         public void execute(ClientHandler user, Message message) {
             Server.endFlight(user);
         }
+    },
 
+    FLIGHT_ENDED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            client.getGameController().endFlight(castedMessage.getArg1());
+            client.getGameController().flightEnded(castedMessage.getArg1());
         }
     };
 

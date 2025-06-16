@@ -18,7 +18,6 @@ public abstract class Client {
     public Client() {
         this.state = UserState.USERNAME;
         this.username = null;
-        this.gameController = null;
         this.lobby = null;
 
         this.viewTui = new ViewTui(this);
@@ -36,12 +35,13 @@ public abstract class Client {
         return viewTui;
     }
 
-    public Lobby getLobby() {
+    public ClientLobby getLobby() {
         return lobby;
     }
 
-    public void setLobby(Lobby lobby) {
+    public void setLobby(ClientLobby lobby) {
         this.lobby = lobby;
+        ClientEventBus.getInstance().publish(lobby == null ? new LeftLobbyEvent(username, null) : new CreatedLobbyEvent(lobby.getGameID(), lobby.getPlayers(), lobby.isLearnerMode(), lobby.getMaxPlayers()));
     }
 
     public UserState getState() {
@@ -58,7 +58,7 @@ public abstract class Client {
 
     public void setUsername(String username) {
         this.username = username;
-        setState(UserState.LOBBY_SELECTION);
+        ClientEventBus.getInstance().publish(new UsernameOkEvent(username));
     }
 
     public abstract void closeConnection();

@@ -5,5 +5,4 @@ public enum UserState {
     LOBBY_SELECTION,
     IN_LOBBY,
     IN_GAME,
-    DISCONNECT
 }

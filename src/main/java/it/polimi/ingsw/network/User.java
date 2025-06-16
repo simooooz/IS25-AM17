@@ -1,13 +1,16 @@
 package it.polimi.ingsw.network;
 
-import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.common.model.events.BatchEndedEvent;
+import it.polimi.ingsw.common.model.events.BatchStartedEvent;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.MatchController;
+import it.polimi.ingsw.common.model.events.EventVisibility;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.game.Lobby;
-import it.polimi.ingsw.network.messages.*;
+import it.polimi.ingsw.common.model.enums.LobbyState;
+import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.rmi.ClientCallbackInterface;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
-import it.polimi.ingsw.network.socket.server.ClientHandler;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -18,11 +21,11 @@ import java.util.List;
  */
 public class User {
 
-    private final static List<User> users = new ArrayList<>();
+    private final static List<User> activeUsers = new ArrayList<>();
+    private final static List<User> inactiveUsers = new ArrayList<>();
 
     protected final String connectionCode;
     protected String username;
-    private GameController gameController;
     private UserState state;
     private Lobby lobby;
 
@@ -32,7 +35,6 @@ public class User {
     public User(String connectionCode, boolean isRMI, ClientCallbackInterface callback) {
         this.connectionCode = connectionCode;
         this.username = null;
-        this.gameController = null;
         this.state = UserState.USERNAME;
         this.lobby = null;
 
@@ -41,41 +43,44 @@ public class User {
             lastPing = System.currentTimeMillis();
         }
 
-        synchronized (users) {
-            users.add(this);
+        synchronized (activeUsers) {
+            activeUsers.add(this);
+        }
+    }
+
+    public void notifyEvents(List<GameEvent> events) {
+        if (events.size() == 1) notifyGameEvent(events.getFirst());
+        else {
+            notifyGameEvent(new BatchStartedEvent());
+            for (GameEvent event : events)
+                notifyGameEvent(event);
+            notifyGameEvent(new BatchEndedEvent());
+        }
+    }
+
+    public void notifyGameEvent(GameEvent gameEvent) {
+        List<String> playersToNotify = new ArrayList<>();
+        if (gameEvent.getVisibility() == EventVisibility.ALL_PLAYERS || gameEvent.getVisibility() == EventVisibility.OTHER_PLAYERS)
+            playersToNotify.addAll(lobby.getPlayers());
+        else if (gameEvent.getVisibility() == EventVisibility.PLAYER_ONLY)
+            playersToNotify.add(username);
+        else if (gameEvent.getVisibility() == EventVisibility.SPECIFIC_PLAYERS)
+            playersToNotify.addAll(gameEvent.getTargetPlayers());
+
+        if (gameEvent.getVisibility() == EventVisibility.OTHER_PLAYERS)
+            playersToNotify.remove(username);
+
+        for (String playerToNotify : playersToNotify) {
+            User userToNotify = User.getUser(playerToNotify);
+            userToNotify.sendGameEvent(gameEvent);
         }
     }
 
     // RMI -> args is list of parameters
     // Socket -> args parameter has length 1 and is a message
-    public void notifyGameEvent(MessageType gameEvent, Object... args) {
-        for (String playerToNotify : lobby.getPlayers()) {
-            User userToNotify = User.getUser(playerToNotify);
-            userToNotify.sendGameEvent(gameEvent, this.username, args);
-        }
-    }
-
-    // RMI -> callback for lobby
-    // Socket -> message with lobby
-    public void notifyLobbyEvent(MessageType lobbyEvent, List<String> playersToNotify) {
-        for (String username : playersToNotify) {
-            User player = User.getUser(username);
-            player.sendLobbyEvent(lobbyEvent, this.lobby);
-        }
-    }
-
-    public void sendGameEvent(MessageType gameEvent, String username, Object... args) {
+    public void sendGameEvent(GameEvent gameEvent) {
         try {
-            this.getCallback().notifyGameEvent(gameEvent, username, args);
-        } catch (RemoteException e) {
-            // Error while notifying an update to a client
-            // Just ignore it
-        }
-    }
-
-    public void sendLobbyEvent(MessageType lobbyEvent, Lobby lobby) {
-        try {
-            this.getCallback().updateLobbyStatus(lobbyEvent, lobby);
+            this.getCallback().notifyGameEvent(gameEvent.eventType(), gameEvent.getArgs());
         } catch (RemoteException e) {
             // Error while notifying an update to a client
             // Just ignore it
@@ -83,25 +88,21 @@ public class User {
     }
 
     public GameController getGameController() {
-        return gameController;
-    }
-
-    public void setGameController(GameController gameController) {
-        this.gameController = gameController;
+        return lobby.getGame();
     }
 
     public String getUsername() {
         return username != null ? username : "";
     }
 
-    public boolean setUsername(String username) {
-        synchronized (users) {
-            boolean taken = users.stream().anyMatch(user -> user.getUsername() != null && user.getUsername().equals(username));
+    public void setUsername(String username) {
+        synchronized (activeUsers) {
+            boolean taken = activeUsers.stream().anyMatch(user -> user.getUsername() != null && user.getUsername().equals(username));
             if (!taken) {
                 this.username = username;
-                setState(UserState.LOBBY_SELECTION);
             }
-            return !taken;
+            else
+                throw new IllegalArgumentException("Username already taken");
         }
     }
 
@@ -138,8 +139,8 @@ public class User {
 
     public static User getUser(String username) {
         List<User> temp;
-        synchronized (users) {
-            temp = new ArrayList<>(users);
+        synchronized (activeUsers) {
+            temp = new ArrayList<>(activeUsers);
         }
         return temp.stream()
                 .filter(user -> user.getUsername().equals(username))
@@ -147,20 +148,32 @@ public class User {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    public static void removeUser(User user) {
-        if (user.lobby != null) {
-            MatchController.getInstance().leaveGame(user.getUsername());
-            user.lobby = null;
+    public static User popInactiveUser(String username) {
+        synchronized (inactiveUsers) {
+            for (User user : inactiveUsers) {
+                if (user.getUsername().equals(username)) {
+                    inactiveUsers.remove(user);
+                    return user;
+                }
+            }
         }
-
-        synchronized (users) {
-            users.remove(user);
-        }
+        return null;
     }
 
-    public static boolean isUsernameTaken(String username) {
-        synchronized (users) {
-            return users.stream().anyMatch(user -> user.getUsername() != null && user.getUsername().equals(username));
+    public static void removeUser(User user) {
+        if (user.lobby != null) {
+            List<GameEvent> events = MatchController.getInstance().leaveGame(user.getUsername());
+            if (user.lobby.getState() == LobbyState.IN_GAME) { // Player was gaming, add to inactive users
+                System.out.println("Disconnesso dal gioco " + user.getUsername());
+                synchronized (inactiveUsers) {
+                    inactiveUsers.add(user);
+                }
+                user.notifyEvents(events);
+            }
+        }
+
+        synchronized (activeUsers) {
+            activeUsers.remove(user);
         }
     }
 

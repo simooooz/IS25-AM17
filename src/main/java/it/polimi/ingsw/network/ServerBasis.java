@@ -3,14 +3,14 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
-import it.polimi.ingsw.model.cards.Card;
+import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.model.game.Lobby;
-import it.polimi.ingsw.model.game.LobbyState;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
-import it.polimi.ingsw.model.game.objects.Dice;
-import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.common.model.enums.LobbyState;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,209 +18,233 @@ import java.util.Map;
 
 public abstract class ServerBasis {
 
-    public static boolean setUsername(User user, String username) {
+    public static void setUsername(User user, String username) {
         if (user.getState() != UserState.USERNAME) throw new IllegalStateException("User is not in state USERNAME");
 
-        if (User.isUsernameTaken(username))
-            return false;
-        return user.setUsername(username);
+        user.setUsername(username);
+        user.setState(UserState.LOBBY_SELECTION);
+        List<GameEvent> events = new ArrayList<>();
+        events.add(new UsernameOkEvent(username));
+
+        // Check previous sessions
+        User oldUser = User.popInactiveUser(username);
+        if (oldUser != null && oldUser.getLobby() != null && oldUser.getLobby().getState() == LobbyState.IN_GAME) { // Rejoin
+            events.addAll(MatchController.getInstance().rejoinGame(username, oldUser.getLobby().getGameID()));
+            user.setLobby(oldUser.getLobby());
+            user.setState(UserState.IN_GAME);
+
+            System.out.println("Riconnesso al gioco " + user.getUsername());
+        }
+
+        user.notifyEvents(events);
     }
 
     public static void createLobby(User user, String name, Integer maxPlayers, Boolean learnerMode) throws PlayerAlreadyInException {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
-        Lobby lobby = MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
+
+        List<GameEvent> events = MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
+        user.setLobby(MatchController.getInstance().getLobby(user.getUsername()));
+        user.setState(UserState.IN_LOBBY);
+        user.notifyEvents(events);
+    }
+
+    public static void joinLobby(User user, String lobbyName) throws LobbyNotFoundException, PlayerAlreadyInException {
+        if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
+
+        List<GameEvent> events = MatchController.getInstance().joinGame(user.getUsername(), lobbyName);
+        Lobby lobby = MatchController.getInstance().getLobby(user.getUsername());
         user.setLobby(lobby);
-        user.notifyLobbyEvent(MessageType.CREATE_LOBBY_OK, lobby.getPlayers());
-    }
+        user.setState(UserState.IN_LOBBY);
 
-    public static void joinLobby(User client, String lobbyName) throws LobbyNotFoundException, PlayerAlreadyInException {
-        if (client.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
-        Lobby lobby = MatchController.getInstance().joinGame(client.getUsername(), lobbyName);
-        client.setLobby(lobby);
         if (lobby.getState() == LobbyState.IN_GAME) {
-            client.notifyLobbyEvent(MessageType.GAME_STARTED_OK, lobby.getPlayers());
-            List<Integer> cardPile = client.getGameController().getModel().getBoard().getCardPile().stream().map(Card::getId).toList();
-            client.notifyGameEvent(MessageType.SET_SHUFFLED_DECK, cardPile);
+            List<String> players = new ArrayList<>(lobby.getPlayers());
+            try {
+                for (String username : players) { // Set GameController for each user and update state
+                    User userP = User.getUser(username);
+                    userP.setState(UserState.IN_GAME);
+                }
+            } catch (UserNotFoundException e) {
+                throw new RuntimeException("Error while creating game");
+            }
 
-            // Test only
-            switch (client.getLobby().getGameID()) {
-                case "test-1" -> client.getGameController().startTest(1);
-                case "test-2" -> client.getGameController().startTest(2);
+            switch (user.getLobby().getGameID()) { // Test only
+                case "test-1" -> events.addAll(user.getGameController().startTest(1));
+                case "test-2" -> events.addAll(user.getGameController().startTest(2));
             }
         }
-        else
-            client.notifyLobbyEvent(MessageType.JOIN_LOBBY_OK, lobby.getPlayers());
+
+        user.notifyEvents(events);
     }
 
-    public static void joinRandomLobby(User client, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
-        if (client.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
-        Lobby lobby = MatchController.getInstance().joinRandomGame(client.getUsername(), learnerMode);
-        client.setLobby(lobby);
-        if (lobby.getState() == LobbyState.IN_GAME) {
-            client.notifyLobbyEvent(MessageType.GAME_STARTED_OK, lobby.getPlayers());
-            List<Integer> cardPile = client.getGameController().getModel().getBoard().getCardPile().stream().map(Card::getId).toList();
-            client.notifyGameEvent(MessageType.SET_SHUFFLED_DECK, cardPile);
+    public static void joinRandomLobby(User user, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
+        if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
-            // Test only
-            switch (client.getLobby().getGameID()) {
-                case "test-1" -> client.getGameController().startTest(1);
-                case "test-2" -> client.getGameController().startTest(2);
+        List<GameEvent> events = MatchController.getInstance().joinRandomGame(user.getUsername(), learnerMode);
+        Lobby lobby = MatchController.getInstance().getLobby(user.getUsername());
+        user.setLobby(lobby);
+        user.setState(UserState.IN_LOBBY);
+
+        if (lobby.getState() == LobbyState.IN_GAME) {
+            List<String> players = new ArrayList<>(lobby.getPlayers());
+            try {
+                for (String username : players) { // Set GameController for each user and update state
+                    User userP = User.getUser(username);
+                    userP.setState(UserState.IN_GAME);
+                }
+            } catch (UserNotFoundException e) {
+                throw new RuntimeException("Error while creating game");
+            }
+
+            switch (user.getLobby().getGameID()) { // Test only
+                case "test-1" -> events.addAll(user.getGameController().startTest(1));
+                case "test-2" -> events.addAll(user.getGameController().startTest(2));
             }
         }
-        else
-            client.notifyLobbyEvent(MessageType.JOIN_LOBBY_OK, lobby.getPlayers());
+
+        user.notifyEvents(events);
     }
 
-    public static void leaveGame(User client) {
-        // TODO check state
-        // TODO gestire situazione lobby si elimina perché ci sono < 2 giocatori
-        MatchController.getInstance().leaveGame(client.getUsername());
+    public static void leaveGame(User user) {
+        if (user.getState() != UserState.IN_GAME || user.getState() != UserState.IN_LOBBY) throw new IllegalStateException("User is not in lobby or game");
 
-        List<String> playersToNotify = new ArrayList<>(client.getLobby().getPlayers());
-        playersToNotify.add(client.getUsername());
-        client.notifyLobbyEvent(MessageType.LEAVE_GAME_OK, playersToNotify);
+        List<GameEvent> events = MatchController.getInstance().leaveGame(user.getUsername());
+        user.setState(UserState.LOBBY_SELECTION);
+        user.setLobby(null);
 
-        client.setLobby(null);
-        client.setGameController(null); // Giusto?
+        user.notifyEvents(events);
     }
 
-    public static void pickComponent(User client, Integer id) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().pickComponent(client.getUsername(), id);
-        client.notifyGameEvent(MessageType.PICK_COMPONENT, id);
+    public static void pickComponent(User user, Integer id) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().pickComponent(user.getUsername(), id);
+        user.notifyEvents(events);
     }
 
-    public static void releaseComponent(User client, Integer id) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().releaseComponent(client.getUsername(), id);
-        client.notifyGameEvent(MessageType.RELEASE_COMPONENT, id);
+    public static void releaseComponent(User user, Integer id) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().releaseComponent(user.getUsername(), id);
+        user.notifyEvents(events);
     }
 
-    public static void reserveComponent(User client, Integer id) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().reserveComponent(client.getUsername(), id);
-        client.notifyGameEvent(MessageType.RESERVE_COMPONENT, id);
+    public static void reserveComponent(User user, Integer id) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().reserveComponent(user.getUsername(), id);
+        user.notifyEvents(events);
     }
 
-    public static void insertComponent(User client, Integer id, Integer row, Integer col, Integer rotations) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().insertComponent(client.getUsername(), id, row, col, rotations, true);
-        client.notifyGameEvent(MessageType.INSERT_COMPONENT, id, row, col, rotations);
+    public static void insertComponent(User user, Integer id, Integer row, Integer col, Integer rotations) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().insertComponent(user.getUsername(), id, row, col, rotations, true);
+        user.notifyEvents(events);
     }
 
-    public static void moveComponent(User client, Integer id, Integer row, Integer col, Integer rotations) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().moveComponent(client.getUsername(), id, row, col, rotations);
-        client.notifyGameEvent(MessageType.MOVE_COMPONENT, id, row, col, rotations);
+    public static void moveComponent(User user, Integer id, Integer row, Integer col, Integer rotations) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().moveComponent(user.getUsername(), id, row, col, rotations);
+        user.notifyEvents(events);
     }
 
-    public static void rotateComponent(User client, Integer id, Integer num) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().rotateComponent(client.getUsername(), id, num);
-        client.notifyGameEvent(MessageType.ROTATE_COMPONENT, id, num);
+    public static void rotateComponent(User user, Integer id, Integer num) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().rotateComponent(user.getUsername(), id, num);
+        user.notifyEvents(events);
     }
 
-    public static void lookCardPile(User client, Integer pileIndex) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().lookCardPile(client.getUsername(), pileIndex);
-        client.notifyGameEvent(MessageType.LOOK_CARD_PILE, pileIndex);
+    public static void lookCardPile(User user, Integer pileIndex) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().lookCardPile(user.getUsername(), pileIndex);
+        user.notifyEvents(events);
     }
 
-    public static void moveHourglass(User client) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().moveHourglass(client.getUsername());
-        client.notifyGameEvent(MessageType.MOVE_HOURGLASS);
+    public static void moveHourglass(User user) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().moveHourglass(user.getUsername());
+        user.notifyEvents(events);
     }
 
-    public static void setReady(User client) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().setReady(client.getUsername());
-        client.notifyGameEvent(MessageType.SET_READY);
+    public static void setReady(User user) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().setReady(user.getUsername());
+        user.notifyEvents(events);
     }
 
-    public static void checkShip(User client, List<Integer> toRemove) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().checkShip(client.getUsername(), toRemove);
-        client.notifyGameEvent(MessageType.CHECK_SHIP, toRemove);
+    public static void checkShip(User user, List<Integer> toRemove) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().checkShip(user.getUsername(), toRemove);
+        user.notifyEvents(events);
     }
 
-    public static void chooseAlien(User client, Map<Integer, AlienType> aliensIds) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().chooseAlien(client.getUsername(), aliensIds);
-        client.notifyGameEvent(MessageType.CHOOSE_ALIEN, aliensIds);
+    public static void chooseAlien(User user, Map<Integer, AlienType> aliensIds) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().chooseAlien(user.getUsername(), aliensIds);
+        user.notifyEvents(events);
     }
 
-    public static void chooseShipPart(User client, Integer partIndex) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().chooseShipPart(client.getUsername(), partIndex);
-        client.notifyGameEvent(MessageType.CHOOSE_SHIP_PART, partIndex);
+    public static void chooseShipPart(User user, Integer partIndex) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().chooseShipPart(user.getUsername(), partIndex);
+        user.notifyEvents(events);
     }
 
-    public static void drawCard(User client) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-
-        if (client.getGameController().getModel().getBoard().getCardPilePos() == 0) {
-            List<Integer> cardPile = client.getGameController().getModel().getBoard().getCardPile().stream().map(Card::getId).toList();
-            client.notifyGameEvent(MessageType.SET_SHUFFLED_DECK, cardPile);
-        }
-
-        client.getGameController().drawCard(client.getUsername());
-        client.notifyGameEvent(MessageType.DRAW_CARD);
+    public static void drawCard(User user) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().drawCard(user.getUsername());
+        user.notifyEvents(events);
     }
 
-    public static void activateCannons(User client, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().activateCannons(client.getUsername(), batteriesIds, cannonComponentsIds);
-        client.notifyGameEvent(MessageType.ACTIVATE_CANNONS, batteriesIds, cannonComponentsIds);
+    public static void activateCannons(User user, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().activateCannons(user.getUsername(), batteriesIds, cannonComponentsIds);
+        user.notifyEvents(events);
     }
 
-    public static void activateEngines(User client, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().activateEngines(client.getUsername(), batteriesIds, engineComponentsIds);
-        client.notifyGameEvent(MessageType.ACTIVATE_ENGINES, batteriesIds, engineComponentsIds);
+    public static void activateEngines(User user, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().activateEngines(user.getUsername(), batteriesIds, engineComponentsIds);
+        user.notifyEvents(events);
     }
 
-    public static void activateShield(User client, Integer batteryId) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().activateShield(client.getUsername(), batteryId);
-        client.notifyGameEvent(MessageType.ACTIVATE_SHIELD, batteryId);
+    public static void activateShield(User user, Integer batteryId) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().activateShield(user.getUsername(), batteryId);
+        user.notifyEvents(events);
     }
 
-    public static void updateGoods(User client, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().updateGoods(client.getUsername(), cargoHoldsIds, batteriesIds);
-        client.notifyGameEvent(MessageType.UPDATE_GOODS, cargoHoldsIds, batteriesIds);
+    public static void updateGoods(User user, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().updateGoods(user.getUsername(), cargoHoldsIds, batteriesIds);
+        user.notifyEvents(events);
     }
 
-    public static void removeCrew(User client, List<Integer> cabinsIds) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().removeCrew(client.getUsername(), cabinsIds);
-        client.notifyGameEvent(MessageType.REMOVE_CREW, cabinsIds);
+    public static void removeCrew(User user, List<Integer> cabinsIds) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().removeCrew(user.getUsername(), cabinsIds);
+        user.notifyEvents(events);
     }
 
-    public static void rollDices(User client) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        int value = Dice.roll() + Dice.roll();
-        client.getGameController().rollDices(client.getUsername(), value);
-        client.notifyGameEvent(MessageType.ROLL_DICES, value);
+    public static void rollDices(User user) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        int value = ((int)(Math.random() * 6) + 1) + ((int)(Math.random() * 6) + 1); // TODO spostare nel server model
+        List<GameEvent> events = user.getGameController().rollDices(user.getUsername(), value);
+        user.notifyEvents(events);
     }
 
-    public static void getBoolean(User client, Boolean value) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().getBoolean(client.getUsername(), value);
-        client.notifyGameEvent(MessageType.GET_BOOLEAN, value);
+    public static void getBoolean(User user, Boolean value) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().getBoolean(user.getUsername(), value);
+        user.notifyEvents(events);
     }
 
-    public static void getIndex(User client, Integer value) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().getIndex(client.getUsername(), value);
-        client.notifyGameEvent(MessageType.GET_INDEX, value);
+    public static void getIndex(User user, Integer value) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().getIndex(user.getUsername(), value);
+        user.notifyEvents(events);
     }
 
-    public static void endFlight(User client) {
-        if (client.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        client.getGameController().endFlight(client.getUsername());
-        client.notifyGameEvent(MessageType.END_FLIGHT);
+    public static void endFlight(User user) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().endFlight(user.getUsername());
+        user.notifyEvents(events);
     }
 
 }

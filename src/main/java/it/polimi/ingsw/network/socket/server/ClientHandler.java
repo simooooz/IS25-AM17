@@ -1,13 +1,11 @@
 package it.polimi.ingsw.network.socket.server;
 
 import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.User;
 import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
-import it.polimi.ingsw.network.messages.MessageType;
-import it.polimi.ingsw.network.messages.SingleArgMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -66,26 +64,13 @@ public class ClientHandler extends User {
     }
 
     @Override
-    public void sendGameEvent(MessageType gameEvent, String username, Object... args) {
-        Object[] newArgs = new Object[args.length + 1];
-        newArgs[0] = username;
-        System.arraycopy(args, 0, newArgs, 1, args.length);
-        Message message = Constants.createMessage(gameEvent, newArgs);
+    public void sendGameEvent(GameEvent gameEvent) {
+        Message message = Constants.createMessage(gameEvent.eventType(), gameEvent.getArgs());
 
         try {
             sendObject(message);
         } catch (ServerException e) {
-            System.err.println("[CLIENT HANDLER] Error while sending message: " + e.getMessage());
-            // Everything should be closed
-        }
-    }
-
-    @Override
-    public void sendLobbyEvent(MessageType lobbyEvent, Lobby lobby) {
-        Message message = Constants.createMessage(lobbyEvent, lobby);
-        try {
-            sendObject(message);
-        } catch (ServerException e) {
+            e.printStackTrace();
             System.err.println("[CLIENT HANDLER] Error while sending message: " + e.getMessage());
             // Everything should be closed
         }

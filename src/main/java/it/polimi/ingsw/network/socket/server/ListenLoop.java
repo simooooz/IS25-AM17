@@ -1,9 +1,7 @@
 package it.polimi.ingsw.network.socket.server;
 
 import it.polimi.ingsw.network.exceptions.ServerException;
-import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
-import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.socket.Heartbeat;
 import it.polimi.ingsw.network.socket.Sense;
 
@@ -30,13 +28,12 @@ public class ListenLoop extends Thread {
                 } else
                     clientHandler.sendObject(new Sense());
 
-                // TODO delayer?
-
             } catch (ServerException e) {
                 // Connection is already closed by Server
                 // This Thread will be interrupted by ClientHandler
             } catch (ClassCastException e) {
-                this.clientHandler.sendGameEvent(MessageType.ERROR, clientHandler.getUsername());
+                // There is an error during casting
+                // Ignore it
             }
 
         }
