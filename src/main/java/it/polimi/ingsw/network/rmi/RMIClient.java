@@ -32,15 +32,35 @@ public class RMIClient extends Client {
 
     public RMIClient() {
         this.sessionCode = UUID.randomUUID().toString();
-        try {
-            ServerInfo serverInfo = DiscoveryClient.findServer();
-            if (serverInfo == null) throw new ClientException();
+        for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
-            Registry registry = LocateRegistry.getRegistry(serverInfo.ipAddress, serverInfo.rmiPort);
-            server = (RMIServerInterface) registry.lookup("ServerRMI");
+            try {
+                ServerInfo serverInfo = DiscoveryClient.findServer();
+                if (serverInfo == null) throw new ClientException();
 
-            clientCallback = new ClientCallback(this);
-            server.registerClient(sessionCode, clientCallback);
+                Registry registry = LocateRegistry.getRegistry(serverInfo.ipAddress, serverInfo.rmiPort);
+                server = (RMIServerInterface) registry.lookup("ServerRMI");
+
+                clientCallback = new ClientCallback(this);
+                server.registerClient(sessionCode, clientCallback);
+                break;
+
+            } catch (ClientException | NotBoundException | RemoteException e) {
+                if (attempt == Constants.MAX_RETRIES) {
+                    System.out.println("[RMI CLIENT] Could not find or connect to server");
+                    System.exit(-1);
+                }
+
+                int delay = Math.min(Constants.BASE_DELAY * (int) Math.pow(2, attempt - 1), Constants.MAX_DELAY);
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    System.exit(-1);
+                }
+            }
+
+        }
 
         // Start sending ping
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);

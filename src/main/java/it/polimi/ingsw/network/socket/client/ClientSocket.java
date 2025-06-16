@@ -39,30 +39,34 @@ public class ClientSocket extends Client {
     }
 
     private void connect() {
-        try {
-            ServerInfo serverInfo = DiscoveryClient.findServer();
-            if (serverInfo == null) throw new ClientException();
+        for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
-            this.socket = new Socket(Constants.DEFAULT_HOST, Constants.DEFAULT_SOCKET_PORT);
-            this.output = new ObjectOutputStream(socket.getOutputStream());
-            this.input = new ObjectInputStream(socket.getInputStream());
-            this.socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
-        } catch (ClientException | IOException e) {
-            System.out.println("[CLIENT SOCKET] Could not find or connect to server");
+            try {
+                ServerInfo serverInfo = DiscoveryClient.findServer();
+                if (serverInfo == null) throw new ClientException();
 
-            // Se c'è un'interfaccia personalizzata (GUI), notifica l'errore invece di terminare
-            if (userInterface != null) {
-                userInterface.displayError("Impossibile connettersi al server. Verifica che il server sia avviato.");
-                return;
+                this.socket = new Socket(serverInfo.ipAddress, serverInfo.socketPort);
+                this.output = new ObjectOutputStream(socket.getOutputStream());
+                this.input = new ObjectInputStream(socket.getInputStream());
+                this.socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
+                break;
+
+            } catch (ClientException | IOException e) {
+                if (attempt == Constants.MAX_RETRIES) {
+                    System.out.println("[CLIENT SOCKET] Could not find or connect to server");
+                    System.exit(-1);
+                }
+
+                int delay = Math.min(Constants.BASE_DELAY * (int) Math.pow(2, attempt - 1), Constants.MAX_DELAY);
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    System.exit(-1);
+                }
             }
 
-            // Solo per la TUI mantieni il comportamento originale
-            System.exit(-1);
         }
-    }
-
-    public boolean isConnected() {
-        return socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     @Override

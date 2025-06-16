@@ -19,6 +19,10 @@ public abstract class Constants {
     public static final String DISCOVERY_RESPONSE = "GALAXY_TRUCKER_SERVER_FOUND";
     public static final int DISCOVERY_TIMEOUT = 5000;
 
+    public static final int MAX_RETRIES = 5;
+    public static final int BASE_DELAY = 1000;
+    public static final int MAX_DELAY = 30000;
+
     public static final int SHIP_ROWS = 5;
     public static final int SHIP_COLUMNS = 7;
 
