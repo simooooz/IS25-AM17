@@ -2,8 +2,10 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
+import it.polimi.ingsw.common.model.events.EventContext;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.game.Lobby;
-import it.polimi.ingsw.model.game.LobbyState;
+import it.polimi.ingsw.common.model.enums.LobbyState;
 
 import java.util.*;
 
@@ -55,20 +57,16 @@ public class MatchController {
      * @param maxPlayers max number of allowed players
      * @param name       lobby's name
      */
-    public synchronized Lobby createNewGame(String username, int maxPlayers, String name, boolean learnerMode) {
+    public synchronized List<GameEvent> createNewGame(String username, int maxPlayers, String name, boolean learnerMode) {
         if (maxPlayers < 2 || maxPlayers > 4) throw new IllegalArgumentException("Max number of allowed players must be between 2 and 4");
-        Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
-                .filter(e -> e.getValue().hasPlayer(username))
-                .findFirst();
-        if (lobbyEntry.isPresent()) throw new PlayerAlreadyInException("Player is already in another lobby");
-
+        if (checkIfIsAnotherLobby(username)) throw new PlayerAlreadyInException("Player is already in another lobby");
         if (lobbies.containsKey(name)) throw new IllegalArgumentException("Lobby name already exists, choose another one");
 
+        EventContext.clear();
         Lobby lobby = new Lobby(name, username, maxPlayers, learnerMode);
         lobbies.put(name, lobby);
-
         lobby.addPlayer(username); // Join in the newly created lobby
-        return lobby;
+        return EventContext.getAndClear();
     }
 
     /**
@@ -77,19 +75,17 @@ public class MatchController {
      * @param username player's username
      * @param gameID   game to join
      */
-    public synchronized Lobby joinGame(String username, String gameID) {
-        Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
-                .filter(e -> e.getValue().hasPlayer(username))
-                .findFirst();
-        if (lobbyEntry.isPresent()) throw new PlayerAlreadyInException("Player is already in another lobby");
+    public synchronized List<GameEvent> joinGame(String username, String gameID) {
+        if (checkIfIsAnotherLobby(username)) throw new PlayerAlreadyInException("Player is already in another lobby");
 
         Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
         Lobby lobby = lobbyOptional
                 .filter(l -> l.getState() == LobbyState.WAITING)
                 .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
 
+        EventContext.clear();
         lobby.addPlayer(username);
-        return lobby;
+        return EventContext.getAndClear();
     }
 
     /**
@@ -97,20 +93,18 @@ public class MatchController {
      *
      * @param username player's username
      */
-    public synchronized Lobby joinRandomGame(String username, boolean learnerMode) {
-        Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
-                .filter(e -> e.getValue().hasPlayer(username))
-                .findFirst();
-        if (lobbyEntry.isPresent()) throw new PlayerAlreadyInException("Player is already in another lobby");
+    public synchronized List<GameEvent> joinRandomGame(String username, boolean learnerMode) {
+        if (checkIfIsAnotherLobby(username)) throw new PlayerAlreadyInException("Player is already in another lobby");
 
         List<Lobby> availableLobbies = this.lobbies.values().stream()
                 .filter(l -> l.getState() == LobbyState.WAITING && l.isLearnerMode() == learnerMode)
                 .toList();
         if (availableLobbies.isEmpty()) throw new LobbyNotFoundException("No lobbies available");
 
+        EventContext.clear();
         Lobby lobby = availableLobbies.get(new Random().nextInt(availableLobbies.size()));
         lobby.addPlayer(username);
-        return lobby;
+        return EventContext.getAndClear();
     }
 
     /**
@@ -118,16 +112,19 @@ public class MatchController {
      *
      * @param username player's username
      */
-    public synchronized void leaveGame(String username) {
+    public synchronized List<GameEvent> leaveGame(String username) {
         Optional<Map.Entry<String, Lobby>> lobbyEntry = lobbies.entrySet().stream()
                 .filter(e -> e.getValue().hasPlayer(username))
                 .findFirst();
         if (lobbyEntry.isEmpty()) throw new LobbyNotFoundException("Lobby not found");
 
+        EventContext.clear();
         Lobby lobby = lobbyEntry.get().getValue();
         lobby.removePlayer(username);
         if (lobby.toDelete())
             lobbies.remove(lobby.getGameID());
+
+        return EventContext.getAndClear();
     }
 
     /**
@@ -136,8 +133,27 @@ public class MatchController {
      * @param username player's username
      * @param gameID   id of lobby/game
      */
-    public void reconnectToGame(String username, int gameID) {
-        // todo
+    // TODO lo faccio diverso da join game
+    public synchronized List<GameEvent> rejoinGame(String username, String gameID) {
+        if (checkIfIsAnotherLobby(username)) throw new PlayerAlreadyInException("Player is already in another lobby");
+
+        Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
+        Lobby lobby = lobbyOptional
+                .filter(l -> l.getState() == LobbyState.IN_GAME)
+                .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
+
+        EventContext.clear();
+        lobby.addPlayer(username);
+        // TODO emit event per inviare il controller
+        return EventContext.getAndClear();
+    }
+
+    public synchronized Lobby getLobby(String username) {
+        return lobbies.values().stream().filter(lobby -> lobby.hasPlayer(username)).findFirst().orElse(null);
+    }
+
+    private boolean checkIfIsAnotherLobby(String username) {
+        return lobbies.entrySet().stream().anyMatch(e -> e.getValue().hasPlayer(username));
     }
 
 }

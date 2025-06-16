@@ -3,10 +3,12 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.ModelFacadeAdvancedMode;
 import it.polimi.ingsw.model.ModelFacadeLearnerMode;
-import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.events.EventContext;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
@@ -29,152 +31,190 @@ public class GameController {
      * @param usernames players' usernames in the game
      */
     public GameController(List<String> usernames, boolean learnerMode) {
-        this.model = learnerMode ? new ModelFacadeLearnerMode(usernames) : new ModelFacadeAdvancedMode(usernames);
+        model = learnerMode ? new ModelFacadeLearnerMode(usernames) : new ModelFacadeAdvancedMode(usernames);
     }
 
     public void startMatch() {
         model.startMatch();
     }
 
-    public void setShuffledCardPile(List<Integer> ids) {
-        model.setShuffledCardPile(ids);
-    }
-
-    public void pickComponent(String username, int componentId) {
+    public List<GameEvent> pickComponent(String username, int componentId) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.pickComponent(username, componentId);
+        return EventContext.getAndClear();
     }
 
-    public void releaseComponent(String username, int componentId) {
+    public List<GameEvent> releaseComponent(String username, int componentId) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.releaseComponent(username, componentId);
+        return EventContext.getAndClear();
     }
 
-    public void reserveComponent(String username, int componentId) {
+    public List<GameEvent> reserveComponent(String username, int componentId) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
+
         model.reserveComponent(username, componentId);
+        return EventContext.getAndClear();
     }
 
-    public void insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
+    public List<GameEvent> insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.insertComponent(username, componentId, row, col, rotations, weld);
+        return EventContext.getAndClear();
     }
 
-    public void moveComponent(String username, int componentId, int row, int col, int rotations) {
+    public List<GameEvent> moveComponent(String username, int componentId, int row, int col, int rotations) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
-        model.moveComponent(username, componentId, row, col);
-        model.rotateComponent(username, componentId, rotations);
+        model.moveComponent(username, componentId, row, col, rotations);
+        return EventContext.getAndClear();
     }
 
-    public void rotateComponent(String username, int componentId, int num) {
+    public List<GameEvent> rotateComponent(String username, int componentId, int num) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.rotateComponent(username, componentId, num);
+        return EventContext.getAndClear();
     }
 
-    public void lookCardPile(String username, int deckIndex) {
+    public List<GameEvent> lookCardPile(String username, int deckIndex) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
         else if (model.isPlayerReady(username)) throw new IllegalStateException("Player is already ready");
         model.lookCardPile(username, deckIndex);
+        return EventContext.getAndClear();
     }
 
-    public void moveHourglass(String username) {
+    public List<GameEvent> moveHourglass(String username) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD && model.getPlayerState(username) != PlayerState.WAIT) throw new IllegalStateException("State is not BUILDING or WAIT");
         model.moveHourglass(username);
+        return EventContext.getAndClear();
     }
 
-    public void setReady(String username) {
+    public List<GameEvent> setReady(String username) {
+        EventContext.clear();
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-
         model.setReady(username);
+        return EventContext.getAndClear();
     }
 
-    public void checkShip(String username, List<Integer> toRemove) {
+    public List<GameEvent> checkShip(String username, List<Integer> toRemove) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.CHECK) throw new IllegalStateException("State is not CHECKING");
         model.checkShip(username, toRemove);
+        return EventContext.getAndClear();
     }
 
-    public void chooseAlien(String username, Map<Integer, AlienType> aliensIds) {
+    public List<GameEvent> chooseAlien(String username, Map<Integer, AlienType> aliensIds) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_ALIEN) throw new IllegalStateException("State is not WAIT_ALIEN");
         model.chooseAlien(username, aliensIds);
+        return EventContext.getAndClear();
     }
 
-    public void chooseShipPart(String username, int partIndex) {
+    public List<GameEvent> chooseShipPart(String username, int partIndex) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_SHIP_PART) throw new IllegalStateException("State is not WAIT_SHIP_PART");
         model.chooseShipPart(username, partIndex);
+        return EventContext.getAndClear();
     }
 
-    public void drawCard(String username) {
+    public List<GameEvent> drawCard(String username) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.DRAW_CARD) throw new IllegalStateException("State is not DRAW_CARD");
         model.drawCard();
+        return EventContext.getAndClear();
     }
 
-    public void activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
+    public List<GameEvent> activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_CANNONS) throw new IllegalStateException("State is not WAIT_CANNONS");
         model.activateCannons(username, batteriesIds, cannonComponentsIds);
+        return EventContext.getAndClear();
     }
 
-    public void activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
+    public List<GameEvent> activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_ENGINES) throw new IllegalStateException("State is not WAIT_ENGINES");
         model.activateEngines(username, batteriesIds, engineComponentsIds);
+        return EventContext.getAndClear();
     }
 
-    public void activateShield(String username, Integer batteryId) {
+    public List<GameEvent> activateShield(String username, Integer batteryId) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_SHIELD) throw new IllegalStateException("State is not WAIT_SHIELD");
         model.activateShield(username, batteryId);
+        return EventContext.getAndClear();
     }
 
-    public void updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
+    public List<GameEvent> updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_GOODS && model.getPlayerState(username) != PlayerState.WAIT_REMOVE_GOODS) throw new IllegalStateException("State is not WAIT_GOODS or WAIT_REMOVE_GOODS");
         model.updateGoods(username, cargoHoldsIds, batteriesIds);
+        return EventContext.getAndClear();
     }
 
-    public void removeCrew(String username, List<Integer> cabinsIds) {
+    public List<GameEvent> removeCrew(String username, List<Integer> cabinsIds) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_REMOVE_CREW) throw new IllegalStateException("State is not WAIT_REMOVE_CREW");
         model.removeCrew(username, cabinsIds);
+        return EventContext.getAndClear();
     }
 
-    public void rollDices(String username, Integer value) {
+    public List<GameEvent> rollDices(String username, Integer value) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_ROLL_DICES) throw new IllegalStateException("State is not WAIT_ROLL_DICES");
         model.rollDices(username, value);
+        return EventContext.getAndClear();
     }
 
-    public void getBoolean(String username, boolean value) {
+    public List<GameEvent> getBoolean(String username, boolean value) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_BOOLEAN) throw new IllegalStateException("State is not WAIT_BOOLEAN");
         model.getBoolean(username, value);
+        return EventContext.getAndClear();
     }
 
-    public void getIndex(String username, Integer value) {
+    public List<GameEvent> getIndex(String username, Integer value) {
+        EventContext.clear();
         if (model.getPlayerState(username) != PlayerState.WAIT_INDEX) throw new IllegalStateException("State is not WAIT_INDEX");
         model.getIndex(username, value);
+        return EventContext.getAndClear();
     }
 
-    public void endFlight(String username) {
+    public List<GameEvent> endFlight(String username) {
+        EventContext.clear();
         model.endFlight(username);
+        return EventContext.getAndClear();
     }
 
     public void leaveGame(String username) {
-        model.setPlayerState(username, PlayerState.END);
-        model.endFlight(username);
+        model.leaveGame(username);
     }
 
     public void endGame() {
@@ -190,255 +230,257 @@ public class GameController {
         return model;
     }
 
-    public void startTest(int testNumber) {
+    public List<GameEvent> startTest(int testNumber) {
+        EventContext.clear();
         List<String> usernames = model.getBoard().getStartingDeck().stream().map(PlayerData::getUsername).toList();
         switch (testNumber) {
             case 1 -> {
-                this.pickComponent(usernames.getFirst(), 102);
-                this.insertComponent(usernames.getFirst(), 102, 0, 2, 0, true);
+                model.pickComponent(usernames.getFirst(), 102);
+                model.insertComponent(usernames.getFirst(), 102, 0, 2, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 16);
-                this.rotateComponent(usernames.getFirst(), 16, 3);
-                this.insertComponent(usernames.getFirst(), 16, 0, 4, 0, true);
+                model.pickComponent(usernames.getFirst(), 16);
+                model.rotateComponent(usernames.getFirst(), 16, 3);
+                model.insertComponent(usernames.getFirst(), 16, 0, 4, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 113);
-                this.rotateComponent(usernames.getFirst(), 113, 3);
-                this.insertComponent(usernames.getFirst(), 113, 1, 1, 0, true);
+                model.pickComponent(usernames.getFirst(), 113);
+                model.rotateComponent(usernames.getFirst(), 113, 3);
+                model.insertComponent(usernames.getFirst(), 113, 1, 1, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 60);
-                this.rotateComponent(usernames.getFirst(), 60, 3);
-                this.insertComponent(usernames.getFirst(), 60, 1, 2, 0, true);
+                model.pickComponent(usernames.getFirst(), 60);
+                model.rotateComponent(usernames.getFirst(), 60, 3);
+                model.insertComponent(usernames.getFirst(), 60, 1, 2, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 131);
-                this.insertComponent(usernames.getFirst(), 131, 1, 3, 0, true);
+                model.pickComponent(usernames.getFirst(), 131);
+                model.insertComponent(usernames.getFirst(), 131, 1, 3, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 116);
-                this.rotateComponent(usernames.getFirst(), 116, 1);
-                this.insertComponent(usernames.getFirst(), 116, 1, 4, 0, true);
+                model.pickComponent(usernames.getFirst(), 116);
+                model.rotateComponent(usernames.getFirst(), 116, 1);
+                model.insertComponent(usernames.getFirst(), 116, 1, 4, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 134);
-                this.rotateComponent(usernames.getFirst(), 134, 3);
-                this.insertComponent(usernames.getFirst(), 134, 2, 0, 0, true);
+                model.pickComponent(usernames.getFirst(), 134);
+                model.rotateComponent(usernames.getFirst(), 134, 3);
+                model.insertComponent(usernames.getFirst(), 134, 2, 0, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 55);
-                this.insertComponent(usernames.getFirst(), 55, 2, 1, 0, true);
+                model.pickComponent(usernames.getFirst(), 55);
+                model.insertComponent(usernames.getFirst(), 55, 2, 1, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 38);
-                this.rotateComponent(usernames.getFirst(), 38, 1);
-                this.insertComponent(usernames.getFirst(), 38, 2, 2, 0, true);
+                model.pickComponent(usernames.getFirst(), 38);
+                model.rotateComponent(usernames.getFirst(), 38, 1);
+                model.insertComponent(usernames.getFirst(), 38, 2, 2, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 63);
-                this.insertComponent(usernames.getFirst(), 63, 2, 4, 0, true);
+                model.pickComponent(usernames.getFirst(), 63);
+                model.insertComponent(usernames.getFirst(), 63, 2, 4, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 24);
-                this.insertComponent(usernames.getFirst(), 24, 2, 5, 0, true);
+                model.pickComponent(usernames.getFirst(), 24);
+                model.insertComponent(usernames.getFirst(), 24, 2, 5, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 25);
-                this.insertComponent(usernames.getFirst(), 25, 2, 6, 0, true);
+                model.pickComponent(usernames.getFirst(), 25);
+                model.insertComponent(usernames.getFirst(), 25, 2, 6, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 9);
-                this.rotateComponent(usernames.getFirst(), 9, 1);
-                this.insertComponent(usernames.getFirst(), 9, 3, 0, 0, true);
+                model.pickComponent(usernames.getFirst(), 9);
+                model.rotateComponent(usernames.getFirst(), 9, 1);
+                model.insertComponent(usernames.getFirst(), 9, 3, 0, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 152);
-                this.rotateComponent(usernames.getFirst(), 152, 2);
-                this.insertComponent(usernames.getFirst(), 152, 3, 1, 0, true);
+                model.pickComponent(usernames.getFirst(), 152);
+                model.rotateComponent(usernames.getFirst(), 152, 2);
+                model.insertComponent(usernames.getFirst(), 152, 3, 1, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 5);
-                this.insertComponent(usernames.getFirst(), 5, 3, 2, 0, true);
+                model.pickComponent(usernames.getFirst(), 5);
+                model.insertComponent(usernames.getFirst(), 5, 3, 2, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 92);
-                this.insertComponent(usernames.getFirst(), 92, 3, 3, 0, true);
+                model.pickComponent(usernames.getFirst(), 92);
+                model.insertComponent(usernames.getFirst(), 92, 3, 3, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 146);
-                this.rotateComponent(usernames.getFirst(), 146, 1);
-                this.insertComponent(usernames.getFirst(), 146, 3, 4, 0, true);
+                model.pickComponent(usernames.getFirst(), 146);
+                model.rotateComponent(usernames.getFirst(), 146, 1);
+                model.insertComponent(usernames.getFirst(), 146, 3, 4, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 62);
-                this.rotateComponent(usernames.getFirst(), 62, 1);
-                this.insertComponent(usernames.getFirst(), 62, 3, 5, 0, true);
+                model.pickComponent(usernames.getFirst(), 62);
+                model.rotateComponent(usernames.getFirst(), 62, 1);
+                model.insertComponent(usernames.getFirst(), 62, 3, 5, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 77);
-                this.insertComponent(usernames.getFirst(), 77, 4, 0, 0, true);
+                model.pickComponent(usernames.getFirst(), 77);
+                model.insertComponent(usernames.getFirst(), 77, 4, 0, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 46);
-                this.rotateComponent(usernames.getFirst(), 46, 2);
-                this.insertComponent(usernames.getFirst(), 46, 4, 1, 0, true);
+                model.pickComponent(usernames.getFirst(), 46);
+                model.rotateComponent(usernames.getFirst(), 46, 2);
+                model.insertComponent(usernames.getFirst(), 46, 4, 1, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 137);
-                this.insertComponent(usernames.getFirst(), 137, 4, 2, 0, true);
+                model.pickComponent(usernames.getFirst(), 137);
+                model.insertComponent(usernames.getFirst(), 137, 4, 2, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 104);
-                this.rotateComponent(usernames.getFirst(), 104, 3);
-                this.insertComponent(usernames.getFirst(), 104, 4, 4, 0, true);
+                model.pickComponent(usernames.getFirst(), 104);
+                model.rotateComponent(usernames.getFirst(), 104, 3);
+                model.insertComponent(usernames.getFirst(), 104, 4, 4, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 36);
-                this.rotateComponent(usernames.getFirst(), 36, 2);
-                this.insertComponent(usernames.getFirst(), 36, 4, 5, 0, true);
+                model.pickComponent(usernames.getFirst(), 36);
+                model.rotateComponent(usernames.getFirst(), 36, 2);
+                model.insertComponent(usernames.getFirst(), 36, 4, 5, 0, true);
 
-                this.pickComponent(usernames.getFirst(), 100);
-                this.rotateComponent(usernames.getFirst(), 100, 1);
-                this.insertComponent(usernames.getFirst(), 100, 4, 6, 0, true);
+                model.pickComponent(usernames.getFirst(), 100);
+                model.rotateComponent(usernames.getFirst(), 100, 1);
+                model.insertComponent(usernames.getFirst(), 100, 4, 6, 0, true);
 
 
-                this.pickComponent(usernames.get(1), 127);
-                this.rotateComponent(usernames.get(1), 127, 1);
-                this.insertComponent(usernames.get(1), 127, 0, 2, 0, true);
+                model.pickComponent(usernames.get(1), 127);
+                model.rotateComponent(usernames.get(1), 127, 1);
+                model.insertComponent(usernames.get(1), 127, 0, 2, 0, true);
 
-                this.pickComponent(usernames.get(1), 108);
-                this.insertComponent(usernames.get(1), 108, 0, 4, 0, true);
+                model.pickComponent(usernames.get(1), 108);
+                model.insertComponent(usernames.get(1), 108, 0, 4, 0, true);
 
-                this.pickComponent(usernames.get(1), 143);
-                this.rotateComponent(usernames.get(1), 143, 3);
-                this.insertComponent(usernames.get(1), 143, 1, 1, 0, true);
+                model.pickComponent(usernames.get(1), 143);
+                model.rotateComponent(usernames.get(1), 143, 3);
+                model.insertComponent(usernames.get(1), 143, 1, 1, 0, true);
 
-                this.pickComponent(usernames.get(1), 64);
-                this.rotateComponent(usernames.get(1), 64, 1);
-                this.insertComponent(usernames.get(1), 64, 1, 2, 0, true);
+                model.pickComponent(usernames.get(1), 64);
+                model.rotateComponent(usernames.get(1), 64, 1);
+                model.insertComponent(usernames.get(1), 64, 1, 2, 0, true);
 
-                this.pickComponent(usernames.get(1), 3);
-                this.rotateComponent(usernames.get(1), 3, 2);
-                this.insertComponent(usernames.get(1), 3, 1, 4, 0, true);
+                model.pickComponent(usernames.get(1), 3);
+                model.rotateComponent(usernames.get(1), 3, 2);
+                model.insertComponent(usernames.get(1), 3, 1, 4, 0, true);
 
-                this.pickComponent(usernames.get(1), 28);
-                this.rotateComponent(usernames.get(1), 28, 3);
-                this.insertComponent(usernames.get(1), 28, 1, 5, 0, true);
+                model.pickComponent(usernames.get(1), 28);
+                model.rotateComponent(usernames.get(1), 28, 3);
+                model.insertComponent(usernames.get(1), 28, 1, 5, 0, true);
 
-                this.pickComponent(usernames.get(1), 149);
-                this.rotateComponent(usernames.get(1), 149, 3);
-                this.insertComponent(usernames.get(1), 149, 2, 0, 0, true);
+                model.pickComponent(usernames.get(1), 149);
+                model.rotateComponent(usernames.get(1), 149, 3);
+                model.insertComponent(usernames.get(1), 149, 2, 0, 0, true);
 
-                this.pickComponent(usernames.get(1), 51);
-                this.rotateComponent(usernames.get(1), 51, 1);
-                this.insertComponent(usernames.get(1), 51, 2, 1, 0, true);
+                model.pickComponent(usernames.get(1), 51);
+                model.rotateComponent(usernames.get(1), 51, 1);
+                model.insertComponent(usernames.get(1), 51, 2, 1, 0, true);
 
-                this.pickComponent(usernames.get(1), 56);
-                this.insertComponent(usernames.get(1), 56, 2, 2, 0, true);
+                model.pickComponent(usernames.get(1), 56);
+                model.insertComponent(usernames.get(1), 56, 2, 2, 0, true);
 
-                this.pickComponent(usernames.get(1), 58);
-                this.rotateComponent(usernames.get(1), 58, 2);
-                this.insertComponent(usernames.get(1), 58, 2, 4, 0, true);
+                model.pickComponent(usernames.get(1), 58);
+                model.rotateComponent(usernames.get(1), 58, 2);
+                model.insertComponent(usernames.get(1), 58, 2, 4, 0, true);
 
-                this.pickComponent(usernames.get(1), 150);
-                this.rotateComponent(usernames.get(1), 150, 1);
-                this.insertComponent(usernames.get(1), 150, 2, 5, 0, true);
+                model.pickComponent(usernames.get(1), 150);
+                model.rotateComponent(usernames.get(1), 150, 1);
+                model.insertComponent(usernames.get(1), 150, 2, 5, 0, true);
 
-                this.pickComponent(usernames.get(1), 103);
-                this.insertComponent(usernames.get(1), 103, 2, 6, 0, true);
+                model.pickComponent(usernames.get(1), 103);
+                model.insertComponent(usernames.get(1), 103, 2, 6, 0, true);
 
-                this.pickComponent(usernames.get(1), 14);
-                this.insertComponent(usernames.get(1), 14, 3, 0, 0, true);
+                model.pickComponent(usernames.get(1), 14);
+                model.insertComponent(usernames.get(1), 14, 3, 0, 0, true);
 
-                this.pickComponent(usernames.get(1), 79);
-                this.insertComponent(usernames.get(1), 79, 3, 1, 0, true);
+                model.pickComponent(usernames.get(1), 79);
+                model.insertComponent(usernames.get(1), 79, 3, 1, 0, true);
 
-                this.pickComponent(usernames.get(1), 85);
-                this.insertComponent(usernames.get(1), 85, 3, 3, 0, true);
+                model.pickComponent(usernames.get(1), 85);
+                model.insertComponent(usernames.get(1), 85, 3, 3, 0, true);
 
-                this.pickComponent(usernames.get(1), 43);
-                this.rotateComponent(usernames.get(1), 43, 1);
-                this.insertComponent(usernames.get(1), 43, 3, 4, 0, true);
+                model.pickComponent(usernames.get(1), 43);
+                model.rotateComponent(usernames.get(1), 43, 1);
+                model.insertComponent(usernames.get(1), 43, 3, 4, 0, true);
 
-                this.pickComponent(usernames.get(1), 53);
-                this.insertComponent(usernames.get(1), 53, 3, 5, 0, true);
+                model.pickComponent(usernames.get(1), 53);
+                model.insertComponent(usernames.get(1), 53, 3, 5, 0, true);
 
-                this.pickComponent(usernames.get(1), 97);
-                this.insertComponent(usernames.get(1), 97, 3, 6, 0, true);
+                model.pickComponent(usernames.get(1), 97);
+                model.insertComponent(usernames.get(1), 97, 3, 6, 0, true);
 
-                this.pickComponent(usernames.get(1), 45);
-                this.rotateComponent(usernames.get(1), 45, 1);
-                this.insertComponent(usernames.get(1), 45, 4, 4, 0, true);
+                model.pickComponent(usernames.get(1), 45);
+                model.rotateComponent(usernames.get(1), 45, 1);
+                model.insertComponent(usernames.get(1), 45, 4, 4, 0, true);
 
-                this.pickComponent(usernames.get(1), 67);
-                this.insertComponent(usernames.get(1), 67, 4, 5, 0, true);
+                model.pickComponent(usernames.get(1), 67);
+                model.insertComponent(usernames.get(1), 67, 4, 5, 0, true);
 
-                this.pickComponent(usernames.get(1), 90);
-                this.reserveComponent(usernames.get(1), 90);
+                model.pickComponent(usernames.get(1), 90);
+                model.reserveComponent(usernames.get(1), 90);
 
 
-                this.pickComponent(usernames.get(2), 118);
-                this.insertComponent(usernames.get(2), 118, 0, 2, 0, true);
+                model.pickComponent(usernames.get(2), 118);
+                model.insertComponent(usernames.get(2), 118, 0, 2, 0, true);
 
-                this.pickComponent(usernames.get(2), 126);
-                this.insertComponent(usernames.get(2), 126, 0, 4, 0, true);
+                model.pickComponent(usernames.get(2), 126);
+                model.insertComponent(usernames.get(2), 126, 0, 4, 0, true);
 
-                this.pickComponent(usernames.get(2), 136);
-                this.rotateComponent(usernames.get(2), 136, 1);
-                this.insertComponent(usernames.get(2), 136, 1, 1, 0, true);
+                model.pickComponent(usernames.get(2), 136);
+                model.rotateComponent(usernames.get(2), 136, 1);
+                model.insertComponent(usernames.get(2), 136, 1, 1, 0, true);
 
-                this.pickComponent(usernames.get(2), 44);
-                this.rotateComponent(usernames.get(2), 44, 3);
-                this.insertComponent(usernames.get(2), 44, 1, 2, 0, true);
+                model.pickComponent(usernames.get(2), 44);
+                model.rotateComponent(usernames.get(2), 44, 3);
+                model.insertComponent(usernames.get(2), 44, 1, 2, 0, true);
 
-                this.pickComponent(usernames.get(2), 61);
-                this.insertComponent(usernames.get(2), 61, 1, 3, 0, true);
+                model.pickComponent(usernames.get(2), 61);
+                model.insertComponent(usernames.get(2), 61, 1, 3, 0, true);
 
-                this.pickComponent(usernames.get(2), 1);
-                this.rotateComponent(usernames.get(2), 1, 3);
-                this.insertComponent(usernames.get(2), 1, 1, 4, 0, true);
+                model.pickComponent(usernames.get(2), 1);
+                model.rotateComponent(usernames.get(2), 1, 3);
+                model.insertComponent(usernames.get(2), 1, 1, 4, 0, true);
 
-                this.pickComponent(usernames.get(2), 133);
-                this.insertComponent(usernames.get(2), 133, 1, 5, 0, true);
+                model.pickComponent(usernames.get(2), 133);
+                model.insertComponent(usernames.get(2), 133, 1, 5, 0, true);
 
-                this.pickComponent(usernames.get(2), 114);
-                this.insertComponent(usernames.get(2), 114, 2, 0, 0, true);
+                model.pickComponent(usernames.get(2), 114);
+                model.insertComponent(usernames.get(2), 114, 2, 0, 0, true);
 
-                this.pickComponent(usernames.get(2), 37);
-                this.rotateComponent(usernames.get(2), 37, 1);
-                this.insertComponent(usernames.get(2), 37, 2, 1, 0, true);
+                model.pickComponent(usernames.get(2), 37);
+                model.rotateComponent(usernames.get(2), 37, 1);
+                model.insertComponent(usernames.get(2), 37, 2, 1, 0, true);
 
-                this.pickComponent(usernames.get(2), 148);
-                this.rotateComponent(usernames.get(2), 148, 2);
-                this.insertComponent(usernames.get(2), 148, 2, 2, 0, true);
+                model.pickComponent(usernames.get(2), 148);
+                model.rotateComponent(usernames.get(2), 148, 2);
+                model.insertComponent(usernames.get(2), 148, 2, 2, 0, true);
 
-                this.pickComponent(usernames.get(2), 142);
-                this.rotateComponent(usernames.get(2), 142, 2);
-                this.insertComponent(usernames.get(2), 142, 2, 4, 0, true);
+                model.pickComponent(usernames.get(2), 142);
+                model.rotateComponent(usernames.get(2), 142, 2);
+                model.insertComponent(usernames.get(2), 142, 2, 4, 0, true);
 
-                this.pickComponent(usernames.get(2), 39);
-                this.rotateComponent(usernames.get(2), 39, 3);
-                this.insertComponent(usernames.get(2), 39, 2, 5, 0, true);
+                model.pickComponent(usernames.get(2), 39);
+                model.rotateComponent(usernames.get(2), 39, 3);
+                model.insertComponent(usernames.get(2), 39, 2, 5, 0, true);
 
-                this.pickComponent(usernames.get(2), 12);
-                this.insertComponent(usernames.get(2), 12, 3, 0, 0, true);
+                model.pickComponent(usernames.get(2), 12);
+                model.insertComponent(usernames.get(2), 12, 3, 0, 0, true);
 
-                this.pickComponent(usernames.get(2), 41);
-                this.insertComponent(usernames.get(2), 41, 3, 1, 0, true);
+                model.pickComponent(usernames.get(2), 41);
+                model.insertComponent(usernames.get(2), 41, 3, 1, 0, true);
 
-                this.pickComponent(usernames.get(2), 18);
-                this.rotateComponent(usernames.get(2), 18, 2);
-                this.insertComponent(usernames.get(2), 18, 3, 2, 0, true);
+                model.pickComponent(usernames.get(2), 18);
+                model.rotateComponent(usernames.get(2), 18, 2);
+                model.insertComponent(usernames.get(2), 18, 3, 2, 0, true);
 
-                this.pickComponent(usernames.get(2), 95);
-                this.insertComponent(usernames.get(2), 95, 3, 3, 0, true);
+                model.pickComponent(usernames.get(2), 95);
+                model.insertComponent(usernames.get(2), 95, 3, 3, 0, true);
 
-                this.pickComponent(usernames.get(2), 151);
-                this.rotateComponent(usernames.get(2), 151, 3);
-                this.insertComponent(usernames.get(2), 151, 3, 4, 0, true);
+                model.pickComponent(usernames.get(2), 151);
+                model.rotateComponent(usernames.get(2), 151, 3);
+                model.insertComponent(usernames.get(2), 151, 3, 4, 0, true);
 
-                this.pickComponent(usernames.get(2), 30);
-                this.insertComponent(usernames.get(2), 30, 3, 5, 0, true);
+                model.pickComponent(usernames.get(2), 30);
+                model.insertComponent(usernames.get(2), 30, 3, 5, 0, true);
 
-                this.pickComponent(usernames.get(2), 75);
-                this.insertComponent(usernames.get(2), 75, 4, 0, 0, true);
+                model.pickComponent(usernames.get(2), 75);
+                model.insertComponent(usernames.get(2), 75, 4, 0, 0, true);
 
-                this.pickComponent(usernames.get(2), 94);
-                this.insertComponent(usernames.get(2), 94, 4, 1, 0, true);
+                model.pickComponent(usernames.get(2), 94);
+                model.insertComponent(usernames.get(2), 94, 4, 1, 0, true);
 
-                this.pickComponent(usernames.get(2), 81);
-                this.insertComponent(usernames.get(2), 81, 4, 2, 0, true);
+                model.pickComponent(usernames.get(2), 81);
+                model.insertComponent(usernames.get(2), 81, 4, 2, 0, true);
 
-                this.pickComponent(usernames.get(2), 10);
-                this.rotateComponent(usernames.get(2), 10, 1);
-                this.insertComponent(usernames.get(2), 10, 4, 4, 0, true);
+                model.pickComponent(usernames.get(2), 10);
+                model.rotateComponent(usernames.get(2), 10, 1);
+                model.insertComponent(usernames.get(2), 10, 4, 4, 0, true);
 
-                this.pickComponent(usernames.get(2), 96);
-                this.insertComponent(usernames.get(2), 96, 4, 5, 0, true);
+                model.pickComponent(usernames.get(2), 96);
+                model.insertComponent(usernames.get(2), 96, 4, 5, 0, true);
 
-                this.pickComponent(usernames.get(2), 87);
-                this.insertComponent(usernames.get(2), 87, 4, 6, 0, true);
+                model.pickComponent(usernames.get(2), 87);
+                model.insertComponent(usernames.get(2), 87, 4, 6, 0, true);
             }
         }
+        return EventContext.getAndClear();
     }
 
 }
