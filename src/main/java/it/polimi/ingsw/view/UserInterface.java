@@ -1,11 +1,11 @@
 package it.polimi.ingsw.view;
 
-import it.polimi.ingsw.network.messages.Message;
+import it.polimi.ingsw.client.model.ClientEventObserver;
 
-public interface UserInterface {
-
-    void displayUpdate(Message message);
-
+public interface UserInterface extends ClientEventObserver {
     void displayError(String message);
-
+    void clear();
+    void start();
+    // void shutdown();
+    // void displayUpdate();
 }
