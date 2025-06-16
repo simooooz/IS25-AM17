@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.cards.commands;
 
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
-import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.game.Board;
 
 public class RollDicesCommand implements Command {

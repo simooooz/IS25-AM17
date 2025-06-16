@@ -1,7 +1,7 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.model.cards.Card;
-import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.client.model.cards.ClientCard;
+import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.network.messages.*;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public abstract class Constants {
         return centeredText.toString();
     }
 
-    public static String displayComponents(List<Component> components, int componentsPerRow) {
+    public static String displayComponents(List<ClientComponent> components, int componentsPerRow) {
         StringBuilder output = new StringBuilder();
 
         for (int rowStart = 0; rowStart < components.size(); rowStart += componentsPerRow) {
@@ -80,11 +80,11 @@ public abstract class Constants {
         return output.toString();
     }
 
-    public static String displayCards(List<Card> cards, int componentsPerRow) {
+    public static String displayCards(List<ClientCard> cards, int cardsPerRow) {
         StringBuilder output = new StringBuilder();
 
-        for (int rowStart = 0; rowStart < cards.size(); rowStart += componentsPerRow) {
-            int rowEnd = Math.min(rowStart + componentsPerRow, cards.size());
+        for (int rowStart = 0; rowStart < cards.size(); rowStart += cardsPerRow) {
+            int rowEnd = Math.min(rowStart + cardsPerRow, cards.size());
 
             // Collect all components for this row and find max height in row
             String[][] rowComponentLines = new String[rowEnd - rowStart][];

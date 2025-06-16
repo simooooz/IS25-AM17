@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.cards.commands;
 
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
-import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;

@@ -7,7 +7,6 @@ import it.polimi.ingsw.network.discovery.ServerInfo;
 import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
-import it.polimi.ingsw.view.UserInterface;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

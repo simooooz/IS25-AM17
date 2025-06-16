@@ -1,16 +1,14 @@
 package it.polimi.ingsw.network.rmi;
 
 import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.discovery.DiscoveryClient;
 import it.polimi.ingsw.network.discovery.ServerInfo;
 import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.MessageType;
-import it.polimi.ingsw.view.TUI.Chroma;
 
-import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
