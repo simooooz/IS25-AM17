@@ -1,18 +1,17 @@
 package it.polimi.ingsw.view.TUI;
 
 import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.cards.PlayerState;
-import it.polimi.ingsw.model.components.Component;
-import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.player.Ship;
+import it.polimi.ingsw.client.model.game.ClientBoard;
+import it.polimi.ingsw.client.model.player.ClientPlayer;
+import it.polimi.ingsw.client.model.player.ClientShip;
+import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.Client;
 
-import java.util.*;
-import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class DisplayUpdater implements Runnable {
+public class DisplayUpdater {
 
     private final Client client;
 
@@ -20,36 +19,8 @@ public class DisplayUpdater implements Runnable {
         this.client = client;
     }
 
-    @Override
-    public void run() {
-        while (!Thread.interrupted()) {
-            try {
-                boolean hasMessages = false;
-                String message;
-
-                while ((message = client.getViewTui().getNetworkMessageQueue().poll()) != null) {
-                    if (!message.equals("ERROR"))
-                        hasMessages = true;
-                }
-
-                if (hasMessages) {
-                    client.getViewTui().clear();
-                    updateDisplay();
-                    System.out.flush();
-                }
-
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Nothing to do
-            }
-        }
-    }
-
     public void updateDisplay() {
         switch (client.getState()) {
-            case DISCONNECT:
-                client.getViewTui().handleDisconnect();
-                break;
             case USERNAME:
                 System.out.print("Insert a username\n> ");
                 break;
@@ -88,25 +59,19 @@ public class DisplayUpdater implements Runnable {
     }
 
     private void displayGame() {
-        PlayerState state = client.getGameController().getState(client.getUsername());
+        PlayerState state = client.getGameController().getModel().getPlayerState(client.getUsername());
 
-        Board board = client.getGameController().getModel().getBoard();
-        Ship ship = board.getPlayerEntityByUsername(client.getUsername()).getShip();
-
-        // Handle wait state
-        // todo also end, done?
-        if (state == PlayerState.WAIT)
-            client.getViewTui().waitLatch = new CountDownLatch(1);
-        else
-            client.getViewTui().waitLatch.countDown();
+        ClientBoard board = client.getGameController().getModel().getBoard();
+        ClientShip ship = board.getPlayerEntityByUsername(client.getUsername()).getShip();
 
         switch (state) {
 
             case BUILD, LOOK_CARD_PILE -> {
                 System.out.println(board.toString(client.getUsername(), state));
                 System.out.println(ship.toString(client.getUsername(), state));
+                if (state == PlayerState.LOOK_CARD_PILE)
+                    System.out.println(Constants.displayCards(board.getLookedCards(), 3));
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println(
                        "[ship <username>]            - view <username>'s ship\n" +
                             "[pick <id>]                  - pick a component\n" +
@@ -117,7 +82,8 @@ public class DisplayUpdater implements Runnable {
                             "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
                             "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
                             "[look-cards <id>]            - view specific card pile (0, 1 or 2)\n" +
-                            "[ready]                      - end building phase",
+                            "[ready]                      - end building phase\n" +
+                            "[q]                          - go back to the main menù",
                         Chroma.BLUE
                 );
                 System.out.print("> ");
@@ -125,14 +91,14 @@ public class DisplayUpdater implements Runnable {
 
             case CHECK -> {
                 System.out.println(ship.toString(client.getUsername(), state));
-                Chroma.println("Oh no! Your ship is not valid :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
+                Chroma.println("Oh no! Your ship is not valid :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
                 Chroma.println(
                         """
                             ENTER a series of components <id> to remove to fix the ship
-                            [<id> <id> ... <id>]               - remove a 'bad' component from the ship
+                            [<id_1> <id_2> ... <id_N>]         - remove a 'bad' component from the ship
                             [ship <username>]                  - view <username>'s ship
+                            [q]                                - go back to the main menù
                         """,
                         Chroma.BLUE
                 );
@@ -140,15 +106,16 @@ public class DisplayUpdater implements Runnable {
             }
 
             case WAIT_ALIEN -> {
+                System.out.println(board.toString(client.getUsername(), state));
                 System.out.println(ship.toString(client.getUsername(), state));
-                Chroma.println("You might want to put aliens in your cabins!", Chroma.YELLOW_BOLD);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
+                Chroma.println("You might want to put aliens in your cabins!", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         """
-                            ENTER a series of <id> cabins in which to put aliens
-                            [<id> <id> ... <id>]               - add alien into the given cabins]
-                            [ship <username>]                  - view <username>'s ship
+                            ENTER a series of <id> cabins and alien type in which to put aliens
+                            [<cabin_id_1> <ENGINE|CANNON> ... <cabin_id_N> <ENGINE|CANNON>] - add alien into the given cabins
+                            [ship <username>]                                               - view <username>'s ship
+                            [q]                                                             - go back to the main menù
                         """,
                         Chroma.BLUE
                 );
@@ -156,15 +123,15 @@ public class DisplayUpdater implements Runnable {
             }
 
             case WAIT_SHIP_PART -> {
-                System.out.println(ship.toString(client.getUsername(), state));
-                Chroma.println("Oh no! Your ship has broken in two or more parts :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
+                this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
+                Chroma.println("Oh no! Your ship has broken in two or more parts :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
                 Chroma.println(
                         """
                             ENTER the index part you want to keep from the ship
-                            [<id>]                             - index part of the ship (ex. 0, 1, ...)
-                            [ship <username>]                  - view <username>'s ship
+                            [<id>]                              - index part of the ship (ex. 0, 1, ...)
+                            [ship <username>]                   - view <username>'s ship
+                            [q]                                 - go back to the main menù
                         """,
                         Chroma.BLUE
                 );
@@ -174,14 +141,12 @@ public class DisplayUpdater implements Runnable {
             case DRAW_CARD -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.print("PRESS enter to draw a card... ", Chroma.BLUE);
             }
 
             case WAIT_CANNONS -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to activate DOUBLE cannons!", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         """
@@ -189,6 +154,7 @@ public class DisplayUpdater implements Runnable {
                                 in order to activate the DOUBLE cannons you wish to activate
                                 [<cannon1_id> ... <cannonN_id> - <battery1_id> ... <batteryN_id>]
                                 [ship <username>]                                                   - view <username>'s ship
+                                [q]                                                                 - go back to the main menù
                                 """,
                         Chroma.BLUE
                 );
@@ -198,7 +164,6 @@ public class DisplayUpdater implements Runnable {
             case WAIT_ENGINES -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to activate DOUBLE engines!", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         """
@@ -206,6 +171,7 @@ public class DisplayUpdater implements Runnable {
                             in order to activate the DOUBLE engines you wish to activate
                             [<engine1_id> ... <engineN_id> - <battery1_id> ... <batteryN_id>]
                             [ship <username>]                                                       - view <username>'s ship
+                            [q]                                                                     - go back to the main menù
                             """,
                         Chroma.BLUE
                 );
@@ -215,12 +181,13 @@ public class DisplayUpdater implements Runnable {
             case WAIT_GOODS -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
-                System.out.println("Invia la nuova configurazione di merci");
+                Chroma.println("You have to add goods!", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         """
-                            <cargo id> <RED BLUE YELLOW> ...
-                            [ship <username>]                  - view <username>'s ship
+                            Send the new configurations of goods
+                            [<cargo_id> <RED BLUE YELLOW> ...]
+                            [ship <username>]                               - view <username>'s ship
+                            [q]                                             - go back to the main menù
                             """,
                         Chroma.BLUE
                 );
@@ -230,12 +197,14 @@ public class DisplayUpdater implements Runnable {
             case WAIT_REMOVE_GOODS -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
-                System.out.println("Devi rimuovere delle merci, invia la nuova configurazione");
+                Chroma.println("You have to remove some goods...", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         """
-                            <cargo id> <RED BLUE YELLOW> - <battery id>
-                            [ship <username>]                  - view <username>'s ship
+                            Send the new configurations of goods in your ship and add batteries if you
+                            haven't enough goods to remove
+                            [<cargo_id> <RED BLUE YELLOW> ... - <battery_id> ... <batteryN_id>]
+                            [ship <username>]                                                       - view <username>'s ship
+                            [q]                                                                     - go back to the main menù
                             """,
                         Chroma.BLUE
                 );
@@ -245,19 +214,18 @@ public class DisplayUpdater implements Runnable {
             case WAIT_ROLL_DICES -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 System.out.print("PRESS enter to roll the dices... ");
             }
 
             case WAIT_REMOVE_CREW -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println(
                         """
                             ENTER a series of cabin components in order to remove crew/alien
                             [<cabin1_id> <cabin2_id> ... <cabinN_id>]
                             [ship <username>]                  - view <username>'s ship
+                            [q]                                - go back to the main menù
                         """,
                         Chroma.BLUE
                 );
@@ -267,7 +235,6 @@ public class DisplayUpdater implements Runnable {
             case WAIT_SHIELD -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to activate shields!", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         """
@@ -275,6 +242,7 @@ public class DisplayUpdater implements Runnable {
                             in order to activate the shield or press enter to not activate it
                             [<battery_id>]
                             [ship <username>]                  - view <username>'s ship
+                            [q]                                - go back to the main menù
                         """,
                         Chroma.BLUE
                 );
@@ -284,12 +252,12 @@ public class DisplayUpdater implements Runnable {
             case WAIT_BOOLEAN -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to take the reward!", Chroma.YELLOW_BOLD);
                 Chroma.println(
                     """
                             [<true/false>]                     - take reward or not
                             [ship <username>]                  - view <username>'s ship
+                            [q]                                - go back to the main menù
                         """,
                         Chroma.BLUE
                 );
@@ -299,13 +267,13 @@ public class DisplayUpdater implements Runnable {
             case WAIT_INDEX -> {
                 this.printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("You might want to land on a planet!", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         """
                                 ENTER the index of the planet you wish to land on
                                 [<id>]                             - indexes from top to bottom (ex. 0,1,...)
                                 [ship <username>]                  - view <username>'s ship
+                                [q]                                - go back to the main menù
                             """,
                         Chroma.BLUE
                 );
@@ -321,45 +289,55 @@ public class DisplayUpdater implements Runnable {
                 if (inGame)
                     printGameInfo(board, ship, state);
 
-                Chroma.println("\n\npress 'q' to go back to the menu", Chroma.GREY_BOLD);
                 Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         (!inGame && !client.getLobby().isLearnerMode() ? "[rotate-hourglass]                 - rotate the hourglass\n" : "") +
-                            "[ship <username>]                  - view <username>'s ship",
+                            "[ship <username>]                  - view <username>'s ship\n" +
+                            "[q]                                - go back to the main menù",
                         Chroma.BLUE
                 );
                 System.out.print("> ");
             }
 
             case END -> {
-                Chroma.println("GAME FINISHED", Chroma.GREEN_BOLD);
+                this.printGameInfo(board, ship, state);
 
-                if (board.getCardPilePos() > 0) {
-                    Chroma.println("Previous card", Chroma.GREY_BOLD);
-                    System.out.println(board.getCardPile().get(board.getCardPilePos()-1));
-                }
-
-                System.out.println(board.toString(client.getUsername(), state));
+                Chroma.println("\nGAME FINISHED", Chroma.GREEN_BOLD);
+                Chroma.println(
+                        """
+                            [ship <username>]                  - view <username>'s ship
+                            [q]                               - go back to the main menù
+                            """,
+                        Chroma.BLUE
+                );
+                System.out.print("> ");
             }
 
         }
     }
 
-    private void printGameInfo(Board board, Ship ship, PlayerState state) {
-        if (board.getCardPilePos() > 0) {
-            Chroma.println("Previous card", Chroma.GREY_BOLD);
-            System.out.println(Constants.displayCards(new ArrayList<>(List.of(board.getCardPile().get(board.getCardPilePos()-1))), 1));
-        }
-
+    private void printGameInfo(ClientBoard board, ClientShip ship, PlayerState state) {
         System.out.println(board.toString(client.getUsername(), state));
         System.out.println(ship.toString(client.getUsername(), state));
 
+        // TODO forse getAllPlayers()?
         if (board.getPlayers().stream()
-                .noneMatch(e -> client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.DRAW_CARD)) {
-            Chroma.println("\nActual card", Chroma.GREY_BOLD);
-            System.out.println(Constants.displayCards(new ArrayList<>(List.of(board.getCardPile().get(board.getCardPilePos()))), 1));
-            board.getCardPile().get(board.getCardPilePos()).printCardInfo(client.getGameController().getModel(), board);
+                .noneMatch(e -> client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.DRAW_CARD || client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.END)) {
+            if (board.getCardPile().size() > 1) {
+                Chroma.println("\nPrevious card\tActual card", Chroma.GREY_BOLD);
+                System.out.println(Constants.displayCards(List.of(board.getCardPile().get(board.getCardPile().size()-2), board.getCardPile().getLast()), 2));
+            }
+            else {
+                Chroma.println("\nActual card", Chroma.GREY_BOLD);
+                System.out.println(Constants.displayCards(List.of(board.getCardPile().getLast()), 1));
+            }
+            board.getCardPile().getLast().printCardInfo(client.getGameController().getModel(), board);
         }
+        else if (!board.getCardPile().isEmpty()) {
+            Chroma.println("Previous card", Chroma.GREY_BOLD);
+            System.out.println(board.getCardPile().getLast());
+        }
+
     }
 
 }

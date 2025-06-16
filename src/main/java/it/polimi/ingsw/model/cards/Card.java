@@ -104,18 +104,20 @@ abstract public class Card {
                 throw new GoodNotValidException("There are more valuable goods in the ship");
         }
 
+        if (number < 0) throw new IllegalArgumentException("Too many goods provided");
         if (number == 0 && batteries.isEmpty()) return;
         else if (number == 0) throw new IllegalArgumentException("Battery components list should be empty");
 
         if (batteries.size() > number)
             throw new BatteryComponentNotValidException("Too many battery components provided");
-        else if (batteries.size() < number && ship.getBatteries() >= number)
+        else if (batteries.size() < number && (ship.getBatteries() >= number || ship.getBatteries() != batteries.size()))
             throw new BatteryComponentNotValidException("Too few battery components provided");
     }
 
     public void doSpecificCheck(PlayerState commandType, List<CabinComponent> cabins, int toRemove, String username, Board board) {
         int crew = cabins.size();
-        if (commandType == PlayerState.WAIT_REMOVE_CREW && crew != toRemove)
+        int shipCrew = board.getPlayerEntityByUsername(username).getShip().getCrew();
+        if (commandType == PlayerState.WAIT_REMOVE_CREW && crew != toRemove && (shipCrew >= toRemove || shipCrew != crew))
             throw new IllegalArgumentException("Too few cabin components provided");
     }
 
