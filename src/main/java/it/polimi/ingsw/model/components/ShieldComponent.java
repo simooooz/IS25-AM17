@@ -1,14 +1,9 @@
 package it.polimi.ingsw.model.components;
 
-import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
-import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
-import it.polimi.ingsw.view.TUI.Chroma;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.model.player.PlayerData;
+import it.polimi.ingsw.common.model.enums.DirectionType;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class ShieldComponent extends Component {
 
@@ -24,50 +19,25 @@ public class ShieldComponent extends Component {
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld) {
-        super.insertComponent(ship, row, col, rotations, weld);
+    public void insertComponent(PlayerData player, int row, int col, int rotations, boolean weld) {
+        super.insertComponent(player, row, col, rotations, weld);
         for (DirectionType direction : directionsProtected)
-            ship.getProtectedSides().add(direction);
+            player.getShip().getProtectedSides().add(direction);
     }
 
     @Override
-    public void rotateComponent(Ship ship) {
+    public void rotateComponent(PlayerData player, int rotations) {
+        super.rotateComponent(player, rotations);
         DirectionType[] directions = DirectionType.values();
-        this.directionsProtected[0] = directions[((this.directionsProtected[0].ordinal() + 1) % 4)];
-        this.directionsProtected[1] = directions[((this.directionsProtected[1].ordinal() + 1) % 4)];
-        super.rotateComponent(ship);
+        this.directionsProtected[0] = directions[((this.directionsProtected[0].ordinal() + rotations) % 4)];
+        this.directionsProtected[1] = directions[((this.directionsProtected[1].ordinal() + rotations) % 4)];
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
-        super.affectDestroy(ship);
-        ship.getProtectedSides().remove(directionsProtected[0]);
-        ship.getProtectedSides().remove(directionsProtected[1]);
-    }
-
-    @Override
-    public List<String> icon() {
-        List<String> icon = new ArrayList<>();
-        icon.add("    " + "🛡️" + "  \t ");
-        if (directionsProtected[0] == DirectionType.NORTH || directionsProtected[1] == DirectionType.NORTH) {
-            if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
-
-                icon.add(Chroma.color("   ↑   →   ", Chroma.BLUE_BOLD));
-            }
-            else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add(Chroma.color("   ←   ↑   ", Chroma.BLUE_BOLD));
-            }
-        }
-        else if (directionsProtected[0] == DirectionType.SOUTH || directionsProtected[1] == DirectionType.SOUTH){
-            if (directionsProtected[0] == DirectionType.EAST || directionsProtected[1] == DirectionType.EAST) {
-                icon.add(Chroma.color("   ↓   →   ", Chroma.BLUE_BOLD));
-            }
-            else if (directionsProtected[0] == DirectionType.WEST || directionsProtected[1] == DirectionType.WEST) {
-                icon.add(Chroma.color("   ←   ↓   ", Chroma.BLUE_BOLD));
-            }
-        }
-
-        return icon;
+    public void affectDestroy(PlayerData player) {
+        super.affectDestroy(player);
+        player.getShip().getProtectedSides().remove(directionsProtected[0]);
+        player.getShip().getProtectedSides().remove(directionsProtected[1]);
     }
 
 }

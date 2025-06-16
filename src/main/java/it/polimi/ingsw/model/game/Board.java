@@ -2,12 +2,14 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
-import it.polimi.ingsw.model.cards.PlayerState;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.components.Component;
+import it.polimi.ingsw.common.model.events.game.PlayersPositionUpdatedEvent;
+import it.polimi.ingsw.common.model.events.EventContext;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.ComponentFactory;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
 
@@ -121,15 +123,25 @@ public abstract class Board {
         }
 
         players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-
+        EventContext.emit(new PlayersPositionUpdatedEvent(
+                startingDeck.stream().map(PlayerData::getUsername).toList(),
+                players.stream().map(e -> new SimpleEntry<>(e.getKey().getUsername(), e.getValue())).toList())
+        );
     }
 
     public void moveToStartingDeck(PlayerData player) {
         players.stream()
                 .filter(el -> el.getKey().equals(player))
                 .findFirst()
-                .ifPresent(players::remove);
-        startingDeck.add(player);
+                .ifPresent(e -> {
+                    players.remove(e);
+                    startingDeck.add(player);
+                });
+
+        EventContext.emit(new PlayersPositionUpdatedEvent(
+                startingDeck.stream().map(PlayerData::getUsername).toList(),
+                players.stream().map(e -> new SimpleEntry<>(e.getKey().getUsername(), e.getValue())).toList())
+        );
     }
 
     public void moveToBoard(PlayerData player) {
@@ -142,9 +154,14 @@ public abstract class Board {
 
         players.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         startingDeck.remove(player);
+
+        EventContext.emit(new PlayersPositionUpdatedEvent(
+                startingDeck.stream().map(PlayerData::getUsername).toList(),
+                players.stream().map(e -> new SimpleEntry<>(e.getKey().getUsername(), e.getValue())).toList())
+        );
     }
 
-    public List<PlayerData> getRanking() {
+    public List<PlayerData> calcRanking() {
         List<PlayerData> players = Stream.concat(
                 this.getPlayersByPos().stream(),
                 this.getStartingDeck().stream()
@@ -196,16 +213,6 @@ public abstract class Board {
                 .toList();
     }
 
-    public void setShuffledCardPile(List<Integer> ids) {
-        Map<Integer, Card> cardMap = this.cardFactory
-                .getAllCards().stream()
-                .collect(Collectors.toMap(Card::getId, card -> card));
-        List<Card> shuffledCards = ids.stream().map(cardMap::get).toList();
-
-        cardPile.clear();
-        cardPile.addAll(shuffledCards);
-    }
-
     public abstract void shuffleCards();
 
     public abstract void startMatch(ModelFacade model);
@@ -217,7 +224,5 @@ public abstract class Board {
     protected abstract int[] getRankingCreditsValues();
 
     protected abstract int getRankingMostBeautifulShipReward();
-
-    public abstract String toString(String username, PlayerState state);
 
 }

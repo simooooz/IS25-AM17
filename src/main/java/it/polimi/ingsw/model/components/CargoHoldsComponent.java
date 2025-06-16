@@ -1,8 +1,8 @@
 package it.polimi.ingsw.model.components;
 
-import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.model.exceptions.GoodNotValidException;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.view.TUI.Chroma;
 

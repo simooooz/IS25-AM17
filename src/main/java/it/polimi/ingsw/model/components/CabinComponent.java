@@ -1,14 +1,14 @@
 package it.polimi.ingsw.model.components;
 
-import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.common.model.events.game.CrewUpdatedEvent;
+import it.polimi.ingsw.common.model.events.EventContext;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
-import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.view.TUI.Chroma;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class CabinComponent extends Component {
@@ -19,7 +19,7 @@ public class CabinComponent extends Component {
 
     public CabinComponent(int id, ConnectorType[] connectors, boolean isStarting) {
         super(id, connectors);
-        this.humans = 0;
+        this.humans = 2;
         this.alien = Optional.empty();
         this.isStarting = isStarting;
     }
@@ -40,6 +40,8 @@ public class CabinComponent extends Component {
         int delta = humans - this.humans;
         ship.setCrew(ship.getCrew() + delta);
         this.humans = humans;
+
+        EventContext.emit(new CrewUpdatedEvent(getId(), humans, alien.orElse(null)));
     }
 
     public Optional<AlienType> getAlien() {
@@ -74,44 +76,30 @@ public class CabinComponent extends Component {
             else { ship.setEngineAlien(false); }
         }
         this.alien = Optional.ofNullable(newAlien);
+
+        EventContext.emit(new CrewUpdatedEvent(getId(), humans, alien.orElse(null)));
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld) {
+    public void insertComponent(PlayerData player, int row, int col, int rotations, boolean weld) {
         if (isStarting) {
             this.showComponent();
             this.x = col;
             this.y = row;
-            ship.getDashboard()[row][col] = Optional.of(this);
+            player.getShip().getDashboard()[row][col] = Optional.of(this);
             this.weldComponent();
         }
         else
-            super.insertComponent(ship, row, col, rotations, weld);
-        setHumans(2, ship);
+            super.insertComponent(player, row, col, rotations, weld);
+
+        player.getShip().setCrew(player.getShip().getCrew() + 2);
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
-        setHumans(0, ship);
-        setAlien(null, ship);
-        super.affectDestroy(ship);
-    }
-
-    @Override
-    public List<String> icon() {
-        if (alien.isEmpty()) {
-            return new ArrayList<>(List.of(
-                    Chroma.color("│   " + "👨" + "  \t│", Chroma.GREY_BOLD),
-                    Chroma.color("└─  " + getHumans() + "/2  ─┘", Chroma.GREY_BOLD))
-            );
-        }
-        else {
-            String color = getAlien().orElseThrow().equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
-            return new ArrayList<>(List.of(
-                Chroma.color("│   " + "👽" + "  \t│", color),
-                Chroma.color("└─────────┘", color))
-            );
-        }
+    public void affectDestroy(PlayerData player) {
+        setHumans(0, player.getShip());
+        setAlien(null, player.getShip());
+        super.affectDestroy(player);
     }
 
 }

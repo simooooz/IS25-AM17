@@ -1,12 +1,10 @@
 package it.polimi.ingsw.model.components;
 
-import it.polimi.ingsw.model.components.utils.ConnectorType;
-import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.view.TUI.Chroma;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class OddComponent extends Component {
@@ -23,8 +21,9 @@ public class OddComponent extends Component {
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
-        super.affectDestroy(ship);
+    public void affectDestroy(PlayerData player) {
+        super.affectDestroy(player);
+        Ship ship = player.getShip();
 
         if (type == AlienType.CANNON && !ship.getCannonAlien() || type == AlienType.ENGINE && !ship.getEngineAlien())
             return;
@@ -45,14 +44,6 @@ public class OddComponent extends Component {
             if (anotherOdd.isEmpty()) // Remove alien in linkedCabin
                 linkedCabin.get().setAlien(null, ship);
         }
-    }
-
-    @Override
-    public List<String> icon() {
-        String color = type.equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
-        return new ArrayList<>(List.of(
-                Chroma.color("│   " + "🛸" + "  \t│", color),
-                Chroma.color("└─────────┘", color)));
     }
 
 }

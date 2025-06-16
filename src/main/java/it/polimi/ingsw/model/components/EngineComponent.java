@@ -1,12 +1,9 @@
 package it.polimi.ingsw.model.components;
 
-import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
-import it.polimi.ingsw.view.TUI.Chroma;
-
-import java.util.ArrayList;
-import java.util.List;
+import it.polimi.ingsw.common.model.enums.DirectionType;
 
 public class EngineComponent extends Component {
 
@@ -28,10 +25,10 @@ public class EngineComponent extends Component {
     }
 
     @Override
-    public void rotateComponent(Ship ship) {
+    public void rotateComponent(PlayerData player, int rotations) {
+        super.rotateComponent(player, rotations);
         DirectionType[] directions = DirectionType.values();
-        this.direction = directions[((this.direction.ordinal() + 1) % 4)];
-        super.rotateComponent(ship);
+        this.direction = directions[((this.direction.ordinal() + rotations) % 4)];
     }
 
     @Override
@@ -41,22 +38,6 @@ public class EngineComponent extends Component {
 
     public int calcPower() {
         return isDouble ? 2 : 1;
-    }
-
-    @Override
-    public List<String> icon() {
-        String arrow = "";
-        switch (this.direction) {
-            case SOUTH: arrow = "↓"; break;
-            case NORTH: arrow = "↑"; break;
-            case WEST: arrow = "←"; break;
-            case EAST: arrow = "→"; break;
-        }
-        return new ArrayList<>(List.of(
-                getIsDouble() ? Chroma.color("│  🚀" + "🚀\t│", Chroma.ORANGE)
-                        : Chroma.color("│   " + "🚀" + "  \t│", Chroma.ORANGE),
-                Chroma.color("└    " + arrow + "    ┘", Chroma.ORANGE)
-        ));
     }
 
 }

@@ -1,12 +1,9 @@
 package it.polimi.ingsw.model.components;
 
-import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.model.properties.DirectionType;
-import it.polimi.ingsw.view.TUI.Chroma;
-
-import java.util.ArrayList;
-import java.util.List;
+import it.polimi.ingsw.common.model.enums.DirectionType;
 
 public class CannonComponent extends Component {
 
@@ -28,10 +25,10 @@ public class CannonComponent extends Component {
     }
 
     @Override
-    public void rotateComponent(Ship ship) {
+    public void rotateComponent(PlayerData player, int rotations) {
+        super.rotateComponent(player, rotations);
         DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3
-        this.direction = directions[(this.direction.ordinal() + 1 % 4)];
-        super.rotateComponent(ship);
+        this.direction = directions[((this.direction.ordinal() + rotations) % 4)];
     }
 
     @Override
@@ -46,22 +43,6 @@ public class CannonComponent extends Component {
     public double calcPower() {
         int factor = direction == DirectionType.NORTH ? 1 : 2;
         return (isDouble ? 2.0 : 1.0) / factor;
-    }
-
-    @Override
-    public List<String> icon() {
-        String arrow = "";
-        switch (this.direction) {
-            case SOUTH: arrow = "↓"; break;
-            case NORTH: arrow = "↑"; break;
-            case WEST: arrow = "←"; break;
-            case EAST: arrow = "→"; break;
-        }
-        return new ArrayList<>(List.of(
-                Chroma.color("┌    " + arrow + "    ┐", Chroma.PURPLE),
-                getIsDouble() ? Chroma.color("│  🔥" + "🔥\t│", Chroma.PURPLE)
-                        : Chroma.color("│   " + "🔥" + "  \t│", Chroma.PURPLE)
-        ));
     }
 
 }

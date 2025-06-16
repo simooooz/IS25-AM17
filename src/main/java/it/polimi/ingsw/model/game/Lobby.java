@@ -1,17 +1,18 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.common.model.enums.LobbyState;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
-import it.polimi.ingsw.network.UserState;
-import it.polimi.ingsw.network.exceptions.UserNotFoundException;
-import it.polimi.ingsw.network.User;
+import it.polimi.ingsw.common.model.events.EventContext;
+import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Lobby implements Serializable {
+public class Lobby {
 
     /**
      * {@link GameController} reference, null if game not started
@@ -62,6 +63,10 @@ public class Lobby implements Serializable {
         this.players = new ArrayList<>();
     }
 
+    public GameController getGame() {
+        return game;
+    }
+
     public void setGame(GameController game) {
         this.game = game;
     }
@@ -104,7 +109,10 @@ public class Lobby implements Serializable {
         if (hasPlayer(username)) throw new PlayerAlreadyInException("Player's already in");
 
         players.add(username);
-        if (players.size() == maxPlayers)
+        EventContext.emit(new JoinedLobbyEvent(username));
+        EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
+
+        if (players.size() == maxPlayers && state == LobbyState.WAITING)
             this.initGame();
     }
 
@@ -123,10 +131,15 @@ public class Lobby implements Serializable {
      */
     public void removePlayer(String username) {
         players.remove(username);
+
+        List<String> toNotify = new ArrayList<>(players);
+        toNotify.add(username);
+        EventContext.emit(new LeftLobbyEvent(username, toNotify));
+
         if (!players.isEmpty())
             master = master.equals(username) ? players.get(new Random().nextInt(players.size())) : master;
 
-        if (toDelete())
+        if (toDelete() && this.state == LobbyState.IN_GAME)
             this.endGame();
         else if (this.state == LobbyState.IN_GAME)
             this.game.leaveGame(username);
@@ -138,23 +151,13 @@ public class Lobby implements Serializable {
     private void initGame() {
         this.state = LobbyState.IN_GAME;
         this.game = new GameController(players, learnerMode);
-
-        try {
-            for (String username : players) { // Set GameController for each user and update state
-                User user = User.getUser(username);
-                user.setState(UserState.IN_GAME);
-                user.setGameController(game);
-            }
-        } catch (UserNotFoundException e) {
-            this.state = LobbyState.WAITING;
-            throw e;
-        }
-
         this.game.startMatch();
     }
 
     public void endGame() {
         this.state = LobbyState.GAME_ENDED;
+        // TODO game ended non può essere settato se il gioco finisce da solo perché sul model
+        // TODO ha senso usarlo?
         this.game.endGame();
     }
 

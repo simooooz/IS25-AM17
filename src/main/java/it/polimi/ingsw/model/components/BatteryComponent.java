@@ -1,13 +1,11 @@
 package it.polimi.ingsw.model.components;
 
-import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.model.components.utils.ConnectorType;
+import it.polimi.ingsw.common.model.enums.ConnectorType;
+import it.polimi.ingsw.common.model.events.game.BatteriesUpdatedEvent;
+import it.polimi.ingsw.common.model.events.EventContext;
 import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
+import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.view.TUI.Chroma;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BatteryComponent extends Component {
 
@@ -32,26 +30,19 @@ public class BatteryComponent extends Component {
         if (batteries == 0) throw new BatteryComponentNotValidException("Not enough batteries");
         batteries--;
         ship.setBatteries(ship.getBatteries() - 1);
+        EventContext.emit(new BatteriesUpdatedEvent(getId(), batteries));
     }
 
     @Override
-    public void insertComponent(Ship ship, int row, int col, int rotations, boolean weld) {
-        super.insertComponent(ship, row, col, rotations, weld);
-        if (isTriple) { ship.setBatteries(ship.getBatteries() + 3); }
-        else { ship.setBatteries(ship.getBatteries() + 2); }
+    public void insertComponent(PlayerData player, int row, int col, int rotations, boolean weld) {
+        super.insertComponent(player, row, col, rotations, weld);
+        player.getShip().setBatteries(player.getShip().getBatteries() + batteries);
     }
 
     @Override
-    public void affectDestroy(Ship ship) {
-        super.affectDestroy(ship);
-        ship.setBatteries(ship.getBatteries() - batteries);
+    public void affectDestroy(PlayerData player) {
+        super.affectDestroy(player);
+        player.getShip().setBatteries(player.getShip().getBatteries() - batteries);
     }
 
-    @Override
-    public List<String> icon() {
-        String battery = "\uD83D\uDD0B";
-        return new ArrayList<>(List.of(
-                "    " + battery + "   \t ",
-                "    " + getBatteries() + "/" + (isTriple ? 3 : 2) + "    "));
-    }
 }
