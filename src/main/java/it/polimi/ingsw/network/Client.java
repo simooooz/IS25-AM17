@@ -1,16 +1,19 @@
 package it.polimi.ingsw.network;
 
-import it.polimi.ingsw.controller.GameController;
-import it.polimi.ingsw.model.game.Lobby;
+import it.polimi.ingsw.client.controller.ClientGameController;
+import it.polimi.ingsw.client.model.ClientEventBus;
+import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.ViewTui;
 
 public abstract class Client {
 
     protected String username;
-    protected GameController gameController;
     protected UserState state;
-    protected Lobby lobby;
+    protected ClientLobby lobby;
 
     protected final ViewTui viewTui;
 
@@ -23,12 +26,8 @@ public abstract class Client {
         this.viewTui = new ViewTui(this);
     }
 
-    public GameController getGameController() {
-        return gameController;
-    }
-
-    public void setGameController(GameController gameController) {
-        this.gameController = gameController;
+    public ClientGameController getGameController() {
+        return lobby.getGame();
     }
 
     public ViewTui getViewTui() {

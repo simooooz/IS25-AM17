@@ -1,11 +1,16 @@
 package it.polimi.ingsw.view.TUI;
 
-import it.polimi.ingsw.model.cards.PlayerState;
-import it.polimi.ingsw.model.components.Component;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.client.model.ClientEventBus;
+import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.game.ComponentInsertedEvent;
+import it.polimi.ingsw.common.model.events.game.ComponentMovedEvent;
+import it.polimi.ingsw.common.model.events.game.ComponentRotatedEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.view.UserInterface;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,14 +21,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
 
-public class ViewTui {
+public class ViewTui implements UserInterface {
 
     private final Client client;
     private final BufferedReader reader;
 
     private final DisplayUpdater displayUpdater;
-    private final BlockingQueue<String> networkMessageQueue = new LinkedBlockingQueue<>();
-    protected volatile CountDownLatch waitLatch = new CountDownLatch(0);
+
+    private final BlockingQueue<Runnable> uiUpdateQueue = new LinkedBlockingQueue<>();
 
     private String localCommand = "";
 
@@ -34,8 +39,40 @@ public class ViewTui {
      */
     public ViewTui(Client client) {
         this.client = client;
+        ClientEventBus.getInstance().subscribe(this);
         this.reader = new BufferedReader(new InputStreamReader(System.in));
         this.displayUpdater = new DisplayUpdater(this.client);
+        startUpdateThread();
+    }
+
+    @Override
+    public void onEvent(GameEvent event) {
+        scheduleUpdate(event);
+    }
+
+    private void scheduleUpdate(GameEvent event) {
+        // TODO che fare con l'evento? Lo togliamo o lo mettiamo come parametro di updateDisplay?
+        uiUpdateQueue.offer(() -> {
+            clear();
+            displayUpdater.updateDisplay();
+            System.out.flush();
+        });
+    }
+
+    private void startUpdateThread() {
+        Thread updateThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Runnable updateTask = uiUpdateQueue.take();
+                    updateTask.run();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+        updateThread.setDaemon(true);
+        updateThread.start();
     }
 
     private void processUserInput(String input) {
@@ -153,7 +190,7 @@ public class ViewTui {
      * @param input provided by the user to influence the game logic
      */
     private void handleInGame(String input) {
-        PlayerState state = client.getGameController().getState(client.getUsername());
+        PlayerState state = client.getGameController().getModel().getPlayerState(client.getUsername());
 
         if (input.equals("q")) {
             boolean sure = InputUtility.requestBoolean("You sure? (y/n)\n> ", false);
@@ -222,7 +259,7 @@ public class ViewTui {
                             } else // No previous local command
                                 localCommand = input + " 0";
 
-                            displayUpdater.updateDisplay();
+                            ClientEventBus.getInstance().publish(new ComponentInsertedEvent(client.getUsername(), Integer.parseInt(commands[1]), row, col));
                         } catch (RuntimeException e) {
                             // Propagate general exceptions
                             throw new IllegalArgumentException(e.getMessage());
@@ -238,9 +275,9 @@ public class ViewTui {
                             if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
                                 localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], String.valueOf(row), String.valueOf(col), localCommand.split(" ")[4]);
                             else // No previous local command
-                                localCommand = input;
+                                localCommand = input + " 0";;
 
-                            displayUpdater.updateDisplay();
+                            ClientEventBus.getInstance().publish(new ComponentMovedEvent(client.getUsername(), Integer.parseInt(commands[1]), row, col));
                         } catch (RuntimeException e) {
                             // Propagate general exceptions
                             throw new IllegalArgumentException(e.getMessage());
@@ -259,7 +296,7 @@ public class ViewTui {
                             else // No previous local command
                                 localCommand = input;
 
-                            displayUpdater.updateDisplay();
+                            ClientEventBus.getInstance().publish(new ComponentRotatedEvent(Integer.parseInt(commands[1]), times));
                         } catch (RuntimeException e) {
                             // Propagate general exceptions
                             throw new IllegalArgumentException(e.getMessage());
@@ -309,7 +346,13 @@ public class ViewTui {
                             .toArray(Integer[]::new);
                     AlienType[] aliens = IntStream.range(0, commands.length)
                             .filter(i -> i % 2 == 1)
-                            .mapToObj(i -> Objects.equals(commands[i], "cannon") ? AlienType.CANNON : AlienType.ENGINE)
+                            .mapToObj(i -> {
+                                if (commands[i].equalsIgnoreCase("cannon"))
+                                    return AlienType.CANNON;
+                                else if (commands[i].equalsIgnoreCase("engine"))
+                                    return AlienType.ENGINE;
+                                throw new IllegalArgumentException("Invalid alien type. Correct types are cannon and engine.");
+                            })
                             .toArray(AlienType[]::new);
 
                     if (ids.length != aliens.length)
@@ -397,9 +440,9 @@ public class ViewTui {
     }
 
     private void revertRotation() {
-        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("rotate")) { // Previous local command was "rotate", revert it
+        if (localCommand.split(" ").length > 0 && (localCommand.split(" ")[0].equals("rotate") || localCommand.split(" ")[0].equals("insert"))) { // Previous local command was "rotate" or "insert", revert it
             try {
-                int times = 4 - (Integer.parseInt(localCommand.split(" ")[2]) % 4);
+                int times = 4 - (localCommand.split(" ")[0].equals("rotate") ? (Integer.parseInt(localCommand.split(" ")[2]) % 4) : (Integer.parseInt(localCommand.split(" ")[4]) % 4));
                 client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
             } catch (RuntimeException e) {
                 // Propagate general exceptions
@@ -408,9 +451,7 @@ public class ViewTui {
         }
     }
 
-    /**
-     * Clears the screen.
-     */
+    @Override
     public void clear() {
         try {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -420,16 +461,14 @@ public class ViewTui {
         }
     }
 
+    @Override
     public void displayError(String message) {
         Chroma.println(message, Chroma.RED);
         System.out.print("> ");
         System.out.flush();
     }
 
-    /**
-     * Shows the title screen.
-     */
-    public void start() throws IOException {
+    public void start() {
         clear();
         System.out.println("Welcome to");
         Chroma.println(
@@ -443,18 +482,20 @@ public class ViewTui {
                          ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
                         """, Chroma.ORANGE
         );
-        System.out.print("Press ENTER to continue...");
-        reader.readLine();
-        displayUpdater.updateDisplay();
 
-        Thread displayThread = new Thread(displayUpdater);
-        displayThread.setDaemon(true);
-        displayThread.start();
+        try {
+            System.out.print("Press ENTER to continue...");
+            reader.readLine();
+            displayUpdater.updateDisplay();
 
-        while (true) {
-            System.out.flush();
-            String input = reader.readLine();
-            processUserInput(input);
+            while (true) {
+                System.out.flush();
+                String input = reader.readLine();
+                processUserInput(input);
+            }
+        } catch (IOException e) {
+            // TODO che faccio?
+            // Ignore it
         }
 
         // this.reader.close();
@@ -465,10 +506,6 @@ public class ViewTui {
         Chroma.println("Bye!", Chroma.YELLOW_BOLD);
         client.closeConnection();
         System.exit(0);
-    }
-
-    public BlockingQueue<String> getNetworkMessageQueue() {
-        return networkMessageQueue;
     }
 
 }
