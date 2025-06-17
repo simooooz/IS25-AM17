@@ -1,15 +1,16 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.cards.*;
 import it.polimi.ingsw.model.cards.utils.*;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static it.polimi.ingsw.model.properties.DirectionType.*;
+import static it.polimi.ingsw.common.model.enums.DirectionType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LearnerModeGameSimulationTest {
@@ -578,7 +579,7 @@ public class LearnerModeGameSimulationTest {
 
         // Final Ranking
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking();
+        List<PlayerData> finalRank = controller.getModel().getBoard().calcRanking();
 
         assertEquals(11, finalRank.stream().filter(p -> p.getUsername().equals("Simone")).findFirst().orElseThrow().getCredits());
         assertEquals(9, finalRank.stream().filter(p -> p.getUsername().equals("Tommaso")).findFirst().orElseThrow().getCredits());

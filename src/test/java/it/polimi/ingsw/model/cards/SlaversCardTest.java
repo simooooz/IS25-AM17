@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.cards;
 
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.AlienType;
+import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.model.player.PlayerData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

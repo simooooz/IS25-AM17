@@ -3,7 +3,7 @@ package it.polimi.ingsw.model.cards;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.components.SpecialCargoHoldsComponent;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

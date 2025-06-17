@@ -1,12 +1,13 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.cards.*;
 import it.polimi.ingsw.model.cards.utils.*;
 
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
-import it.polimi.ingsw.model.game.objects.AlienType;
-import it.polimi.ingsw.model.game.objects.ColorType;
+import it.polimi.ingsw.common.model.enums.AlienType;
+import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
-import static it.polimi.ingsw.model.properties.DirectionType.*;
+import static it.polimi.ingsw.common.model.enums.DirectionType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameSimulationTest {
@@ -668,7 +669,7 @@ public class GameSimulationTest {
         finish = card12.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 11, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
         if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking();
+        List<PlayerData> finalRank = controller.getModel().getBoard().calcRanking();
 
         assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().countExposedConnectors());
         assertEquals(9, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().countExposedConnectors());
@@ -1443,7 +1444,7 @@ public class GameSimulationTest {
         assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getShip().countExposedConnectors());
 
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().getRanking();
+        List<PlayerData> finalRank = controller.getModel().getBoard().calcRanking();
 
         assertEquals(2, finalRank.stream().filter(p -> p.getUsername().equals("Simone")).findFirst().orElseThrow().getCredits());
         assertEquals(17, finalRank.stream().filter(p -> p.getUsername().equals("Tommaso")).findFirst().orElseThrow().getCredits());

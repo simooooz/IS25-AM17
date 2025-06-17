@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.cards.utils.CannonFire;
 import it.polimi.ingsw.model.components.*;
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static it.polimi.ingsw.model.properties.DirectionType.*;
+import static it.polimi.ingsw.common.model.enums.DirectionType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PiratesCardTest {

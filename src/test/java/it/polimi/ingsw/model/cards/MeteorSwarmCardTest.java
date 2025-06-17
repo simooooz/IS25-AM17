@@ -1,12 +1,13 @@
 package it.polimi.ingsw.model.cards;
 
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.model.cards.utils.Meteor;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.model.game.Board;
 
 import it.polimi.ingsw.model.player.PlayerData;
-import it.polimi.ingsw.model.properties.DirectionType;
+import it.polimi.ingsw.common.model.enums.DirectionType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
