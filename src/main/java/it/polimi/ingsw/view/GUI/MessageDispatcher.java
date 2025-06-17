@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import javafx.application.Platform;
 
@@ -29,11 +30,11 @@ public class MessageDispatcher {
         handlers.remove(handler);
     }
 
-    public void dispatchMessage(MessageType eventType, String username, Object... args) {
+    public void dispatchMessage(GameEvent event) {
         Platform.runLater(() -> {
             for (MessageHandler handler : handlers)
-                if (handler.canHandle(eventType))
-                    handler.handleMessage(eventType, username, args);
+                if (handler.canHandle(event.eventType()))
+                    handler.handleMessage(event);
         });
     }
 

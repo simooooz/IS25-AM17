@@ -1,5 +1,7 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.network.messages.MessageType;
 import javafx.application.Platform;
@@ -53,7 +55,7 @@ public class WaitingRoomController implements MessageHandler {
     private void initializeLobbyState() {
         // Controlla se abbiamo già una lobby disponibile
         if (JavaFxInterface.getClientInstance().getLobby() != null) {
-            Lobby lobby = JavaFxInterface.getClientInstance().getLobby();
+            ClientLobby lobby = JavaFxInterface.getClientInstance().getLobby();
             String lobbyName = lobby.getGameID();
             int players = lobby.getMaxPlayers();
             boolean isLearnerMode = lobby.isLearnerMode();
@@ -189,11 +191,11 @@ public class WaitingRoomController implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(MessageType eventType, String username, Object... args) {
-        switch (eventType) {
-            case CREATE_LOBBY_OK, JOIN_LOBBY_OK -> {
+    public void handleMessage(GameEvent event) {
+        switch (event.eventType()) {
+            case CREATED_LOBBY_EVENT, JOINED_LOBBY_EVENT -> {
                 if (JavaFxInterface.getClientInstance().getLobby() != null) {
-                    Lobby lobby = JavaFxInterface.getClientInstance().getLobby();
+                    ClientLobby lobby = JavaFxInterface.getClientInstance().getLobby();
                     String lobbyName = lobby.getGameID();
                     int players = lobby.getMaxPlayers();
                     boolean isLearnerMode = lobby.isLearnerMode();
@@ -205,22 +207,20 @@ public class WaitingRoomController implements MessageHandler {
                     updatePlayersList();
                 }
             }
-            case LEAVE_GAME -> {
-                if (args.length > 0) {
-                    String playerName = args[0].toString();
+            case LEFT_LOBBY_EVENT -> {
+                if (event.getArgs().length > 0) {
+                    String playerName = event.getArgs()[0].toString();
                     currentPlayers.remove(playerName);
                     updatePlayersList();
                 }
-            }
-            case GAME_STARTED_OK -> {
-                Platform.runLater(() -> navigateToGame());
-            }
-            case LEAVE_GAME_OK -> {
                 Platform.runLater(() -> navigateToMainMenu());
             }
+            case MATCH_STARTED_EVENT -> {
+                Platform.runLater(() -> navigateToGame());
+            }
             case ERROR -> {
-                if (args.length > 0) {
-                    Platform.runLater(() -> showError(args[0].toString()));
+                if (event.getArgs().length > 0) {
+                    Platform.runLater(() -> showError(event.getArgs()[0].toString()));
                 }
             }
         }
@@ -259,11 +259,10 @@ public class WaitingRoomController implements MessageHandler {
     @Override
     public boolean canHandle(MessageType messageType) {
         return List.of(
-                MessageType.CREATE_LOBBY_OK,
-                MessageType.JOIN_LOBBY_OK,
-                MessageType.LEAVE_GAME,
-                MessageType.GAME_STARTED_OK,
-                MessageType.LEAVE_GAME_OK,
+                MessageType.CREATED_LOBBY_EVENT,
+                MessageType.JOINED_LOBBY_EVENT,
+                MessageType.LEFT_LOBBY_EVENT,
+                MessageType.MATCH_STARTED_EVENT,
                 MessageType.ERROR
         ).contains(messageType);
     }

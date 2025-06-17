@@ -5,7 +5,6 @@ import it.polimi.ingsw.client.model.ClientEventObserver;
 public interface UserInterface extends ClientEventObserver {
     void displayError(String message);
     void clear();
-    void start();
     // void shutdown();
     // void displayUpdate();
 }

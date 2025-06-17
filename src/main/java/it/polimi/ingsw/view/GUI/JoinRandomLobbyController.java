@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -131,24 +132,24 @@ public class JoinRandomLobbyController implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(MessageType eventType, String username, Object... args) {
-        switch (eventType) {
-            case JOIN_LOBBY_OK -> {
+    public void handleMessage(GameEvent event) {
+        switch (event.eventType()) {
+            case JOINED_LOBBY_EVENT -> {
                 Platform.runLater(() -> {
                     System.out.println("Successfully joined random lobby!");
                     navigateToScene("/fxml/waitingRoom.fxml", WaitingRoomController.class);
                 });
             }
             // FIX: Aggiunto supporto per GAME_STARTED_OK
-            case GAME_STARTED_OK -> {
+            case MATCH_STARTED_EVENT -> {
                 Platform.runLater(() -> {
                     System.out.println("Game started automatically after joining random lobby!");
                     navigateToGame();
                 });
             }
             case ERROR -> {
-                if (args.length > 0) {
-                    Platform.runLater(() -> showError(args[0].toString()));
+                if (event.getArgs().length > 0) {
+                    Platform.runLater(() -> showError(event.getArgs()[0].toString()));
                 }
             }
         }
@@ -157,8 +158,8 @@ public class JoinRandomLobbyController implements MessageHandler {
     @Override
     public boolean canHandle(MessageType messageType) {
         // FIX: Aggiunto GAME_STARTED_OK alla lista dei messaggi gestibili
-        return messageType == MessageType.JOIN_LOBBY_OK ||
-                messageType == MessageType.GAME_STARTED_OK ||
+        return messageType == MessageType.JOINED_LOBBY_EVENT ||
+                messageType == MessageType.MATCH_STARTED_EVENT ||
                 messageType == MessageType.ERROR;
     }
 }

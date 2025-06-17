@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -146,12 +147,12 @@ public class MainController implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(MessageType eventType, String username, Object... args) {
-        switch (eventType) {
-            case USERNAME_OK -> {
+    public void handleMessage(GameEvent event) {
+        switch (event.eventType()) {
+            case USERNAME_OK_EVENT -> {
                 Platform.runLater(() -> setLobbySelection());
             }
-            case GAME_STARTED_OK -> {
+            case MATCH_STARTED_EVENT -> {
                 Platform.runLater(() -> navigateToScene("/fxml/game.fxml", BuildController.class));
             }
         }
@@ -160,13 +161,8 @@ public class MainController implements MessageHandler {
     @Override
     public boolean canHandle(MessageType messageType) {
         return List.of(
-                MessageType.SET_USERNAME,
-                MessageType.USERNAME_OK,
-                MessageType.CREATE_LOBBY_OK,
-                MessageType.JOIN_LOBBY_OK,
-                MessageType.JOIN_RANDOM_LOBBY_OK,
-                MessageType.LEAVE_GAME_OK,
-                MessageType.GAME_STARTED_OK
+                MessageType.MATCH_STARTED_EVENT,
+                MessageType.USERNAME_OK_EVENT
         ).contains(messageType);
     }
 }

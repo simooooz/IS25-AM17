@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -145,9 +146,9 @@ public class CreateLobbyController implements MessageHandler {
     // Modifica nel metodo handleMessage di CreateLobbyController
 
     @Override
-    public void handleMessage(MessageType eventType, String username, Object... args) {
-        switch (eventType) {
-            case CREATE_LOBBY_OK -> {
+    public void handleMessage(GameEvent event) {
+        switch (event.eventType()) {
+            case CREATED_LOBBY_EVENT -> {
                 Platform.runLater(() -> {
                     System.out.println("Lobby created successfully!");
                     // NON reinoltrare il messaggio - lascia che il WaitingRoomController
@@ -156,8 +157,8 @@ public class CreateLobbyController implements MessageHandler {
                 });
             }
             case ERROR -> {
-                if (args.length > 0) {
-                    Platform.runLater(() -> showError(args[0].toString()));
+                if (event.getArgs().length > 0) {
+                    Platform.runLater(() -> showError(event.getArgs()[0].toString()));
                 }
             }
         }
@@ -165,6 +166,6 @@ public class CreateLobbyController implements MessageHandler {
 
     @Override
     public boolean canHandle(MessageType messageType) {
-        return messageType == MessageType.CREATE_LOBBY_OK || messageType == MessageType.ERROR;
+        return messageType == MessageType.CREATED_LOBBY_EVENT || messageType == MessageType.ERROR;
     }
 }

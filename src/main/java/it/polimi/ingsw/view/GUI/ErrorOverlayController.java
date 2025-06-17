@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -21,7 +22,7 @@ public class ErrorOverlayController implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(MessageType eventType, String username, Object... args) {
+    public void handleMessage(GameEvent event) {
 
     }
 
