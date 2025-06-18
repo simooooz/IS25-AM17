@@ -207,6 +207,7 @@ public class Component {
     }
 
     public void rotateComponent(PlayerData player, int rotations) {
+        if (rotations % 4 == 0) return;
         Ship ship = player.getShip();
         if ((ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) && (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)))
             throw new ComponentNotValidException("Component isn't in hand or in dashboard");

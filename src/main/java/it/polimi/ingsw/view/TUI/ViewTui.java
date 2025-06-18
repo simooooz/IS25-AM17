@@ -443,7 +443,7 @@ public class ViewTui implements UserInterface {
         if (localCommand.split(" ").length > 0 && (localCommand.split(" ")[0].equals("rotate") || localCommand.split(" ")[0].equals("insert"))) { // Previous local command was "rotate" or "insert", revert it
             try {
                 int times = 4 - (localCommand.split(" ")[0].equals("rotate") ? (Integer.parseInt(localCommand.split(" ")[2]) % 4) : (Integer.parseInt(localCommand.split(" ")[4]) % 4));
-                client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
+                client.getGameController().componentRotated(Integer.parseInt(localCommand.split(" ")[1]), times);
             } catch (RuntimeException e) {
                 // Propagate general exceptions
                 throw new IllegalArgumentException(e.getMessage());
