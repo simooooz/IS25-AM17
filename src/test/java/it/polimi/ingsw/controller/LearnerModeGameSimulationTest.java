@@ -347,10 +347,10 @@ public class LearnerModeGameSimulationTest {
         PenaltyCombatZone penalty1 = new CountablePenaltyZone(3, MalusType.DAYS);
         PenaltyCombatZone penalty2 = new CountablePenaltyZone(2, MalusType.CREW);
         PenaltyCombatZone penalty3 = new CannonFirePenaltyCombatZone(new ArrayList<>(List.of(new CannonFire(false, SOUTH), new CannonFire(true, SOUTH))));
-        List<AbstractMap.SimpleEntry<CriteriaType, PenaltyCombatZone>> damages = new ArrayList<>();
-        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CREW, penalty1));
-        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.ENGINE, penalty2));
-        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CANNON, penalty3));
+        List<WarLine> damages = new ArrayList<>();
+        damages.add(new WarLine(CriteriaType.CREW, penalty1));
+        damages.add(new WarLine(CriteriaType.ENGINE, penalty2));
+        damages.add(new WarLine(CriteriaType.CANNON, penalty3));
         CombatZoneCard card6 = new CombatZoneCard(0, 1, true, damages);
         cardDeck.add(card6);
 
