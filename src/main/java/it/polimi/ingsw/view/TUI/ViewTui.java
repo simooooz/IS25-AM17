@@ -42,11 +42,11 @@ public class ViewTui implements UserInterface {
     }
 
     @Override
-    public void onEvent(GameEvent event) {
-        scheduleUpdate(event);
+    public void onEvent(List<GameEvent> events) {
+        scheduleUpdate();
     }
 
-    private void scheduleUpdate(GameEvent event) {
+    private void scheduleUpdate() {
         // TODO che fare con l'evento? Lo togliamo o lo mettiamo come parametro di updateDisplay?
         uiUpdateQueue.offer(() -> {
             clear();

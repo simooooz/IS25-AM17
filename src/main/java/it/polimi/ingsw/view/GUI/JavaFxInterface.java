@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 
 public class JavaFxInterface extends Application implements UserInterface {
 
@@ -61,11 +62,9 @@ public class JavaFxInterface extends Application implements UserInterface {
     }
 
     @Override
-    public void onEvent(GameEvent event) {
-        System.out.println("aaaaa");
-        Platform.runLater(() -> {
-            MessageDispatcher.getInstance().dispatchMessage(event);
-        });
+    public void onEvent(List<GameEvent> events) {
+        for (GameEvent event : events)
+            Platform.runLater(() -> MessageDispatcher.getInstance().dispatchMessage(event));
     }
 
     @Override
