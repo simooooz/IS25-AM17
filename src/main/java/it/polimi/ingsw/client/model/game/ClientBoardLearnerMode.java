@@ -67,13 +67,8 @@ public class ClientBoardLearnerMode extends ClientBoard {
                     sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
                 for (SimpleEntry<ClientPlayer, Integer> entry : players)
                     sb.append("- ").append(entry.getKey().getUsername()).append(Chroma.color(" READY\n", Chroma.GREEN));
-
-                List<String> left = startingDeck.stream().filter(ClientPlayer::hasEndedInAdvance).map(ClientPlayer::getUsername).toList();
-                if (!left.isEmpty()) {
-                    sb.append("\nPlayers left:\n");
-                    for (String player : left)
-                        sb.append("- ").append(Chroma.color(player, Chroma.BLACK_BOLD));
-                }
+                for (ClientPlayer player : startingDeck.stream().filter(ClientPlayer::hasEndedInAdvance).toList())
+                    sb.append("- ").append(player).append("\n");
 
             }
 
@@ -86,16 +81,16 @@ public class ClientBoardLearnerMode extends ClientBoard {
                     sb.append("- ").append(entry.getKey()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
 
                 if (!startingDeck.isEmpty()) {
-                    sb.append("Starting deck:\n");
+                    sb.append("\bStarting deck:\n");
                     for (ClientPlayer player : startingDeck)
-                        sb.append("  ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
+                        sb.append("- ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
                 }
             }
 
             case END -> {
                 sb.append("\nRanking:\n");
                 for (ClientPlayer player : getAllPlayers())
-                    sb.append("-  ").append(player).append(" $").append(player.getCredits()).append("\n");
+                    sb.append("- ").append(player).append(" $").append(player.getCredits()).append("\n");
             }
         }
         return sb.toString();

@@ -83,7 +83,7 @@ public class Server extends ServerBasis implements Runnable {
 
         try {
             Socket socket = serverSocket.accept();
-            socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
+            socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
             ClientHandler connection = new ClientHandler(connectionCode, socket);
 
             synchronized (this.connections) {
@@ -103,7 +103,7 @@ public class Server extends ServerBasis implements Runnable {
         synchronized (this.connections) {
             ClientHandler conn = this.connections.get(connectionCode);
             if (conn != null) {
-                User.removeUser(conn); // TODO da cambiare e mettere inattivo
+                User.removeUser(conn);
                 conn.close();
                 this.connections.remove(connectionCode);
             }
@@ -139,16 +139,13 @@ public class Server extends ServerBasis implements Runnable {
                 String connectionCode = this.openConnection();
                 System.out.println("[SOCKET SERVER] Connection " + connectionCode + " opened");
             } catch (ServerException e) {
-                System.err.println("[SOCKET SERVER] Error while opening a new connection: " + e.getMessage());
+                // Error while opening a new connection
+                // Ignore it
             }
 
         }
 
-        try {
-            serverSocket.close();
-        } catch (IOException e) {
-            throw new RuntimeException("[SERVER] Error while closing server");
-        }
+        stop();
     }
 
 }

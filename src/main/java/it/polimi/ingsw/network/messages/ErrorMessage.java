@@ -12,11 +12,6 @@ public class ErrorMessage extends Message {
         this.message = message;
     }
 
-    public ErrorMessage() {
-        super(MessageType.ERROR);
-        this.message = null;
-    }
-
     public String getMessage() {
         return message != null ? message : "Empty message";
     }

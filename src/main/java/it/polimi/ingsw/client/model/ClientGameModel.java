@@ -206,6 +206,7 @@ public abstract class ClientGameModel {
 
     public void playerLeft(String username) {
         ClientPlayer player = board.getPlayerEntityByUsername(username);
+        player.setEndedInAdvance(true);
         player.setLeftMatch(true);
     }
 

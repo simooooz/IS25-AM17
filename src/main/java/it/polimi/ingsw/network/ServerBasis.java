@@ -11,6 +11,7 @@ import it.polimi.ingsw.common.model.enums.LobbyState;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
+import it.polimi.ingsw.network.messages.MessageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,6 @@ public abstract class ServerBasis {
             events.addAll(MatchController.getInstance().rejoinGame(username, oldUser.getLobby().getGameID()));
             user.setLobby(oldUser.getLobby());
             user.setState(UserState.IN_GAME);
-
-            System.out.println("Riconnesso al gioco " + user.getUsername());
         }
 
         user.notifyEvents(events);
@@ -52,34 +51,17 @@ public abstract class ServerBasis {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().joinGame(user.getUsername(), lobbyName);
-        Lobby lobby = MatchController.getInstance().getLobby(user.getUsername());
-        user.setLobby(lobby);
-        user.setState(UserState.IN_LOBBY);
-
-        if (lobby.getState() == LobbyState.IN_GAME) {
-            List<String> players = new ArrayList<>(lobby.getPlayers());
-            try {
-                for (String username : players) { // Set GameController for each user and update state
-                    User userP = User.getUser(username);
-                    userP.setState(UserState.IN_GAME);
-                }
-            } catch (UserNotFoundException e) {
-                throw new RuntimeException("Error while creating game");
-            }
-
-            switch (user.getLobby().getGameID()) { // Test only
-                case "test-1" -> events.addAll(user.getGameController().startTest(1));
-                case "test-2" -> events.addAll(user.getGameController().startTest(2));
-            }
-        }
-
-        user.notifyEvents(events);
+        joinCommon(user, events);
     }
 
     public static void joinRandomLobby(User user, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().joinRandomGame(user.getUsername(), learnerMode);
+        joinCommon(user, events);
+    }
+
+    private static void joinCommon(User user, List<GameEvent> events) {
         Lobby lobby = MatchController.getInstance().getLobby(user.getUsername());
         user.setLobby(lobby);
         user.setState(UserState.IN_LOBBY);
@@ -105,9 +87,10 @@ public abstract class ServerBasis {
     }
 
     public static void leaveGame(User user) {
-        if (user.getState() != UserState.IN_GAME || user.getState() != UserState.IN_LOBBY) throw new IllegalStateException("User is not in lobby or game");
+        if (user.getState() != UserState.IN_GAME && user.getState() != UserState.IN_LOBBY) throw new IllegalStateException("User is not in lobby or game");
 
         List<GameEvent> events = MatchController.getInstance().leaveGame(user.getUsername());
+        events.stream().filter(e -> e.eventType().equals(MessageType.LEFT_LOBBY_EVENT)).findFirst().ifPresent(e -> e.getTargetPlayers().add(user.getUsername()));
         user.setState(UserState.LOBBY_SELECTION);
         user.setLobby(null);
 

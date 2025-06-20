@@ -122,7 +122,6 @@ public class Lobby {
         players.remove(username);
 
         List<String> toNotify = new ArrayList<>(players);
-        toNotify.add(username);
         EventContext.emit(new LeftLobbyEvent(username, toNotify));
     }
 
@@ -135,7 +134,7 @@ public class Lobby {
             this.game.rejoinGame(username);
 
         EventContext.emit(new JoinedLobbyEvent(username));
-        EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
+        // EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
 
     }
 
