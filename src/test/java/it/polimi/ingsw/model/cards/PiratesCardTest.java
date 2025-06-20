@@ -88,6 +88,7 @@ class PiratesCardTest {
         PiratesCard piratesCard = new PiratesCard(0, 2, false, 1, 4, 3, cannonFires);
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
+        board.getCardPile().add(piratesCard);
 
 
         controller.drawCard("Simone");
@@ -140,6 +141,7 @@ class PiratesCardTest {
 
         PiratesCard piratesCard = new PiratesCard(0, 2, false, 3, 5, 3, cannonFires);
         board.getCardPile().clear();
+        board.getCardPile().add(piratesCard);
         board.getCardPile().add(piratesCard);
 
         controller.drawCard("Simone");
@@ -201,6 +203,7 @@ class PiratesCardTest {
         cannonFires = new ArrayList<>(List.of(c1, c2));
         PiratesCard piratesCard = new PiratesCard(0, 2, false, 1, 5, 3, cannonFires);
         board.getCardPile().clear();
+        board.getCardPile().add(piratesCard);
         board.getCardPile().add(piratesCard);
 
 

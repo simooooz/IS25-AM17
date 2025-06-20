@@ -20,4 +20,8 @@ public class CountablePenaltyZone extends PenaltyCombatZone {
         return penaltyType.resolve(penaltyNumber, board, username);
     }
 
+    @Override
+    public int getPenaltyNumber() {
+        return penaltyNumber;
+    }
 }

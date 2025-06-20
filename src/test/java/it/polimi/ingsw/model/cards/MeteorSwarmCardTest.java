@@ -88,6 +88,7 @@ class MeteorSwarmCardTest {
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
+        board.getCardPile().add(meteorSwarmCard);
 
         controller.drawCard("Simone");
         // set dice manually
@@ -119,6 +120,7 @@ class MeteorSwarmCardTest {
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
+        board.getCardPile().add(meteorSwarmCard);
 
         controller.drawCard("Simone");
         // set dice manually
@@ -149,6 +151,7 @@ class MeteorSwarmCardTest {
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
+        board.getCardPile().add(meteorSwarmCard);
         board.getCardPile().add(meteorSwarmCard);
 
         controller.drawCard("Simone");
@@ -183,6 +186,7 @@ class MeteorSwarmCardTest {
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
+        board.getCardPile().add(meteorSwarmCard);
 
         controller.drawCard("Simone");
 
@@ -213,6 +217,7 @@ class MeteorSwarmCardTest {
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
+        board.getCardPile().add(meteorSwarmCard);
         board.getCardPile().add(meteorSwarmCard);
 
         controller.drawCard("Simone");
@@ -280,6 +285,7 @@ class MeteorSwarmCardTest {
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
         board.getCardPile().add(meteorSwarmCard);
+        board.getCardPile().add(meteorSwarmCard);
 
 
         controller.drawCard("Simone");
@@ -342,6 +348,7 @@ class MeteorSwarmCardTest {
 
         MeteorSwarmCard meteorSwarmCard = new MeteorSwarmCard(0, 2, false, meteors);
         board.getCardPile().clear();
+        board.getCardPile().add(meteorSwarmCard);
         board.getCardPile().add(meteorSwarmCard);
 
         controller.drawCard("Simone");

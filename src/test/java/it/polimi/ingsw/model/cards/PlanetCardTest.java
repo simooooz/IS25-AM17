@@ -50,6 +50,7 @@ class PlanetCardTest {
         PlanetCard planetCard = new PlanetCard(0, 2, true, planetList, 3);
         board.getCardPile().clear();
         board.getCardPile().add(planetCard);
+        board.getCardPile().add(planetCard);
 
     }
 

@@ -78,7 +78,7 @@ public class PlanetCard extends Card{
         if (commandType == PlayerState.WAIT_INDEX) {
             if (value == null) // Players doesn't land
                 model.setPlayerState(username, PlayerState.DONE);
-            else if (value >= planets.size() || value < 0 || landedPlayers.containsValue(planets.get(value))) // Invalid index
+            else if (value >= planets.size() || landedPlayers.containsValue(planets.get(value))) // Invalid index
                 throw new IllegalArgumentException("Planet not valid or already occupied");
             else { // Land
                 landedPlayers.put(username, planets.get(value));

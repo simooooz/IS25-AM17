@@ -156,6 +156,7 @@ class CombatZoneCardTest {
         CombatZoneCard combatZoneCard = new CombatZoneCard(0, 2, false, damages);
         board.getCardPile().clear();
         board.getCardPile().add(combatZoneCard);
+        board.getCardPile().add(combatZoneCard);
 
         ((CargoHoldsComponent) p3.getShip().getDashboard(3,5).orElseThrow()).loadGood(ColorType.BLUE, p3.getShip());
         ((CargoHoldsComponent) p3.getShip().getDashboard(3,5).orElseThrow()).loadGood(ColorType.GREEN, p3.getShip());
