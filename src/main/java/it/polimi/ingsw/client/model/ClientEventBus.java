@@ -25,10 +25,6 @@ public class ClientEventBus {
         observers.add(observer);
     }
 
-    public void unsubscribe(ClientEventObserver observer) {
-        observers.remove(observer);
-    }
-
     public void startBatch() {
         inBatch = true;
         hasPendingChanges = false;

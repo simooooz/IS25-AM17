@@ -122,6 +122,8 @@ public class RMIClient extends Client {
                 case END_FLIGHT -> server.endFlightHandler(sessionCode);
             }
         } catch (RemoteException | RuntimeException e) {
+            System.out.println("[RMI CLIENT] Remote exception: " + e.getMessage());
+            e.printStackTrace();
             viewTui.displayError(e.getMessage());
         }
     }

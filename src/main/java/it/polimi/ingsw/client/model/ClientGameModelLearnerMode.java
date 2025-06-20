@@ -8,7 +8,7 @@ import java.util.List;
 public class ClientGameModelLearnerMode extends ClientGameModel {
 
     public ClientGameModelLearnerMode(List<String> usernames) {
-        super(usernames);
+        super();
         this.board = new ClientBoardLearnerMode(usernames);
     }
 

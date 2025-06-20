@@ -19,23 +19,16 @@ public class ClientPiratesCard extends ClientEnemiesCard {
 
     @JsonProperty private List<String> defeatedPlayers;
     @JsonProperty private int cannonIndex;
-    @JsonProperty private int coord;
-
-    public ClientPiratesCard(int id, int level, boolean isLearner, int piratesFirePower, int credits, int days, List<ClientCannonFire> cannonFires) {
-        super(id, level, isLearner, days, piratesFirePower);
-        this.credits = credits;
-        this.cannonFires = cannonFires;
-        this.defeatedPlayers = new ArrayList<>();
-    }
+    @JsonProperty private List<Integer> coords;
 
     public ClientPiratesCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 
@@ -97,9 +90,9 @@ public class ClientPiratesCard extends ClientEnemiesCard {
         Chroma.println("Pirates are" + (enemiesDefeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
 
         if (enemiesDefeated && board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
-            Chroma.println("Cannon fire n." + (cannonIndex+1) + " is hitting at coord: " + coord, Chroma.YELLOW_BOLD);
+            Chroma.println("Cannon fire n." + (cannonIndex+1) + " is hitting at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
         else if (cannonIndex > 0)
-            Chroma.println("Previous cannon fire n." + (cannonIndex) + " has come at coord: " + coord, Chroma.YELLOW_BOLD);
+            Chroma.println("Previous cannon fire n." + (cannonIndex) + " has come at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
 
     }
 

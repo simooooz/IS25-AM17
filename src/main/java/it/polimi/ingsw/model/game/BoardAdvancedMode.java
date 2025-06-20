@@ -1,8 +1,10 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.CardFactoryAdvancedMode;
 import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.model.factory.ComponentFactory;
 import it.polimi.ingsw.model.game.objects.Time;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
@@ -13,9 +15,11 @@ import java.util.*;
 public class BoardAdvancedMode extends Board {
 
     private final Time timeManagement;
+    private final Map<String, Integer> cardPilesWatchMap;
 
     public BoardAdvancedMode(List<String> usernames) {
         super();
+        this.cardPilesWatchMap = new HashMap<>();
         this.timeManagement = new Time();
 
         List<ColorType> colors = Arrays.stream(ColorType.values()).toList();
@@ -24,12 +28,16 @@ public class BoardAdvancedMode extends Board {
 
             Ship ship = new ShipAdvancedMode();
             player.setShip(ship);
+
+            ComponentFactory componentFactory = new ComponentFactory();
+            this.commonComponents = new ArrayList<>(componentFactory.getComponents());
+            this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
             componentFactory.getStartingCabins().get(colors.get(i)).insertComponent(player, 2, 3, 0, true);
 
             this.startingDeck.add(player);
         }
 
-        this.cardFactory = new CardFactoryAdvancedMode();
+        CardFactory cardFactory = new CardFactoryAdvancedMode();
         cardPile.addAll(cardFactory.getCards());
     }
 
@@ -60,6 +68,11 @@ public class BoardAdvancedMode extends Board {
     public void pickNewCard(ModelFacade model) {
         cardPile.get(cardPilePos).endCard(this);
         super.pickNewCard(model);
+    }
+
+    @Override
+    public Map<String, Integer> getCardPilesWatchMap() {
+        return cardPilesWatchMap;
     }
 
     @Override

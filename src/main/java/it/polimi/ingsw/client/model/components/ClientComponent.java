@@ -23,7 +23,7 @@ public class ClientComponent {
     private ConnectorType[] connectors;
     private int x;
     private int y;
-    private boolean inserted; // TODO lo tengo per evitare che nella gui venga spostato?
+    private boolean inserted;
     private boolean shown;
 
     public ClientComponent(int id, ConnectorType[] connectors) {
@@ -83,14 +83,8 @@ public class ClientComponent {
         if (inserted)
             throw new ComponentNotValidException("Component is already welded");
 
-        for (int i=0; i<(rotations % 4); i++) {
-            ConnectorType[] newConnectors = new ConnectorType[4];
-            newConnectors[0] = connectors[3];
-            newConnectors[1] = connectors[0];
-            newConnectors[2] = connectors[1];
-            newConnectors[3] = connectors[2];
-            connectors = newConnectors;
-        }
+        for (int i=0; i<(rotations % 4); i++)
+            rotateComponent();
     }
 
     public void moveComponent(ClientPlayer player, int row, int col, int rotations) {
@@ -133,11 +127,12 @@ public class ClientComponent {
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
         List<String> componentLines = new ArrayList<>();
+        String topBorder;
         if (!shown) {
-            String topBorder = " " + angles[0] + Constants.repeat(hBorder, 11) + angles[1] + " ";
+            topBorder = " " + angles[0] + Constants.repeat(hBorder, 11) + angles[1] + " ";
             componentLines.add(topBorder);
 
-            String leftBorder = "";
+            String leftBorder;
             leftBorder = " " + vBorder + inTheMiddle(String.valueOf(this.id), 11) + vBorder + " ";
             componentLines.add(leftBorder);
 
@@ -150,11 +145,10 @@ public class ClientComponent {
             String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 11) + angles[3] + " ";
             componentLines.add(bottomBorder);
 
-            return String.join("\n", componentLines);
         }
         else {
             // First row
-            String topBorder = " " + angles[0];
+            topBorder = " " + angles[0];
 
             if (connectors[0] == ConnectorType.EMPTY)
                 topBorder = topBorder + Constants.repeat(hBorder, 11) + angles[1] + " ";
@@ -240,8 +234,8 @@ public class ClientComponent {
                 bottomBorder = bottomBorder + hBorder + "┬" + Constants.repeat(hBorder, 3) + "┬" + Constants.repeat(hBorder, 3) + "┬" + hBorder + angles[3] + " ";
             componentLines.add(bottomBorder);
 
-            return String.join("\n", componentLines);
         }
+        return String.join("\n", componentLines);
     }
 
     public List<String> icon() {

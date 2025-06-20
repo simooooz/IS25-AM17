@@ -14,7 +14,11 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class Component {
+public sealed class Component permits
+        BatteryComponent, CabinComponent, CannonComponent,
+        EngineComponent, OddComponent,
+        ShieldComponent, SpecialCargoHoldsComponent
+{
 
     private final int id;
     private ConnectorType[] connectors;
@@ -90,7 +94,7 @@ public class Component {
      *
      * @param board Board ref
      * @param player Player ref
-     * @throws ComponentNotValidException if the component is not pickable
+     * @throws ComponentNotValidException if the component can't be picked
      */
     public void pickComponent(Board board, PlayerData player) {
         Ship ship = player.getShip();
@@ -113,15 +117,15 @@ public class Component {
     /**
      * Releases to the board this(component) from the hand, or ship if not welded yet
      *
-     * @param board
-     * @param player
+     * @param board Board ref
+     * @param player Player ref
      */
     public void releaseComponent(Board board, PlayerData player) {
         Ship ship = player.getShip();
         if (board.getCommonComponents().contains(this) || !shown)
             throw new ComponentNotValidException("This component is already released");
         if (inserted)
-            throw new ComponentNotValidException("Component is welded");
+            throw new ComponentNotValidException("Component is already welded");
 
         if (ship.getHandComponent().isPresent() && ship.getHandComponent().get().equals(this)) // Component to release is in hand
             ship.setHandComponent(null);
@@ -156,7 +160,7 @@ public class Component {
     public void insertComponent(PlayerData player, int row, int col, int rotations, boolean weld) {
         Ship ship = player.getShip();
 
-        if (!ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
+        if (ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("The position where to insert it is not valid"); // Check if new position is valid
         else if (!shown)
             throw new ComponentNotValidException("Component is hidden");
@@ -189,11 +193,12 @@ public class Component {
 
     public void moveComponent(PlayerData player, int row, int col, int rotations) {
         Ship ship = player.getShip();
+
         if (ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this))
             throw new ComponentNotValidException("Component isn't in dashboard");
         else if (inserted)
-            throw new ComponentNotValidException("Component already welded");
-        else if (!ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
+            throw new ComponentNotValidException("Component is already welded");
+        else if (ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("New position isn't valid or is already occupied"); // Check if new position is valid
 
         ship.getDashboard()[y][x] = Optional.empty();
@@ -202,7 +207,6 @@ public class Component {
         ship.getDashboard()[row][col] = Optional.of(this);
 
         rotateComponent(player, rotations);
-
         EventContext.emit(new ComponentMovedEvent(player.getUsername(), id, row, col));
     }
 
@@ -227,6 +231,7 @@ public class Component {
         EventContext.emit(new ComponentRotatedEvent(id, rotations % 4));
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean checkComponent(Ship ship) {
         if (getLinkedNeighbors(ship).isEmpty()) // Not isolated check
             return false;
@@ -238,14 +243,10 @@ public class Component {
                 (ship.getDashboard(y + 1, x).isEmpty() || Component.areConnectorsCompatible(ship.getDashboard(y + 1, x).get().connectors[0], connectors[2])); // Bottom connector check
     }
 
-    // Returns DONE if there is only a part, otherwise WAIT_SHIP_PART
     public PlayerState destroyComponent(PlayerData player) {
         affectDestroy(player);
         List<List<Component>> groups = player.getShip().calcShipParts();
-
-        if (groups.size() > 1)
-            return PlayerState.WAIT_SHIP_PART;
-        return PlayerState.DONE;
+        return groups.size() > 1 ? PlayerState.WAIT_SHIP_PART : PlayerState.DONE;
     }
 
     public int getX() {
@@ -258,6 +259,18 @@ public class Component {
 
     public int getId() {
         return id;
+    }
+
+    public <T> boolean matchesType(Class<T> type) {
+        return type == Component.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T castTo(Class<T> type) {
+        if (type == Component.class || type.isAssignableFrom(this.getClass())) {
+            return (T) this;
+        }
+        throw new ClassCastException("Cannot cast " + this.getClass().getName() + " to " + type.getName());
     }
 
 }

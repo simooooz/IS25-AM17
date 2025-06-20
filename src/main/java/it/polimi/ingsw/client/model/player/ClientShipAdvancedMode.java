@@ -1,6 +1,5 @@
 package it.polimi.ingsw.client.model.player;
 
-import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.view.TUI.Chroma;
 
 public class ClientShipAdvancedMode extends ClientShip {

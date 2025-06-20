@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.model.game;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.cards.ClientCard;
+import it.polimi.ingsw.client.model.factory.ClientComponentFactory;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.client.model.player.ClientShipAdvancedMode;
@@ -31,6 +32,10 @@ public class ClientBoardAdvancedMode extends ClientBoard {
 
             ClientShip ship = new ClientShipAdvancedMode();
             player.setShip(ship);
+
+            ClientComponentFactory componentFactory = new ClientComponentFactory();
+            this.commonComponents = new ArrayList<>(componentFactory.getComponents());
+            this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
             componentFactory.getStartingCabins().get(colors.get(i)).insertComponent(player, 2, 3, 0, true);
 
             this.startingDeck.add(player);
@@ -104,19 +109,19 @@ public class ClientBoardAdvancedMode extends ClientBoard {
 
                 sb.append("\nPlayers in game:\n");
                 for (SimpleEntry<ClientPlayer, Integer> entry : players)
-                    sb.append("- ").append(entry.getKey().getUsername()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
+                    sb.append("- ").append(entry.getKey()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
 
                 if (!startingDeck.isEmpty()) {
                     sb.append("Starting deck:\n");
                     for (ClientPlayer player : startingDeck)
-                        sb.append("  ").append(player.getUsername()).append(" | ").append("$").append(player.getCredits()).append("\n");
+                        sb.append("  ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
                 }
             }
 
             case END -> {
                 sb.append("\nRanking:\n");
                 for (ClientPlayer player : getAllPlayers())
-                    sb.append("-  ").append(player.getUsername()).append(" $").append(player.getCredits()).append("\n");
+                    sb.append("-  ").append(player).append(" $").append(player.getCredits()).append("\n");
             }
         }
         return sb.toString();

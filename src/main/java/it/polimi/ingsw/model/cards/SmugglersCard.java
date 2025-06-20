@@ -8,7 +8,8 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class SmugglersCard extends EnemiesCard {
 
@@ -52,7 +53,7 @@ public class SmugglersCard extends EnemiesCard {
             playerIndex++;
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override

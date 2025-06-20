@@ -7,18 +7,14 @@ import java.util.List;
 
 public class ClientStardustCard extends ClientCard {
 
-    public ClientStardustCard(int id, int level, boolean isLearner) {
-        super(id, level, isLearner);
-    }
-
     public ClientStardustCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 

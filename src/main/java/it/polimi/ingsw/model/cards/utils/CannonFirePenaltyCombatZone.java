@@ -13,7 +13,7 @@ import java.util.Optional;
 public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
     @JsonProperty private final List<CannonFire> cannonFires;
-    @JsonProperty private int coord;
+    @JsonProperty private List<Integer> coords;
     @JsonProperty private int cannonIndex;
 
     public CannonFirePenaltyCombatZone(List<CannonFire> cannonFires) {
@@ -21,7 +21,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     }
 
     @Override
-    public PlayerState resolve(ModelFacade model, Board board, PlayerData player) {
+    public PlayerState resolve(ModelFacade model, Board board, String username) {
         return PlayerState.WAIT_ROLL_DICES;
     }
 
@@ -29,10 +29,10 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     public void doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_ROLL_DICES) {
             PlayerData player = board.getPlayerEntityByUsername(username);
-            this.coord = value;
+            this.coords.add(value);
 
-            PlayerState newState = cannonFires.get(cannonIndex).hit(player, coord);
-            if (newState == PlayerState.DONE && cannonIndex < cannonFires.size() - 1) { // Cannot go in done if it's not really finished because is a sub-state.
+            PlayerState newState = cannonFires.get(cannonIndex).hit(player, coords.getLast());
+            if (newState == PlayerState.DONE && cannonIndex < cannonFires.size() - 1) { // Cannot go in done if it's not really finished because is a deeper state.
                 newState = PlayerState.WAIT_ROLL_DICES;
                 cannonIndex++;
             }
@@ -40,7 +40,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             model.setPlayerState(username, newState);
         }
         else
-            throw new RuntimeException("Command type not valid in doCommandEffects");
+            throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -49,14 +49,14 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
             PlayerData player = board.getPlayerEntityByUsername(username);
 
             if (!value) { // Component destroyed
-                Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
+                Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coords.getLast());
                 target.ifPresent(component -> {
                     PlayerState newState = component.destroyComponent(player); // DONE or WAIT_SHIP_PART
                     model.setPlayerState(player.getUsername(), newState);
                 });
             }
 
-            if (model.getPlayerState(player.getUsername()) == PlayerState.WAIT_SHIP_PART) // Not finished yer, user has to choose part of ship to remove and then cannon index can be increased
+            if (model.getPlayerState(player.getUsername()) == PlayerState.WAIT_SHIP_PART) // Not finished yet, user has to choose part of ship to remove and then cannon index can be increased
                 return;
 
             cannonIndex++;
@@ -66,7 +66,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
                 model.setPlayerState(username, PlayerState.DONE);
         }
         else
-            throw new RuntimeException("Command type not valid in doCommandEffects");
+            throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
                 model.setPlayerState(username, PlayerState.DONE);
         }
         else
-            throw new RuntimeException("Command type not valid in doCommandEffects");
+            throw new RuntimeException("Command type not valid");
     }
 
 }

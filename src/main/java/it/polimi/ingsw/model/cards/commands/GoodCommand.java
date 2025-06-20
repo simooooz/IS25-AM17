@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
+import it.polimi.ingsw.model.components.CargoHoldsComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.components.SpecialCargoHoldsComponent;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
@@ -25,7 +26,7 @@ public class GoodCommand implements Command {
     private final String username;
     private final Board board;
     private final ModelFacade model;
-    Map<ColorType, Integer> deltaGood;
+    private final Map<ColorType, Integer> deltaGood;
     private final Map<SpecialCargoHoldsComponent, List<ColorType>> newDisposition;
     private final List<BatteryComponent> batteries;
 
@@ -80,9 +81,12 @@ public class GoodCommand implements Command {
             if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
                 throw new ComponentNotValidException("Cargo hold component not valid");
 
-        for (SpecialCargoHoldsComponent component : newDisposition.keySet())
+        for (SpecialCargoHoldsComponent component : newDisposition.keySet()) {
             if (newDisposition.get(component).size() > component.getNumber())
                 throw new GoodNotValidException("Too many goods in cargo hold");
+            if (newDisposition.get(component).contains(ColorType.RED) && !component.matchesType(SpecialCargoHoldsComponent.class))
+                throw new GoodNotValidException("Red good in normal hold");
+        }
 
         for (Component component : batteries)
             if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))

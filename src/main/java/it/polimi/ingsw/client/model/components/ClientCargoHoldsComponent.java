@@ -25,7 +25,7 @@ public class ClientCargoHoldsComponent extends ClientComponent {
 
     @Override
     public List<String> icon() {
-        String text = "";
+        String text;
         if (number == 2) {
             if (goods.size() == 1)
                 text = goods.getFirst().toString() + "   " + Chroma.color("   " , getColor());

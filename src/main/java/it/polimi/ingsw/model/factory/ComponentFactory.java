@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.AlienType;
@@ -54,6 +55,7 @@ public class ComponentFactory {
 
     private JsonNode loadJsonConfig() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
         try {
             return objectMapper.readTree(new File("src/main/resources/factory.json"));
         } catch (IOException e) {

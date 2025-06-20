@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import it.polimi.ingsw.model.cards.SlaversCard;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.utils.*;
@@ -29,7 +30,7 @@ import java.util.*;
 public abstract class CardFactory {
 
     protected final List<Card> cardPile;
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new Jdk8Module());
 
     public CardFactory() {
         this.cardPile = new ArrayList<>();
@@ -41,6 +42,7 @@ public abstract class CardFactory {
 
     protected JsonNode loadJsonConfig() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
         try {
             return objectMapper.readTree(new File("src/main/resources/factory.json"));
         } catch (IOException e) {
@@ -155,7 +157,7 @@ public abstract class CardFactory {
 
             case "CombactZoneCard":
                 JsonNode combactArray = cardJson.get("warLines");
-                List<AbstractMap.SimpleEntry<CriteriaType, PenaltyCombatZone>> combact = new ArrayList<>();
+                List<WarLine> combact = new ArrayList<>();
                 for (int i = 0; i < combactArray.size(); i++) {
                     JsonNode combactJson = combactArray.get(i);
                     CriteriaType criteria = CriteriaType.valueOf(combactJson.get("CriteriaType").asText());
@@ -179,7 +181,7 @@ public abstract class CardFactory {
                     } else {
                         throw new IllegalArgumentException("Unknown penalty type: " + penaltyType);
                     }
-                    combact.add(new AbstractMap.SimpleEntry<>(criteria, penalty));
+                    combact.add(new WarLine(criteria, penalty));
                 }
                 return new CombatZoneCard(id, level, isLearner, combact);
 

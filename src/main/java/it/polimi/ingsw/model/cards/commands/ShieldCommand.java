@@ -9,20 +9,19 @@ import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.Ship;
 
-import java.util.Optional;
 
 public class ShieldCommand implements Command {
 
     private final ModelFacade model;
     private final String username;
     private final Board board;
-    private final Optional<BatteryComponent> battery;
+    private final BatteryComponent battery;
 
     public ShieldCommand(ModelFacade model, Board board, String username, BatteryComponent battery) {
         this.model = model;
         this.username = username;
         this.board = board;
-        this.battery = Optional.ofNullable(battery);
+        this.battery = battery;
     }
 
     @Override
@@ -30,18 +29,19 @@ public class ShieldCommand implements Command {
         Ship ship = board.getPlayerEntityByUsername(username).getShip();
         checkInput(ship);
 
-        battery.ifPresent(batteryComponent -> batteryComponent.useBattery(ship));
-        return card.doCommandEffects(PlayerState.WAIT_SHIELD, battery.isPresent(), model, board, username);
+        if (battery != null)
+            battery.useBattery(ship);
+
+        return card.doCommandEffects(PlayerState.WAIT_SHIELD, battery != null, model, board, username);
     }
 
     private void checkInput(Ship ship) {
-        if (battery.isEmpty()) return;
-        BatteryComponent component = battery.get();
+        if (battery == null) return;
 
-        if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
+        if (ship.getDashboard(battery.getY(), battery.getX()).isEmpty() || !ship.getDashboard(battery.getY(), battery.getX()).get().equals(battery))
             throw new ComponentNotValidException("Battery component not valid");
 
-        if (component.getBatteries() == 0)
+        if (battery.getBatteries() == 0)
             throw new BatteryComponentNotValidException("Not enough batteries");
     }
 

@@ -133,6 +133,7 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     // true if username has been set, otherwise false
     @Override
     public void setUsernameHandler(String sessionCode, String username) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call setUsernameHandler");
         User user = getUserInRmiSessions(sessionCode);
         setUsername(user, username);
     }
@@ -140,48 +141,56 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     // Returns GameID
     @Override
     public void createLobbyHandler(String sessionCode, String name, Integer maxPlayers, Boolean learnerMode) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call createLobbyHandler");
         User user = getUserInRmiSessions(sessionCode);
         createLobby(user, name, maxPlayers, learnerMode);
     }
 
     @Override
     public void joinLobbyHandler(String sessionCode, String lobbyName) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call joinLobbyHandler");
         User user = getUserInRmiSessions(sessionCode);
         joinLobby(user, lobbyName);
     }
 
     @Override
     public void joinRandomLobbyHandler(String sessionCode, Boolean learnerMode) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call joinRandomLobbyHandler");
         User user = getUserInRmiSessions(sessionCode);
         joinRandomLobby(user, learnerMode);
     }
 
     @Override
     public void leaveGameHandler(String sessionCode) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call leaveGameHandler");
         User user = getUserInRmiSessions(sessionCode);
         leaveGame(user);
     }
 
     @Override
     public void pickComponentHandler(String sessionCode, Integer id) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call pickComponentHandler");
         User user = getUserInRmiSessions(sessionCode);
         pickComponent(user, id);
     }
 
     @Override
     public void releaseComponentHandler(String sessionCode, Integer id) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call releaseComponentHandler");
         User user = getUserInRmiSessions(sessionCode);
         releaseComponent(user, id);
     }
 
     @Override
     public void reserveComponentHandler(String sessionCode, Integer id) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call reserveComponentHandler");
         User user = getUserInRmiSessions(sessionCode);
         reserveComponent(user, id);
     }
 
     @Override
     public void insertComponentHandler(String sessionCode, Integer id, Integer row, Integer col, Integer rotations) throws RemoteException {
+        System.out.println("[RMI SERVER] Received call insertComponentHandler " + id + " " + row + " " + col + " " + rotations);
         User user = getUserInRmiSessions(sessionCode);
         insertComponent(user, id, row, col, rotations);
     }

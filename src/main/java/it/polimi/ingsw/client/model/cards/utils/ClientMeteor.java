@@ -9,11 +9,6 @@ public class ClientMeteor {
     @JsonProperty private boolean isBig;
     @JsonProperty private DirectionType directionFrom;
 
-    public ClientMeteor(boolean isBig, DirectionType directionFrom) {
-        this.isBig = isBig;
-        this.directionFrom = directionFrom;
-    }
-
     public ClientMeteor() {}
 
     @Override

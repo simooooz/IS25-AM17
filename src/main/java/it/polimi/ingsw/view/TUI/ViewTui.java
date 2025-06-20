@@ -418,7 +418,13 @@ public class ViewTui implements UserInterface {
                 client.send(MessageType.ACTIVATE_SHIELD, id);
             }
             case WAIT_BOOLEAN -> {
-                Boolean value = Boolean.parseBoolean(input);
+                boolean value;
+                if (input.trim().equalsIgnoreCase("true"))
+                    value = true;
+                else if (input.trim().equalsIgnoreCase("false"))
+                    value = false;
+                else
+                    throw new IllegalArgumentException("Invalid boolean value. Correct values are true or false.");
                 client.send(MessageType.GET_BOOLEAN, value);
             }
             case WAIT_INDEX -> {

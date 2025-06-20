@@ -25,7 +25,8 @@ public class ModelFacadeAdvancedMode extends ModelFacade {
 
             for (CabinComponent cabin : cabins) {
                 if (!cabin.getLinkedNeighbors(player.getShip()).stream()
-                        .filter(c -> c instanceof OddComponent)
+                        .filter(c -> c.matchesType(OddComponent.class))
+                        .map(c -> c.castTo(OddComponent.class))
                         .toList().isEmpty()
                 ) { // There is a cabin with an odd near odd component => player has to choose and phase isn't done
                     phaseDone = false;

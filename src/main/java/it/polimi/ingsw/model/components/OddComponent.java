@@ -7,7 +7,7 @@ import it.polimi.ingsw.model.player.Ship;
 
 import java.util.Optional;
 
-public class OddComponent extends Component {
+public final class OddComponent extends Component {
 
     private final AlienType type;
 
@@ -29,21 +29,35 @@ public class OddComponent extends Component {
             return;
 
         Optional<CabinComponent> linkedCabin = this.getLinkedNeighbors(ship).stream()
-                .filter(c -> c instanceof CabinComponent)
-                .map(c -> (CabinComponent) c)
+                .filter(c -> c.matchesType(CabinComponent.class))
+                .map(c -> c.castTo(CabinComponent.class))
                 .filter(c -> c.getAlien().isPresent() && c.getAlien().get() == type)
                 .findFirst();
 
         if (linkedCabin.isPresent()) {
             Optional<OddComponent> anotherOdd = linkedCabin.get().getLinkedNeighbors(ship).stream()
-                    .filter(c -> c instanceof OddComponent)
-                    .map(c -> (OddComponent) c)
+                    .filter(c -> c.matchesType(OddComponent.class))
+                    .map(c -> c.castTo(OddComponent.class))
                     .filter(o -> o.getType() == type && !o.equals(this))
                     .findFirst();
 
             if (anotherOdd.isEmpty()) // Remove alien in linkedCabin
                 linkedCabin.get().setAlien(null, ship);
         }
+    }
+
+    @Override
+    public <T> boolean matchesType(Class<T> type) {
+        return type == OddComponent.class;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T castTo(Class<T> type) {
+        if (type == OddComponent.class) {
+            return (T) this;
+        }
+        throw new ClassCastException("Cannot cast OddComponent to " + type.getName());
     }
 
 }

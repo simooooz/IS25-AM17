@@ -12,11 +12,11 @@ public class RollDicesCommand implements Command {
     private final Board board;
     private final int value;
 
-    public RollDicesCommand(ModelFacade model, Board board, String username, int value) {
+    public RollDicesCommand(ModelFacade model, Board board, String username) {
         this.model = model;
         this.username = username;
         this.board = board;
-        this.value = value;
+        this.value = ((int)(Math.random() * 6) + 1) + ((int)(Math.random() * 6) + 1);
     }
 
     @Override

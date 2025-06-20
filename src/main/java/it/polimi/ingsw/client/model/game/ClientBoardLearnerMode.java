@@ -1,10 +1,9 @@
 package it.polimi.ingsw.client.model.game;
 
 import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.cards.ClientCard;
-import it.polimi.ingsw.client.model.events.CardPileLookedEvent;
+import it.polimi.ingsw.client.model.factory.ClientComponentFactory;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.client.model.player.ClientShipLearnerMode;
@@ -13,19 +12,26 @@ import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class ClientBoardLearnerMode extends ClientBoard {
 
     public ClientBoardLearnerMode(List<String> usernames) {
         super();
+
         List<ColorType> colors = Arrays.stream(ColorType.values()).toList();
         for (int i = 0; i < usernames.size(); i++) {
             ClientPlayer player = new ClientPlayer(usernames.get(i));
 
             ClientShip ship = new ClientShipLearnerMode();
             player.setShip(ship);
+
+            ClientComponentFactory componentFactory = new ClientComponentFactory();
+            this.commonComponents = new ArrayList<>(componentFactory.getComponents());
+            this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
             componentFactory.getStartingCabins().get(colors.get(i)).insertComponent(player, 2, 3, 0, true);
 
             this.startingDeck.add(player);
@@ -76,19 +82,19 @@ public class ClientBoardLearnerMode extends ClientBoard {
 
                 sb.append("\nPlayers in game:\n");
                 for (SimpleEntry<ClientPlayer, Integer> entry : players)
-                    sb.append("- ").append(entry.getKey().getUsername()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
+                    sb.append("- ").append(entry.getKey()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
 
                 if (!startingDeck.isEmpty()) {
                     sb.append("Starting deck:\n");
                     for (ClientPlayer player : startingDeck)
-                        sb.append("  ").append(player.getUsername()).append(" | ").append("$").append(player.getCredits()).append("\n");
+                        sb.append("  ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
                 }
             }
 
             case END -> {
                 sb.append("\nRanking:\n");
                 for (ClientPlayer player : getAllPlayers())
-                    sb.append("-  ").append(player.getUsername()).append(" $").append(player.getCredits()).append("\n");
+                    sb.append("-  ").append(player).append(" $").append(player.getCredits()).append("\n");
             }
         }
         return sb.toString();

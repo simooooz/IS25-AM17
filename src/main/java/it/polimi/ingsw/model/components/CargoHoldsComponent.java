@@ -4,9 +4,8 @@ import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.model.exceptions.GoodNotValidException;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.Ship;
-import it.polimi.ingsw.view.TUI.Chroma;
 
-public class CargoHoldsComponent extends SpecialCargoHoldsComponent {
+public final class CargoHoldsComponent extends SpecialCargoHoldsComponent {
 
     public CargoHoldsComponent(int id, ConnectorType[] connectors, int number) {
         super(id, connectors, number);
@@ -24,8 +23,20 @@ public class CargoHoldsComponent extends SpecialCargoHoldsComponent {
         super.unloadGood(good, ship);
     }
 
-    public String getColor() {
-        return Chroma.WHITE_BACKGROUND;
+    @Override
+    public <T> boolean matchesType(Class<T> type) {
+        return type == CargoHoldsComponent.class;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T castTo(Class<T> type) {
+        if (type == CargoHoldsComponent.class ||
+                type == SpecialCargoHoldsComponent.class ||
+                type.isAssignableFrom(this.getClass())) {
+            return (T) this;
+        }
+        throw new ClassCastException("Cannot cast CargoHoldsComponent to " + type.getName());
     }
 
 }

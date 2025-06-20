@@ -6,26 +6,26 @@ import java.util.List;
 public class ClientCannonFirePenaltyCombatZone extends ClientPenaltyCombatZone {
 
     @JsonProperty private List<ClientCannonFire> cannonFires;
-    // TODO mi servono??
-    @JsonProperty private int coord;
+    // TODO stampare coords e cannon index
+    @JsonProperty private List<Integer> coords;
     @JsonProperty private int cannonIndex;
 
     public ClientCannonFirePenaltyCombatZone() {}
 
     @Override
     public String toString() {
-        String fires = "";
+        StringBuilder fires = new StringBuilder();
         for (int i = 0; i <= cannonFires.size(); i++) {
             if (i == 0)
-                fires = fires + "\t   │\n";
+                fires.append("\t   │\n");
             else if (i == cannonFires.size())
-                fires = fires + "│       " + cannonFires.get(i-1).toString();
+                fires.append("│       ").append(cannonFires.get(i - 1).toString());
             else {
-                fires = fires + "│       " + cannonFires.get(i-1).toString() + "\t   │\n";
+                fires.append("│       ").append(cannonFires.get(i - 1).toString()).append("\t   │\n");
             }
         }
 
-        return fires;
+        return fires.toString();
     }
 
 }

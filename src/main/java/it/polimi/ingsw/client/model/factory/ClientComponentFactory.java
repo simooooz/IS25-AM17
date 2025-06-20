@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.model.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import it.polimi.ingsw.client.model.components.*;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -56,6 +57,7 @@ public class ClientComponentFactory {
 
     private JsonNode loadJsonConfig() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
         try {
             return objectMapper.readTree(new File("src/main/resources/factory.json"));
         } catch (IOException e) {

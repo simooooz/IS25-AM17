@@ -19,10 +19,6 @@ public class Time {
         this.hourglassPos = 3;
     }
 
-    public int getTimeLeft() {
-        return timeLeft;
-    }
-
     public int getHourglassPos() {
         return hourglassPos;
     }
@@ -43,7 +39,10 @@ public class Time {
                 if (timeLeft == 1) {
                     this.cancel();
                     if (hourglassPos == 0) {
-                        List<PlayerData> players = new ArrayList<>(model.getBoard().getStartingDeck());
+                        List<PlayerData> players = new ArrayList<>(model.getBoard().getStartingDeck())
+                                .stream()
+                                .filter(p -> !p.hasEndedInAdvance())
+                                .toList();
                         for (PlayerData player : players)
                             model.setReady(player.getUsername());
                     }

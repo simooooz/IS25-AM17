@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 
-public class EngineComponent extends Component {
+public final class EngineComponent extends Component {
 
     private DirectionType direction;
     private final boolean isDouble;
@@ -16,12 +16,12 @@ public class EngineComponent extends Component {
         this.isDouble = isDouble;
     }
 
-    public DirectionType getDirection() {
-        return direction;
-    }
-
     public boolean getIsDouble() {
         return isDouble;
+    }
+
+    public int calcPower() {
+        return isDouble ? 2 : 1;
     }
 
     @Override
@@ -36,8 +36,18 @@ public class EngineComponent extends Component {
         return super.checkComponent(ship) && (direction == DirectionType.SOUTH && ship.getDashboard(y+1, x).isEmpty());
     }
 
-    public int calcPower() {
-        return isDouble ? 2 : 1;
+    @Override
+    public <T> boolean matchesType(Class<T> type) {
+        return type == EngineComponent.class;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T castTo(Class<T> type) {
+        if (type == EngineComponent.class) {
+            return (T) this;
+        }
+        throw new ClassCastException("Cannot cast EngineComponent to " + type.getName());
     }
 
 }

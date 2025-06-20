@@ -37,10 +37,10 @@ public class AbandonedStationCard extends Card{
 
         for (PlayerData player : this.players)
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);
-        return autoCheckPlayers(model, board);
+        return autoCheckPlayers(model);
     }
 
-    private boolean autoCheckPlayers(ModelFacade model, Board board) {
+    private boolean autoCheckPlayers(ModelFacade model) {
         for (; playerIndex < this.players.size(); playerIndex++) {
             PlayerData player = this.players.get(playerIndex);
 
@@ -73,9 +73,9 @@ public class AbandonedStationCard extends Card{
         else if (commandType == PlayerState.WAIT_BOOLEAN) {
             model.setPlayerState(username, PlayerState.DONE);
             playerIndex++;
-            return autoCheckPlayers(model, board);
+            return autoCheckPlayers(model);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -87,9 +87,9 @@ public class AbandonedStationCard extends Card{
             board.movePlayer(player, days * -1);
 
             playerIndex++;
-            return autoCheckPlayers(model, board);
+            return autoCheckPlayers(model);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override

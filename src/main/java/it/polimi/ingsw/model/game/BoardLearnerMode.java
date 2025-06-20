@@ -1,8 +1,10 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.ModelFacade;
+import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.CardFactoryLearnerMode;
 import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.model.factory.ComponentFactory;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.player.ShipLearnerMode;
@@ -20,12 +22,16 @@ public class BoardLearnerMode extends Board {
 
             Ship ship = new ShipLearnerMode();
             player.setShip(ship);
+
+            ComponentFactory componentFactory = new ComponentFactory();
+            this.commonComponents = new ArrayList<>(componentFactory.getComponents());
+            this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
             componentFactory.getStartingCabins().get(colors.get(i)).insertComponent(player, 2, 3, 0, true);
 
             this.startingDeck.add(player);
         }
 
-        this.cardFactory = new CardFactoryLearnerMode();
+        CardFactory cardFactory = new CardFactoryLearnerMode();
         cardPile.addAll(cardFactory.getCards());
     }
 
@@ -40,11 +46,8 @@ public class BoardLearnerMode extends Board {
     }
 
     @Override
-    public void pickNewCard(ModelFacade model) {
-        for (PlayerData player : getPlayersByPos())
-            if (player.hasEndedInAdvance())
-                moveToStartingDeck(player);
-        super.pickNewCard(model);
+    public Map<String, Integer> getCardPilesWatchMap() {
+        throw new RuntimeException("Card piles aren't in learner mode flight");
     }
 
     @Override

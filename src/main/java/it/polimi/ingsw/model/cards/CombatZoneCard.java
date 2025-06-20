@@ -1,34 +1,31 @@
 package it.polimi.ingsw.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.ingsw.common.model.Pair;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.ModelFacade;
-import it.polimi.ingsw.model.cards.utils.CriteriaType;
-import it.polimi.ingsw.model.cards.utils.PenaltyCombatZone;
+import it.polimi.ingsw.model.cards.utils.WarLine;
 import it.polimi.ingsw.model.components.BatteryComponent;
 import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class CombatZoneCard extends Card {
 
-    @JsonProperty private final List<SimpleEntry<CriteriaType, PenaltyCombatZone>> warLines;
+    @JsonProperty private final List<WarLine> warLines;
     @JsonProperty private int warLineIndex;
     private int playerIndex;
-    @JsonProperty private final SimpleEntry<SimpleEntry<Character, Optional<PlayerData>>, Double> worst;
+    @JsonProperty private final Pair<Optional<String>, Double> worst;
 
-    public CombatZoneCard(int id, int level, boolean isLearner, List<SimpleEntry<CriteriaType, PenaltyCombatZone>> warLines) {
+    public CombatZoneCard(int id, int level, boolean isLearner, List<WarLine> warLines) {
         super(id, level, isLearner);
         this.warLines = warLines;
-
-        SimpleEntry<Character, Optional<PlayerData>> temp = new SimpleEntry<>('a', Optional.empty());
-        this.worst = new SimpleEntry<>(temp, 0.0);
+        this.worst = new Pair<>(Optional.empty(), 0.0);
     }
 
     @Override
@@ -50,7 +47,7 @@ public class CombatZoneCard extends Card {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
             PlayerData player = board.getPlayersByPos().get(playerIndex);
 
-            PlayerState newState = warLines.get(warLineIndex).getKey().countCriteria(player, worst);
+            PlayerState newState = warLines.get(warLineIndex).getCriteriaType().countCriteria(player, worst);
             model.setPlayerState(player.getUsername(), newState);
             if (newState != PlayerState.DONE)
                 return false;
@@ -62,14 +59,14 @@ public class CombatZoneCard extends Card {
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
-        if (hasDone && worst.getKey().getValue().isPresent()) { // Apply malus
-            PlayerState newState = warLines.get(warLineIndex).getValue().resolve(model, board, worst.getKey().getValue().get());
-            model.setPlayerState(worst.getKey().getValue().get().getUsername(), newState);
+        if (hasDone && worst.getKey().isPresent()) { // Apply malus
+            PlayerState newState = warLines.get(warLineIndex).getPenalty().resolve(model, board, worst.getKey().get());
+            model.setPlayerState(worst.getKey().get(), newState);
             if (newState == PlayerState.DONE)
-                worst.getKey().setValue(Optional.empty());
+                worst.setKey(Optional.empty());
         }
 
-        if (hasDone && worst.getKey().getValue().isEmpty()) { // Malus already applied, go to the next line
+        if (hasDone && worst.getKey().isEmpty()) { // Malus already applied, go to the next line
             warLineIndex++;
             if (warLineIndex >= warLines.size())
                 return true;
@@ -88,9 +85,8 @@ public class CombatZoneCard extends Card {
         if (commandType == PlayerState.WAIT_ENGINES) {
             model.setPlayerState(username, PlayerState.DONE);
 
-            if (worst.getKey().getValue().isEmpty() || worst.getValue() > value) { // Update worst
-                PlayerData player = board.getPlayerEntityByUsername(username);
-                worst.getKey().setValue(Optional.of(player));
+            if (worst.getKey().isEmpty() || worst.getValue() > value) { // Update worst
+                worst.setKey(Optional.of(username));
                 worst.setValue(value.doubleValue());
             }
 
@@ -98,27 +94,27 @@ public class CombatZoneCard extends Card {
             return autoCheckPlayers(model, board);
         }
         else if (commandType == PlayerState.WAIT_ROLL_DICES) {
-            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value, model, board, username);
+            warLines.get(warLineIndex).getPenalty().doCommandEffects(commandType, value, model, board, username);
 
             if (model.getPlayerState(username) == PlayerState.DONE) // If nested doCommandEffect has put state to DONE
-                worst.getKey().setValue(Optional.empty());
+                worst.setKey(Optional.empty());
 
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
     public boolean doCommandEffects(PlayerState commandType, Boolean value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_SHIELD) {
-            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, value, model, board, username);
+            warLines.get(warLineIndex).getPenalty().doCommandEffects(commandType, value, model, board, username);
 
             if (model.getPlayerState(username) == PlayerState.DONE) // If nested doCommandEffect has put state to DONE
-                worst.getKey().setValue(Optional.empty());
+                worst.setKey(Optional.empty());
 
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -126,37 +122,36 @@ public class CombatZoneCard extends Card {
         if (commandType == PlayerState.WAIT_CANNONS) {
             model.setPlayerState(username, PlayerState.DONE);
 
-            if (worst.getKey().getValue().isEmpty() || worst.getValue() > value) { // Update worst
-                PlayerData player = board.getPlayerEntityByUsername(username);
-                worst.getKey().setValue(Optional.of(player));
+            if (worst.getKey().isEmpty() || worst.getValue() > value) { // Update worst
+                worst.setKey(Optional.of(username));
                 worst.setValue(value);
             }
 
             playerIndex++;
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
     public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_REMOVE_CREW || commandType == PlayerState.WAIT_REMOVE_GOODS) {
-            worst.getKey().setValue(Optional.empty());
+            worst.setKey(Optional.empty());
             model.setPlayerState(username, PlayerState.DONE);
 
             return autoCheckPlayers(model, board);
         }
         else if (commandType == PlayerState.WAIT_SHIP_PART) {
-            warLines.get(warLineIndex).getValue().doCommandEffects(commandType, model, board, username);
+            warLines.get(warLineIndex).getPenalty().doCommandEffects(commandType, model, board, username);
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
     public void doSpecificCheck(PlayerState commandType, List<CabinComponent> cabins, int toRemove, String username, Board board) {
         if (commandType == PlayerState.WAIT_REMOVE_CREW) {
-            int num = warLines.get(warLineIndex).getValue().getPenaltyNumber();
+            int num = warLines.get(warLineIndex).getPenalty().getPenaltyNumber();
             super.doSpecificCheck(commandType, cabins, num, username, board);
         }
     }
@@ -164,7 +159,7 @@ public class CombatZoneCard extends Card {
     @Override
     public void doSpecificCheck(PlayerState commandType, int number, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
         if (commandType == PlayerState.WAIT_REMOVE_GOODS) {
-            int num = warLines.get(warLineIndex).getValue().getPenaltyNumber();
+            int num = warLines.get(warLineIndex).getPenalty().getPenaltyNumber();
             super.doSpecificCheck(commandType, num, deltaGood, batteries, username, board);
         }
     }

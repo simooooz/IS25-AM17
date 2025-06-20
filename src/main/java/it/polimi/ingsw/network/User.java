@@ -82,6 +82,8 @@ public class User {
         try {
             this.getCallback().notifyGameEvent(gameEvent.eventType(), gameEvent.getArgs());
         } catch (RemoteException e) {
+            System.out.println("[USER] Rmi callback remote exception: " + e.getMessage());
+            e.printStackTrace();
             // Error while notifying an update to a client
             // Just ignore it
         }

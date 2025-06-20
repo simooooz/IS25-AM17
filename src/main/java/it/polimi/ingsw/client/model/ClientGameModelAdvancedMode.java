@@ -10,22 +10,18 @@ import java.util.List;
 public class ClientGameModelAdvancedMode extends ClientGameModel {
 
     public ClientGameModelAdvancedMode(List<String> usernames) {
-        super(usernames);
+        super();
         this.board = new ClientBoardAdvancedMode(usernames);
     }
 
     @Override
     public void cardPileLooked(String username, int deckIndex) {
-        PlayerState.LOOK_CARD_PILE.getDeckIndex().put(username, deckIndex);
-
         ClientEventBus.getInstance().publish(new CardPileLookedEvent(username, deckIndex, null));
     }
 
     @Override
     public void cardPileLooked(String username, int deckIndex, List<ClientCard> cards) {
         board.getLookedCards().addAll(cards);
-        PlayerState.LOOK_CARD_PILE.getDeckIndex().put(username, deckIndex);
-
         ClientEventBus.getInstance().publish(new CardPileLookedEvent(username, deckIndex, board.getLookedCards()));
     }
 

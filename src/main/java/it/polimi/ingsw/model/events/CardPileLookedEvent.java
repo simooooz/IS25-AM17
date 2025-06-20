@@ -18,7 +18,7 @@ public record CardPileLookedEvent(String username, Integer deckIndex, List<Card>
 
     @Override
     public Object[] getArgs() {
-        return new Object[]{username, deckIndex, CardFactory.serializeCardList(cards)};
+        return new Object[]{username, deckIndex, cards == null ? cards : CardFactory.serializeCardList(cards)};
     }
 
 }

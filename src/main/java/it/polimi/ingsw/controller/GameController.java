@@ -3,10 +3,8 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.ModelFacadeAdvancedMode;
 import it.polimi.ingsw.model.ModelFacadeLearnerMode;
-import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.events.EventContext;
 import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -34,198 +32,172 @@ public class GameController {
         model = learnerMode ? new ModelFacadeLearnerMode(usernames) : new ModelFacadeAdvancedMode(usernames);
     }
 
-    public void startMatch() {
+    public synchronized void startMatch() {
         model.startMatch();
     }
 
-    public List<GameEvent> pickComponent(String username, int componentId) {
+    public synchronized List<GameEvent> pickComponent(String username, int componentId) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.pickComponent(username, componentId);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> releaseComponent(String username, int componentId) {
+    public synchronized List<GameEvent> releaseComponent(String username, int componentId) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.releaseComponent(username, componentId);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> reserveComponent(String username, int componentId) {
+    public synchronized List<GameEvent> reserveComponent(String username, int componentId) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.reserveComponent(username, componentId);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
+    public synchronized List<GameEvent> insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.insertComponent(username, componentId, row, col, rotations, weld);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> moveComponent(String username, int componentId, int row, int col, int rotations) {
+    public synchronized List<GameEvent> moveComponent(String username, int componentId, int row, int col, int rotations) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.moveComponent(username, componentId, row, col, rotations);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> rotateComponent(String username, int componentId, int num) {
+    public synchronized List<GameEvent> rotateComponent(String username, int componentId, int num) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        else if (model.isPlayerReady(username)) throw new RuntimeException("Player is ready");
 
         model.rotateComponent(username, componentId, num);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> lookCardPile(String username, int deckIndex) {
+    public synchronized List<GameEvent> lookCardPile(String username, int deckIndex) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-        else if (model.isPlayerReady(username)) throw new IllegalStateException("Player is already ready");
+
         model.lookCardPile(username, deckIndex);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> moveHourglass(String username) {
+    public synchronized List<GameEvent> moveHourglass(String username) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD && model.getPlayerState(username) != PlayerState.WAIT) throw new IllegalStateException("State is not BUILDING or WAIT");
+
         model.moveHourglass(username);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> setReady(String username) {
+    public synchronized List<GameEvent> setReady(String username) {
         EventContext.clear();
-        if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.releaseCardPile(username);
-        else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
+
         model.setReady(username);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> checkShip(String username, List<Integer> toRemove) {
+    public synchronized List<GameEvent> checkShip(String username, List<Integer> toRemove) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.CHECK) throw new IllegalStateException("State is not CHECKING");
+
         model.checkShip(username, toRemove);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> chooseAlien(String username, Map<Integer, AlienType> aliensIds) {
+    public synchronized List<GameEvent> chooseAlien(String username, Map<Integer, AlienType> aliensIds) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_ALIEN) throw new IllegalStateException("State is not WAIT_ALIEN");
+
         model.chooseAlien(username, aliensIds);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> chooseShipPart(String username, int partIndex) {
+    public synchronized List<GameEvent> chooseShipPart(String username, int partIndex) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_SHIP_PART) throw new IllegalStateException("State is not WAIT_SHIP_PART");
+
         model.chooseShipPart(username, partIndex);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> drawCard(String username) {
+    public synchronized List<GameEvent> drawCard(String username) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.DRAW_CARD) throw new IllegalStateException("State is not DRAW_CARD");
-        model.drawCard();
+
+        model.drawCard(username);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
+    public synchronized List<GameEvent> activateCannons(String username, List<Integer> batteriesIds, List<Integer> cannonComponentsIds) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_CANNONS) throw new IllegalStateException("State is not WAIT_CANNONS");
+
         model.activateCannons(username, batteriesIds, cannonComponentsIds);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
+    public synchronized List<GameEvent> activateEngines(String username, List<Integer> batteriesIds, List<Integer> engineComponentsIds) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_ENGINES) throw new IllegalStateException("State is not WAIT_ENGINES");
+
         model.activateEngines(username, batteriesIds, engineComponentsIds);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> activateShield(String username, Integer batteryId) {
+    public synchronized List<GameEvent> activateShield(String username, Integer batteryId) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_SHIELD) throw new IllegalStateException("State is not WAIT_SHIELD");
+
         model.activateShield(username, batteryId);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
+    public synchronized List<GameEvent> updateGoods(String username, Map<Integer, List<ColorType>> cargoHoldsIds, List<Integer> batteriesIds) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_GOODS && model.getPlayerState(username) != PlayerState.WAIT_REMOVE_GOODS) throw new IllegalStateException("State is not WAIT_GOODS or WAIT_REMOVE_GOODS");
+
         model.updateGoods(username, cargoHoldsIds, batteriesIds);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> removeCrew(String username, List<Integer> cabinsIds) {
+    public synchronized List<GameEvent> removeCrew(String username, List<Integer> cabinsIds) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_REMOVE_CREW) throw new IllegalStateException("State is not WAIT_REMOVE_CREW");
+
         model.removeCrew(username, cabinsIds);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> rollDices(String username, Integer value) {
+    public synchronized List<GameEvent> rollDices(String username) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_ROLL_DICES) throw new IllegalStateException("State is not WAIT_ROLL_DICES");
-        model.rollDices(username, value);
+
+        model.rollDices(username);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> getBoolean(String username, boolean value) {
+    public synchronized List<GameEvent> getBoolean(String username, boolean value) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_BOOLEAN) throw new IllegalStateException("State is not WAIT_BOOLEAN");
+
         model.getBoolean(username, value);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> getIndex(String username, Integer value) {
+    public synchronized List<GameEvent> getIndex(String username, Integer value) {
         EventContext.clear();
-        if (model.getPlayerState(username) != PlayerState.WAIT_INDEX) throw new IllegalStateException("State is not WAIT_INDEX");
+
         model.getIndex(username, value);
         return EventContext.getAndClear();
     }
 
-    public List<GameEvent> endFlight(String username) {
+    public synchronized List<GameEvent> endFlight(String username) {
         EventContext.clear();
         model.endFlight(username);
         return EventContext.getAndClear();
     }
 
-    public void leaveGame(String username) {
+    public synchronized void leaveGame(String username) {
         model.leaveGame(username);
     }
 
-    public void endGame() {
-        model.endGame();
+    public synchronized void rejoinGame(String username) {
+        model.rejoinGame(username);
     }
 
     // TEST only
-    public PlayerState getState(String username) {
-        return model.getPlayerState(username);
-    }
-
     public ModelFacade getModel() {
         return model;
     }
@@ -479,6 +451,7 @@ public class GameController {
                 model.pickComponent(usernames.get(2), 87);
                 model.insertComponent(usernames.get(2), 87, 4, 6, 0, true);
             }
+            case 2 -> {}
         }
         return EventContext.getAndClear();
     }

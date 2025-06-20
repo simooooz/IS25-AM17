@@ -15,9 +15,9 @@ public abstract class EnemiesCard extends Card {
 
     @JsonProperty protected final int days;
     @JsonProperty protected final int enemyFirePower;
+    @JsonProperty protected boolean enemiesDefeated;
 
     protected List<PlayerData> players;
-    @JsonProperty protected boolean enemiesDefeated;
     protected int playerIndex;
 
     public EnemiesCard(int id, int level, boolean isLearner, int days, int enemyFirePower) {
@@ -107,7 +107,7 @@ public abstract class EnemiesCard extends Card {
 
             return false;
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
 }
