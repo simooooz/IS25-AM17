@@ -7,6 +7,7 @@ import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
     public CannonFirePenaltyCombatZone(List<CannonFire> cannonFires) {
         this.cannonFires = cannonFires;
+        this.coords = new ArrayList<>();
     }
 
     @Override

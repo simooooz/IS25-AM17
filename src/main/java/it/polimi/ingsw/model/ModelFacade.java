@@ -347,7 +347,7 @@ public abstract class ModelFacade {
 
         Map<SpecialCargoHoldsComponent, List<ColorType>> cargoHolds = new HashMap<>();
         cargoHoldsIds.keySet().stream()
-                .filter(id -> board.getMapIdComponents().get(id) != null && board.getMapIdComponents().get(id).matchesType(SpecialCargoHoldsComponent.class))
+                .filter(id -> board.getMapIdComponents().get(id) != null && (board.getMapIdComponents().get(id).matchesType(SpecialCargoHoldsComponent.class) || board.getMapIdComponents().get(id).matchesType(CargoHoldsComponent.class)))
                 .forEach(id -> cargoHolds.put(board.getMapIdComponents().get(id).castTo(SpecialCargoHoldsComponent.class), cargoHoldsIds.get(id)));
 
         Card card = board.getCardPile().get(board.getCardPilePos());

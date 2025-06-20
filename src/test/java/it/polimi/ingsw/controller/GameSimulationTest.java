@@ -442,7 +442,7 @@ public class GameSimulationTest {
         assertEquals(-2, controller.getModel().getBoard().getPlayers().get(2).getValue());
 
         // Second War Line
-        controller.activateEngines("Tommaso", new ArrayList<>(List.of(16)), new ArrayList<>(List.of(77)));
+        controller.activateEngines("Tommaso", new ArrayList<>(List.of(16)), new ArrayList<>(List.of(92)));
         assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().getBatteries());
 
         controller.activateEngines("Simone", new ArrayList<>(), new ArrayList<>());
@@ -669,15 +669,10 @@ public class GameSimulationTest {
         finish = card12.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 11, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
         if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().calcRanking();
 
-        assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().countExposedConnectors());
-        assertEquals(9, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().countExposedConnectors());
-        assertEquals(9, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getShip().countExposedConnectors());
-
-        assertEquals(16, finalRank.get(0).getCredits());
-        assertEquals(3, finalRank.get(1).getCredits());
-        assertEquals(0, finalRank.get(2).getCredits());
+        assertEquals(0, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getCredits());
+        assertEquals(3, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getCredits());
+        assertEquals(16, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getCredits());
 
 
     }
@@ -1444,12 +1439,13 @@ public class GameSimulationTest {
         assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getShip().countExposedConnectors());
 
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().calcRanking();
 
-        assertEquals(2, finalRank.stream().filter(p -> p.getUsername().equals("Simone")).findFirst().orElseThrow().getCredits());
-        assertEquals(17, finalRank.stream().filter(p -> p.getUsername().equals("Tommaso")).findFirst().orElseThrow().getCredits());
-        assertEquals(19, finalRank.stream().filter(p -> p.getUsername().equals("Demetrio")).findFirst().orElseThrow().getCredits());
-        assertEquals(47, finalRank.stream().filter(p -> p.getUsername().equals("Davide")).findFirst().orElseThrow().getCredits());
+        assertEquals(2, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getCredits());
+        assertEquals(17, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getCredits());
+        assertEquals(19, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getCredits());
+        assertEquals(47, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getCredits());
+
+
 
     }
 

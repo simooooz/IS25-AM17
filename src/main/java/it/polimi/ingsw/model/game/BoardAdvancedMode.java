@@ -23,7 +23,9 @@ public class BoardAdvancedMode extends Board {
         super();
         this.cardPilesWatchMap = new HashMap<>();
         this.timeManagement = new Time();
-
+        ComponentFactory componentFactory = new ComponentFactory();
+        this.commonComponents = new ArrayList<>(componentFactory.getComponents());
+        this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
         List<ColorType> colors = Arrays.stream(ColorType.values()).toList();
         for (int i = 0; i < usernames.size(); i++) {
             PlayerData player = new PlayerData(usernames.get(i));
@@ -31,9 +33,6 @@ public class BoardAdvancedMode extends Board {
             Ship ship = new ShipAdvancedMode();
             player.setShip(ship);
 
-            ComponentFactory componentFactory = new ComponentFactory();
-            this.commonComponents = new ArrayList<>(componentFactory.getComponents());
-            this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
             componentFactory.getStartingCabins().get(colors.get(i)).insertComponent(player, 2, 3, 0, true);
 
             this.startingDeck.add(player);

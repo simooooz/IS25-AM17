@@ -143,6 +143,8 @@ class PiratesCardTest {
         board.getCardPile().clear();
         board.getCardPile().add(piratesCard);
         board.getCardPile().add(piratesCard);
+        StardustCard stardustCard = new StardustCard(0, 2, false);
+        board.getCardPile().add(stardustCard);
 
         controller.drawCard("Simone");
 

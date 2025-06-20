@@ -4,7 +4,6 @@ import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.cards.*;
 import it.polimi.ingsw.model.cards.utils.*;
 import it.polimi.ingsw.common.model.enums.ColorType;
-import it.polimi.ingsw.model.player.PlayerData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -579,12 +578,10 @@ public class LearnerModeGameSimulationTest {
 
         // Final Ranking
 
-        List<PlayerData> finalRank = controller.getModel().getBoard().calcRanking();
-
-        assertEquals(11, finalRank.stream().filter(p -> p.getUsername().equals("Simone")).findFirst().orElseThrow().getCredits());
-        assertEquals(9, finalRank.stream().filter(p -> p.getUsername().equals("Tommaso")).findFirst().orElseThrow().getCredits());
-        assertEquals(6, finalRank.stream().filter(p -> p.getUsername().equals("Demetrio")).findFirst().orElseThrow().getCredits());
-        assertEquals(5, finalRank.stream().filter(p -> p.getUsername().equals("Davide")).findFirst().orElseThrow().getCredits());
+        assertEquals(11, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getCredits());
+        assertEquals(9, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getCredits());
+        assertEquals(6, controller.getModel().getBoard().getPlayerEntityByUsername("Demetrio").getCredits());
+        assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Davide").getCredits());
 
 
     }
