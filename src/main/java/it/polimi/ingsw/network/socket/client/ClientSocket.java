@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.discovery.ServerInfo;
 import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.view.UserInterface;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -27,14 +28,14 @@ public class ClientSocket extends Client {
     private HeartbeatThread heartbeatThread;
     private ListenLoopOfClient listenLoop;
 
-    public ClientSocket() {
+    public ClientSocket(UserInterface ui) {
+        super(ui);
         this.connect();
 
         heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
         heartbeatThread.start();
 
         listenLoop = new ListenLoopOfClient(this);
-        this.viewTui.start();
     }
 
     private void connect() {
@@ -143,7 +144,7 @@ public class ClientSocket extends Client {
         try {
             message.execute(this);
         } catch (RuntimeException e) {
-            viewTui.displayError(e.getMessage());
+            ui.displayError(e.getMessage());
         }
     }
 

@@ -2,25 +2,18 @@ package it.polimi.ingsw.view.TUI;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.game.ClientBoard;
-import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.network.Client;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class DisplayUpdater {
+    
 
-    private final Client client;
-
-    public DisplayUpdater(Client client) {
-        this.client = client;
-    }
+    public DisplayUpdater() {}
 
     public void updateDisplay() {
-        switch (client.getState()) {
+        switch (ViewTui.getClientInstance().getState()) {
             case USERNAME:
                 System.out.print("Insert a username\n> ");
                 break;
@@ -37,11 +30,11 @@ public class DisplayUpdater {
     }
 
     private void displayLobbyInfo() {
-        System.out.println("✅ Lobby ID: " + client.getLobby().getGameID());
-        System.out.println((client.getLobby().isLearnerMode() ? "🔵" : "🟣").concat(" Game Mode: ".concat(client.getLobby().isLearnerMode() ? "Learner Flight" : "Standard")));
-        System.out.println("👥 " + client.getLobby().getPlayers().size() + "/" + client.getLobby().getMaxPlayers() + " players:");
+        System.out.println("✅ Lobby ID: " + ViewTui.getClientInstance().getLobby().getGameID());
+        System.out.println((ViewTui.getClientInstance().getLobby().isLearnerMode() ? "🔵" : "🟣").concat(" Game Mode: ".concat(ViewTui.getClientInstance().getLobby().isLearnerMode() ? "Learner Flight" : "Standard")));
+        System.out.println("👥 " + ViewTui.getClientInstance().getLobby().getPlayers().size() + "/" + ViewTui.getClientInstance().getLobby().getMaxPlayers() + " players:");
 
-        for (String player : client.getLobby().getPlayers()) {
+        for (String player : ViewTui.getClientInstance().getLobby().getPlayers()) {
             Chroma.println("- " + player, Chroma.GREY_BOLD);
         }
 
@@ -59,16 +52,16 @@ public class DisplayUpdater {
     }
 
     private void displayGame() {
-        PlayerState state = client.getGameController().getModel().getPlayerState(client.getUsername());
+        PlayerState state = ViewTui.getClientInstance().getGameController().getModel().getPlayerState(ViewTui.getClientInstance().getUsername());
 
-        ClientBoard board = client.getGameController().getModel().getBoard();
-        ClientShip ship = board.getPlayerEntityByUsername(client.getUsername()).getShip();
+        ClientBoard board = ViewTui.getClientInstance().getGameController().getModel().getBoard();
+        ClientShip ship = board.getPlayerEntityByUsername(ViewTui.getClientInstance().getUsername()).getShip();
 
         switch (state) {
 
             case BUILD, LOOK_CARD_PILE -> {
-                System.out.println(board.toString(client.getUsername(), state));
-                System.out.println(ship.toString(client.getUsername(), state));
+                System.out.println(board.toString(ViewTui.getClientInstance().getUsername(), state));
+                System.out.println(ship.toString(ViewTui.getClientInstance().getUsername(), state));
                 if (state == PlayerState.LOOK_CARD_PILE)
                     System.out.println(Constants.displayCards(board.getLookedCards(), 3));
 
@@ -77,8 +70,8 @@ public class DisplayUpdater {
                             "[pick <id>]                  - pick a component\n" +
                             "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
                             "[release <id>]               - release the picked component\n" +
-                            (client.getLobby().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
-                            (client.getLobby().isLearnerMode() ? "" : "[rotate-hourglass]           - rotate the hourglass\n") +
+                            (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
+                            (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[rotate-hourglass]           - rotate the hourglass\n") +
                             "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
                             "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
                             "[look-cards <id>]            - view specific card pile (0, 1 or 2)\n" +
@@ -90,7 +83,7 @@ public class DisplayUpdater {
             }
 
             case CHECK -> {
-                System.out.println(ship.toString(client.getUsername(), state));
+                System.out.println(ship.toString(ViewTui.getClientInstance().getUsername(), state));
 
                 Chroma.println("Oh no! Your ship is not valid :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
                 Chroma.println(
@@ -106,8 +99,8 @@ public class DisplayUpdater {
             }
 
             case WAIT_ALIEN -> {
-                System.out.println(board.toString(client.getUsername(), state));
-                System.out.println(ship.toString(client.getUsername(), state));
+                System.out.println(board.toString(ViewTui.getClientInstance().getUsername(), state));
+                System.out.println(ship.toString(ViewTui.getClientInstance().getUsername(), state));
 
                 Chroma.println("You might want to put aliens in your cabins!", Chroma.YELLOW_BOLD);
                 Chroma.println(
@@ -282,16 +275,16 @@ public class DisplayUpdater {
 
             case WAIT, DONE -> {
                 boolean inGame = board.getStartingDeck().stream()
-                        .noneMatch(p -> client.getGameController().getModel().getPlayerState(p.getUsername()) != PlayerState.END)
+                        .noneMatch(p -> ViewTui.getClientInstance().getGameController().getModel().getPlayerState(p.getUsername()) != PlayerState.END)
                         && board.getPlayersByPos().stream()
-                        .noneMatch(p -> client.getGameController().getModel().getPlayerState(p.getUsername()) == PlayerState.WAIT_ALIEN);
+                        .noneMatch(p -> ViewTui.getClientInstance().getGameController().getModel().getPlayerState(p.getUsername()) == PlayerState.WAIT_ALIEN);
 
                 if (inGame)
                     printGameInfo(board, ship, state);
 
                 Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                        (!inGame && !client.getLobby().isLearnerMode() ? "[rotate-hourglass]                 - rotate the hourglass\n" : "") +
+                        (!inGame && !ViewTui.getClientInstance().getLobby().isLearnerMode() ? "[rotate-hourglass]                 - rotate the hourglass\n" : "") +
                             "[ship <username>]                  - view <username>'s ship\n" +
                             "[q]                                - go back to the main menù",
                         Chroma.BLUE
@@ -317,12 +310,12 @@ public class DisplayUpdater {
     }
 
     private void printGameInfo(ClientBoard board, ClientShip ship, PlayerState state) {
-        System.out.println(board.toString(client.getUsername(), state));
-        System.out.println(ship.toString(client.getUsername(), state));
+        System.out.println(board.toString(ViewTui.getClientInstance().getUsername(), state));
+        System.out.println(ship.toString(ViewTui.getClientInstance().getUsername(), state));
 
         // TODO forse getAllPlayers()?
         if (board.getPlayers().stream()
-                .noneMatch(e -> client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.DRAW_CARD || client.getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.END)) {
+                .noneMatch(e -> ViewTui.getClientInstance().getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.DRAW_CARD || ViewTui.getClientInstance().getGameController().getModel().getPlayerState(e.getKey().getUsername()) == PlayerState.END)) {
             if (board.getCardPile().size() > 1) {
                 Chroma.println("\nPrevious card\tActual card", Chroma.GREY_BOLD);
                 System.out.println(Constants.displayCards(List.of(board.getCardPile().get(board.getCardPile().size()-2), board.getCardPile().getLast()), 2));
@@ -331,7 +324,7 @@ public class DisplayUpdater {
                 Chroma.println("\nActual card", Chroma.GREY_BOLD);
                 System.out.println(Constants.displayCards(List.of(board.getCardPile().getLast()), 1));
             }
-            board.getCardPile().getLast().printCardInfo(client.getGameController().getModel(), board);
+            board.getCardPile().getLast().printCardInfo(ViewTui.getClientInstance().getGameController().getModel(), board);
         }
         else if (!board.getCardPile().isEmpty()) {
             Chroma.println("Previous card", Chroma.GREY_BOLD);

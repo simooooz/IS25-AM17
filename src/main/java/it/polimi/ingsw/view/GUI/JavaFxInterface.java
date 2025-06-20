@@ -1,9 +1,8 @@
 package it.polimi.ingsw.view.GUI;
 
-import it.polimi.ingsw.client.model.components.ClientComponent;
+import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.Client;
-import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
@@ -19,6 +18,18 @@ public class JavaFxInterface extends Application implements UserInterface {
 
     private static Client client;
     private Parent root;
+
+    @Override
+    public void start() {
+        ClientEventBus.getInstance().subscribe(this);
+        Platform.startup(() -> {
+            try {
+                start(new Stage());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -38,10 +49,7 @@ public class JavaFxInterface extends Application implements UserInterface {
         // Crea il client passando questa interfaccia GUI e disabilitando l'avvio automatico della TUI
         new Thread(() -> {
             try {
-                client = new ClientSocket();
-                if (client == null) {
-                    Platform.runLater(() -> displayError("Errore durante l'inizializzazione del client"));
-                }
+                client = new ClientSocket(this);
             } catch (Exception e) {
                 Platform.runLater(() -> displayError("Errore durante la connessione: " + e.getMessage()));
             }
@@ -54,6 +62,7 @@ public class JavaFxInterface extends Application implements UserInterface {
 
     @Override
     public void onEvent(GameEvent event) {
+        System.out.println("aaaaa");
         Platform.runLater(() -> {
             MessageDispatcher.getInstance().dispatchMessage(event);
         });
