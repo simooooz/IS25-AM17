@@ -3,7 +3,6 @@ package it.polimi.ingsw.model.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import it.polimi.ingsw.model.components.*;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.AlienType;
@@ -12,6 +11,8 @@ import it.polimi.ingsw.common.model.enums.DirectionType;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
 
 public class ComponentFactory {
@@ -53,16 +54,37 @@ public class ComponentFactory {
         return startingCabins;
     }
 
-    private JsonNode loadJsonConfig() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new Jdk8Module());
+    protected JsonNode loadJsonConfig() {
+        ObjectMapper objectMapper = createObjectMapper();
+
         try {
-            return objectMapper.readTree(new File("src/main/resources/factory.json"));
+            InputStream configStream = getClass().getResourceAsStream("/factory.json");
+
+            if (configStream == null) {
+                throw new RuntimeException("Config file 'factory.json' not found in resources");
+            }
+
+            return objectMapper.readTree(configStream);
+
         } catch (IOException e) {
-            throw new RuntimeException("Unable to load config file");
+            throw new RuntimeException("Unable to parse config file", e);
         }
     }
 
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Prova a registrare JDK8 module se disponibile
+        try {
+            Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
+            // Se arriviamo qui, la classe esiste
+            objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
+        } catch (ClassNotFoundException e) {
+            // JDK8 module non disponibile, continua senza
+        }
+
+        return objectMapper;
+    }
     public Map<Integer, Component> getComponentsMap() {
         return new HashMap<>(componentsMap);
     }
