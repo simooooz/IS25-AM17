@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.enums.PlayerState;
@@ -13,6 +14,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -217,7 +219,7 @@ public abstract class Board {
 
     public abstract void startMatch(ModelFacade model);
 
-    public abstract void moveHourglass(String username, ModelFacade model);
+    public abstract void moveHourglass(String username, ModelFacade model, Consumer<List<GameEvent>> callback);
 
     public abstract int[] getBoardOrderPos();
 

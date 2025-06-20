@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.common.model.events.EventContext;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.common.model.events.game.*;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.enums.PlayerState;
@@ -19,6 +20,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public abstract class ModelFacade {
@@ -143,14 +145,14 @@ public abstract class ModelFacade {
         EventContext.emit(new CardPileReleasedEvent(username));
     }
 
-    public void moveHourglass(String username) {
+    public void moveHourglass(String username, Consumer<List<GameEvent>> callback) {
         if (getPlayerState(username) == PlayerState.LOOK_CARD_PILE) releaseCardPile(username);
         else if (
             getPlayerState(username) != PlayerState.BUILD &&
             (getPlayerState(username) != PlayerState.WAIT || board.getPlayerEntityByUsername(username).hasEndedInAdvance())
         ) throw new IllegalStateException("State is not BUILDING or WAIT");
 
-        board.moveHourglass(username, this);
+        board.moveHourglass(username, this, callback);
         EventContext.emit(new HourglassMovedEvent());
     }
 

@@ -158,7 +158,7 @@ public abstract class ServerBasis {
 
     public static void moveHourglass(User user) {
         if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        List<GameEvent> events = user.getGameController().moveHourglass(user.getUsername());
+        List<GameEvent> events = user.getGameController().moveHourglass(user.getUsername(), user::notifyEvents);
         user.notifyEvents(events);
     }
 

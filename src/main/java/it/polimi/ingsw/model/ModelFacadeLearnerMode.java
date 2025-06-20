@@ -1,9 +1,11 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.game.BoardLearnerMode;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ModelFacadeLearnerMode extends ModelFacade {
 
@@ -29,7 +31,7 @@ public class ModelFacadeLearnerMode extends ModelFacade {
     }
 
     @Override
-    public void moveHourglass(String username) {
+    public void moveHourglass(String username, Consumer<List<GameEvent>> callback) {
         throw new IllegalArgumentException("Match is in learner mode");
     }
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.CardFactoryAdvancedMode;
@@ -11,6 +12,7 @@ import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.player.ShipAdvancedMode;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class BoardAdvancedMode extends Board {
 
@@ -42,14 +44,14 @@ public class BoardAdvancedMode extends Board {
     }
 
     @Override
-    public void moveHourglass(String username, ModelFacade model) {
+    public void moveHourglass(String username, ModelFacade model, Consumer<List<GameEvent>> callback) {
         if (timeManagement.getHourglassPos() == 1)
             getPlayersByPos().stream()
                     .filter(player -> player.getUsername().equals(username))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("You can't rotate hourglass because you haven't finished to build your ship"));
 
-        timeManagement.startTimer(model);
+        timeManagement.startTimer(model, callback);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class BoardAdvancedMode extends Board {
 
     @Override
     public void startMatch(ModelFacade model) {
-        timeManagement.startTimer(model);
+        timeManagement.startTimer(model, (_) -> {});
     }
 
     @Override

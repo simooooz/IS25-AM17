@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.CardFactoryLearnerMode;
@@ -10,6 +11,7 @@ import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.model.player.ShipLearnerMode;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class BoardLearnerMode extends Board {
 
@@ -56,7 +58,7 @@ public class BoardLearnerMode extends Board {
     }
 
     @Override
-    public void moveHourglass(String username, ModelFacade model) {
+    public void moveHourglass(String username, ModelFacade model, Consumer<List<GameEvent>> callback) {
         throw new RuntimeException("Hourglass is not in learner mode flight");
     }
 

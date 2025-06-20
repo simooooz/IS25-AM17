@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * It creates via {@link ModelFacade} a game instance
@@ -85,10 +86,10 @@ public class GameController {
         return EventContext.getAndClear();
     }
 
-    public synchronized List<GameEvent> moveHourglass(String username) {
+    public synchronized List<GameEvent> moveHourglass(String username, Consumer<List<GameEvent>> callback) {
         EventContext.clear();
 
-        model.moveHourglass(username);
+        model.moveHourglass(username, callback);
         return EventContext.getAndClear();
     }
 

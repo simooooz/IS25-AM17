@@ -49,7 +49,7 @@ public class ClientBoardAdvancedMode extends ClientBoard {
 
     private void rotateHourglass() {
         if (hourglassPos > 0) {
-            timeLeft = 60;
+            timeLeft = 10;
             hourglassPos--;
         }
     }
