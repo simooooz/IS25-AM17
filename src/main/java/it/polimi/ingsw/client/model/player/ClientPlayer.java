@@ -1,5 +1,8 @@
 package it.polimi.ingsw.client.model.player;
 
+import it.polimi.ingsw.common.dto.PlayerDTO;
+import it.polimi.ingsw.view.TUI.Chroma;
+
 /**
  * Represents a read-only view of a player's state on the client side.
  */
@@ -16,6 +19,14 @@ public class ClientPlayer {
         this.credits = 0;
         this.endedInAdvance = false;
         this.leftMatch = false;
+    }
+
+    public ClientPlayer(PlayerDTO dto, ClientShip ship) {
+        this.username = dto.username;
+        this.credits = dto.credits;
+        this.endedInAdvance = dto.endedInAdvance;
+        this.leftMatch = dto.leftMatch;
+        this.ship = ship;
     }
 
     public String getUsername() {
@@ -48,6 +59,17 @@ public class ClientPlayer {
 
     public void setLeftMatch(boolean leftMatch) {
         this.leftMatch = leftMatch;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(username);
+        if (leftMatch)
+            sb.append(Chroma.color(" (left game)", Chroma.GREY_BOLD));
+        else if (endedInAdvance)
+            sb.append(Chroma.color(" (ended flight)", Chroma.GREY_BOLD));
+        return sb.toString();
     }
 
 }

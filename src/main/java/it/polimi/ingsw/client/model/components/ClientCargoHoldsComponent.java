@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.model.components;
 
 import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.common.dto.CargoHoldsComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.view.TUI.Chroma;
@@ -8,7 +9,7 @@ import it.polimi.ingsw.view.TUI.Chroma;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientCargoHoldsComponent extends ClientComponent {
+public final class ClientCargoHoldsComponent extends ClientComponent {
 
     private final int number;
     private final List<ColorType> goods;
@@ -19,13 +20,19 @@ public class ClientCargoHoldsComponent extends ClientComponent {
         this.goods = new ArrayList<>();
     }
 
+    public ClientCargoHoldsComponent(CargoHoldsComponentDTO dto) {
+        super(dto);
+        this.number = dto.number;
+        this.goods = dto.goods;
+    }
+
     public List<ColorType> getGoods() {
         return goods;
     }
 
     @Override
     public List<String> icon() {
-        String text = "";
+        String text;
         if (number == 2) {
             if (goods.size() == 1)
                 text = goods.getFirst().toString() + "   " + Chroma.color("   " , getColor());

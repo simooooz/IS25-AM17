@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.model.components;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
+import it.polimi.ingsw.common.dto.*;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 
@@ -17,13 +18,16 @@ import static it.polimi.ingsw.Constants.inTheMiddle;
  * This class and its subclasses are simple data containers without business logic.
  * Jackson annotations are used to handle polymorphism during deserialization.
  */
-public class ClientComponent {
+public sealed class ClientComponent permits
+    ClientBatteryComponent, ClientCabinComponent, ClientCannonComponent,
+    ClientCargoHoldsComponent, ClientEngineComponent, ClientOddComponent, ClientShieldComponent
+{
 
     private final int id;
     private ConnectorType[] connectors;
     private int x;
     private int y;
-    private boolean inserted; // TODO lo tengo per evitare che nella gui venga spostato?
+    private boolean inserted;
     private boolean shown;
 
     public ClientComponent(int id, ConnectorType[] connectors) {
@@ -31,6 +35,13 @@ public class ClientComponent {
         this.connectors = connectors;
         this.inserted = false;
         this.shown = false;
+    }
+
+    public ClientComponent(ComponentDTO dto) {
+        this.id = dto.id;
+        this.connectors = dto.connectors;
+        this.inserted = dto.inserted;
+        this.shown = dto.shown;
     }
 
     public int getId() {
@@ -75,6 +86,7 @@ public class ClientComponent {
     }
 
     public void rotateComponent(ClientPlayer player, int rotations) {
+        if (rotations % 4 == 0) return;
         ClientShip ship = player.getShip();
         if ((ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) && (ship.getComponentInHand().isEmpty() || !ship.getComponentInHand().get().equals(this)))
             throw new ComponentNotValidException("Component isn't in hand or in dashboard");
@@ -82,14 +94,8 @@ public class ClientComponent {
         if (inserted)
             throw new ComponentNotValidException("Component is already welded");
 
-        for (int i=0; i<(rotations % 4); i++) {
-            ConnectorType[] newConnectors = new ConnectorType[4];
-            newConnectors[0] = connectors[3];
-            newConnectors[1] = connectors[0];
-            newConnectors[2] = connectors[1];
-            newConnectors[3] = connectors[2];
-            connectors = newConnectors;
-        }
+        for (int i=0; i<(rotations % 4); i++)
+            rotateComponent();
     }
 
     public void moveComponent(ClientPlayer player, int row, int col, int rotations) {
@@ -132,11 +138,12 @@ public class ClientComponent {
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
         List<String> componentLines = new ArrayList<>();
+        String topBorder;
         if (!shown) {
-            String topBorder = " " + angles[0] + Constants.repeat(hBorder, 11) + angles[1] + " ";
+            topBorder = " " + angles[0] + Constants.repeat(hBorder, 11) + angles[1] + " ";
             componentLines.add(topBorder);
 
-            String leftBorder = "";
+            String leftBorder;
             leftBorder = " " + vBorder + inTheMiddle(String.valueOf(this.id), 11) + vBorder + " ";
             componentLines.add(leftBorder);
 
@@ -149,11 +156,10 @@ public class ClientComponent {
             String bottomBorder = " " + angles[2] + Constants.repeat(hBorder, 11) + angles[3] + " ";
             componentLines.add(bottomBorder);
 
-            return String.join("\n", componentLines);
         }
         else {
             // First row
-            String topBorder = " " + angles[0];
+            topBorder = " " + angles[0];
 
             if (connectors[0] == ConnectorType.EMPTY)
                 topBorder = topBorder + Constants.repeat(hBorder, 11) + angles[1] + " ";
@@ -239,8 +245,8 @@ public class ClientComponent {
                 bottomBorder = bottomBorder + hBorder + "┬" + Constants.repeat(hBorder, 3) + "┬" + Constants.repeat(hBorder, 3) + "┬" + hBorder + angles[3] + " ";
             componentLines.add(bottomBorder);
 
-            return String.join("\n", componentLines);
         }
+        return String.join("\n", componentLines);
     }
 
     public List<String> icon() {

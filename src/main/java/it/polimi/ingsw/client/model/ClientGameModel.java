@@ -5,12 +5,12 @@ import it.polimi.ingsw.client.model.components.ClientBatteryComponent;
 import it.polimi.ingsw.client.model.components.ClientCabinComponent;
 import it.polimi.ingsw.client.model.components.ClientCargoHoldsComponent;
 import it.polimi.ingsw.client.model.components.ClientComponent;
-import it.polimi.ingsw.client.model.events.CardPileLookedEvent;
 import it.polimi.ingsw.client.model.events.CardRevealedEvent;
 import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
 import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
+import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -19,13 +19,11 @@ import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Main class for the client-side model.
  * It holds a read-only representation of the game state and notifies the View of any changes.
  * This class is the single point of access for the UI to the game data.
- *
  * DIFFERENCES FROM SERVER MODEL:
  * - No business logic: It doesn't enforce game rules.
  * - Observable: It notifies observers (the View) when its state changes.
@@ -38,12 +36,14 @@ public abstract class ClientGameModel {
 
     protected ClientBoard board;
 
-    private final List<String> usernames;
     protected Map<String, PlayerState> playersState;
 
-    public ClientGameModel(List<String> usernames) {
-        this.usernames = usernames;
+    public ClientGameModel() {
         this.playersState = new HashMap<>();
+    }
+
+    public ClientGameModel(ModelDTO dto) {
+        this.playersState = dto.playersState;
     }
 
     public PlayerState getPlayerState(String username) {
@@ -137,8 +137,6 @@ public abstract class ClientGameModel {
 
     public void cardPileReleased(String username) {
         board.getLookedCards().clear();
-        PlayerState.LOOK_CARD_PILE.getDeckIndex().remove(username);
-
         ClientEventBus.getInstance().publish(new CardPileReleasedEvent(username));
     }
 
@@ -209,6 +207,17 @@ public abstract class ClientGameModel {
         board.getPlayerEntityByUsername(username).setEndedInAdvance(true);
 
         ClientEventBus.getInstance().publish(new FlightEndedEvent(username));
+    }
+
+    public void playerLeft(String username) {
+        ClientPlayer player = board.getPlayerEntityByUsername(username);
+        player.setEndedInAdvance(true);
+        player.setLeftMatch(true);
+    }
+
+    public void playerRejoined(String username) {
+        ClientPlayer player = board.getPlayerEntityByUsername(username);
+        player.setLeftMatch(false);
     }
 
     public void rotateComponent(String username, int componentId, int num) {

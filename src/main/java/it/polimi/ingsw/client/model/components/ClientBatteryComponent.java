@@ -1,11 +1,12 @@
 package it.polimi.ingsw.client.model.components;
 
+import it.polimi.ingsw.common.dto.BatteryComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientBatteryComponent extends ClientComponent {
+public final class ClientBatteryComponent extends ClientComponent {
 
     private final boolean isTriple;
     private int batteries;
@@ -14,6 +15,12 @@ public class ClientBatteryComponent extends ClientComponent {
         super(id, connectors);
         this.isTriple = isTriple;
         this.batteries = isTriple ? 3 : 2;
+    }
+
+    public ClientBatteryComponent(BatteryComponentDTO dto) {
+        super(dto);
+        this.isTriple = dto.isTriple;
+        this.batteries = dto.batteries;
     }
 
     public void setBatteries(int batteries) {
