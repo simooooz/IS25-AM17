@@ -3,7 +3,7 @@ package it.polimi.ingsw.client.model;
 import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.events.CardPileLookedEvent;
 import it.polimi.ingsw.client.model.game.ClientBoardAdvancedMode;
-import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.dto.ModelDTO;
 
 import java.util.List;
 
@@ -12,6 +12,11 @@ public class ClientGameModelAdvancedMode extends ClientGameModel {
     public ClientGameModelAdvancedMode(List<String> usernames) {
         super();
         this.board = new ClientBoardAdvancedMode(usernames);
+    }
+
+    public ClientGameModelAdvancedMode(ModelDTO dto) {
+        super(dto);
+        this.board = new ClientBoardAdvancedMode(dto.board);
     }
 
     @Override

@@ -11,18 +11,23 @@ import java.util.*;
  * Represents a read-only view of a player's ship on the client side.
  * Contains the grid of components and other ship-related data.
  */
-public abstract class ClientShip {
+public sealed abstract class ClientShip permits
+    ClientShipLearnerMode, ClientShipAdvancedMode
+{
 
     private final Optional<ClientComponent>[][] dashboard;
     private ClientComponent componentInHand;
     private final List<ClientComponent> discards;
     private final List<ClientComponent> reserves;
 
+    private final List<List<ClientComponent>> brokenParts;
+
     @SuppressWarnings("unchecked")
     public ClientShip() {
         this.dashboard = new Optional[Constants.SHIP_ROWS][Constants.SHIP_COLUMNS];
         this.discards = new ArrayList<>();
         this.reserves = new ArrayList<>();
+        this.brokenParts = new ArrayList<>();
         this.componentInHand = null;
 
         for (int row = 0; row < Constants.SHIP_ROWS; row++) {
@@ -74,6 +79,10 @@ public abstract class ClientShip {
         }
 
         return output.toString();
+    }
+
+    public List<List<ClientComponent>> getBrokenParts() {
+        return brokenParts;
     }
 
     private void printShip(StringBuilder output) {

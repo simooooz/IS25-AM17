@@ -10,6 +10,7 @@ import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
 import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
+import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -39,6 +40,10 @@ public abstract class ClientGameModel {
 
     public ClientGameModel() {
         this.playersState = new HashMap<>();
+    }
+
+    public ClientGameModel(ModelDTO dto) {
+        this.playersState = dto.playersState;
     }
 
     public PlayerState getPlayerState(String username) {
@@ -150,6 +155,18 @@ public abstract class ClientGameModel {
         ClientEventBus.getInstance().publish(new PlayersPositionUpdatedEvent(starting, players));
     }
 
+    public void shipBroken(String username, List<List<Integer>> parts) {
+        ClientShip ship = board.getPlayerEntityByUsername(username).getShip();
+
+        List<List<ClientComponent>> newParts = new ArrayList<>();
+        for (List<Integer> group : parts)
+            newParts.add(group.stream().map(c -> board.getMapIdComponents().get(c)).toList());
+
+        ship.getBrokenParts().clear();
+        ship.getBrokenParts().addAll(newParts);
+        ClientEventBus.getInstance().publish(new ShipBrokenEven(username, parts));
+    }
+
     public void cardRevealed(ClientCard card) {
         board.getCardPile().add(card);
 
@@ -206,6 +223,7 @@ public abstract class ClientGameModel {
 
     public void playerLeft(String username) {
         ClientPlayer player = board.getPlayerEntityByUsername(username);
+        player.setEndedInAdvance(true);
         player.setLeftMatch(true);
     }
 

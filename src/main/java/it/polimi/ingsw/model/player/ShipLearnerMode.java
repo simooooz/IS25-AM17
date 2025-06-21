@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.player;
 
-public class ShipLearnerMode extends Ship {
+public final class ShipLearnerMode extends Ship {
 
     public ShipLearnerMode() {
         super();

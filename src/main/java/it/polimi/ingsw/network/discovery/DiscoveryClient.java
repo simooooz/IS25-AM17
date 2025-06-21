@@ -15,20 +15,7 @@ public class DiscoveryClient {
         ServerInfo serverInfo = null;
 
         try {
-            DatagramSocket socket = new DatagramSocket();
-            socket.setBroadcast(true);
-            socket.setSoTimeout(Constants.DISCOVERY_TIMEOUT);
-
-            byte[] messageData = Constants.DISCOVERY_MESSAGE.getBytes();
-            List<InetAddress> broadcastAddresses = getBroadcastAddresses();
-
-            for (InetAddress broadcastAddress : broadcastAddresses) {
-                DatagramPacket packet = new DatagramPacket(
-                        messageData, messageData.length,
-                        broadcastAddress, Constants.DISCOVERY_PORT
-                );
-                socket.send(packet);
-            }
+            DatagramSocket socket = getDatagramSocket();
 
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < Constants.DISCOVERY_TIMEOUT) {
@@ -61,6 +48,24 @@ public class DiscoveryClient {
         }
 
         return serverInfo;
+    }
+
+    private static DatagramSocket getDatagramSocket() throws IOException {
+        DatagramSocket socket = new DatagramSocket();
+        socket.setBroadcast(true);
+        socket.setSoTimeout(Constants.DISCOVERY_TIMEOUT);
+
+        byte[] messageData = Constants.DISCOVERY_MESSAGE.getBytes();
+        List<InetAddress> broadcastAddresses = getBroadcastAddresses();
+
+        for (InetAddress broadcastAddress : broadcastAddresses) {
+            DatagramPacket packet = new DatagramPacket(
+                    messageData, messageData.length,
+                    broadcastAddress, Constants.DISCOVERY_PORT
+            );
+            socket.send(packet);
+        }
+        return socket;
     }
 
     private static List<InetAddress> getBroadcastAddresses() throws SocketException {

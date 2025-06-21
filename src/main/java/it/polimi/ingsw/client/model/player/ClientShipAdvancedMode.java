@@ -2,7 +2,7 @@ package it.polimi.ingsw.client.model.player;
 
 import it.polimi.ingsw.view.TUI.Chroma;
 
-public class ClientShipAdvancedMode extends ClientShip {
+public final class ClientShipAdvancedMode extends ClientShip {
 
     public ClientShipAdvancedMode() {
         super();

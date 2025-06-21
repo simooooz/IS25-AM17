@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.ClientGameModelAdvancedMode;
 import it.polimi.ingsw.client.model.ClientGameModelLearnerMode;
 import it.polimi.ingsw.client.model.cards.ClientCard;
+import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
@@ -17,6 +18,10 @@ public class ClientGameController {
 
     public ClientGameController(List<String> usernames, boolean learnerMode) {
         this.model = learnerMode ? new ClientGameModelLearnerMode(usernames) : new ClientGameModelAdvancedMode(usernames);
+    }
+
+    public ClientGameController(boolean learnerMode, ModelDTO dto) {
+        this.model = learnerMode ? new ClientGameModelLearnerMode(dto) : new ClientGameModelAdvancedMode(dto);
     }
 
     public void matchStarted() {
@@ -73,6 +78,10 @@ public class ClientGameController {
 
     public void cardRevealed(ClientCard card) {
         model.cardRevealed(card);
+    }
+
+    public void shipBroken(String username, List<List<Integer>> parts) {
+        model.shipBroken(username, parts);
     }
 
     public void batteriesUpdated(int id, int batteries) {

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.BatteryComponentDTO;
+import it.polimi.ingsw.common.dto.ComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.events.game.BatteriesUpdatedEvent;
 import it.polimi.ingsw.common.model.events.EventContext;
@@ -10,9 +12,11 @@ import it.polimi.ingsw.model.player.Ship;
 public final class BatteryComponent extends Component {
 
     private int batteries;
+    private final boolean isTriple;
 
     public BatteryComponent(int id, ConnectorType[] connectors, boolean isTriple) {
         super(id, connectors);
+        this.isTriple = isTriple;
         this.batteries = isTriple ? 3 : 2;
     }
 
@@ -51,6 +55,11 @@ public final class BatteryComponent extends Component {
             return (T) this;
         }
         throw new ClassCastException("Cannot cast BatteryComponent to " + type.getName());
+    }
+
+    @Override
+    public ComponentDTO toDTO() {
+        return new BatteryComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), isTriple, batteries);
     }
 
 }

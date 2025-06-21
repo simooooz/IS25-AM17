@@ -10,11 +10,12 @@ import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 
+import java.util.List;
 import java.util.Set;
 
 public sealed interface GameEvent permits
-        UniqueEvent, BatchStartedEvent, BatchEndedEvent,
-        MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent,
+        UniqueEvent, BatchStartedEvent, BatchEndedEvent, SyncAllEvent,
+        MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent, ShipBrokenEven,
         ComponentReleasedEvent, ComponentReservedEvent, ComponentRotatedEvent, ComponentDestroyedEvent,
         HourglassMovedEvent, CardPileLookedEvent, CardPileReleasedEvent, CardRevealedEvent, CardUpdatedEvent,
         it.polimi.ingsw.client.model.events.CardPileLookedEvent, it.polimi.ingsw.client.model.events.CardRevealedEvent, it.polimi.ingsw.client.model.events.CardUpdatedEvent,
@@ -25,7 +26,7 @@ public sealed interface GameEvent permits
     EventVisibility getVisibility();
     Object[] getArgs();
 
-    default Set<String> getTargetPlayers() { return Set.of(); }; // Only for SPECIFIC_PLAYERS visibility
+    default List<String> getTargetPlayers() { return List.of(); }; // Only for SPECIFIC_PLAYERS visibility
 
     default String getUniqueKey() { return null; }
 

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.CargoHoldsComponentDTO;
+import it.polimi.ingsw.common.dto.ComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.events.EventContext;
 import it.polimi.ingsw.common.model.events.game.GoodsUpdatedEvent;
@@ -64,6 +66,11 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
             return (T) this;
         }
         throw new ClassCastException("Cannot cast " + this.getClass().getName() + " to " + type.getName());
+    }
+
+    @Override
+    public ComponentDTO toDTO() {
+        return new CargoHoldsComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), number, goods);
     }
 
 }

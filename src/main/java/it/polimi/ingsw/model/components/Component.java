@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.ComponentDTO;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.events.EventContext;
@@ -12,6 +13,7 @@ import it.polimi.ingsw.model.player.Ship;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public sealed class Component permits
@@ -246,7 +248,14 @@ public sealed class Component permits
     public PlayerState destroyComponent(PlayerData player) {
         affectDestroy(player);
         List<List<Component>> groups = player.getShip().calcShipParts();
-        return groups.size() > 1 ? PlayerState.WAIT_SHIP_PART : PlayerState.DONE;
+        if (groups.size() > 1) {
+            List<List<Integer>> newGroups = new ArrayList<>();
+            for (List<Component> group : groups)
+                newGroups.add(group.stream().map(Component::getId).collect(Collectors.toList()));
+            EventContext.emit(new ShipBrokenEven(player.getUsername(), newGroups));
+            return PlayerState.WAIT_SHIP_PART;
+        }
+        return PlayerState.DONE;
     }
 
     public int getX() {
@@ -261,8 +270,19 @@ public sealed class Component permits
         return id;
     }
 
+    public boolean isInserted() {
+        return inserted;
+    }
+
+    public boolean isShown() {
+        return shown;
+    }
+
     public <T> boolean matchesType(Class<T> type) {
-        return type == Component.class;
+        if (type.isInstance(this)) {
+            return true;
+        }
+        return type == Component.class || type.isAssignableFrom(this.getClass());
     }
 
     @SuppressWarnings("unchecked")
@@ -271,6 +291,10 @@ public sealed class Component permits
             return (T) this;
         }
         throw new ClassCastException("Cannot cast " + this.getClass().getName() + " to " + type.getName());
+    }
+
+    public ComponentDTO toDTO() {
+        return new ComponentDTO(id, connectors, x, y, inserted, shown);
     }
 
 }

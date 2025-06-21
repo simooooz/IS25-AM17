@@ -1,9 +1,11 @@
 package it.polimi.ingsw.client.model.game;
 
 import it.polimi.ingsw.client.model.ClientGameModel;
+import it.polimi.ingsw.client.model.factory.ClientCardFactory;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.components.ClientComponent;
+import it.polimi.ingsw.common.dto.BoardDTO;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 
@@ -28,6 +30,10 @@ public abstract class ClientBoard {
         this.startingDeck = new ArrayList<>();
         this.players = new ArrayList<>();
         this.cardPile = new ArrayList<>();
+    }
+
+    public ClientBoard(BoardDTO dto) {
+        this.cardPile = ClientCardFactory.deserializeCardList(dto.cardPile);
     }
 
     public Map<Integer, ClientComponent> getMapIdComponents() {

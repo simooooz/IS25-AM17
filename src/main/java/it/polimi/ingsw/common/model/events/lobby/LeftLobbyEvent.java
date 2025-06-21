@@ -17,8 +17,8 @@ public record LeftLobbyEvent(String username, List<String> playersNotify) implem
     public EventVisibility getVisibility() { return EventVisibility.SPECIFIC_PLAYERS; }
 
     @Override
-    public Set<String> getTargetPlayers() {
-        return new HashSet<>(playersNotify);
+    public List<String> getTargetPlayers() {
+        return playersNotify;
     }
 
     @Override

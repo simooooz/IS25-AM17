@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.model.components;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
+import it.polimi.ingsw.common.dto.*;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 
@@ -17,7 +18,10 @@ import static it.polimi.ingsw.Constants.inTheMiddle;
  * This class and its subclasses are simple data containers without business logic.
  * Jackson annotations are used to handle polymorphism during deserialization.
  */
-public class ClientComponent {
+public sealed class ClientComponent permits
+    ClientBatteryComponent, ClientCabinComponent, ClientCannonComponent,
+    ClientCargoHoldsComponent, ClientEngineComponent, ClientOddComponent, ClientShieldComponent
+{
 
     private final int id;
     private ConnectorType[] connectors;
@@ -31,6 +35,13 @@ public class ClientComponent {
         this.connectors = connectors;
         this.inserted = false;
         this.shown = false;
+    }
+
+    public ClientComponent(ComponentDTO dto) {
+        this.id = dto.id;
+        this.connectors = dto.connectors;
+        this.inserted = dto.inserted;
+        this.shown = dto.shown;
     }
 
     public int getId() {

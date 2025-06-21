@@ -1,12 +1,16 @@
 package it.polimi.ingsw.network.rmi;
 
+import it.polimi.ingsw.client.controller.ClientGameController;
 import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.factory.ClientCardFactory;
 import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.dto.GameStateDTOFactory;
+import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -30,6 +34,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
     public void notifyGameEvent(MessageType eventType, Object... args) throws RemoteException {
         System.out.println("[CLIENT CALLBACK] Received call notifyGameEvent " + eventType);
         switch (eventType) {
+            case ERROR -> ClientEventBus.getInstance().publish(new GameErrorEvent((String) args[0]));
             case BATCH_START -> ClientEventBus.getInstance().startBatch();
             case BATCH_END -> ClientEventBus.getInstance().endBatch();
 
@@ -57,6 +62,13 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
                 client.getLobby().initGame();
                 client.setState(UserState.IN_GAME);
             }
+            case SYNC_ALL_EVENT -> {
+                ModelDTO dto = GameStateDTOFactory.deserializeDTO((String) args[0]);
+
+                ClientLobby lobby = client.getLobby();
+                lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
+                client.setState(UserState.IN_GAME);
+            }
             case FLIGHT_ENDED_EVENT -> client.getGameController().flightEnded((String) args[0]);
             case PLAYERS_STATE_UPDATED_EVENT -> client.getGameController().playersStateUpdated((Map<String, PlayerState>) args[0]);
             case COMPONENT_PICKED_EVENT -> client.getGameController().componentPicked((String) args[0], (Integer) args[1]);
@@ -76,6 +88,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             }
             case CARD_PILE_RELEASED_EVENT -> client.getGameController().cardPileReleased((String) args[0]);
             case HOURGLASS_MOVED_EVENT -> client.getGameController().hourglassMoved();
+            case SHIP_BROKEN_EVENT -> client.getGameController().shipBroken((String) args[0], (List<List<Integer>>) args[1]);
             case PLAYERS_POSITION_UPDATED_EVENT -> client.getGameController().playersPositionUpdated((List<String>) args[0], (List<AbstractMap.SimpleEntry<String, Integer>>) args[1]);
             case CARD_REVEALED_EVENT -> {
                 ClientCard card = ClientCardFactory.deserializeCard((String) args[0]);

@@ -48,7 +48,7 @@ public class ClientSocket extends Client {
                 this.socket = new Socket(serverInfo.ipAddress, serverInfo.socketPort);
                 this.output = new ObjectOutputStream(socket.getOutputStream());
                 this.input = new ObjectInputStream(socket.getInputStream());
-                this.socket.setSoTimeout(Constants.SOCKET_TIMEOUT);
+                this.socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
                 break;
 
             } catch (ClientException | IOException e) {

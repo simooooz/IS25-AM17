@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.model.components;
 
 import it.polimi.ingsw.client.model.player.ClientPlayer;
+import it.polimi.ingsw.common.dto.ShieldComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 import it.polimi.ingsw.view.TUI.Chroma;
@@ -8,13 +9,18 @@ import it.polimi.ingsw.view.TUI.Chroma;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientShieldComponent extends ClientComponent {
+public final class ClientShieldComponent extends ClientComponent {
 
     private final DirectionType[] directionsProtected;
 
     public ClientShieldComponent(int id, ConnectorType[] connectors, DirectionType[] directionsProtected) {
         super(id, connectors);
         this.directionsProtected = directionsProtected;
+    }
+
+    public ClientShieldComponent(ShieldComponentDTO dto) {
+        super(dto);
+        this.directionsProtected = dto.directionsProtected;
     }
 
     @Override

@@ -47,17 +47,13 @@ public class ClientHandler extends User {
             this.output.flush();
         } catch (IOException e) {
             Server.getInstance().closeConnection(connectionCode);
-            throw new ServerException("[CLIENT CONNECTION] Error while sending object");
         }
     }
 
     public Object readObject() throws ServerException {
         try {
-            Object obj = input.readObject();
-            if (obj == null)
-                throw new ServerException();
-            return obj;
-        } catch (IOException | ClassNotFoundException | ServerException e) {
+            return input.readObject();
+        } catch (IOException | ClassNotFoundException e) {
             Server.getInstance().closeConnection(connectionCode);
             throw new ServerException("[CLIENT CONNECTION] Object is null or could not be read");
         }
@@ -71,7 +67,6 @@ public class ClientHandler extends User {
             sendObject(message);
         } catch (ServerException e) {
             e.printStackTrace();
-            System.err.println("[CLIENT HANDLER] Error while sending message: " + e.getMessage());
             // Everything should be closed
         }
     }
@@ -90,6 +85,7 @@ public class ClientHandler extends User {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     public void close() {
         if (this.socket == null) return; // Already closed
 

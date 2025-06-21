@@ -1,12 +1,16 @@
 package it.polimi.ingsw.network.messages;
 
+import it.polimi.ingsw.client.controller.ClientGameController;
 import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.factory.ClientCardFactory;
 import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.dto.GameStateDTOFactory;
+import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
@@ -20,7 +24,13 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public enum MessageType {
 
-    ERROR,
+    ERROR {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            ClientEventBus.getInstance().publish(new GameErrorEvent(castedMessage.getArg1()));
+        }
+    },
 
     BATCH_START {
         @Override
@@ -111,6 +121,18 @@ public enum MessageType {
                 client.setLobby(null);
                 client.setState(UserState.LOBBY_SELECTION);
             }
+        }
+    },
+
+    SYNC_ALL_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            ModelDTO dto = GameStateDTOFactory.deserializeDTO(castedMessage.getArg1());
+
+            ClientLobby lobby = client.getLobby();
+            lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
+            client.setState(UserState.IN_GAME);
         }
     },
 
@@ -308,6 +330,14 @@ public enum MessageType {
         }
     },
 
+    SHIP_BROKEN_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, List<List<Integer>>> castedMessage = (DoubleArgMessage<String, List<List<Integer>>>) message;
+            client.getGameController().shipBroken(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
     PLAYERS_POSITION_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -327,7 +357,7 @@ public enum MessageType {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            ClientCard card = ClientCardFactory.deserializeCard(castedMessage.getArg1()); // TODO spostare dalla factory ad un metodo nel network
+            ClientCard card = ClientCardFactory.deserializeCard(castedMessage.getArg1());
             client.getGameController().cardRevealed(card);
         }
     },

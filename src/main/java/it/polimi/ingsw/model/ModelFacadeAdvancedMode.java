@@ -38,7 +38,7 @@ public class ModelFacadeAdvancedMode extends ModelFacade {
         }
 
         if (phaseDone)
-            playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+            board.pickNewCard(this);
     }
 
 }

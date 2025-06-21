@@ -3,10 +3,13 @@ package it.polimi.ingsw.client.model.game;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.cards.ClientCard;
+import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.client.model.factory.ClientComponentFactory;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.client.model.player.ClientShipAdvancedMode;
+import it.polimi.ingsw.common.dto.BoardDTO;
+import it.polimi.ingsw.common.dto.GameStateDTOFactory;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.view.TUI.Chroma;
@@ -43,6 +46,56 @@ public class ClientBoardAdvancedMode extends ClientBoard {
         }
     }
 
+    public ClientBoardAdvancedMode(BoardDTO dto) {
+        super(dto);
+
+        this.timeLeft = dto.timeLeft;
+        this.hourglassPos = dto.hourglassPos;
+
+        this.timer = new Timer();
+        if (timeLeft > 0) startTimer();
+
+        this.lookedCards = new ArrayList<>();
+        this.mapIdComponents = new HashMap<>();
+        for (Integer id : dto.mapIdComponents.keySet()) {
+            ClientComponent component = GameStateDTOFactory.componentFromDTO(dto.mapIdComponents.get(id));
+            this.mapIdComponents.put(id, component);
+        }
+
+        this.commonComponents = dto.commonComponents.stream().map(id -> this.mapIdComponents.get(id)).toList();
+
+        this.startingDeck = dto.startingDeck.stream().map(e -> {
+            ClientShip ship = new ClientShipAdvancedMode();
+            if (e.ship.componentInHand != null)
+                ship.setComponentInHand(mapIdComponents.get(e.ship.componentInHand));
+            for (Integer discard : e.ship.discards)
+                ship.getDiscards().add(mapIdComponents.get(discard));
+            for (Integer reserve : e.ship.reserves)
+                ship.getReserves().add(mapIdComponents.get(reserve));
+            for (int i = 0; i < e.ship.dashboard.length; i++)
+                for (int j = 0; j < e.ship.dashboard[i].length; j++)
+                    ship.getDashboard()[i][j] = e.ship.dashboard[i][j] == null ? Optional.empty() : Optional.of(mapIdComponents.get(e.ship.dashboard[i][j]));
+
+            return new ClientPlayer(e, ship);
+        }).toList();
+
+        this.players = dto.players.stream().map(e -> {
+            ClientShip ship = new ClientShipAdvancedMode();
+            if (e.player.ship.componentInHand != null)
+                ship.setComponentInHand(mapIdComponents.get(e.player.ship.componentInHand));
+            for (Integer discard : e.player.ship.discards)
+                ship.getDiscards().add(mapIdComponents.get(discard));
+            for (Integer reserve : e.player.ship.reserves)
+                ship.getReserves().add(mapIdComponents.get(reserve));
+            for (int i = 0; i < e.player.ship.dashboard.length; i++)
+                for (int j = 0; j < e.player.ship.dashboard[i].length; j++)
+                    ship.getDashboard()[i][j] = e.player.ship.dashboard[i][j] == null ? Optional.empty() : Optional.of(mapIdComponents.get(e.player.ship.dashboard[i][j]));
+
+            return new SimpleEntry<>(new ClientPlayer(e.player, ship), e.position);
+        }).toList();
+
+    }
+
     @Override
     public List<ClientCard> getLookedCards() {
         return lookedCards;
@@ -56,8 +109,6 @@ public class ClientBoardAdvancedMode extends ClientBoard {
     }
 
     private void startTimer() {
-        rotateHourglass();
-
         TimerTask currentTask = new TimerTask() {
             public void run() {
                 if (timeLeft == 1)
@@ -70,12 +121,14 @@ public class ClientBoardAdvancedMode extends ClientBoard {
 
     @Override
     public void moveHourglass() {
+        rotateHourglass();
         startTimer();
     }
 
     @Override
     public void startMatch(ClientGameModel model) {
         this.hourglassPos = 3;
+        rotateHourglass();
         startTimer();
     }
 
@@ -95,13 +148,8 @@ public class ClientBoardAdvancedMode extends ClientBoard {
                     sb.append("- ").append(player.getUsername()).append(Chroma.color(" not ready\n", Chroma.RED));
                 for (SimpleEntry<ClientPlayer, Integer> entry : players)
                     sb.append("- ").append(entry.getKey().getUsername()).append(Chroma.color(" READY\n", Chroma.GREEN));
-
-                List<String> left = startingDeck.stream().filter(ClientPlayer::hasEndedInAdvance).map(ClientPlayer::getUsername).toList();
-                if (!left.isEmpty()) {
-                    sb.append("\nPlayers left:\n");
-                    for (String player : left)
-                        sb.append("- ").append(Chroma.color(player, Chroma.BLACK_BOLD));
-                }
+                for (ClientPlayer player : startingDeck.stream().filter(ClientPlayer::hasEndedInAdvance).toList())
+                    sb.append("- ").append(player).append("\n");
             }
 
             case DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, WAIT_SHIP_PART, DONE -> {
@@ -113,16 +161,16 @@ public class ClientBoardAdvancedMode extends ClientBoard {
                     sb.append("- ").append(entry.getKey()).append(" | ").append("flight days: ").append(entry.getValue()).append(" | ").append("$").append(entry.getKey().getCredits()).append("\n");
 
                 if (!startingDeck.isEmpty()) {
-                    sb.append("Starting deck:\n");
+                    sb.append("\nStarting deck:\n");
                     for (ClientPlayer player : startingDeck)
-                        sb.append("  ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
+                        sb.append("- ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
                 }
             }
 
             case END -> {
                 sb.append("\nRanking:\n");
                 for (ClientPlayer player : getAllPlayers())
-                    sb.append("-  ").append(player).append(" $").append(player.getCredits()).append("\n");
+                    sb.append("- ").append(player).append(" $").append(player.getCredits()).append("\n");
             }
         }
         return sb.toString();

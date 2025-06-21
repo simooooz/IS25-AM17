@@ -12,7 +12,7 @@ public abstract class Constants {
     public static final int DEFAULT_RMI_PORT = 1099;
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final int HEARTBEAT_INTERVAL = 2000;
-    public static final int SOCKET_TIMEOUT = 4000;
+    public static final int NETWORK_TIMEOUT = 4000;
 
     public static final int DISCOVERY_PORT = 4040;
     public static final String DISCOVERY_MESSAGE = "GALAXY_TRUCKER_SERVER_DISCOVERY";
@@ -137,7 +137,6 @@ public abstract class Constants {
             case 2 -> message = new DoubleArgMessage<>(gameEvent, args[0], args[1]);
             case 3 -> message = new TripleArgMessage<>(gameEvent, args[0], args[1], args[2]);
             case 4 -> message = new QuadrupleArgMessage<>(gameEvent, args[0], args[1], args[2], args[3]);
-            case 5 -> message = new QuintupleArgMessage<>(gameEvent, args[0], args[1], args[2], args[3], args[4]);
             default -> message = new ErrorMessage("Unknown message");
         }
         return message;

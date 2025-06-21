@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.model.components;
 
 import it.polimi.ingsw.client.model.player.ClientPlayer;
+import it.polimi.ingsw.common.dto.CannonComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 import it.polimi.ingsw.view.TUI.Chroma;
@@ -8,7 +9,7 @@ import it.polimi.ingsw.view.TUI.Chroma;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientCannonComponent extends ClientComponent {
+public final class ClientCannonComponent extends ClientComponent {
 
     private DirectionType direction;
     private final boolean isDouble;
@@ -17,6 +18,12 @@ public class ClientCannonComponent extends ClientComponent {
         super(id, connectors);
         this.direction = direction;
         this.isDouble = isDouble;
+    }
+
+    public ClientCannonComponent(CannonComponentDTO dto) {
+        super(dto);
+        this.direction = dto.direction;
+        this.isDouble = dto.isDouble;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.common.dto.BoardDTO;
+import it.polimi.ingsw.common.dto.GameStateDTOFactory;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
@@ -9,6 +11,7 @@ import it.polimi.ingsw.common.model.events.game.PlayersPositionUpdatedEvent;
 import it.polimi.ingsw.common.model.events.EventContext;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.player.PlayerData;
 
 
@@ -35,7 +38,7 @@ public abstract class Board {
         this.players = new ArrayList<>();
 
         this.cardPile = new ArrayList<>();
-        this.cardPilePos = 0;
+        this.cardPilePos = -1;
     }
 
     public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
@@ -211,6 +214,23 @@ public abstract class Board {
         return players.stream()
                 .sorted(Comparator.comparingInt(PlayerData::getCredits).reversed())
                 .toList();
+    }
+
+    public BoardDTO toDto() {
+        BoardDTO boardDTO = new BoardDTO();
+
+        boardDTO.mapIdComponents = mapIdComponents.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toDTO()));
+        boardDTO.commonComponents = commonComponents.stream()
+                .map(Component::getId).toList();
+        boardDTO.players = players.stream()
+                .map(GameStateDTOFactory::createPlayerPositionDTO).toList();
+        boardDTO.startingDeck = startingDeck.stream()
+                .map(GameStateDTOFactory::createPlayerDTO).toList();
+        boardDTO.cardPile = CardFactory.serializeCardList(cardPile.stream()
+                .limit(cardPilePos).toList());
+
+        return boardDTO;
     }
 
     public abstract Map<String, Integer> getCardPilesWatchMap();

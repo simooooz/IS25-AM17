@@ -8,7 +8,6 @@ import it.polimi.ingsw.common.model.events.EventVisibility;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.common.model.enums.LobbyState;
-import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.rmi.ClientCallbackInterface;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 
@@ -60,7 +59,7 @@ public class User {
 
     public void notifyGameEvent(GameEvent gameEvent) {
         List<String> playersToNotify = new ArrayList<>();
-        if (gameEvent.getVisibility() == EventVisibility.ALL_PLAYERS || gameEvent.getVisibility() == EventVisibility.OTHER_PLAYERS)
+        if ((gameEvent.getVisibility() == EventVisibility.ALL_PLAYERS || gameEvent.getVisibility() == EventVisibility.OTHER_PLAYERS) && lobby != null)
             playersToNotify.addAll(lobby.getPlayers());
         else if (gameEvent.getVisibility() == EventVisibility.PLAYER_ONLY)
             playersToNotify.add(username);
@@ -163,10 +162,13 @@ public class User {
     }
 
     public static void removeUser(User user) {
+        synchronized (activeUsers) {
+            if (!activeUsers.contains(user)) return;
+        }
+
         if (user.lobby != null) {
             List<GameEvent> events = MatchController.getInstance().leaveGame(user.getUsername());
             if (user.lobby.getState() == LobbyState.IN_GAME) { // Player was gaming, add to inactive users
-                System.out.println("Disconnesso dal gioco " + user.getUsername());
                 synchronized (inactiveUsers) {
                     inactiveUsers.add(user);
                 }

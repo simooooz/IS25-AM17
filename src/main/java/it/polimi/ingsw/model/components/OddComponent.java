@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.ComponentDTO;
+import it.polimi.ingsw.common.dto.OddComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.model.player.PlayerData;
@@ -58,6 +60,11 @@ public final class OddComponent extends Component {
             return (T) this;
         }
         throw new ClassCastException("Cannot cast OddComponent to " + type.getName());
+    }
+
+    @Override
+    public ComponentDTO toDTO() {
+        return new OddComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), type);
     }
 
 }

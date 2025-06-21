@@ -1,5 +1,8 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.common.dto.ModelDTO;
+import it.polimi.ingsw.common.dto.GameStateDTOFactory;
+import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.ModelFacadeAdvancedMode;
 import it.polimi.ingsw.model.ModelFacadeLearnerMode;
@@ -40,63 +43,106 @@ public class GameController {
     public synchronized List<GameEvent> pickComponent(String username, int componentId) {
         EventContext.clear();
 
-        model.pickComponent(username, componentId);
+        try {
+            model.pickComponent(username, componentId);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> releaseComponent(String username, int componentId) {
         EventContext.clear();
 
-        model.releaseComponent(username, componentId);
+        try {
+            model.releaseComponent(username, componentId);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> reserveComponent(String username, int componentId) {
         EventContext.clear();
 
-        model.reserveComponent(username, componentId);
+        try {
+            model.reserveComponent(username, componentId);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
         EventContext.clear();
 
-        model.insertComponent(username, componentId, row, col, rotations, weld);
+        try {
+            model.insertComponent(username, componentId, row, col, rotations, weld);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> moveComponent(String username, int componentId, int row, int col, int rotations) {
         EventContext.clear();
 
-        model.moveComponent(username, componentId, row, col, rotations);
+        try {
+            model.moveComponent(username, componentId, row, col, rotations);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> rotateComponent(String username, int componentId, int num) {
         EventContext.clear();
 
-        model.rotateComponent(username, componentId, num);
+        try {
+            model.rotateComponent(username, componentId, num);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> lookCardPile(String username, int deckIndex) {
         EventContext.clear();
 
-        model.lookCardPile(username, deckIndex);
+        try {
+            model.lookCardPile(username, deckIndex);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> moveHourglass(String username, Consumer<List<GameEvent>> callback) {
         EventContext.clear();
 
-        model.moveHourglass(username, callback);
+        try {
+            model.moveHourglass(username, callback);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+
         return EventContext.getAndClear();
     }
 
     public synchronized List<GameEvent> setReady(String username) {
         EventContext.clear();
 
-        model.setReady(username);
+        try {
+            model.setReady(username);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+
         return EventContext.getAndClear();
     }
 
@@ -196,6 +242,10 @@ public class GameController {
 
     public synchronized void rejoinGame(String username) {
         model.rejoinGame(username);
+    }
+
+    public synchronized ModelDTO toDTO() {
+        return GameStateDTOFactory.createFromModel(model);
     }
 
     // TEST only

@@ -26,6 +26,10 @@ public class Time {
         return hourglassPos;
     }
 
+    public int getTimeLeft() {
+        return timeLeft;
+    }
+
     private void rotateHourglass() {
         if (hourglassPos > 0) {
             timeLeft = 10;
