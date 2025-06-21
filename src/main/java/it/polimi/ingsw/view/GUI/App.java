@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
+import it.polimi.ingsw.view.GUI.fxmlcontroller.LoginController;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -15,10 +16,15 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.List;
 
-public class JavaFxInterface extends Application implements UserInterface {
+public class App extends Application implements UserInterface {
 
     private static Client client;
     private Parent root;
+    private static Stage primaryStage;
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
 
     @Override
     public void start() {
@@ -34,20 +40,23 @@ public class JavaFxInterface extends Application implements UserInterface {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/preGame.fxml"));
+        primaryStage = stage;
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
         this.root = loader.load();
 
-        // Registra il controller principale
-        MainController mainController = loader.getController();
-        MessageDispatcher.getInstance().registerHandler(mainController);
+        // init main controller
+        LoginController loginController = loader.getController();
+        MessageDispatcher.getInstance().registerHandler(loginController);
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1280, 800);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Galaxy Trucker");
         stage.setFullScreen(true);
         stage.show();
 
-        // Crea il client passando questa interfaccia GUI e disabilitando l'avvio automatico della TUI
+        // client init
         new Thread(() -> {
             try {
                 client = new ClientSocket(this);

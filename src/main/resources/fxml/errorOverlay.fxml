@@ -4,7 +4,7 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 
-<StackPane fx:id="overlayRoot" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw.view.GUI.ErrorOverlayController"
+<StackPane fx:id="overlayRoot" xmlns:fx="http://javafx.com/fxml" fx:controller="it.polimi.ingsw.view.GUI.fxmlcontroller.ErrorOverlayController"
            style="-fx-background-color: rgba(0, 0, 0, 0.6);"
            prefWidth="600" prefHeight="400">
 

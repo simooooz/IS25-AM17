@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.view.GUI.fxmlcontroller.MessageHandler;
 import javafx.application.Platform;
 
 import java.util.ArrayList;

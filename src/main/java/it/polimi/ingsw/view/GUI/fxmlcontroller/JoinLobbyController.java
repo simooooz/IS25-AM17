@@ -1,7 +1,9 @@
-package it.polimi.ingsw.view.GUI;
+package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.view.GUI.App;
+import it.polimi.ingsw.view.GUI.MessageDispatcher;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,20 +14,12 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 
-public class CreateLobbyController implements MessageHandler {
+public class JoinLobbyController implements MessageHandler {
 
     @FXML private TextField lobbyNameField;
-    @FXML private ToggleButton btn2Players;
-    @FXML private ToggleButton btn3Players;
-    @FXML private ToggleButton btn4Players;
-    @FXML private ToggleButton btnLearnerMode;
-    @FXML private ToggleButton btnAdvancedMode;
     @FXML private Label errorLabel;
     @FXML private VBox vbox;
     @FXML private Label result_text;
-
-    @FXML private ToggleGroup playersGroup;
-    @FXML private ToggleGroup modeGroup;
 
     // Cache della Scene per evitare problemi di null
     private Scene cachedScene;
@@ -49,39 +43,27 @@ public class CreateLobbyController implements MessageHandler {
             cachedScene = errorLabel.getScene();
         } else if (vbox != null && vbox.getScene() != null) {
             cachedScene = vbox.getScene();
-        } else if (btn2Players != null && btn2Players.getScene() != null) {
-            cachedScene = btn2Players.getScene();
         }
     }
 
     @FXML
-    private void handleCreateLobby() {
+    private void handleJoinLobby() {
         String name = lobbyNameField.getText().trim();
-        boolean nameValid = name.length() >= 3 && name.length() <= 18;
 
-        Toggle selectedPlayer = playersGroup.getSelectedToggle();
-        Toggle selectedMode = modeGroup.getSelectedToggle();
-
-        if (!nameValid)
-            showError("Lobby name must be between 3 and 18 characters.");
-        else if (selectedPlayer == null)
-            showError("Please select number of players.");
-        else if (selectedMode == null)
-            showError("Please select game mode.");
-        else {
-            errorLabel.setVisible(false);
-            int players = ((ToggleButton) selectedPlayer).getId().equals(btn2Players.getId()) ? 2 :
-                    (((ToggleButton) selectedPlayer).getId().equals(btn3Players.getId()) ? 3 : 4);
-            boolean isLearner = ((ToggleButton) selectedMode).getId().equals(btnLearnerMode.getId());
-
-            System.out.println("Creating lobby: " + name + " with " + players + " players, learner: " + isLearner);
-            JavaFxInterface.getClientInstance().send(MessageType.CREATE_LOBBY, name, players, isLearner);
+        if (name.isEmpty()) {
+            showError("Please enter lobby name.");
+        } else {
+            if (errorLabel != null) {
+                errorLabel.setVisible(false);
+            }
+            System.out.println("Joining lobby: " + name);
+            App.getClientInstance().send(MessageType.JOIN_LOBBY, name);
         }
     }
 
     @FXML
     private void handleBack() {
-        navigateToScene("/fxml/preGame.fxml", MainController.class);
+        navigateToScene("/fxml/login.fxml", LoginController.class);
     }
 
     private void showError(String message) {
@@ -89,6 +71,10 @@ public class CreateLobbyController implements MessageHandler {
             errorLabel.setText(message);
             errorLabel.setVisible(true);
         }
+    }
+
+    private void navigateToGame() {
+        navigateToScene("/fxml/build.fxml", BuildController.class);
     }
 
     // Metodo unificato per la navigazione
@@ -132,28 +118,25 @@ public class CreateLobbyController implements MessageHandler {
         } else if (vbox != null && vbox.getScene() != null) {
             cachedScene = vbox.getScene();
             return cachedScene;
-        } else if (btn2Players != null && btn2Players.getScene() != null) {
-            cachedScene = btn2Players.getScene();
-            return cachedScene;
-        } else if (btnLearnerMode != null && btnLearnerMode.getScene() != null) {
-            cachedScene = btnLearnerMode.getScene();
-            return cachedScene;
         }
 
         return null;
     }
 
-    // Modifica nel metodo handleMessage di CreateLobbyController
-
     @Override
     public void handleMessage(GameEvent event) {
         switch (event.eventType()) {
-            case CREATED_LOBBY_EVENT -> {
+            case JOINED_LOBBY_EVENT -> {
                 Platform.runLater(() -> {
-                    System.out.println("Lobby created successfully!");
-                    // NON reinoltrare il messaggio - lascia che il WaitingRoomController
-                    // gestisca il proprio stato tramite i dati del client
+                    System.out.println("Successfully joined lobby!");
                     navigateToScene("/fxml/waitingRoom.fxml", WaitingRoomController.class);
+                });
+            }
+            // FIX: Aggiunto supporto per GAME_STARTED_OK
+            case MATCH_STARTED_EVENT -> {
+                Platform.runLater(() -> {
+                    System.out.println("Game started automatically after joining!");
+                    navigateToGame();
                 });
             }
             case ERROR -> {
@@ -166,6 +149,9 @@ public class CreateLobbyController implements MessageHandler {
 
     @Override
     public boolean canHandle(MessageType messageType) {
-        return messageType == MessageType.CREATED_LOBBY_EVENT || messageType == MessageType.ERROR;
+        // FIX: Aggiunto GAME_STARTED_OK alla lista dei messaggi gestibili
+        return messageType == MessageType.JOINED_LOBBY_EVENT ||
+                messageType == MessageType.MATCH_STARTED_EVENT ||
+                messageType == MessageType.ERROR;
     }
 }

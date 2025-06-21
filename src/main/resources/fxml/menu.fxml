@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox alignment="CENTER" spacing="128" styleClass="main-container"
+      prefWidth="900" prefHeight="500"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.polimi.ingsw.view.GUI.fxmlcontroller.MenuController">
+
+    <!-- Left menu section -->
+    <VBox alignment="CENTER" minWidth="300" spacing="30">
+
+        <VBox alignment="CENTER" spacing="20">
+            <Button fx:id="createLobbyBtn" prefWidth="200" maxWidth="200"
+                    onAction="#handleCreateLobby" styleClass="button"
+                    text="Create Lobby"/>
+
+            <Button fx:id="joinLobbyBtn" prefWidth="200" maxWidth="200"
+                    onAction="#handleJoinLobby" styleClass="button"
+                    text="Join Lobby"/>
+
+            <Button fx:id="joinRandomBtn" prefWidth="200" maxWidth="200"
+                    onAction="#handleJoinRandom" styleClass="button"
+                    text="Join Random"/>
+
+            <Button fx:id="exitGameBtn" prefWidth="200" maxWidth="200"
+                    onAction="#handleExitGame" styleClass="button-danger"
+                    text="Exit Game"/>
+        </VBox>
+
+        <!-- Status label -->
+        <Label fx:id="statusLabel" styleClass="status-text" text="Ready to play!"
+               alignment="CENTER"/>
+
+    </VBox>
+
+    <!-- Right side panel -->
+    <AnchorPane fx:id="sidePanel" HBox.hgrow="ALWAYS"
+                prefWidth="500" maxWidth="500" minWidth="450"
+                prefHeight="400" maxHeight="400" minHeight="350"
+                styleClass="panel" visible="false">
+
+        <!-- Close button anchored to top right -->
+        <Button fx:id="closePanelBtn" prefHeight="30" maxHeight="30"
+                prefWidth="30" maxWidth="30"
+                onAction="#closeSidePanel" styleClass="close-button"
+                text="✕"
+                AnchorPane.topAnchor="10.0" AnchorPane.rightAnchor="10.0"/>
+
+        <!-- Hidden title label -->
+        <Label fx:id="sidePanelTitle" styleClass="subtitle" visible="false"
+               AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0"/>
+
+        <!-- Content container centered -->
+        <VBox fx:id="sidePanelContent" spacing="15" alignment="CENTER"
+              prefWidth="400" maxWidth="400"
+              AnchorPane.topAnchor="60.0" AnchorPane.bottomAnchor="30.0"
+              AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0"/>
+
+    </AnchorPane>
+
+</HBox>

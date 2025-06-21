@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="128" styleClass="main-container" xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.GUI.fxmlcontroller.LoginController">
+
+    <!-- header -->
+    <VBox alignment="CENTER">
+        <ImageView preserveRatio="true" fitWidth="800" fitHeight="300">
+            <Image url="@../images/logo.png"/>
+        </ImageView>
+    </VBox>
+
+    <!-- input section -->
+    <VBox alignment="CENTER" spacing="16">
+
+        <VBox fx:id="username" alignment="CENTER"/>
+
+        <Label fx:id="hintLabel" text="press ENTER to continue..." styleClass="hint-text" visible="false"/>
+
+        <Label fx:id="status" textAlignment="CENTER" visible="false"/>
+
+    </VBox>
+
+</VBox>

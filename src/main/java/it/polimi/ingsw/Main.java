@@ -4,7 +4,7 @@ import it.polimi.ingsw.network.discovery.DiscoveryServer;
 import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.rmi.RMIServer;
 import it.polimi.ingsw.network.socket.server.Server;
-import it.polimi.ingsw.view.GUI.JavaFxInterface;
+import it.polimi.ingsw.view.GUI.App;
 import it.polimi.ingsw.view.TUI.InputUtility;
 import it.polimi.ingsw.view.TUI.ViewTui;
 
@@ -19,7 +19,7 @@ public class Main {
             if (clientType == 1)
                 new ViewTui().start();
             else if (clientType == 2)
-                new JavaFxInterface().start();
+                new App().start();
 
         } else if (args[0].equals("server")) {
             System.out.println("Starting server...");

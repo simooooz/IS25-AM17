@@ -1,7 +1,9 @@
-package it.polimi.ingsw.view.GUI;
+package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.view.GUI.App;
+import it.polimi.ingsw.view.GUI.MessageDispatcher;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,12 +14,15 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 
-public class JoinLobbyController implements MessageHandler {
+public class JoinRandomLobbyController implements MessageHandler {
 
-    @FXML private TextField lobbyNameField;
+    @FXML private ToggleButton btnLearnerMode;
+    @FXML private ToggleButton btnAdvancedMode;
     @FXML private Label errorLabel;
     @FXML private VBox vbox;
     @FXML private Label result_text;
+
+    @FXML private ToggleGroup modeGroup;
 
     // Cache della Scene per evitare problemi di null
     private Scene cachedScene;
@@ -35,33 +40,37 @@ public class JoinLobbyController implements MessageHandler {
     }
 
     private void cacheScene() {
-        if (lobbyNameField != null && lobbyNameField.getScene() != null) {
-            cachedScene = lobbyNameField.getScene();
-        } else if (errorLabel != null && errorLabel.getScene() != null) {
+        if (errorLabel != null && errorLabel.getScene() != null) {
             cachedScene = errorLabel.getScene();
+        } else if (btnLearnerMode != null && btnLearnerMode.getScene() != null) {
+            cachedScene = btnLearnerMode.getScene();
+        } else if (btnAdvancedMode != null && btnAdvancedMode.getScene() != null) {
+            cachedScene = btnAdvancedMode.getScene();
         } else if (vbox != null && vbox.getScene() != null) {
             cachedScene = vbox.getScene();
         }
     }
 
     @FXML
-    private void handleJoinLobby() {
-        String name = lobbyNameField.getText().trim();
+    private void handleJoinRandom() {
+        Toggle selectedMode = modeGroup.getSelectedToggle();
 
-        if (name.isEmpty()) {
-            showError("Please enter lobby name.");
+        if (selectedMode == null) {
+            showError("Please select preferred game mode.");
         } else {
             if (errorLabel != null) {
                 errorLabel.setVisible(false);
             }
-            System.out.println("Joining lobby: " + name);
-            JavaFxInterface.getClientInstance().send(MessageType.JOIN_LOBBY, name);
+            boolean isLearner = ((ToggleButton) selectedMode).getId().equals(btnLearnerMode.getId());
+
+            System.out.println("Joining random lobby with learner mode: " + isLearner);
+            App.getClientInstance().send(MessageType.JOIN_RANDOM_LOBBY, isLearner);
         }
     }
 
     @FXML
     private void handleBack() {
-        navigateToScene("/fxml/preGame.fxml", MainController.class);
+        navigateToScene("/fxml/login.fxml", LoginController.class);
     }
 
     private void showError(String message) {
@@ -72,7 +81,7 @@ public class JoinLobbyController implements MessageHandler {
     }
 
     private void navigateToGame() {
-        navigateToScene("/fxml/buildPage.fxml", BuildController.class);
+        navigateToScene("/fxml/build.fxml", BuildController.class);
     }
 
     // Metodo unificato per la navigazione
@@ -107,11 +116,14 @@ public class JoinLobbyController implements MessageHandler {
         }
 
         // Poi prova i componenti FXML e aggiorna la cache
-        if (lobbyNameField != null && lobbyNameField.getScene() != null) {
-            cachedScene = lobbyNameField.getScene();
-            return cachedScene;
-        } else if (errorLabel != null && errorLabel.getScene() != null) {
+        if (errorLabel != null && errorLabel.getScene() != null) {
             cachedScene = errorLabel.getScene();
+            return cachedScene;
+        } else if (btnLearnerMode != null && btnLearnerMode.getScene() != null) {
+            cachedScene = btnLearnerMode.getScene();
+            return cachedScene;
+        } else if (btnAdvancedMode != null && btnAdvancedMode.getScene() != null) {
+            cachedScene = btnAdvancedMode.getScene();
             return cachedScene;
         } else if (vbox != null && vbox.getScene() != null) {
             cachedScene = vbox.getScene();
@@ -126,14 +138,14 @@ public class JoinLobbyController implements MessageHandler {
         switch (event.eventType()) {
             case JOINED_LOBBY_EVENT -> {
                 Platform.runLater(() -> {
-                    System.out.println("Successfully joined lobby!");
+                    System.out.println("Successfully joined random lobby!");
                     navigateToScene("/fxml/waitingRoom.fxml", WaitingRoomController.class);
                 });
             }
             // FIX: Aggiunto supporto per GAME_STARTED_OK
             case MATCH_STARTED_EVENT -> {
                 Platform.runLater(() -> {
-                    System.out.println("Game started automatically after joining!");
+                    System.out.println("Game started automatically after joining random lobby!");
                     navigateToGame();
                 });
             }
