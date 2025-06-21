@@ -17,6 +17,7 @@ module it.polimi.ingsw {
     exports it.polimi.ingsw.common.model.enums;
     exports it.polimi.ingsw.common.model.events;
     exports it.polimi.ingsw.common.model;
+    exports it.polimi.ingsw.common.dto;
 
     exports it.polimi.ingsw.client.model;
     exports it.polimi.ingsw.client.model.cards;
@@ -24,11 +25,13 @@ module it.polimi.ingsw {
     exports it.polimi.ingsw.client.model.game;
     exports it.polimi.ingsw.client.model.player;
     exports it.polimi.ingsw.client.model.components;
+    exports it.polimi.ingsw.client.model.factory;
     exports it.polimi.ingsw.client.controller;
 
     requires com.fasterxml.jackson.datatype.jdk8;
     requires com.fasterxml.jackson.databind;
 
+    opens it.polimi.ingsw.model.factory to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.model.cards to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.model.cards.utils to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.client.model.cards to com.fasterxml.jackson.databind;

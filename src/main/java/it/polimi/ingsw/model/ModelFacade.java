@@ -55,70 +55,62 @@ public abstract class ModelFacade {
     }
 
     public void pickComponent(String username, int componentId) {
-        checkBuildingState(username);
-
         PlayerData player = board.getPlayerEntityByUsername(username);
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
+        checkBuildingState(username);
 
         component.pickComponent(board, player);
     }
 
     public void releaseComponent(String username, int componentId) {
-        checkBuildingState(username);
-
         PlayerData player = board.getPlayerEntityByUsername(username);
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
+        checkBuildingState(username);
 
         component.releaseComponent(board, player);
     }
 
     public void reserveComponent(String username, int componentId) {
-        checkBuildingState(username);
-
         PlayerData player = board.getPlayerEntityByUsername(username);
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
+        checkBuildingState(username);
 
         component.reserveComponent(player);
     }
 
     public void insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
-        checkBuildingState(username);
-
         PlayerData player = board.getPlayerEntityByUsername(username);
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
+        checkBuildingState(username);
 
         component.insertComponent(player, row, col, rotations, weld);
     }
 
     public void moveComponent(String username, int componentId, int row, int col, int rotations) {
-        checkBuildingState(username);
-
         PlayerData player = board.getPlayerEntityByUsername(username);
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
+        checkBuildingState(username);
 
         component.moveComponent(player, row, col, rotations);
     }
 
     public void rotateComponent(String username, int componentId, int num) {
-        checkBuildingState(username);
-
         PlayerData player = board.getPlayerEntityByUsername(username);
         Component component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
+        checkBuildingState(username);
 
         component.rotateComponent(player, num);
     }
 
     public void lookCardPile(String username, int deckIndex) {
-        if (getPlayerState(username) == PlayerState.LOOK_CARD_PILE) releaseCardPile(username);
-        else if (getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("State is not BUILDING");
-
-        if (deckIndex < 0 || deckIndex > 2) throw new IllegalArgumentException("Invalid deck index");
+        if (getPlayerState(username) != PlayerState.BUILD && getPlayerState(username) == PlayerState.LOOK_CARD_PILE) throw new IllegalStateException("State is not BUILDING");
+        else if (deckIndex < 0 || deckIndex > 2) throw new IllegalArgumentException("Invalid deck index");
         else if (board.getCardPilesWatchMap().containsValue(deckIndex)) throw new IllegalArgumentException("Another player is already looking this card pile");
 
         PlayerData player = board.getPlayerEntityByUsername(username);
@@ -132,6 +124,7 @@ public abstract class ModelFacade {
         if (!valid)
             throw new IllegalArgumentException("You have to insert at least one component to see a card pile");
 
+        if (getPlayerState(username) == PlayerState.LOOK_CARD_PILE) releaseCardPile(username);
         player.getShip().getHandComponent().ifPresent(c -> c.releaseComponent(board, player));
 
         setPlayerState(username, PlayerState.LOOK_CARD_PILE);
@@ -150,13 +143,15 @@ public abstract class ModelFacade {
     }
 
     public void moveHourglass(String username, Consumer<List<GameEvent>> callback) {
-        if (getPlayerState(username) == PlayerState.LOOK_CARD_PILE) releaseCardPile(username);
-        else if (
+        if (
             getPlayerState(username) != PlayerState.BUILD &&
+            getPlayerState(username) != PlayerState.LOOK_CARD_PILE &&
             (getPlayerState(username) != PlayerState.WAIT || board.getPlayerEntityByUsername(username).hasEndedInAdvance())
         ) throw new IllegalStateException("State is not BUILDING or WAIT");
 
         board.moveHourglass(username, this, callback);
+        if (getPlayerState(username) == PlayerState.LOOK_CARD_PILE) releaseCardPile(username);
+
         EventContext.emit(new HourglassMovedEvent());
     }
 
