@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.ComponentDTO;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.events.EventContext;
@@ -261,8 +262,19 @@ public sealed class Component permits
         return id;
     }
 
+    public boolean isInserted() {
+        return inserted;
+    }
+
+    public boolean isShown() {
+        return shown;
+    }
+
     public <T> boolean matchesType(Class<T> type) {
-        return type == Component.class;
+        if (type.isInstance(this)) {
+            return true;
+        }
+        return type == Component.class || type.isAssignableFrom(this.getClass());
     }
 
     @SuppressWarnings("unchecked")
@@ -271,6 +283,10 @@ public sealed class Component permits
             return (T) this;
         }
         throw new ClassCastException("Cannot cast " + this.getClass().getName() + " to " + type.getName());
+    }
+
+    public ComponentDTO toDTO() {
+        return new ComponentDTO(id, connectors, x, y, inserted, shown);
     }
 
 }

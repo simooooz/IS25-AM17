@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.ComponentDTO;
+import it.polimi.ingsw.common.dto.ShieldComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.common.model.enums.DirectionType;
@@ -55,6 +57,11 @@ public final class ShieldComponent extends Component {
             return (T) this;
         }
         throw new ClassCastException("Cannot cast ShieldComponent to " + type.getName());
+    }
+
+    @Override
+    public ComponentDTO toDTO() {
+        return new ShieldComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), directionsProtected);
     }
 
 }

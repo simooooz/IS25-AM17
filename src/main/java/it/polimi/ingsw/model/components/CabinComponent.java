@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.CabinComponentDTO;
+import it.polimi.ingsw.common.dto.ComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.events.game.CrewUpdatedEvent;
 import it.polimi.ingsw.common.model.events.EventContext;
@@ -115,6 +117,11 @@ public final class CabinComponent extends Component {
             return (T) this;
         }
         throw new ClassCastException("Cannot cast CabinComponent to " + type.getName());
+    }
+
+    @Override
+    public ComponentDTO toDTO() {
+        return new CabinComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), alien, humans, isStarting);
     }
 
 }

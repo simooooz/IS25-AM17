@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.ComponentDTO;
+import it.polimi.ingsw.common.dto.EngineComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
@@ -48,6 +50,11 @@ public final class EngineComponent extends Component {
             return (T) this;
         }
         throw new ClassCastException("Cannot cast EngineComponent to " + type.getName());
+    }
+
+    @Override
+    public ComponentDTO toDTO() {
+        return new EngineComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), direction, isDouble);
     }
 
 }
