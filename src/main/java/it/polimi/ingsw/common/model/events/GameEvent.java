@@ -15,7 +15,7 @@ import java.util.Set;
 
 public sealed interface GameEvent permits
         UniqueEvent, BatchStartedEvent, BatchEndedEvent, SyncAllEvent,
-        MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent,
+        MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent, ShipBrokenEven,
         ComponentReleasedEvent, ComponentReservedEvent, ComponentRotatedEvent, ComponentDestroyedEvent,
         HourglassMovedEvent, CardPileLookedEvent, CardPileReleasedEvent, CardRevealedEvent, CardUpdatedEvent,
         it.polimi.ingsw.client.model.events.CardPileLookedEvent, it.polimi.ingsw.client.model.events.CardRevealedEvent, it.polimi.ingsw.client.model.events.CardUpdatedEvent,

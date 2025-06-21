@@ -88,6 +88,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             }
             case CARD_PILE_RELEASED_EVENT -> client.getGameController().cardPileReleased((String) args[0]);
             case HOURGLASS_MOVED_EVENT -> client.getGameController().hourglassMoved();
+            case SHIP_BROKEN_EVENT -> client.getGameController().shipBroken((String) args[0], (List<List<Integer>>) args[1]);
             case PLAYERS_POSITION_UPDATED_EVENT -> client.getGameController().playersPositionUpdated((List<String>) args[0], (List<AbstractMap.SimpleEntry<String, Integer>>) args[1]);
             case CARD_REVEALED_EVENT -> {
                 ClientCard card = ClientCardFactory.deserializeCard((String) args[0]);

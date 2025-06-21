@@ -330,6 +330,14 @@ public enum MessageType {
         }
     },
 
+    SHIP_BROKEN_EVENT {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            DoubleArgMessage<String, List<List<Integer>>> castedMessage = (DoubleArgMessage<String, List<List<Integer>>>) message;
+            client.getGameController().shipBroken(castedMessage.getArg1(), castedMessage.getArg2());
+        }
+    },
+
     PLAYERS_POSITION_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {

@@ -80,6 +80,10 @@ public class ClientGameController {
         model.cardRevealed(card);
     }
 
+    public void shipBroken(String username, List<List<Integer>> parts) {
+        model.shipBroken(username, parts);
+    }
+
     public void batteriesUpdated(int id, int batteries) {
         model.batteriesUpdated(id, batteries);
     }

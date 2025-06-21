@@ -13,6 +13,7 @@ import it.polimi.ingsw.model.player.Ship;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public sealed class Component permits
@@ -247,7 +248,14 @@ public sealed class Component permits
     public PlayerState destroyComponent(PlayerData player) {
         affectDestroy(player);
         List<List<Component>> groups = player.getShip().calcShipParts();
-        return groups.size() > 1 ? PlayerState.WAIT_SHIP_PART : PlayerState.DONE;
+        if (groups.size() > 1) {
+            List<List<Integer>> newGroups = new ArrayList<>();
+            for (List<Component> group : groups)
+                newGroups.add(group.stream().map(Component::getId).collect(Collectors.toList()));
+            EventContext.emit(new ShipBrokenEven(player.getUsername(), newGroups));
+            return PlayerState.WAIT_SHIP_PART;
+        }
+        return PlayerState.DONE;
     }
 
     public int getX() {

@@ -155,6 +155,18 @@ public abstract class ClientGameModel {
         ClientEventBus.getInstance().publish(new PlayersPositionUpdatedEvent(starting, players));
     }
 
+    public void shipBroken(String username, List<List<Integer>> parts) {
+        ClientShip ship = board.getPlayerEntityByUsername(username).getShip();
+
+        List<List<ClientComponent>> newParts = new ArrayList<>();
+        for (List<Integer> group : parts)
+            newParts.add(group.stream().map(c -> board.getMapIdComponents().get(c)).toList());
+
+        ship.getBrokenParts().clear();
+        ship.getBrokenParts().addAll(newParts);
+        ClientEventBus.getInstance().publish(new ShipBrokenEven(username, parts));
+    }
+
     public void cardRevealed(ClientCard card) {
         board.getCardPile().add(card);
 
