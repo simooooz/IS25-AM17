@@ -1,9 +1,12 @@
 package it.polimi.ingsw.network.rmi;
 
+import it.polimi.ingsw.client.controller.ClientGameController;
 import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.factory.ClientCardFactory;
 import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.dto.GameStateDTOFactory;
+import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -55,6 +58,13 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
 
             case MATCH_STARTED_EVENT -> {
                 client.getLobby().initGame();
+                client.setState(UserState.IN_GAME);
+            }
+            case SYNC_ALL_EVENT -> {
+                ModelDTO dto = GameStateDTOFactory.deserializeDTO((String) args[0]);
+
+                ClientLobby lobby = client.getLobby();
+                lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
                 client.setState(UserState.IN_GAME);
             }
             case FLIGHT_ENDED_EVENT -> client.getGameController().flightEnded((String) args[0]);

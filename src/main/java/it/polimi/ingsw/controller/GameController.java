@@ -198,6 +198,10 @@ public class GameController {
         model.rejoinGame(username);
     }
 
+    public synchronized ModelDTO toDTO() {
+        return GameStateDTOFactory.createFromModel(model);
+    }
+
     // TEST only
     public ModelFacade getModel() {
         return model;

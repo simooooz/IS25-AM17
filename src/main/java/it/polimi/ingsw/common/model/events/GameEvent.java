@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 public sealed interface GameEvent permits
-        UniqueEvent, BatchStartedEvent, BatchEndedEvent,
+        UniqueEvent, BatchStartedEvent, BatchEndedEvent, SyncAllEvent,
         MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent,
         ComponentReleasedEvent, ComponentReservedEvent, ComponentRotatedEvent, ComponentDestroyedEvent,
         HourglassMovedEvent, CardPileLookedEvent, CardPileReleasedEvent, CardRevealedEvent, CardUpdatedEvent,

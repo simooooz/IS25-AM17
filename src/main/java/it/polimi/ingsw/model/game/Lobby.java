@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.common.dto.GameStateDTOFactory;
 import it.polimi.ingsw.common.model.enums.LobbyState;
+import it.polimi.ingsw.common.model.events.game.SyncAllEvent;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.common.model.events.EventContext;
@@ -130,12 +132,13 @@ public class Lobby {
 
         players.add(username);
 
-        if (this.game != null)
-            this.game.rejoinGame(username);
-
         EventContext.emit(new JoinedLobbyEvent(username));
-        // EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
+        EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
 
+        if (this.game != null) {
+            this.game.rejoinGame(username);
+            EventContext.emit(new SyncAllEvent(game.toDTO()));
+        }
     }
 
     /**
