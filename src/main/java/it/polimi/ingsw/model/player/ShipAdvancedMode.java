@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.player;
 
-public class ShipAdvancedMode extends Ship {
+public final class ShipAdvancedMode extends Ship {
 
     public ShipAdvancedMode() {
         super();

@@ -11,7 +11,9 @@ import java.util.*;
  * Represents a read-only view of a player's ship on the client side.
  * Contains the grid of components and other ship-related data.
  */
-public abstract class ClientShip {
+public sealed abstract class ClientShip permits
+    ClientShipLearnerMode, ClientShipAdvancedMode
+{
 
     private final Optional<ClientComponent>[][] dashboard;
     private ClientComponent componentInHand;

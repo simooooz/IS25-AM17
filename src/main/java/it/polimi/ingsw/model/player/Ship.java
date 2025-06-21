@@ -9,7 +9,9 @@ import it.polimi.ingsw.common.model.enums.DirectionType;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class Ship {
+public sealed abstract class Ship permits
+    ShipLearnerMode, ShipAdvancedMode
+{
 
     private final Optional<Component>[][] dashboard;
     private final List<Component> discards;
