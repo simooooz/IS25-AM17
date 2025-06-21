@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.model.player;
 
+import it.polimi.ingsw.common.dto.PlayerDTO;
 import it.polimi.ingsw.view.TUI.Chroma;
 
 /**
@@ -18,6 +19,14 @@ public class ClientPlayer {
         this.credits = 0;
         this.endedInAdvance = false;
         this.leftMatch = false;
+    }
+
+    public ClientPlayer(PlayerDTO dto, ClientShip ship) {
+        this.username = dto.username;
+        this.credits = dto.credits;
+        this.endedInAdvance = dto.endedInAdvance;
+        this.leftMatch = dto.leftMatch;
+        this.ship = ship;
     }
 
     public String getUsername() {

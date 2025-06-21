@@ -10,6 +10,7 @@ import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
 import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
+import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -39,6 +40,10 @@ public abstract class ClientGameModel {
 
     public ClientGameModel() {
         this.playersState = new HashMap<>();
+    }
+
+    public ClientGameModel(ModelDTO dto) {
+        this.playersState = dto.playersState;
     }
 
     public PlayerState getPlayerState(String username) {

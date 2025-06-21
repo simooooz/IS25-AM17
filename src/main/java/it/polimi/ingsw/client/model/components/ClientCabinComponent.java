@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.model.components;
 
 import it.polimi.ingsw.client.model.player.ClientPlayer;
+import it.polimi.ingsw.common.dto.CabinComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.view.TUI.Chroma;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ClientCabinComponent extends ClientComponent {
+public final class ClientCabinComponent extends ClientComponent {
 
     private AlienType alien;
     private int humans;
@@ -20,6 +21,13 @@ public class ClientCabinComponent extends ClientComponent {
         this.alien = null;
         this.humans = 2;
         this.isStarting = isStarting;
+    }
+
+    public ClientCabinComponent(CabinComponentDTO dto) {
+        super(dto);
+        this.alien = dto.alien;
+        this.humans = dto.humans;
+        this.isStarting = dto.isStarting;
     }
 
     public void setAlien(AlienType alien) {
