@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network.messages;
 
+import it.polimi.ingsw.client.controller.ClientGameController;
 import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.factory.ClientCardFactory;
@@ -9,6 +10,7 @@ import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
@@ -22,7 +24,13 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public enum MessageType {
 
-    ERROR,
+    ERROR {
+        @Override
+        public void execute(ClientSocket client, Message message) {
+            SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
+            ClientEventBus.getInstance().publish(new GameErrorEvent(castedMessage.getArg1()));
+        }
+    },
 
     BATCH_START {
         @Override

@@ -10,6 +10,7 @@ import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
+import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -33,6 +34,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
     public void notifyGameEvent(MessageType eventType, Object... args) throws RemoteException {
         System.out.println("[CLIENT CALLBACK] Received call notifyGameEvent " + eventType);
         switch (eventType) {
+            case ERROR -> ClientEventBus.getInstance().publish(new GameErrorEvent((String) args[0]));
             case BATCH_START -> ClientEventBus.getInstance().startBatch();
             case BATCH_END -> ClientEventBus.getInstance().endBatch();
 

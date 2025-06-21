@@ -43,7 +43,12 @@ public class ViewTui implements UserInterface {
 
     @Override
     public void onEvent(List<GameEvent> events) {
-        scheduleUpdate();
+        if (events.size() == 1 && events.getFirst().eventType() == MessageType.ERROR)
+            displayError((String) events.getFirst().getArgs()[0]);
+        else {
+            scheduleUpdate();
+            events.stream().filter(e -> e.eventType() == MessageType.ERROR).findFirst().ifPresent(e -> displayError((String) e.getArgs()[0]));
+        }
     }
 
     private void scheduleUpdate() {
@@ -286,7 +291,7 @@ public class ViewTui implements UserInterface {
                             client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(commands[1]), times);
 
                             if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("rotate")) // Previous local command was "rotate"
-                                localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], String.valueOf((times + Integer.parseInt(commands[2])) % 4));
+                                localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], String.valueOf((times + Integer.parseInt(localCommand.split(" ")[2])) % 4));
                             else if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
                                 localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], localCommand.split(" ")[2], localCommand.split(" ")[3], String.valueOf((Integer.parseInt(localCommand.split(" ")[4]) + times) % 4));
                             else // No previous local command
@@ -465,9 +470,11 @@ public class ViewTui implements UserInterface {
 
     @Override
     public void displayError(String message) {
-        Chroma.println(message, Chroma.RED);
-        System.out.print("> ");
-        System.out.flush();
+        uiUpdateQueue.offer(() -> {
+            Chroma.println(message, Chroma.RED);
+            System.out.print("> ");
+            System.out.flush();
+        });
     }
 
     @Override
