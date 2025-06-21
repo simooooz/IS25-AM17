@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model;
 
-import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.game.BoardLearnerMode;
 
@@ -16,8 +15,8 @@ public class ModelFacadeLearnerMode extends ModelFacade {
 
     @Override
     protected void manageChooseAlienPhase(int playerIndex) {
-        // There isn't alien phase in learner moe
-        playersState.put(board.getPlayersByPos().getFirst().getUsername(), PlayerState.DRAW_CARD);
+        // There isn't alien phase in learner mode
+        board.pickNewCard(this);
     }
 
     @Override

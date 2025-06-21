@@ -68,7 +68,8 @@ public class BoardAdvancedMode extends Board {
 
     @Override
     public void pickNewCard(ModelFacade model) {
-        cardPile.get(cardPilePos).endCard(this);
+        if (cardPilePos >= 0)
+            cardPile.get(cardPilePos).endCard(this);
         super.pickNewCard(model);
     }
 

@@ -38,7 +38,7 @@ public abstract class Board {
         this.players = new ArrayList<>();
 
         this.cardPile = new ArrayList<>();
-        this.cardPilePos = 0;
+        this.cardPilePos = -1;
     }
 
     public List<SimpleEntry<PlayerData, Integer>> getPlayers() {
