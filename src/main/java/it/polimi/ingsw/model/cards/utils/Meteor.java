@@ -27,7 +27,7 @@ public class Meteor {
         if (coord > 10 || coord < 4) return PlayerState.DONE; // Miss
         Ship ship = player.getShip();
 
-        List<Component> targets = getTargets(ship, coord);// Find hit component
+        List<Component> targets = getTargets(ship, coord); // Find hit component
         if (targets.isEmpty()) return PlayerState.DONE; // Miss
         Component target = targets.getFirst();
 
@@ -43,17 +43,16 @@ public class Meteor {
             }
 
             List<CannonComponent> cannonsOverLine = targets.stream()
-                .filter(c -> c instanceof CannonComponent)
-                .map(c -> (CannonComponent) c)
+                .filter(c -> c.matchesType(CannonComponent.class))
+                .map(c -> c.castTo(CannonComponent.class))
                 .filter(c -> c.getDirection() == directionFrom)
                 .toList();
 
             Optional<CannonComponent> singleCannon = cannonsOverLine.stream().filter(c -> !c.getIsDouble()).findFirst();
             if (singleCannon.isPresent()) return PlayerState.DONE;
 
-            if (!cannonsOverLine.isEmpty()) { // There is a double cannon that could destroy meteor
+            if (!cannonsOverLine.isEmpty()) // There is a double cannon that could destroy meteor
                 return PlayerState.WAIT_CANNONS;
-            }
 
         }
         return target.destroyComponent(player); // Destroy component

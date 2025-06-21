@@ -3,7 +3,6 @@ package it.polimi.ingsw.client.model.game;
 import it.polimi.ingsw.client.controller.ClientGameController;
 import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.common.model.enums.LobbyState;
-import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 
@@ -84,11 +83,19 @@ public class ClientLobby {
 
     public void addPlayer(String username) {
         players.add(username);
+
+        if (this.state == LobbyState.IN_GAME)
+            this.game.playerRejoined(username);
+
         ClientEventBus.getInstance().publish(new JoinedLobbyEvent(username));
     }
 
     public void removePlayer(String username) {
         players.remove(username);
+
+        if (this.state == LobbyState.IN_GAME)
+            this.game.playerLeft(username);
+
         ClientEventBus.getInstance().publish(new LeftLobbyEvent(username, null));
     }
 
@@ -96,14 +103,9 @@ public class ClientLobby {
      * Init the {@link ClientGameController} associated with the lobby
      */
     public void initGame() {
-        this.state = LobbyState.IN_GAME;
         this.game = new ClientGameController(players, learnerMode);
         this.game.matchStarted();
-    }
-
-    public void endGame() {
-        // TODO lato client lo stato della lobby non viene mai settato a game ended
-        this.state = LobbyState.GAME_ENDED;
+        this.state = LobbyState.IN_GAME;
     }
 
 }

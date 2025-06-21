@@ -18,21 +18,14 @@ public class ClientAbandonedShipCard extends ClientCard {
     @JsonProperty private int credits;
     @JsonProperty private int days;
 
-    public ClientAbandonedShipCard(int id, int level, boolean isLearner, int crew, int credits, int days) {
-        super(id, level, isLearner);
-        this.crew = crew;
-        this.credits = credits;
-        this.days = days;
-    }
-
     public ClientAbandonedShipCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 

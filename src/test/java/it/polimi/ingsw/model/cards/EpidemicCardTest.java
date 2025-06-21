@@ -39,6 +39,7 @@ class EpidemicCardTest {
         EpidemicCard epidemicCard = new EpidemicCard(0, 2, false);
         board.getCardPile().clear();
         board.getCardPile().add(epidemicCard);
+        board.getCardPile().add(epidemicCard);
 
     }
 

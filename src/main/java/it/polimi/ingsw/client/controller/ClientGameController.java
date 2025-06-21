@@ -103,6 +103,14 @@ public class ClientGameController {
         model.flightEnded(username);
     }
 
+    public void playerLeft(String username) {
+        model.playerLeft(username);
+    }
+
+    public void playerRejoined(String username) {
+        model.playerRejoined(username);
+    }
+
     public void insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.cardPileReleased(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("Player is not building");

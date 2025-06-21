@@ -18,20 +18,14 @@ public class ClientSmugglersCard extends ClientEnemiesCard {
     @JsonProperty private int penalty;
     @JsonProperty private Map<ColorType, Integer> reward;
 
-    public ClientSmugglersCard(int id, int level, boolean isLearner, int smugglersFirePower, int penalty, Map<ColorType, Integer> reward, int days) {
-        super(id, level, isLearner, days, smugglersFirePower);
-        this.penalty = penalty;
-        this.reward = reward;
-    }
-
     public ClientSmugglersCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 
@@ -58,12 +52,12 @@ public class ClientSmugglersCard extends ClientEnemiesCard {
 
         cardLines.add(divider);
 
-        String good = "  ";
+        StringBuilder good = new StringBuilder("  ");
         for (ColorType c : reward.keySet()) {
             for (int k = 0; k < reward.get(c); k++)
-                good = good + c.toString() + "  ";
+                good.append(c.toString()).append("  ");
         }
-        String goodsRow = vBorder + Constants.inTheMiddle(good, 22) + vBorder;
+        String goodsRow = vBorder + Constants.inTheMiddle(good.toString(), 22) + vBorder;
         cardLines.add(goodsRow);
         cardLines.add(divider);
 

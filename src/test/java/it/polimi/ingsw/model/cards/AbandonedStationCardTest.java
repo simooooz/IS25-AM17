@@ -96,6 +96,8 @@ class AbandonedStationCardTest {
         AbandonedStationCard abandonedStationCard = new AbandonedStationCard(0, 2, false, 2, 5, cardGoods);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedStationCard);
+        board.getCardPile().add(abandonedStationCard);
+
 
         controller.drawCard("Simone");
 
@@ -132,3 +134,4 @@ class AbandonedStationCardTest {
         assertEquals(10, board.getPlayers().stream().filter(entry -> entry.getKey().equals(p2)).findFirst().orElseThrow().getValue());
     }
 }
+

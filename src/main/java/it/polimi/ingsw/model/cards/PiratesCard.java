@@ -19,13 +19,14 @@ public class PiratesCard extends EnemiesCard {
 
     @JsonProperty private final List<String> defeatedPlayers;
     @JsonProperty private int cannonIndex;
-    @JsonProperty private int coord;
+    @JsonProperty private List<Integer> coords;
 
     public PiratesCard(int id, int level, boolean isLearner, int piratesFirePower, int credits, int days, List<CannonFire> cannonFires) {
         super(id, level, isLearner, days, piratesFirePower);
         this.credits = credits;
         this.cannonFires = cannonFires;
         this.defeatedPlayers = new ArrayList<>();
+        this.coords = new ArrayList<>();
     }
 
     @Override
@@ -65,16 +66,16 @@ public class PiratesCard extends EnemiesCard {
     @Override
     public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_ROLL_DICES) {
-            this.coord = value;
+            this.coords.add(value);
             for (String defeatedPlayerUsername : defeatedPlayers) {
                 PlayerData defeatedPlayer = board.getPlayerEntityByUsername(defeatedPlayerUsername);
-                PlayerState newState = cannonFires.get(cannonIndex).hit(defeatedPlayer, coord);
+                PlayerState newState = cannonFires.get(cannonIndex).hit(defeatedPlayer, coords.getLast());
                 model.setPlayerState(defeatedPlayerUsername, newState);
             }
             cannonIndex++;
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -85,9 +86,8 @@ public class PiratesCard extends EnemiesCard {
                 enemiesDefeated = true;
                 return false;
             }
-            else if (value >= enemyFirePower) { // Tie or pirates already defeated
+            else if (value >= enemyFirePower) // Tie or pirates already defeated
                 model.setPlayerState(username, PlayerState.DONE);
-            }
             else { // Player is defeated
                 defeatedPlayers.add(username);
                 model.setPlayerState(username, PlayerState.DONE);
@@ -95,7 +95,7 @@ public class PiratesCard extends EnemiesCard {
             playerIndex++;
             return autoCheckPlayers(model,board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -114,7 +114,7 @@ public class PiratesCard extends EnemiesCard {
             if (value) // Shield activated
                 model.setPlayerState(player.getUsername(), PlayerState.DONE);
             else { // Not activated => find target and if present calc new state
-                Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coord);
+                Optional<Component> target = cannonFires.get(cannonIndex).getTarget(player.getShip(), coords.getLast());
                 target.ifPresent(component -> {
                     PlayerState newState = component.destroyComponent(player); // DONE or WAIT_SHIP_PART
                     model.setPlayerState(player.getUsername(), newState);
@@ -122,7 +122,7 @@ public class PiratesCard extends EnemiesCard {
             }
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -131,7 +131,7 @@ public class PiratesCard extends EnemiesCard {
             model.setPlayerState(username, PlayerState.DONE);
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
 }

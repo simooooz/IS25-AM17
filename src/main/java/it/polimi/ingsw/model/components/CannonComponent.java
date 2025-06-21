@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 
-public class CannonComponent extends Component {
+public final class CannonComponent extends Component {
 
     private DirectionType direction;
     private final boolean isDouble;
@@ -24,6 +24,11 @@ public class CannonComponent extends Component {
         return isDouble;
     }
 
+    public double calcPower() {
+        int factor = direction == DirectionType.NORTH ? 1 : 2;
+        return (isDouble ? 2.0 : 1.0) / factor;
+    }
+
     @Override
     public void rotateComponent(PlayerData player, int rotations) {
         super.rotateComponent(player, rotations);
@@ -40,9 +45,18 @@ public class CannonComponent extends Component {
                 (direction == DirectionType.WEST && ship.getDashboard(y, x - 1).isEmpty());
     }
 
-    public double calcPower() {
-        int factor = direction == DirectionType.NORTH ? 1 : 2;
-        return (isDouble ? 2.0 : 1.0) / factor;
+    @Override
+    public <T> boolean matchesType(Class<T> type) {
+        return type == CannonComponent.class;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T castTo(Class<T> type) {
+        if (type == CannonComponent.class) {
+            return (T) this;
+        }
+        throw new ClassCastException("Cannot cast CannonComponent to " + type.getName());
     }
 
 }

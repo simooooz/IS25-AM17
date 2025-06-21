@@ -68,19 +68,14 @@ abstract public class Card {
 
         for (PlayerData player : players)
             if (player.getShip().getCrew() - (player.getShip().getCannonAlien() ? 1 : 0) - (player.getShip().getEngineAlien() ? 1 : 0) == 0)
-                board.moveToStartingDeck(player);
+                player.endFlight();
 
         if (!board.getPlayers().isEmpty()) {
             int leaderPos = board.getPlayers().getFirst().getValue();
             for (SimpleEntry<PlayerData, Integer> entry : board.getPlayers())
                 if (leaderPos >= entry.getValue() + 24)
-                    board.moveToStartingDeck(entry.getKey());
+                    entry.getKey().endFlight();
         }
-
-        for (PlayerData player : players)
-            if (player.hasEndedInAdvance())
-                board.moveToStartingDeck(player);
-
     }
 
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> rewards, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
@@ -88,7 +83,7 @@ abstract public class Card {
 
         for (ColorType good : ColorType.values())
             if ((deltaGood.get(good) > 0 && !rewards.containsKey(good)) || (rewards.containsKey(good) && deltaGood.get(good) > rewards.get(good)))
-                throw new GoodNotValidException("Reward check not valid");
+                throw new GoodNotValidException("Reward check not passed, insert only allowed goods");
 
         if (!batteries.isEmpty())
             throw new BatteryComponentNotValidException("Battery component list should be empty");

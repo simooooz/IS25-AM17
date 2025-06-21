@@ -22,7 +22,7 @@ class CombatZoneCardTest {
     private PlayerData p3;
     private GameController controller;
     private Board board;
-    private List<AbstractMap.SimpleEntry<CriteriaType, PenaltyCombatZone>> damages;
+    private List<WarLine> damages;
 
 
     @BeforeEach
@@ -149,12 +149,13 @@ class CombatZoneCardTest {
         PenaltyCombatZone penalty2 = new CountablePenaltyZone(3, MalusType.DAYS);
         PenaltyCombatZone penalty3 = new CountablePenaltyZone(2, MalusType.CREW);
         damages = new ArrayList<>();
-        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CREW, penalty1));
-        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.ENGINE, penalty2));
-        damages.add(new AbstractMap.SimpleEntry<>(CriteriaType.CANNON, penalty3));
+        damages.add(new WarLine(CriteriaType.CREW, penalty1));
+        damages.add(new WarLine(CriteriaType.ENGINE, penalty2));
+        damages.add(new WarLine(CriteriaType.CANNON, penalty3));
 
         CombatZoneCard combatZoneCard = new CombatZoneCard(0, 2, false, damages);
         board.getCardPile().clear();
+        board.getCardPile().add(combatZoneCard);
         board.getCardPile().add(combatZoneCard);
 
         ((CargoHoldsComponent) p3.getShip().getDashboard(3,5).orElseThrow()).loadGood(ColorType.BLUE, p3.getShip());

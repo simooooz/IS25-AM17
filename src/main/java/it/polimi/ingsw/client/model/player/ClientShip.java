@@ -18,6 +18,7 @@ public abstract class ClientShip {
     private final List<ClientComponent> discards;
     private final List<ClientComponent> reserves;
 
+    @SuppressWarnings("unchecked")
     public ClientShip() {
         this.dashboard = new Optional[Constants.SHIP_ROWS][Constants.SHIP_COLUMNS];
         this.discards = new ArrayList<>();
@@ -54,18 +55,6 @@ public abstract class ClientShip {
 
     public void setComponentInHand(ClientComponent component) {
         this.componentInHand = component;
-    }
-
-    public <T extends ClientComponent> List<T> getComponentByType(Class<T> componentType) {
-        List<T> list = new ArrayList<>();
-        for (Optional<ClientComponent>[] row : dashboard) {
-            for (Optional<ClientComponent> component : row) {
-                if (component.isPresent() && componentType.isInstance(component.get())) {
-                    list.add(componentType.cast(component.get()));
-                }
-            }
-        }
-        return list;
     }
 
     public String toString(String username, PlayerState state) {

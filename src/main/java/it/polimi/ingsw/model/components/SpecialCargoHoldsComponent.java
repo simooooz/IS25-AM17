@@ -11,7 +11,7 @@ import it.polimi.ingsw.model.player.Ship;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpecialCargoHoldsComponent extends Component {
+public sealed class SpecialCargoHoldsComponent extends Component permits CargoHoldsComponent {
 
     private final int number;
     private final List<ColorType> goods;
@@ -50,6 +50,20 @@ public class SpecialCargoHoldsComponent extends Component {
         for (ColorType good : goods) {
             player.getShip().getGoods().put(good, player.getShip().getGoods().get(good) - 1);
         }
+    }
+
+    @Override
+    public <T> boolean matchesType(Class<T> type) {
+        return type == SpecialCargoHoldsComponent.class;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T castTo(Class<T> type) {
+        if (type == SpecialCargoHoldsComponent.class || type.isAssignableFrom(this.getClass())) {
+            return (T) this;
+        }
+        throw new ClassCastException("Cannot cast " + this.getClass().getName() + " to " + type.getName());
     }
 
 }

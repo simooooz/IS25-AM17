@@ -8,30 +8,28 @@ import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.TUI.ViewTui;
+import it.polimi.ingsw.view.UserInterface;
 
 public abstract class Client {
 
     protected String username;
     protected UserState state;
     protected ClientLobby lobby;
+    protected UserInterface ui;
 
-    protected final ViewTui viewTui;
-
-
-    public Client() {
+    public Client(UserInterface ui) {
+        this.ui = ui;
         this.state = UserState.USERNAME;
         this.username = null;
         this.lobby = null;
-
-        this.viewTui = new ViewTui(this);
     }
 
     public ClientGameController getGameController() {
         return lobby.getGame();
     }
 
-    public ViewTui getViewTui() {
-        return viewTui;
+    public UserInterface getViewTui() {
+        return ui;
     }
 
     public ClientLobby getLobby() {

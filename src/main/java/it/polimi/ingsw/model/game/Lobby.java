@@ -10,7 +10,6 @@ import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Lobby {
 
@@ -30,12 +29,7 @@ public class Lobby {
      * learner flag
      */
     private final boolean learnerMode;
-    /**
-     * player's username who created the lobby
-     */
-    private String master;
 
-    public static final int MIN_PLAYERS = 2;
     /**
      * max num of players master wants to be accepted
      */
@@ -49,14 +43,12 @@ public class Lobby {
      * Constructor
      *
      * @param name        lobby's id
-     * @param master      master's username
      * @param maxPlayers  max players allowed in a lobby
      * @param learnerMode true if is a test flight
      */
-    public Lobby(String name, String master, int maxPlayers, boolean learnerMode) {
+    public Lobby(String name, int maxPlayers, boolean learnerMode) {
         this.state = LobbyState.WAITING;
         this.id = name;
-        this.master = master;
         this.learnerMode = learnerMode;
 
         this.maxPlayers = maxPlayers;
@@ -83,10 +75,6 @@ public class Lobby {
         return players;
     }
 
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
     public boolean isLearnerMode() {
         return learnerMode;
     }
@@ -95,9 +83,7 @@ public class Lobby {
      * Check whether there are conditions to eliminate the lobby
      */
     public boolean toDelete() {
-        if (state == LobbyState.WAITING)
-            return players.isEmpty();
-        return (state == LobbyState.IN_GAME) && (players.size() < MIN_PLAYERS);
+        return players.isEmpty();
     }
 
     /**
@@ -106,7 +92,7 @@ public class Lobby {
      * @param username player's username
      */
     public void addPlayer(String username) {
-        if (hasPlayer(username)) throw new PlayerAlreadyInException("Player's already in");
+        if (players.contains(username)) throw new PlayerAlreadyInException("Player's already in");
 
         players.add(username);
         EventContext.emit(new JoinedLobbyEvent(username));
@@ -130,35 +116,36 @@ public class Lobby {
      * @param username player's username
      */
     public void removePlayer(String username) {
+        if (this.state == LobbyState.IN_GAME)
+            this.game.leaveGame(username);
+
         players.remove(username);
 
         List<String> toNotify = new ArrayList<>(players);
         toNotify.add(username);
         EventContext.emit(new LeftLobbyEvent(username, toNotify));
+    }
 
-        if (!players.isEmpty())
-            master = master.equals(username) ? players.get(new Random().nextInt(players.size())) : master;
+    public void rejoinPlayer(String username) {
+        if (players.contains(username)) throw new PlayerAlreadyInException("Player's already in");
 
-        if (toDelete() && this.state == LobbyState.IN_GAME)
-            this.endGame();
-        else if (this.state == LobbyState.IN_GAME)
-            this.game.leaveGame(username);
+        players.add(username);
+
+        if (this.game != null)
+            this.game.rejoinGame(username);
+
+        EventContext.emit(new JoinedLobbyEvent(username));
+        EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
+
     }
 
     /**
      * Init the {@link GameController} associated with the lobby
      */
     private void initGame() {
-        this.state = LobbyState.IN_GAME;
         this.game = new GameController(players, learnerMode);
         this.game.startMatch();
-    }
-
-    public void endGame() {
-        this.state = LobbyState.GAME_ENDED;
-        // TODO game ended non può essere settato se il gioco finisce da solo perché sul model
-        // TODO ha senso usarlo?
-        this.game.endGame();
+        this.state = LobbyState.IN_GAME;
     }
 
 }

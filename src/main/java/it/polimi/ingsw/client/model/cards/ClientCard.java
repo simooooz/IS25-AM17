@@ -30,6 +30,7 @@ import it.polimi.ingsw.client.model.ClientGameModel;
 })
 public abstract class ClientCard {
 
+    // TODO stampare id e livello?
     @JsonProperty private int id;
     @JsonProperty private int level;
     @JsonProperty protected boolean isLearner;

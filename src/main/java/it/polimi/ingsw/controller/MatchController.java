@@ -63,7 +63,7 @@ public class MatchController {
         if (lobbies.containsKey(name)) throw new IllegalArgumentException("Lobby name already exists, choose another one");
 
         EventContext.clear();
-        Lobby lobby = new Lobby(name, username, maxPlayers, learnerMode);
+        Lobby lobby = new Lobby(name, maxPlayers, learnerMode);
         lobbies.put(name, lobby);
         lobby.addPlayer(username); // Join in the newly created lobby
         return EventContext.getAndClear();
@@ -133,7 +133,6 @@ public class MatchController {
      * @param username player's username
      * @param gameID   id of lobby/game
      */
-    // TODO lo faccio diverso da join game
     public synchronized List<GameEvent> rejoinGame(String username, String gameID) {
         if (checkIfIsAnotherLobby(username)) throw new PlayerAlreadyInException("Player is already in another lobby");
 
@@ -143,8 +142,8 @@ public class MatchController {
                 .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
 
         EventContext.clear();
-        lobby.addPlayer(username);
-        // TODO emit event per inviare il controller
+        lobby.rejoinPlayer(username);
+
         return EventContext.getAndClear();
     }
 

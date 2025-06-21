@@ -28,6 +28,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
     @SuppressWarnings("unchecked")
     @Override
     public void notifyGameEvent(MessageType eventType, Object... args) throws RemoteException {
+        System.out.println("[CLIENT CALLBACK] Received call notifyGameEvent " + eventType);
         switch (eventType) {
             case BATCH_START -> ClientEventBus.getInstance().startBatch();
             case BATCH_END -> ClientEventBus.getInstance().endBatch();

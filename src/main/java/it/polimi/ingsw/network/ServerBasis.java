@@ -158,7 +158,7 @@ public abstract class ServerBasis {
 
     public static void moveHourglass(User user) {
         if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        List<GameEvent> events = user.getGameController().moveHourglass(user.getUsername());
+        List<GameEvent> events = user.getGameController().moveHourglass(user.getUsername(), user::notifyEvents);
         user.notifyEvents(events);
     }
 
@@ -224,8 +224,7 @@ public abstract class ServerBasis {
 
     public static void rollDices(User user) {
         if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
-        int value = ((int)(Math.random() * 6) + 1) + ((int)(Math.random() * 6) + 1); // TODO spostare nel server model
-        List<GameEvent> events = user.getGameController().rollDices(user.getUsername(), value);
+        List<GameEvent> events = user.getGameController().rollDices(user.getUsername());
         user.notifyEvents(events);
     }
 

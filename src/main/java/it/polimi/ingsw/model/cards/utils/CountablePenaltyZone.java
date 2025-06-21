@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.game.Board;
-import it.polimi.ingsw.model.player.PlayerData;
 
 public class CountablePenaltyZone extends PenaltyCombatZone {
 
@@ -17,19 +16,12 @@ public class CountablePenaltyZone extends PenaltyCombatZone {
     }
 
     @Override
-    public PlayerState resolve(ModelFacade model, Board board, PlayerData player) {
-        return penaltyType.resolve(penaltyNumber, board, player);
+    public PlayerState resolve(ModelFacade model, Board board, String username) {
+        return penaltyType.resolve(penaltyNumber, board, username);
     }
 
     @Override
-    @JsonProperty
     public int getPenaltyNumber() {
         return penaltyNumber;
     }
-
-    @JsonProperty
-    public MalusType getPenaltyType() {
-        return penaltyType;
-    }
-
 }

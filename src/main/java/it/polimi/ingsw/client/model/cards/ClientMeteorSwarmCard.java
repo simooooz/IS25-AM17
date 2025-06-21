@@ -16,21 +16,16 @@ public class ClientMeteorSwarmCard extends ClientCard {
 
     @JsonProperty private List<ClientMeteor> meteors;
     @JsonProperty private int meteorIndex;
-    @JsonProperty private int coord;
-
-    public ClientMeteorSwarmCard(int id, int level, boolean isLearner, List<ClientMeteor> meteors) {
-        super(id, level, isLearner);
-        this.meteors = meteors;
-    }
+    @JsonProperty private List<Integer> coords;
 
     public ClientMeteorSwarmCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 
@@ -76,9 +71,9 @@ public class ClientMeteorSwarmCard extends ClientCard {
         }
 
         if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
-            Chroma.println("Meteor n." + (meteorIndex+1) + " is hitting at coord: " + coord, Chroma.YELLOW_BOLD);
+            Chroma.println("Meteor n." + (meteorIndex+1) + " is hitting at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
         else if (meteorIndex > 0)
-            Chroma.println("Previous meteor n." + (meteorIndex) + " has come at coord: " + coord, Chroma.YELLOW_BOLD);
+            Chroma.println("Previous meteor n." + (meteorIndex) + " has come at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
     }
 
 

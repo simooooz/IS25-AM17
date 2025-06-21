@@ -6,7 +6,9 @@ import it.polimi.ingsw.model.components.EngineComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OpenSpaceCard extends Card {
@@ -43,13 +45,17 @@ public class OpenSpaceCard extends Card {
             int doubleEnginesPower = player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(EngineComponent::getIsDouble)
                     .mapToInt(EngineComponent::calcPower)
+                    .boxed()
+                    .sorted(Comparator.reverseOrder())
                     .limit(player.getShip().getBatteries())
+                    .mapToInt(Integer::intValue)
                     .sum();
 
             if (doubleEnginesPower != 0) {
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT_ENGINES);
                 return false;
-            } else {
+            }
+            else {
                 enginesActivated.put(player.getUsername(), singleEnginesPower);
                 model.setPlayerState(player.getUsername(), PlayerState.DONE);
             }
@@ -58,7 +64,8 @@ public class OpenSpaceCard extends Card {
         // Check if everyone has finished
         if (playerIndex >= board.getPlayersByPos().size()) {
 
-            for (PlayerData player : board.getPlayersByPos())
+            List<PlayerData> players = board.getPlayersByPos();
+            for (PlayerData player : players)
                 board.movePlayer(player, enginesActivated.get(player.getUsername()));
 
             return true;
@@ -75,14 +82,14 @@ public class OpenSpaceCard extends Card {
             playerIndex++;
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
     public void endCard(Board board) {
         for (PlayerData player : board.getPlayersByPos())
             if (enginesActivated.get(player.getUsername()) == 0)
-                board.moveToStartingDeck(player);
+                player.endFlight();
         super.endCard(board);
     }
 

@@ -115,6 +115,7 @@ class SlaversCardTest {
         SlaversCard slaversCard = new SlaversCard(0, 2, false, 2, 5, 1, 1);
         board.getCardPile().clear();
         board.getCardPile().add(slaversCard);
+        board.getCardPile().add(slaversCard);
 
         controller.chooseAlien("Simone", new HashMap<>(Map.of(52, AlienType.ENGINE)));
 

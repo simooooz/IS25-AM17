@@ -2,41 +2,32 @@ package it.polimi.ingsw.client.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.ingsw.Constants;
+import it.polimi.ingsw.client.model.cards.utils.ClientWarLine;
 import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
-import it.polimi.ingsw.client.model.cards.utils.ClientCriteriaType;
-import it.polimi.ingsw.client.model.cards.utils.ClientPenaltyCombatZone;
+import it.polimi.ingsw.common.model.Pair;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.view.TUI.Chroma;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class ClientCombatZoneCard extends ClientCard {
 
-    @JsonProperty private List<SimpleEntry<ClientCriteriaType, ClientPenaltyCombatZone>> warLines;
+    @JsonProperty private List<ClientWarLine> warLines;
     @JsonProperty private int warLineIndex;
-    @JsonProperty private SimpleEntry<SimpleEntry<Character, Optional<String>>, Double> worst;
-
-    public ClientCombatZoneCard(int id, int level, boolean isLearner, List<SimpleEntry<ClientCriteriaType, ClientPenaltyCombatZone>> warLines) {
-        super(id, level, isLearner);
-        this.warLines = warLines;
-
-        SimpleEntry<Character, Optional<String>> temp = new SimpleEntry<>('a', Optional.empty());
-        this.worst = new SimpleEntry<>(temp, 0.0);
-    }
+    @JsonProperty private Pair<Optional<String>, Double> worst;
 
     public ClientCombatZoneCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 
@@ -54,8 +45,8 @@ public class ClientCombatZoneCard extends ClientCard {
         cardLines.add(divider);
 
         String firstRow = vBorder + "  "  +
-                warLines.getFirst().getKey().toString() + "        " +
-                warLines.getFirst().getValue().toString() + "\t   " +
+                warLines.getFirst().getCriteriaType().toString() + "        " +
+                warLines.getFirst().getPenalty().toString() + "\t   " +
                 vBorder;
         cardLines.add(firstRow);
 
@@ -63,8 +54,8 @@ public class ClientCombatZoneCard extends ClientCard {
         cardLines.add(divider);
 
         String secondRow = vBorder + "  "  +
-                warLines.get(1).getKey().toString() + "        " +
-                warLines.get(1).getValue().toString() + "\t   " +
+                warLines.get(1).getCriteriaType().toString() + "        " +
+                warLines.get(1).getPenalty().toString() + "\t   " +
                 vBorder;
         cardLines.add(secondRow);
 
@@ -72,8 +63,8 @@ public class ClientCombatZoneCard extends ClientCard {
         cardLines.add(divider);
 
         String thirdRow = vBorder + "  "  +
-                warLines.get(2).getKey().toString() + "        "  +
-                warLines.get(2).getValue().toString() + "\t   " +
+                warLines.get(2).getCriteriaType().toString() + "        "  +
+                warLines.get(2).getPenalty().toString() + "\t   " +
                 vBorder;
         cardLines.add(thirdRow);
 
@@ -102,7 +93,7 @@ public class ClientCombatZoneCard extends ClientCard {
             }
         }
         Chroma.println("Fighting at war line n." + (warLineIndex+1), Chroma.YELLOW_BOLD);
-        worst.getKey().getValue().ifPresent(p -> Chroma.println("Actually the worst player is " + p + " with a score of " + worst.getValue(), Chroma.YELLOW_BOLD));
+        worst.getKey().ifPresent(p -> Chroma.println("Actually the worst player is " + p + " with a score of " + worst.getValue(), Chroma.YELLOW_BOLD));
     }
 
 

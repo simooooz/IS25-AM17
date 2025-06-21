@@ -1,18 +1,8 @@
 package it.polimi.ingsw.common.model.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum PlayerState {
     BUILD,
-    LOOK_CARD_PILE {
-        private final Map<String, Integer> deckIndex = new HashMap<>();
-
-        @Override
-        public Map<String, Integer> getDeckIndex() {
-            return deckIndex;
-        }
-    },
+    LOOK_CARD_PILE,
     CHECK,
     WAIT_ALIEN,
     WAIT_SHIP_PART,
@@ -30,9 +20,4 @@ public enum PlayerState {
     WAIT_BOOLEAN,
     WAIT_INDEX,
     DONE;
-
-    public Map<String, Integer> getDeckIndex() {
-        throw new RuntimeException("Illegal call");
-    }
-
 }

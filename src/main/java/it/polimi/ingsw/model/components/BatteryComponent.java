@@ -7,19 +7,13 @@ import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.model.player.Ship;
 
-public class BatteryComponent extends Component {
+public final class BatteryComponent extends Component {
 
-    private final boolean isTriple;
     private int batteries;
 
     public BatteryComponent(int id, ConnectorType[] connectors, boolean isTriple) {
         super(id, connectors);
-        this.isTriple = isTriple;
         this.batteries = isTriple ? 3 : 2;
-    }
-
-    public boolean getIsTriple() {
-        return isTriple;
     }
 
     public int getBatteries() {
@@ -43,6 +37,20 @@ public class BatteryComponent extends Component {
     public void affectDestroy(PlayerData player) {
         super.affectDestroy(player);
         player.getShip().setBatteries(player.getShip().getBatteries() - batteries);
+    }
+
+    @Override
+    public <T> boolean matchesType(Class<T> type) {
+        return type == BatteryComponent.class;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T castTo(Class<T> type) {
+        if (type == BatteryComponent.class) {
+            return (T) this;
+        }
+        throw new ClassCastException("Cannot cast BatteryComponent to " + type.getName());
     }
 
 }

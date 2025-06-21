@@ -9,11 +9,6 @@ public class ClientCannonFire {
     @JsonProperty private boolean isBig;
     @JsonProperty private DirectionType directionFrom;
 
-    public ClientCannonFire(boolean isBig, DirectionType directionFrom) {
-        this.isBig = isBig;
-        this.directionFrom = directionFrom;
-    }
-
     public ClientCannonFire() {}
 
     @Override

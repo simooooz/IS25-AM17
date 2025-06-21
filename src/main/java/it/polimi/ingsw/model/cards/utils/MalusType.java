@@ -7,7 +7,8 @@ import it.polimi.ingsw.model.player.PlayerData;
 public enum MalusType {
     DAYS {
         @Override
-        public PlayerState resolve(int penaltyNumber, Board board, PlayerData player) {
+        public PlayerState resolve(int penaltyNumber, Board board, String username) {
+            PlayerData player = board.getPlayerEntityByUsername(username);
             board.movePlayer(player, -1*penaltyNumber);
             return PlayerState.DONE;
         }
@@ -15,17 +16,17 @@ public enum MalusType {
 
     GOODS {
         @Override
-        public PlayerState resolve(int penaltyNumber, Board board, PlayerData player) {
+        public PlayerState resolve(int penaltyNumber, Board board, String username) {
             return PlayerState.WAIT_REMOVE_GOODS;
         }
     },
 
     CREW {
         @Override
-        public PlayerState resolve(int penaltyNumber, Board board, PlayerData player) {
+        public PlayerState resolve(int penaltyNumber, Board board, String username) {
             return PlayerState.WAIT_REMOVE_CREW;
         }
     };
 
-    public abstract PlayerState resolve(int penaltyNumber, Board board, PlayerData player);
+    public abstract PlayerState resolve(int penaltyNumber, Board board, String username);
 }

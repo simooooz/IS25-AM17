@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.enums.PlayerState;
@@ -7,25 +8,21 @@ import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.common.model.events.game.PlayersPositionUpdatedEvent;
 import it.polimi.ingsw.common.model.events.EventContext;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
-import it.polimi.ingsw.model.factory.CardFactory;
-import it.polimi.ingsw.model.factory.ComponentFactory;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public abstract class Board {
 
-    protected final ComponentFactory componentFactory;
-    protected CardFactory cardFactory;
-
-    private final Map<Integer, Component> mapIdComponents;
-    protected final List<Component> commonComponents;
+    protected Map<Integer, Component> mapIdComponents;
+    protected List<Component> commonComponents;
 
     protected final List<SimpleEntry<PlayerData, Integer>> players;
     protected final List<PlayerData> startingDeck;
@@ -34,10 +31,6 @@ public abstract class Board {
     protected int cardPilePos;
 
     public Board() {
-        this.componentFactory = new ComponentFactory();
-        this.commonComponents = new ArrayList<>(componentFactory.getComponents());
-        this.mapIdComponents = new HashMap<>(componentFactory.getComponentsMap());
-
         this.startingDeck = new ArrayList<>();
         this.players = new ArrayList<>();
 
@@ -81,6 +74,12 @@ public abstract class Board {
     }
 
     public void pickNewCard(ModelFacade model) {
+        for (PlayerData player : getPlayersByPos())
+            if (player.hasEndedInAdvance()) {
+                model.setPlayerState(player.getUsername(), PlayerState.WAIT);
+                moveToStartingDeck(player);
+            }
+
         cardPilePos++;
         if (cardPilePos == cardPile.size() || players.isEmpty()) // All cards are resolved or there are no more players
             model.endGame();
@@ -106,7 +105,6 @@ public abstract class Board {
             while (!moved) {
                 boolean positionOccupied = false; // check if the position in occupied
 
-                // iterate on the player to check if the player are in the previous position
                 for (SimpleEntry<PlayerData, Integer> otherEntry : players) {
                     if (!otherEntry.equals(entry) && otherEntry.getValue() == nextPosition) {
                         positionOccupied = true;
@@ -117,7 +115,8 @@ public abstract class Board {
                 if (!positionOccupied) {
                     entry.setValue(nextPosition);
                     moved = true;
-                } else
+                }
+                else
                     nextPosition = (position > 0) ? nextPosition + 1 : nextPosition - 1;
             }
         }
@@ -161,6 +160,7 @@ public abstract class Board {
         );
     }
 
+    // TODO check
     public List<PlayerData> calcRanking() {
         List<PlayerData> players = Stream.concat(
                 this.getPlayersByPos().stream(),
@@ -213,11 +213,13 @@ public abstract class Board {
                 .toList();
     }
 
+    public abstract Map<String, Integer> getCardPilesWatchMap();
+
     public abstract void shuffleCards();
 
     public abstract void startMatch(ModelFacade model);
 
-    public abstract void moveHourglass(String username, ModelFacade model);
+    public abstract void moveHourglass(String username, ModelFacade model, Consumer<List<GameEvent>> callback);
 
     public abstract int[] getBoardOrderPos();
 

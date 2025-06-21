@@ -86,9 +86,11 @@ class AbandonedShipCardTest {
 
     @Test
     void testShouldNotUpdateCardIfCrewNotEnough() {
-        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 10, 0, 0);
+        AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 10, 6, 0);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
+        board.getCardPile().add(abandonedShipCard);
+
 
         controller.drawCard("Simone");
 
@@ -101,6 +103,7 @@ class AbandonedShipCardTest {
     void testShouldCheckIfTheParameterAreUpdateWithHuman() {
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 2, 6, 7);
         board.getCardPile().clear();
+        board.getCardPile().add(abandonedShipCard);
         board.getCardPile().add(abandonedShipCard);
 
         controller.drawCard("Simone");
@@ -119,6 +122,7 @@ class AbandonedShipCardTest {
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 2, 6, 7);
         board.getCardPile().clear();
         board.getCardPile().add(abandonedShipCard);
+        board.getCardPile().add(abandonedShipCard);
 
         controller.drawCard("Simone");
 
@@ -135,6 +139,7 @@ class AbandonedShipCardTest {
     void testShouldCheckIfTheCardIsUsedBySecondPlayer() {
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 4, 6, 2);
         board.getCardPile().clear();
+        board.getCardPile().add(abandonedShipCard);
         board.getCardPile().add(abandonedShipCard);
 
         controller.drawCard("Simone");
@@ -155,6 +160,7 @@ class AbandonedShipCardTest {
     void testShouldCheckIfTheCardIsUsedByThirdPlayer() {
         AbandonedShipCard abandonedShipCard = new AbandonedShipCard(0, 2, false, 1, 6, 2);
         board.getCardPile().clear();
+        board.getCardPile().add(abandonedShipCard);
         board.getCardPile().add(abandonedShipCard);
 
         controller.drawCard("Simone");

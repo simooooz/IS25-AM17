@@ -16,20 +16,14 @@ public class ClientSlaversCard extends ClientEnemiesCard {
     @JsonProperty private int crew;
     @JsonProperty private int credits;
 
-    public ClientSlaversCard(int id, int level, boolean isLearner, int crew, int credits, int days, int slaversFirePower) {
-        super(id, level, isLearner, days, slaversFirePower);
-        this.crew = crew;
-        this.credits = credits;
-    }
-
     public ClientSlaversCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 

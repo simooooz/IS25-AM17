@@ -26,7 +26,6 @@ public class PlanetCard extends Card{
         this.planets = planets;
         this.days = days;
         this.landedPlayers = new HashMap<>();
-
     }
 
     @Override
@@ -41,11 +40,11 @@ public class PlanetCard extends Card{
 
     private boolean autoCheckPlayers(ModelFacade model, Board board) {
         for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
-            if (playerIndex < board.getPlayersByPos().size() && landedPlayers.size() < planets.size()) {
+            if (landedPlayers.size() < planets.size()) {
                 model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
                 return false;
             }
-            else if (playerIndex < board.getPlayersByPos().size()) // Planets are finished
+            else // Planets are finished
                 model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.DONE);
         }
 
@@ -79,17 +78,16 @@ public class PlanetCard extends Card{
         if (commandType == PlayerState.WAIT_INDEX) {
             if (value == null) // Players doesn't land
                 model.setPlayerState(username, PlayerState.DONE);
-            else if (value >= planets.size() || value < 0 || landedPlayers.containsValue(planets.get(value))) // Invalid index
+            else if (value >= planets.size() || landedPlayers.containsValue(planets.get(value))) // Invalid index
                 throw new IllegalArgumentException("Planet not valid or already occupied");
             else { // Land
-                PlayerData player = board.getPlayerEntityByUsername(username);
                 landedPlayers.put(username, planets.get(value));
                 model.setPlayerState(username, PlayerState.WAIT);
             }
             playerIndex++;
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -98,13 +96,12 @@ public class PlanetCard extends Card{
             model.setPlayerState(username, PlayerState.DONE);
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> r, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
-        PlayerData player = board.getPlayerEntityByUsername(username);
-        super.doSpecificCheck(commandType, landedPlayers.get(username).getRewards(), deltaGood, batteries, username, board);
+        super.doSpecificCheck(commandType, landedPlayers.get(username).rewards(), deltaGood, batteries, username, board);
     }
 
 }

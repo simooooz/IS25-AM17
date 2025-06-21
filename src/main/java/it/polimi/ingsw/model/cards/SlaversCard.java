@@ -7,7 +7,8 @@ import it.polimi.ingsw.model.components.CabinComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
-import java.util.*;
+import java.util.List;
+
 
 public class SlaversCard extends EnemiesCard {
 
@@ -38,7 +39,7 @@ public class SlaversCard extends EnemiesCard {
             playerIndex++;
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -48,7 +49,7 @@ public class SlaversCard extends EnemiesCard {
             playerIndex++;
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override

@@ -12,18 +12,14 @@ import java.util.List;
 
 public class ClientOpenSpaceCard extends ClientCard {
 
-    public ClientOpenSpaceCard(int id, int level, boolean isLearner) {
-        super(id, level, isLearner);
-    }
-
     public ClientOpenSpaceCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 

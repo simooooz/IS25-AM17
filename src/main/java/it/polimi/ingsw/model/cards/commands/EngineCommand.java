@@ -39,8 +39,8 @@ public class EngineCommand implements Command {
         int singleEnginePower = ship.getComponentByType(EngineComponent.class).stream()
                 .filter(engine -> !engine.getIsDouble())
                 .toList().size();
-        int dobuleEnginePower = engines.stream().mapToInt(EngineComponent::calcPower).sum();
-        int userEnginePower = singleEnginePower + dobuleEnginePower;
+        int doubleEnginePower = engines.stream().mapToInt(EngineComponent::calcPower).sum();
+        int userEnginePower = singleEnginePower + doubleEnginePower;
         if (userEnginePower > 0 && ship.getEngineAlien())
             userEnginePower += 2;
 
@@ -53,9 +53,12 @@ public class EngineCommand implements Command {
             if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
                 throw new ComponentNotValidException("Battery component not valid");
 
-        for (Component component : engines)
+        for (EngineComponent component : engines) {
             if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
                 throw new ComponentNotValidException("Engine component not valid");
+            else if (!component.getIsDouble())
+                throw new ComponentNotValidException("Engine component " + component.getId() + "is not double");
+        }
 
         if (batteries.size() != engines.size())
             throw new RuntimeException("Inconsistent number of batteries components");

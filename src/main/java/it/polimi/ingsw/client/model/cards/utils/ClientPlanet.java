@@ -9,10 +9,6 @@ public class ClientPlanet {
 
     @JsonProperty private Map<ColorType, Integer> rewards;
 
-    public ClientPlanet(Map<ColorType, Integer> rewards) {
-        this.rewards = rewards;
-    }
-
     public ClientPlanet() {}
 
     public Map<ColorType, Integer> getRewards() {

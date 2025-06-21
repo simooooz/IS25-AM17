@@ -11,7 +11,6 @@ import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,23 +20,14 @@ public class ClientPlanetCard extends ClientCard {
     @JsonProperty private Map<String, ClientPlanet> landedPlayers;
     @JsonProperty private int days;
 
-    private int playerIndex;
-
-    public ClientPlanetCard(int id, int level, boolean isLearner, List<ClientPlanet> planets, int days) {
-        super(id, level, isLearner);
-        this.planets = planets;
-        this.days = days;
-        this.landedPlayers = new HashMap<>();
-    }
-
     public ClientPlanetCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 
@@ -57,12 +47,12 @@ public class ClientPlanetCard extends ClientCard {
         //Planets
 
         for (ClientPlanet p : planets) {
-            String goods = "  ";
+            StringBuilder goods = new StringBuilder("  ");
             for (ColorType c : p.getRewards().keySet()) {
                 for (int k = 0; k < p.getRewards().get(c); k++)
-                    goods =  goods + c.toString() + "  ";
+                    goods.append(c.toString()).append("  ");
             }
-            String row = vBorder + Constants.inTheMiddle(goods, 22) + vBorder;
+            String row = vBorder + Constants.inTheMiddle(goods.toString(), 22) + vBorder;
             cardLines.add(row);
             cardLines.add(divider);
         }
@@ -82,7 +72,7 @@ public class ClientPlanetCard extends ClientCard {
     public void printCardInfo(ClientGameModel model, ClientBoard board) {
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
-            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + landedPlayers.get(player.getUsername())+1 + ")" : "(not landed)";
+            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + planets.indexOf(landedPlayers.get(player.getUsername()))+1 + ")" : "(not landed)";
 
             switch (state) {
                 case DONE -> Chroma.println("- " + player.getUsername() + " has done " + landInfo, Chroma.YELLOW_BOLD);

@@ -8,6 +8,7 @@ import it.polimi.ingsw.network.discovery.DiscoveryClient;
 import it.polimi.ingsw.network.discovery.ServerInfo;
 import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.view.UserInterface;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -28,7 +29,8 @@ public class RMIClient extends Client {
     private ClientCallback clientCallback;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public RMIClient() {
+    public RMIClient(UserInterface ui) {
+        super(ui);
         this.sessionCode = UUID.randomUUID().toString();
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
@@ -62,7 +64,6 @@ public class RMIClient extends Client {
 
         // Start sending ping
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
-        this.viewTui.start();
     }
 
     private void sendPing() {
@@ -122,7 +123,9 @@ public class RMIClient extends Client {
                 case END_FLIGHT -> server.endFlightHandler(sessionCode);
             }
         } catch (RemoteException | RuntimeException e) {
-            viewTui.displayError(e.getMessage());
+            System.out.println("[RMI CLIENT] Remote exception: " + e.getMessage());
+            e.printStackTrace();
+            ui.displayError(e.getMessage());
         }
     }
 

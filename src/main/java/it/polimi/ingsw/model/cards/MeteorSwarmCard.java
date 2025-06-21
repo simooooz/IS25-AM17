@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +18,12 @@ public class MeteorSwarmCard extends Card{
 
     @JsonProperty private final List<Meteor> meteors;
     @JsonProperty private int meteorIndex;
-    @JsonProperty private int coord;
+    @JsonProperty private List<Integer> coords;
 
     public MeteorSwarmCard(int id, int level, boolean isLearner, List<Meteor> meteors) {
         super(id, level, isLearner);
         this.meteors = meteors;
+        this.coords = new ArrayList<>();
     }
 
     @Override
@@ -61,33 +63,28 @@ public class MeteorSwarmCard extends Card{
             if (cannons.size() != 1) throw new IllegalArgumentException("Too many cannon components provided");
             CannonComponent chosenCannon = cannons.getFirst();
 
-            List<Component> targets = meteors.get(meteorIndex).getTargets(player.getShip(), coord);
+            List<Component> targets = meteors.get(meteorIndex).getTargets(player.getShip(), coords.getLast());
             if (meteors.get(meteorIndex).getDirectionFrom() != DirectionType.NORTH) {
-                targets.addAll(meteors.get(meteorIndex).getDirectionFrom().getComponentsFromThisDirection(player.getShip().getDashboard(), coord-1));
-                targets.addAll(meteors.get(meteorIndex).getDirectionFrom().getComponentsFromThisDirection(player.getShip().getDashboard(), coord+1));
+                targets.addAll(meteors.get(meteorIndex).getDirectionFrom().getComponentsFromThisDirection(player.getShip().getDashboard(), coords.getLast()-1));
+                targets.addAll(meteors.get(meteorIndex).getDirectionFrom().getComponentsFromThisDirection(player.getShip().getDashboard(), coords.getLast()+1));
             }
 
-            targets.stream()
-                    .filter(c -> c instanceof CannonComponent)
-                    .map(c -> (CannonComponent) c)
-                    .filter(c -> c.getDirection() == meteors.get(meteorIndex).getDirectionFrom())
-                    .filter(cannonComponent -> cannonComponent.equals(chosenCannon))
-                    .findFirst()
-                    .orElseThrow(() -> new  IllegalArgumentException("Cannon component not found in target coordinates"));
+            if (chosenCannon.getDirection() != meteors.get(meteorIndex).getDirectionFrom() || !targets.contains(chosenCannon))
+                throw new IllegalArgumentException("Cannon component not found in target coordinates");
         }
     }
 
     @Override
     public boolean doCommandEffects(PlayerState commandType, Integer value, ModelFacade model, Board board, String username) {
         if (commandType == PlayerState.WAIT_ROLL_DICES) {
-            this.coord = value;
+            this.coords.add(value);
             for (PlayerData player : board.getPlayersByPos()) {
-                PlayerState newState = meteors.get(meteorIndex).hit(player, coord);
+                PlayerState newState = meteors.get(meteorIndex).hit(player, coords.getLast());
                 model.setPlayerState(player.getUsername(), newState);
             }
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -95,7 +92,7 @@ public class MeteorSwarmCard extends Card{
         PlayerData player = board.getPlayerEntityByUsername(username);
         if (commandType == PlayerState.WAIT_CANNONS) {
             if (value == 0) {
-                Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coord).stream().findFirst();
+                Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coords.getLast()).stream().findFirst();
                 target.ifPresent(component -> {
                     PlayerState newState = component.destroyComponent(player); // DONE or WAIT_SHIP_PART
                     model.setPlayerState(username, newState);
@@ -105,7 +102,7 @@ public class MeteorSwarmCard extends Card{
                 model.setPlayerState(username, PlayerState.DONE);
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -113,7 +110,7 @@ public class MeteorSwarmCard extends Card{
         PlayerData player = board.getPlayerEntityByUsername(username);
         if (commandType == PlayerState.WAIT_SHIELD) {
             if (!value) {
-                Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coord).stream().findFirst();
+                Optional<Component> target = meteors.get(meteorIndex).getTargets(player.getShip(), coords.getLast()).stream().findFirst();
                 target.ifPresent(component -> {
                     PlayerState newState = component.destroyComponent(player); // DONE or WAIT_SHIP_PART
                     model.setPlayerState(username, newState);
@@ -123,7 +120,7 @@ public class MeteorSwarmCard extends Card{
                 model.setPlayerState(username, PlayerState.DONE);
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
     @Override
@@ -132,7 +129,7 @@ public class MeteorSwarmCard extends Card{
             model.setPlayerState(username, PlayerState.DONE);
             return autoCheckPlayers(model, board);
         }
-        throw new RuntimeException("Command type not valid in doCommandEffects");
+        throw new RuntimeException("Command type not valid");
     }
 
 }

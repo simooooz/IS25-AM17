@@ -7,18 +7,14 @@ import java.util.List;
 
 public class ClientEpidemicCard extends ClientCard {
 
-    public ClientEpidemicCard(int id, int level, boolean isLearner) {
-        super(id, level, isLearner);
-    }
-
     public ClientEpidemicCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 

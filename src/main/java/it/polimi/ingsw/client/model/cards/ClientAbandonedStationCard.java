@@ -19,21 +19,14 @@ public class ClientAbandonedStationCard extends ClientCard {
     @JsonProperty private int days;
     @JsonProperty private Map<ColorType, Integer> goods;
 
-    public ClientAbandonedStationCard(int id, int level, boolean isLearner, int crew, int days, Map<ColorType, Integer> goods) {
-        super(id, level, isLearner);
-        this.crew = crew;
-        this.days = days;
-        this.goods = goods;
-    }
-
     public ClientAbandonedStationCard() {}
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         String hBorder = "─";
         String vBorder = "│";
         String[] angles = {"┌", "┐", "└", "┘"};
-        String hDivider = "┼";
         String leftDivider = "├";
         String rightDivider = "┤";
 
@@ -50,17 +43,17 @@ public class ClientAbandonedStationCard extends ClientCard {
         String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
         cardLines.add(divider);
 
-        String crewRow = vBorder + "         " + days + " 👨" + "\t   " + vBorder;
+        String crewRow = vBorder + "         " + crew + " 👨" + "\t   " + vBorder;
 
         cardLines.add(crewRow);
         cardLines.add(divider);
 
-        String good = "  ";
+        StringBuilder good = new StringBuilder("  ");
         for (ColorType c : goods.keySet()) {
             for (int k = 0; k < goods.get(c); k++)
-                good = good + c.toString() + "  ";
+                good.append(c.toString()).append("  ");
         }
-        String goodsRow = vBorder + Constants.inTheMiddle(good, 22) + vBorder;
+        String goodsRow = vBorder + Constants.inTheMiddle(good.toString(), 22) + vBorder;
         cardLines.add(goodsRow);
         cardLines.add(divider);
 

@@ -10,6 +10,8 @@ import it.polimi.ingsw.common.model.events.game.ComponentMovedEvent;
 import it.polimi.ingsw.common.model.events.game.ComponentRotatedEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
+import it.polimi.ingsw.network.rmi.RMIClient;
+import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.view.UserInterface;
 
 import java.io.BufferedReader;
@@ -23,7 +25,7 @@ import java.util.stream.IntStream;
 
 public class ViewTui implements UserInterface {
 
-    private final Client client;
+    private static Client client;
     private final BufferedReader reader;
 
     private final DisplayUpdater displayUpdater;
@@ -32,25 +34,19 @@ public class ViewTui implements UserInterface {
 
     private String localCommand = "";
 
-    /**
-     * Constructs a new ViewTui with the given client controller.
-     *
-     * @param client the client that handles communication logic
-     */
-    public ViewTui(Client client) {
-        this.client = client;
+    public ViewTui() {
         ClientEventBus.getInstance().subscribe(this);
         this.reader = new BufferedReader(new InputStreamReader(System.in));
-        this.displayUpdater = new DisplayUpdater(this.client);
+        this.displayUpdater = new DisplayUpdater();
         startUpdateThread();
     }
 
     @Override
-    public void onEvent(GameEvent event) {
-        scheduleUpdate(event);
+    public void onEvent(List<GameEvent> events) {
+        scheduleUpdate();
     }
 
-    private void scheduleUpdate(GameEvent event) {
+    private void scheduleUpdate() {
         // TODO che fare con l'evento? Lo togliamo o lo mettiamo come parametro di updateDisplay?
         uiUpdateQueue.offer(() -> {
             clear();
@@ -418,7 +414,13 @@ public class ViewTui implements UserInterface {
                 client.send(MessageType.ACTIVATE_SHIELD, id);
             }
             case WAIT_BOOLEAN -> {
-                Boolean value = Boolean.parseBoolean(input);
+                boolean value;
+                if (input.trim().equalsIgnoreCase("true"))
+                    value = true;
+                else if (input.trim().equalsIgnoreCase("false"))
+                    value = false;
+                else
+                    throw new IllegalArgumentException("Invalid boolean value. Correct values are true or false.");
                 client.send(MessageType.GET_BOOLEAN, value);
             }
             case WAIT_INDEX -> {
@@ -443,7 +445,7 @@ public class ViewTui implements UserInterface {
         if (localCommand.split(" ").length > 0 && (localCommand.split(" ")[0].equals("rotate") || localCommand.split(" ")[0].equals("insert"))) { // Previous local command was "rotate" or "insert", revert it
             try {
                 int times = 4 - (localCommand.split(" ")[0].equals("rotate") ? (Integer.parseInt(localCommand.split(" ")[2]) % 4) : (Integer.parseInt(localCommand.split(" ")[4]) % 4));
-                client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
+                client.getGameController().componentRotated(Integer.parseInt(localCommand.split(" ")[1]), times);
             } catch (RuntimeException e) {
                 // Propagate general exceptions
                 throw new IllegalArgumentException(e.getMessage());
@@ -468,6 +470,7 @@ public class ViewTui implements UserInterface {
         System.out.flush();
     }
 
+    @Override
     public void start() {
         clear();
         System.out.println("Welcome to");
@@ -486,8 +489,17 @@ public class ViewTui implements UserInterface {
         try {
             System.out.print("Press ENTER to continue...");
             reader.readLine();
-            displayUpdater.updateDisplay();
 
+            int clientType = InputUtility.requestInt("Press 1 to choose socket client or 2 for RMI: ", false, 1, 2);
+
+            if (clientType == 1)
+                this.client = new ClientSocket(this);
+            else if (clientType == 2)
+                this.client = new RMIClient(this);
+            else
+                System.exit(-1);
+
+            displayUpdater.updateDisplay();
             while (true) {
                 System.out.flush();
                 String input = reader.readLine();
@@ -506,6 +518,10 @@ public class ViewTui implements UserInterface {
         Chroma.println("Bye!", Chroma.YELLOW_BOLD);
         client.closeConnection();
         System.exit(0);
+    }
+
+    public static Client getClientInstance() {
+        return client;
     }
 
 }

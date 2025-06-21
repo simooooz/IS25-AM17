@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.model;
 import it.polimi.ingsw.common.model.events.BatchEndedEvent;
 import it.polimi.ingsw.common.model.events.GameEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -10,6 +11,7 @@ public class ClientEventBus {
 
     private boolean inBatch = false;
     private boolean hasPendingChanges = false;
+    private List<GameEvent> events = new ArrayList<>();
 
     private final List<ClientEventObserver> observers = new CopyOnWriteArrayList<>();
     private static ClientEventBus instance;
@@ -25,11 +27,8 @@ public class ClientEventBus {
         observers.add(observer);
     }
 
-    public void unsubscribe(ClientEventObserver observer) {
-        observers.remove(observer);
-    }
-
     public void startBatch() {
+        events.clear();
         inBatch = true;
         hasPendingChanges = false;
     }
@@ -38,17 +37,27 @@ public class ClientEventBus {
         inBatch = false;
 
         if (hasPendingChanges) {
-            publish(new BatchEndedEvent());
+            publishAll();
             hasPendingChanges = false;
         }
     }
 
     public void publish(GameEvent event) {
+        events.add(event);
+
         if (inBatch)
             hasPendingChanges = true;
-        else
+        else {
             for (ClientEventObserver observer : observers)
-                observer.onEvent(event);
+                observer.onEvent(events);
+            events.clear();
+        }
+    }
+
+    public void publishAll() {
+        for (ClientEventObserver observer : observers)
+            observer.onEvent(events);
+        events.clear();
     }
 
 }

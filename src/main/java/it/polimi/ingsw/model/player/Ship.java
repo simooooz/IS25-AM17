@@ -10,10 +10,12 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Ship {
+
     private final Optional<Component>[][] dashboard;
     private final List<Component> discards;
     private final List<Component> reserves;
-    private Optional<Component> handComponent;
+    private Component handComponent;
+
     private int crew;
     private int batteries;
     private boolean engineAlien;
@@ -21,26 +23,25 @@ public abstract class Ship {
     private final Map<ColorType, Integer> goods;
     private final List<DirectionType> protectedSides;
 
+    @SuppressWarnings("unchecked")
     public Ship() {
         this.dashboard = new Optional[Constants.SHIP_ROWS][Constants.SHIP_COLUMNS];
         this.discards = new ArrayList<>();
         this.reserves = new ArrayList<>();
-        this.handComponent = Optional.empty();
+        this.handComponent = null;
+
         this.crew = 0;
         this.batteries = 0;
         this.engineAlien = false;
         this.cannonAlien = false;
-        this.goods = new HashMap<>();
-        for (ColorType c : ColorType.values()) {
-            this.goods.put(c, 0);
-        }
         this.protectedSides = new ArrayList<>();
+        this.goods = new HashMap<>();
+        for (ColorType c : ColorType.values())
+            this.goods.put(c, 0);
 
-        for (int row = 0; row < Constants.SHIP_ROWS; row++) {
-            for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
+        for (int row = 0; row < Constants.SHIP_ROWS; row++)
+            for (int col = 0; col < Constants.SHIP_COLUMNS; col++)
                 this.dashboard[row][col] = Optional.empty();
-            }
-        }
     }
 
     public Optional<Component>[][] getDashboard() {
@@ -64,11 +65,11 @@ public abstract class Ship {
      * @return the component in hand
      */
     public Optional<Component> getHandComponent() {
-        return handComponent;
+        return Optional.ofNullable(handComponent);
     }
 
     public void setHandComponent(Component component) {
-        this.handComponent = Optional.ofNullable(component);
+        this.handComponent = component;
     }
 
     public int countExposedConnectors() {
@@ -134,8 +135,29 @@ public abstract class Ship {
         List<T> list = new ArrayList<>();
         for (Optional<Component>[] row : dashboard) {
             for (Optional<Component> component : row) {
-                if (component.isPresent() && componentType.isInstance(component.get())) {
-                    list.add(componentType.cast(component.get()));
+                if (component.isPresent()) {
+                    Component comp = component.get();
+                    switch (comp) {
+                        case BatteryComponent bc when componentType.isAssignableFrom(BatteryComponent.class) ->
+                                list.add(componentType.cast(bc));
+                        case CabinComponent cc when componentType.isAssignableFrom(CabinComponent.class) ->
+                                list.add(componentType.cast(cc));
+                        case CannonComponent cnc when componentType.isAssignableFrom(CannonComponent.class) ->
+                                list.add(componentType.cast(cnc));
+                        case EngineComponent ec when componentType.isAssignableFrom(EngineComponent.class) ->
+                                list.add(componentType.cast(ec));
+                        case OddComponent oc when componentType.isAssignableFrom(OddComponent.class) ->
+                                list.add(componentType.cast(oc));
+                        case ShieldComponent sc when componentType.isAssignableFrom(ShieldComponent.class) ->
+                                list.add(componentType.cast(sc));
+                        case CargoHoldsComponent chc when componentType.isAssignableFrom(CargoHoldsComponent.class) ->
+                                list.add(componentType.cast(chc));
+                        case SpecialCargoHoldsComponent special when componentType.isAssignableFrom(SpecialCargoHoldsComponent.class) ->
+                                list.add(componentType.cast(special));
+                        case Component c when componentType.isAssignableFrom(Component.class) ->
+                                list.add(componentType.cast(c));
+                        default -> {}
+                    }
                 }
             }
         }
@@ -158,8 +180,6 @@ public abstract class Ship {
     }
 
     public List<List<Component>> calcShipParts() {
-
-        // Matrix of booleans to track visited components
         boolean[][] visited = new boolean[dashboard.length][dashboard[0].length];
         List<List<Component>> groups = new ArrayList<>();
 
@@ -168,27 +188,26 @@ public abstract class Ship {
             for (int j = 0; j < dashboard[0].length; j++) {
                 if (this.getDashboard(i, j).isPresent() && !visited[i][j]) {
                     List<Component> group = new ArrayList<>();
-                    dfs(i, j, visited, group, Optional.empty());
+                    dfs(i, j, visited, group, null);
                     groups.add(group);
                 }
             }
         }
-
         return groups;
     }
 
-    @SuppressWarnings({"OptionalGetWithoutIsPresent", "OptionalUsedAsFieldOrParameterType"})
-    private void dfs(int i, int j, boolean[][] visited, List<Component> group, Optional<Component> otherComponentOpt) {
+    @SuppressWarnings({"OptionalGetWithoutIsPresent"})
+    private void dfs(int i, int j, boolean[][] visited, List<Component> group, Component otherComponentOpt) {
         if (i < 0 || i >= dashboard.length || j < 0 || j >= dashboard[0].length) return;
         if (visited[i][j] || dashboard[i][j].isEmpty()) return;
 
         // Skip if connectors are not linked together
-        if (otherComponentOpt.isPresent()) {
+        if (otherComponentOpt != null) {
             if (
-                    dashboard[i][j].get().getX() < otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.get().getConnectors()[3]) ||
-                            dashboard[i][j].get().getX() > otherComponentOpt.get().getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[3], otherComponentOpt.get().getConnectors()[1]) ||
-                            dashboard[i][j].get().getY() < otherComponentOpt.get().getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.get().getConnectors()[0]) ||
-                            dashboard[i][j].get().getY() > otherComponentOpt.get().getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.get().getConnectors()[2])
+                    dashboard[i][j].get().getX() < otherComponentOpt.getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[1], otherComponentOpt.getConnectors()[3]) ||
+                            dashboard[i][j].get().getX() > otherComponentOpt.getX() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[3], otherComponentOpt.getConnectors()[1]) ||
+                            dashboard[i][j].get().getY() < otherComponentOpt.getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[2], otherComponentOpt.getConnectors()[0]) ||
+                            dashboard[i][j].get().getY() > otherComponentOpt.getY() && !Component.areConnectorsLinked(dashboard[i][j].get().getConnectors()[0], otherComponentOpt.getConnectors()[2])
             )
                 return;
         }
@@ -197,10 +216,10 @@ public abstract class Ship {
         dashboard[i][j].ifPresent(group::add);
 
         // Check close components
-        dfs(i - 1, j, visited, group, dashboard[i][j]);
-        dfs(i + 1, j, visited, group, dashboard[i][j]);
-        dfs(i, j - 1, visited, group, dashboard[i][j]);
-        dfs(i, j + 1, visited, group, dashboard[i][j]);
+        dfs(i - 1, j, visited, group, dashboard[i][j].orElse(null));
+        dfs(i + 1, j, visited, group, dashboard[i][j].orElse(null));
+        dfs(i, j - 1, visited, group, dashboard[i][j].orElse(null));
+        dfs(i, j + 1, visited, group, dashboard[i][j].orElse(null));
     }
 
     public abstract boolean validPositions(int row, int col);

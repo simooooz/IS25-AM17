@@ -55,9 +55,12 @@ public class CannonCommand implements Command {
             if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
                 throw new ComponentNotValidException("Battery component not valid");
 
-        for (Component component : cannons)
+        for (CannonComponent component : cannons) {
             if (ship.getDashboard(component.getY(), component.getX()).isEmpty() || !ship.getDashboard(component.getY(), component.getX()).get().equals(component))
                 throw new ComponentNotValidException("Cannon component not valid");
+            else if (!component.getIsDouble())
+                throw new ComponentNotValidException("Cannon component " + component.getId() + "is not double");
+        }
 
         if (batteries.size() != cannons.size())
             throw new RuntimeException("Inconsistent number of batteries components");
