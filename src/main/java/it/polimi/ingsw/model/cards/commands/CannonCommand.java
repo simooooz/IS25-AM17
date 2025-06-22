@@ -63,7 +63,7 @@ public class CannonCommand implements Command {
         }
 
         if (batteries.size() != cannons.size())
-            throw new RuntimeException("Inconsistent number of batteries components");
+            throw new RuntimeException("Inconsistent number of batteries");
 
         boolean enoughBatteries = batteries.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))

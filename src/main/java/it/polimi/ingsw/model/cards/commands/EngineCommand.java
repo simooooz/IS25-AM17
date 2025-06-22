@@ -61,7 +61,7 @@ public class EngineCommand implements Command {
         }
 
         if (batteries.size() != engines.size())
-            throw new RuntimeException("Inconsistent number of batteries components");
+            throw new RuntimeException("Inconsistent number of batteries");
 
         boolean enoughBatteries = batteries.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))

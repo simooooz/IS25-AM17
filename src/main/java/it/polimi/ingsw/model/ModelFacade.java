@@ -425,10 +425,11 @@ public abstract class ModelFacade {
         player.endFlight();
 
         player.getShip().getHandComponent().ifPresent(c -> c.releaseComponent(board, player));
-        releaseCardPile(username);
 
         PlayerState state = getPlayerState(username);
-        if (state == PlayerState.CHECK && areShipsReady())
+        if (state == PlayerState.LOOK_CARD_PILE)
+            releaseCardPile(username);
+        else if (state == PlayerState.CHECK && areShipsReady())
             manageChooseAlienPhase(0);
         else if (state == PlayerState.WAIT_ALIEN) {
             int playerIndex = board.getPlayersByPos().indexOf(board.getPlayerEntityByUsername(username)) + 1;

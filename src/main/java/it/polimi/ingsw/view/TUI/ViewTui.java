@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.TUI;
 
 import it.polimi.ingsw.client.model.ClientEventBus;
+import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -8,6 +9,8 @@ import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.common.model.events.game.ComponentInsertedEvent;
 import it.polimi.ingsw.common.model.events.game.ComponentMovedEvent;
 import it.polimi.ingsw.common.model.events.game.ComponentRotatedEvent;
+import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
+import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.rmi.RMIClient;
@@ -106,6 +109,9 @@ public class ViewTui implements UserInterface {
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             Chroma.println("Command not valid. Please try again.", Chroma.RED);
             System.out.print("> ");
+        } catch (PlayerNotFoundException e) {
+            Chroma.println("Player not found. Please try again.", Chroma.RED);
+            System.out.print("> ");
         } catch (IllegalArgumentException e) {
             Chroma.println(e.getMessage(), Chroma.RED);
             System.out.print("> ");
@@ -200,6 +206,20 @@ public class ViewTui implements UserInterface {
                 client.send(MessageType.LEAVE_GAME);
             else
                 System.out.print("> ");
+            return;
+        }
+        else if (input.split(" ").length > 1 && input.split(" ")[0].equals("ship") ) {
+            String username = input.split(" ")[1];
+            ClientPlayer player = client.getGameController().getModel().getBoard().getPlayerEntityByUsername(username);
+            clear();
+            if (!player.getUsername().equals(client.getUsername())) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(Chroma.color(username + "'s ship:\n", Chroma.YELLOW_BOLD));
+                player.getShip().printShip(sb);
+                sb.append("\n\n");
+                System.out.println(sb);
+            }
+            displayUpdater.updateDisplay();
             return;
         }
 
@@ -387,6 +407,10 @@ public class ViewTui implements UserInterface {
                                 .toList();
                     }
                 }
+
+                if (cannonComponentsIds.size() != batteriesIds.size())
+                    throw new IllegalArgumentException("Inconsistent number of batteries");
+
                 if (state == PlayerState.WAIT_CANNONS)
                     client.send(MessageType.ACTIVATE_CANNONS, batteriesIds, cannonComponentsIds);
                 else

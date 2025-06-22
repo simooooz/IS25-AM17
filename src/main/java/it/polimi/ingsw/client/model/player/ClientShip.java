@@ -85,7 +85,7 @@ public sealed abstract class ClientShip permits
         return brokenParts;
     }
 
-    private void printShip(StringBuilder output) {
+    public void printShip(StringBuilder output) {
         output.append("    ");
         for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
             output.append(Chroma.color(String.format("       %-2d       ", col + 4), Chroma.RESET));
