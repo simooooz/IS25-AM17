@@ -134,4 +134,15 @@ public class MeteorSwarmCard extends Card{
         throw new RuntimeException("Command type not valid");
     }
 
+    @Override
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        if (board.getPlayersByPos().isEmpty())
+            return true;
+
+        if (state == PlayerState.WAIT_ROLL_DICES) {
+            model.setPlayerState(board.getPlayersByPos().getFirst().getUsername(), PlayerState.WAIT_ROLL_DICES);
+        }
+        return autoCheckPlayers(model, board);
+    }
+
 }

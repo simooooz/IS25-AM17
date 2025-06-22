@@ -110,4 +110,24 @@ public abstract class EnemiesCard extends Card {
         throw new RuntimeException("Command type not valid");
     }
 
+    @SuppressWarnings("Duplicates")
+    @Override
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        int indexOfLeftPlayer = players.indexOf(player);
+
+        if (playerIndex > indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            playerIndex--;
+        }
+        else if (playerIndex == indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            return autoCheckPlayers(model, board);
+        }
+        else
+            players.remove(playerIndex);
+
+        return false;
+    }
+
 }

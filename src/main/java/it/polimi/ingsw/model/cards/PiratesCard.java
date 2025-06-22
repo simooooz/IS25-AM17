@@ -134,4 +134,15 @@ public class PiratesCard extends EnemiesCard {
         throw new RuntimeException("Command type not valid");
     }
 
+    @Override
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        defeatedPlayers.remove(username);
+        if (state == PlayerState.WAIT_ROLL_DICES) {
+            if (!defeatedPlayers.isEmpty())
+                model.setPlayerState(defeatedPlayers.getFirst(), PlayerState.WAIT_ROLL_DICES);
+        }
+
+        return super.doLeftGameEffects(state, model, board, username);
+    }
+
 }

@@ -97,4 +97,24 @@ public class AbandonedShipCard extends Card {
         super.doSpecificCheck(commandType, cabins, this.crew, username, board);
     }
 
+    @SuppressWarnings("Duplicates")
+    @Override
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        int indexOfLeftPlayer = players.indexOf(player);
+
+        if (playerIndex > indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            playerIndex--;
+        }
+        else if (playerIndex == indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            return autoCheckPlayers(model);
+        }
+        else
+            players.remove(playerIndex);
+
+        return false;
+    }
+
 }

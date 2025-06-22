@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,8 +20,10 @@ public class CombatZoneCard extends Card {
 
     @JsonProperty private final List<WarLine> warLines;
     @JsonProperty private int warLineIndex;
-    private int playerIndex;
     @JsonProperty private final Pair<Optional<String>, Double> worst;
+
+    private int playerIndex;
+    private List<PlayerData> players;
 
     public CombatZoneCard(int id, int level, boolean isLearner, List<WarLine> warLines) {
         super(id, level, isLearner);
@@ -35,8 +38,9 @@ public class CombatZoneCard extends Card {
         else {
             this.warLineIndex = 0;
             this.playerIndex = 0;
+            this.players = new ArrayList<>(board.getPlayersByPos());
 
-            for (PlayerData player : board.getPlayersByPos())
+            for (PlayerData player : players)
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT);
 
             return autoCheckPlayers(model, board);
@@ -44,8 +48,8 @@ public class CombatZoneCard extends Card {
     }
 
     private boolean autoCheckPlayers(ModelFacade model, Board board) {
-        for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
-            PlayerData player = board.getPlayersByPos().get(playerIndex);
+        for (; playerIndex < players.size(); playerIndex++) {
+            PlayerData player = players.get(playerIndex);
 
             PlayerState newState = warLines.get(warLineIndex).getCriteriaType().countCriteria(player, worst);
             model.setPlayerState(player.getUsername(), newState);
@@ -55,13 +59,17 @@ public class CombatZoneCard extends Card {
 
         // Check if everyone has finished
         boolean hasDone = true;
-        for (PlayerData player : board.getPlayersByPos())
+        for (PlayerData player : players)
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
                 hasDone = false;
 
         if (hasDone && worst.getKey().isPresent()) { // Apply malus
             PlayerState newState = warLines.get(warLineIndex).getPenalty().resolve(model, board, worst.getKey().get());
             model.setPlayerState(worst.getKey().get(), newState);
+
+            // Update players because flight days could be changed (due to penalty)
+            this.players = new ArrayList<>(board.getPlayersByPos().stream().filter(oldP -> players.contains(oldP)).toList());
+
             if (newState == PlayerState.DONE)
                 worst.setKey(Optional.empty());
         }
@@ -71,7 +79,7 @@ public class CombatZoneCard extends Card {
             if (warLineIndex >= warLines.size())
                 return true;
             else {
-                for (PlayerData player : board.getPlayersByPos())
+                for (PlayerData player : players)
                     model.setPlayerState(player.getUsername(), PlayerState.WAIT);
                 this.playerIndex = 0;
                 return autoCheckPlayers(model, board);
@@ -162,6 +170,33 @@ public class CombatZoneCard extends Card {
             int num = warLines.get(warLineIndex).getPenalty().getPenaltyNumber();
             super.doSpecificCheck(commandType, num, deltaGood, batteries, username, board);
         }
+    }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        if ( // Player was the worst
+            state == PlayerState.WAIT_REMOVE_CREW || state == PlayerState.WAIT_REMOVE_GOODS ||
+            state == PlayerState.WAIT_ROLL_DICES || state == PlayerState.WAIT_SHIP_PART ||
+            state == PlayerState.WAIT_SHIELD
+        )
+            worst.setKey(Optional.empty());
+
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        int indexOfLeftPlayer = players.indexOf(player);
+
+        if (playerIndex > indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            playerIndex--;
+        }
+        else if (playerIndex == indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            return autoCheckPlayers(model, board);
+        }
+        else
+            players.remove(playerIndex);
+
+        return false;
     }
 
 }

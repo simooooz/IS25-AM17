@@ -134,4 +134,9 @@ abstract public class Card {
     public boolean doCommandEffects(PlayerState commandType, ModelFacade model, Board board, String username) {
         throw new RuntimeException("Method not valid");
     }
+
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        return false;
+    }
+
 }

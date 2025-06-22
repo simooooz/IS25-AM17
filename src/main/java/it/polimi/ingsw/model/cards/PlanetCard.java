@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.model.player.PlayerData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class PlanetCard extends Card{
     @JsonProperty private final int days;
 
     private int playerIndex;
+    private List<PlayerData> players;
 
     public PlanetCard(int id, int level, boolean isLearner, List<Planet> planets, int days) {
         super(id, level, isLearner);
@@ -31,27 +33,28 @@ public class PlanetCard extends Card{
     @Override
     public boolean startCard(ModelFacade model, Board board){
         this.playerIndex = 0;
+        this.players = new ArrayList<>(board.getPlayersByPos());
 
-        for (PlayerData player: board.getPlayersByPos())
+        for (PlayerData player: players)
             model.setPlayerState(player.getUsername(), PlayerState.WAIT);
 
         return autoCheckPlayers(model, board);
     }
 
     private boolean autoCheckPlayers(ModelFacade model, Board board) {
-        for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
+        for (; playerIndex < players.size(); playerIndex++) {
             if (landedPlayers.size() < planets.size()) {
-                model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
+                model.setPlayerState(players.get(playerIndex).getUsername(), PlayerState.WAIT_INDEX);
                 return false;
             }
             else // Planets are finished
-                model.setPlayerState(board.getPlayersByPos().get(playerIndex).getUsername(), PlayerState.DONE);
+                model.setPlayerState(players.get(playerIndex).getUsername(), PlayerState.DONE);
         }
 
         // Check if everyone has finished
         boolean hasLanded = true;
         boolean hasLandedAndSetGoods = true;
-        for (PlayerData player : board.getPlayersByPos()) {
+        for (PlayerData player : players) {
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE && model.getPlayerState(player.getUsername()) != PlayerState.WAIT)
                 hasLanded = false;
             if (model.getPlayerState(player.getUsername()) != PlayerState.DONE)
@@ -59,13 +62,13 @@ public class PlanetCard extends Card{
         }
 
         if (hasLanded && !hasLandedAndSetGoods) { // First phase finished, start second one
-            for (PlayerData player : board.getPlayersByPos())
+            for (PlayerData player : players)
                 if (model.getPlayerState(player.getUsername()) == PlayerState.WAIT)
                     model.setPlayerState(player.getUsername(), PlayerState.WAIT_GOODS);
         }
 
         if (hasLandedAndSetGoods) { // Card finished
-            for (PlayerData player : board.getPlayersByPos().reversed())
+            for (PlayerData player : players.reversed())
                 if (landedPlayers.containsKey(player.getUsername()))
                     board.movePlayer(player, days * -1);
             return true;
@@ -102,6 +105,26 @@ public class PlanetCard extends Card{
     @Override
     public void doSpecificCheck(PlayerState commandType, Map<ColorType, Integer> r, Map<ColorType, Integer> deltaGood, List<BatteryComponent> batteries, String username, Board board) {
         super.doSpecificCheck(commandType, landedPlayers.get(username).rewards(), deltaGood, batteries, username, board);
+    }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        int indexOfLeftPlayer = players.indexOf(player);
+
+        if (playerIndex > indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            playerIndex--;
+        }
+        else if (playerIndex == indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            return autoCheckPlayers(model, board);
+        }
+        else
+            players.remove(playerIndex);
+
+        return false;
     }
 
 }

@@ -6,14 +6,12 @@ import it.polimi.ingsw.model.components.EngineComponent;
 import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.model.player.PlayerData;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OpenSpaceCard extends Card {
 
     private int playerIndex;
+    private List<PlayerData> players;
     private Map<String, Integer> enginesActivated = new HashMap<>();
 
     public OpenSpaceCard(int id, int level, boolean isLearner) {
@@ -24,16 +22,17 @@ public class OpenSpaceCard extends Card {
     public boolean startCard(ModelFacade model, Board board) {
         playerIndex = 0;
         this.enginesActivated = new HashMap<>();
+        this.players = new ArrayList<>(board.getPlayersByPos());
 
-        board.getPlayersByPos().forEach(player ->
+        players.forEach(player ->
                 model.setPlayerState(player.getUsername(), PlayerState.WAIT)
         );
         return autoCheckPlayers(model, board);
     }
 
     public boolean autoCheckPlayers(ModelFacade model, Board board) {
-        for (; playerIndex < board.getPlayersByPos().size(); playerIndex++) {
-            PlayerData player = board.getPlayersByPos().get(playerIndex);
+        for (; playerIndex < players.size(); playerIndex++) {
+            PlayerData player = players.get(playerIndex);
 
             int singleEnginesPower = player.getShip().getComponentByType(EngineComponent.class).stream()
                     .filter(engine -> !engine.getIsDouble())
@@ -61,16 +60,10 @@ public class OpenSpaceCard extends Card {
             }
         }
 
-        // Check if everyone has finished
-        if (playerIndex >= board.getPlayersByPos().size()) {
+        for (PlayerData player : players)
+            board.movePlayer(player, enginesActivated.get(player.getUsername()));
 
-            List<PlayerData> players = board.getPlayersByPos();
-            for (PlayerData player : players)
-                board.movePlayer(player, enginesActivated.get(player.getUsername()));
-
-            return true;
-        }
-        return false;
+        return true;
     }
 
     @Override
@@ -91,6 +84,26 @@ public class OpenSpaceCard extends Card {
             if (enginesActivated.get(player.getUsername()) == 0)
                 player.endFlight();
         super.endCard(board);
+    }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        int indexOfLeftPlayer = players.indexOf(player);
+
+        if (playerIndex > indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            playerIndex--;
+        }
+        else if (playerIndex == indexOfLeftPlayer) {
+            players.remove(playerIndex);
+            return autoCheckPlayers(model, board);
+        }
+        else
+            players.remove(playerIndex);
+
+        return false;
     }
 
 }
