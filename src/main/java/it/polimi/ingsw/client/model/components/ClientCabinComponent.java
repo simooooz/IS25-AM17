@@ -68,4 +68,11 @@ public final class ClientCabinComponent extends ClientComponent {
         }
     }
 
-} 
+    public AlienType getAlien() {
+        return alien;
+    }
+
+    public int getHumans() {
+        return humans;
+    }
+}

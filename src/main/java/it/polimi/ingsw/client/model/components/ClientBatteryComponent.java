@@ -35,4 +35,7 @@ public final class ClientBatteryComponent extends ClientComponent {
                 "    " + batteries + "/" + (isTriple ? 3 : 2) + "    "));
     }
 
+    public int getBatteries() {
+        return batteries;
+    }
 }
