@@ -60,10 +60,6 @@ public class ClientGameController {
         model.cardPileLooked(username, deckIndex, cards);
     }
 
-    public void cardPileLooked(String username, int deckIndex) {
-        model.cardPileLooked(username, deckIndex);
-    }
-
     public void cardPileReleased(String username) {
         model.cardPileReleased(username);
     }

@@ -13,7 +13,7 @@ public record CardPileLookedEvent(String username, Integer deckIndex, List<Clien
     public MessageType eventType() { return MessageType.CARD_PILE_LOOKED_EVENT; }
 
     @Override
-    public EventVisibility getVisibility() { return cards == null ? EventVisibility.OTHER_PLAYERS : EventVisibility.PLAYER_ONLY; }
+    public EventVisibility getVisibility() { return EventVisibility.PLAYER_ONLY; }
 
     @Override
     public Object[] getArgs() {

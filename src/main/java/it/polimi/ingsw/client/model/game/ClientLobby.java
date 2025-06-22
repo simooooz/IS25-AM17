@@ -104,8 +104,8 @@ public class ClientLobby {
      */
     public void initGame() {
         this.game = new ClientGameController(players, learnerMode);
-        this.game.matchStarted();
         this.state = LobbyState.IN_GAME;
+        this.game.matchStarted();
     }
 
 }

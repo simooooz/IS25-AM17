@@ -289,6 +289,4 @@ public abstract class ClientGameModel {
 
     public abstract void cardPileLooked(String username, int deckIndex, List<ClientCard> cards);
 
-    public abstract void cardPileLooked(String username, int deckIndex);
-
 }

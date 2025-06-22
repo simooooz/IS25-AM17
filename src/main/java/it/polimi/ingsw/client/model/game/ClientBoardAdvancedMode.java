@@ -13,6 +13,7 @@ import it.polimi.ingsw.common.dto.GameStateDTOFactory;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.view.TUI.Chroma;
+import it.polimi.ingsw.view.TUI.DisplayUpdater;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
@@ -153,6 +154,11 @@ public class ClientBoardAdvancedMode extends ClientBoard {
             }
 
             case DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, WAIT_SHIP_PART, DONE -> {
+                if (DisplayUpdater.getPhase().equals("build")) {
+                    sb.append("\nHourglass position: ").append(hourglassPos).append(hourglassPos == 0 ? " (last!)" : "");
+                    sb.append("\nTime left: ").append(timeLeft).append("\n");
+                }
+
                 if (!cardPile.isEmpty())
                     sb.append(Chroma.color("\nCards resolved so far " + (cardPile.size()-(state == PlayerState.DRAW_CARD ? 0 : 1)) + "/12", Chroma.GREY_BOLD)).append("\n");
 

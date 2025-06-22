@@ -58,8 +58,8 @@ public enum MessageType {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            client.setUsername(castedMessage.getArg1());
             client.setState(UserState.LOBBY_SELECTION);
+            client.setUsername(castedMessage.getArg1());
         }
     },
 
@@ -75,8 +75,8 @@ public enum MessageType {
         @Override
         public void execute(ClientSocket client, Message message) {
             QuadrupleArgMessage<String, List<String>, Boolean, Integer> castedMessage = (QuadrupleArgMessage<String, List<String>, Boolean, Integer>) message;
-            client.setLobby(new ClientLobby(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4()));
             client.setState(UserState.IN_LOBBY);
+            client.setLobby(new ClientLobby(castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4()));
         }
     },
 
@@ -118,8 +118,8 @@ public enum MessageType {
             if (!castedMessage.getArg1().equals(client.getUsername()))
                 client.getLobby().removePlayer(castedMessage.getArg1());
             else {
-                client.setLobby(null);
                 client.setState(UserState.LOBBY_SELECTION);
+                client.setLobby(null);
             }
         }
     },
@@ -139,8 +139,8 @@ public enum MessageType {
     MATCH_STARTED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
-            client.getLobby().initGame();
             client.setState(UserState.IN_GAME);
+            client.getLobby().initGame();
         }
     },
 
@@ -268,12 +268,8 @@ public enum MessageType {
         @Override
         public void execute(ClientSocket client, Message message) {
             TripleArgMessage<String, Integer, String> castedMessage = (TripleArgMessage<String, Integer, String>) message;
-            if (castedMessage.getArg3() == null)
-                client.getGameController().cardPileLooked(castedMessage.getArg1(), castedMessage.getArg2());
-            else {
-                List<ClientCard> cards = ClientCardFactory.deserializeCardList(castedMessage.getArg3());
-                client.getGameController().cardPileLooked(castedMessage.getArg1(), castedMessage.getArg2(), cards);
-            }
+            List<ClientCard> cards = ClientCardFactory.deserializeCardList(castedMessage.getArg3());
+            client.getGameController().cardPileLooked(castedMessage.getArg1(), castedMessage.getArg2(), cards);
         }
     },
 

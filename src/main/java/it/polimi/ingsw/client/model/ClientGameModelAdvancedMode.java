@@ -20,11 +20,6 @@ public class ClientGameModelAdvancedMode extends ClientGameModel {
     }
 
     @Override
-    public void cardPileLooked(String username, int deckIndex) {
-        ClientEventBus.getInstance().publish(new CardPileLookedEvent(username, deckIndex, null));
-    }
-
-    @Override
     public void cardPileLooked(String username, int deckIndex, List<ClientCard> cards) {
         board.getLookedCards().addAll(cards);
         ClientEventBus.getInstance().publish(new CardPileLookedEvent(username, deckIndex, board.getLookedCards()));

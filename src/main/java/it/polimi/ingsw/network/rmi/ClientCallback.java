@@ -39,12 +39,12 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             case BATCH_END -> ClientEventBus.getInstance().endBatch();
 
             case USERNAME_OK_EVENT -> {
-                client.setUsername((String) args[0]);
                 client.setState(UserState.LOBBY_SELECTION);
+                client.setUsername((String) args[0]);
             }
             case CREATED_LOBBY_EVENT -> {
-                client.setLobby(new ClientLobby((String) args[0], (List<String>) args[1], (Boolean) args[2], (Integer) args[3]));
                 client.setState(UserState.IN_LOBBY);
+                client.setLobby(new ClientLobby((String) args[0], (List<String>) args[1], (Boolean) args[2], (Integer) args[3]));
             }
             case JOINED_LOBBY_EVENT -> {
                 client.getLobby().addPlayer((String) args[0]);
@@ -53,14 +53,14 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
                 if (!args[0].equals(client.getUsername()))
                     client.getLobby().removePlayer((String) args[0]);
                 else {
-                    client.setLobby(null);
                     client.setState(UserState.LOBBY_SELECTION);
+                    client.setLobby(null);
                 }
             }
 
             case MATCH_STARTED_EVENT -> {
-                client.getLobby().initGame();
                 client.setState(UserState.IN_GAME);
+                client.getLobby().initGame();
             }
             case SYNC_ALL_EVENT -> {
                 ModelDTO dto = GameStateDTOFactory.deserializeDTO((String) args[0]);
@@ -79,12 +79,8 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             case COMPONENT_ROTATED_EVENT -> client.getGameController().componentRotated((Integer) args[0], (Integer) args[1]);
             case COMPONENT_DESTROYED_EVENT -> client.getGameController().componentDestroyed((String) args[0], (Integer) args[1]);
             case CARD_PILE_LOOKED_EVENT -> {
-                if (args[2] == null)
-                    client.getGameController().cardPileLooked((String) args[0], (Integer) args[1]);
-                else {
-                    List<ClientCard> cards = ClientCardFactory.deserializeCardList((String) args[2]);
-                    client.getGameController().cardPileLooked((String) args[0], (Integer) args[1], cards);
-                }
+                List<ClientCard> cards = ClientCardFactory.deserializeCardList((String) args[2]);
+                client.getGameController().cardPileLooked((String) args[0], (Integer) args[1], cards);
             }
             case CARD_PILE_RELEASED_EVENT -> client.getGameController().cardPileReleased((String) args[0]);
             case HOURGLASS_MOVED_EVENT -> client.getGameController().hourglassMoved();

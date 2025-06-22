@@ -19,5 +19,5 @@ public enum PlayerState {
     WAIT_SHIELD,
     WAIT_BOOLEAN,
     WAIT_INDEX,
-    DONE;
+    DONE
 }

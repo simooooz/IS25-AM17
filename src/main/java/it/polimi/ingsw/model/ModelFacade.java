@@ -133,7 +133,6 @@ public abstract class ModelFacade {
         int startingDeckIndex = deckIndex == 0 ? 0 : (deckIndex == 1 ? 3 : 6);
         int endingDeckIndex = startingDeckIndex + 3;
         EventContext.emit(new CardPileLookedEvent(username, deckIndex, board.getCardPile().subList(startingDeckIndex, endingDeckIndex)));
-        EventContext.emit(new CardPileLookedEvent(username, deckIndex, null));
     }
 
     public void releaseCardPile(String username) {
@@ -404,16 +403,22 @@ public abstract class ModelFacade {
     }
 
     public void endFlight(String username) {
-        if (getPlayerState(username) == PlayerState.BUILD || getPlayerState(username) == PlayerState.LOOK_CARD_PILE) throw new IllegalStateException("You can't end flight in this state");
-        PlayerData player = board.getPlayerEntityByUsername(username);
+        for (String p : usernames) {
+            if (
+                getPlayerState(p) == PlayerState.BUILD ||
+                getPlayerState(p) == PlayerState.LOOK_CARD_PILE ||
+                getPlayerState(p) == PlayerState.CHECK ||
+                getPlayerState(p) == PlayerState.WAIT_ALIEN
+            ) throw new IllegalStateException("You can't end flight in this phase");
+        }
 
-        boolean isDrawOrAlienPhase = true;
-        for (PlayerData p : board.getPlayersByPos())
-            if (playersState.get(p.getUsername()) != PlayerState.WAIT && playersState.get(p.getUsername()) != PlayerState.DRAW_CARD && playersState.get(p.getUsername()) != PlayerState.WAIT_ALIEN)
-                isDrawOrAlienPhase = false;
+        PlayerData player = board.getPlayerEntityByUsername(username);
+        if (player.hasEndedInAdvance())
+            throw new IllegalStateException("You have already ended flight");
 
         player.endFlight();
-        if (isDrawOrAlienPhase) {
+        boolean cardIsStarted = board.getPlayersByPos().stream().noneMatch(p -> getPlayerState(p.getUsername()) == PlayerState.DRAW_CARD);
+        if (!cardIsStarted) {
             board.moveToStartingDeck(player);
             setPlayerState(player.getUsername(), PlayerState.WAIT);
         }
@@ -443,6 +448,10 @@ public abstract class ModelFacade {
                 board.moveToStartingDeck(player);
                 return;
             }
+        }
+        else if (state == PlayerState.END) {
+            board.moveToStartingDeck(player);
+            return;
         }
 
         board.moveToStartingDeck(player);

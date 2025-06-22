@@ -10,7 +10,6 @@ import it.polimi.ingsw.common.model.events.game.ComponentInsertedEvent;
 import it.polimi.ingsw.common.model.events.game.ComponentMovedEvent;
 import it.polimi.ingsw.common.model.events.game.ComponentRotatedEvent;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
-import it.polimi.ingsw.model.game.Board;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.rmi.RMIClient;
@@ -21,9 +20,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.IntStream;
 
 public class ViewTui implements UserInterface {
@@ -32,51 +28,24 @@ public class ViewTui implements UserInterface {
     private final BufferedReader reader;
 
     private final DisplayUpdater displayUpdater;
-    private final BlockingQueue<Runnable> uiUpdateQueue = new LinkedBlockingQueue<>(); // TODO serve?
-
     private String localCommand = "";
 
     public ViewTui() {
         ClientEventBus.getInstance().subscribe(this);
         this.reader = new BufferedReader(new InputStreamReader(System.in));
         this.displayUpdater = new DisplayUpdater();
-        startUpdateThread();
     }
 
     @Override
     public void onEvent(List<GameEvent> events) {
-        if (false)
-            displayError((String) events.getFirst().getArgs()[0]);
-        else {
-            scheduleUpdate();
-            events.stream().filter(e -> e.eventType() == MessageType.ERROR).findFirst().ifPresent(e -> displayError((String) e.getArgs()[0]));
-        }
+        scheduleUpdate();
+        events.stream().filter(e -> e.eventType() == MessageType.ERROR).findFirst().ifPresent(e -> displayError((String) e.getArgs()[0]));
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void scheduleUpdate() {
-        uiUpdateQueue.offer(() -> {
-            clear();
-            displayUpdater.updateDisplay();
-            System.out.flush();
-        });
-    }
-
-    // TODO cambiare con schedule at fixed rate
-    private void startUpdateThread() {
-        Thread updateThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Runnable updateTask = uiUpdateQueue.take();
-                    updateTask.run();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-        });
-        updateThread.setDaemon(true);
-        updateThread.start();
+        clear();
+        displayUpdater.updateDisplay();
+        System.out.flush();
     }
 
     private void processUserInput(String input) {
@@ -208,7 +177,7 @@ public class ViewTui implements UserInterface {
                 System.out.print("> ");
             return;
         }
-        else if (input.split(" ").length > 1 && input.split(" ")[0].equals("ship") ) {
+        else if (input.split(" ").length > 1 && input.split(" ")[0].equals("ship")) {
             String username = input.split(" ")[1];
             ClientPlayer player = client.getGameController().getModel().getBoard().getPlayerEntityByUsername(username);
             clear();
@@ -220,6 +189,10 @@ public class ViewTui implements UserInterface {
                 System.out.println(sb);
             }
             displayUpdater.updateDisplay();
+            return;
+        }
+        else if (input.equals("end-flight")) {
+            client.send(MessageType.END_FLIGHT);
             return;
         }
 
@@ -297,7 +270,7 @@ public class ViewTui implements UserInterface {
                             if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
                                 localCommand = String.join(" ", localCommand.split(" ")[0], localCommand.split(" ")[1], String.valueOf(row), String.valueOf(col), localCommand.split(" ")[4]);
                             else // No previous local command
-                                localCommand = input + " 0";;
+                                localCommand = input + " 0";
 
                             ClientEventBus.getInstance().publish(new ComponentMovedEvent(client.getUsername(), Integer.parseInt(commands[1]), row, col));
                         } catch (RuntimeException e) {
@@ -503,13 +476,12 @@ public class ViewTui implements UserInterface {
 
     @Override
     public void displayError(String message) {
-        uiUpdateQueue.offer(() -> {
-            Chroma.println(message, Chroma.RED);
-            System.out.print("> ");
-            System.out.flush();
-        });
+        Chroma.println(message, Chroma.RED);
+        System.out.print("> ");
+        System.out.flush();
     }
 
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void start() {
         clear();
@@ -540,21 +512,29 @@ public class ViewTui implements UserInterface {
                 System.exit(-1);
 
             displayUpdater.updateDisplay();
+
             while (true) {
                 System.out.flush();
                 String input = reader.readLine();
                 processUserInput(input);
             }
+
         } catch (IOException e) {
-            // TODO che faccio?
-            // Ignore it
+            handleDisconnect();
         }
 
-        // this.reader.close();
     }
 
     public void handleDisconnect() {
         Chroma.println("Bye!", Chroma.YELLOW_BOLD);
+
+        if (reader != null) {
+            try {
+                this.reader.close();
+            } catch (IOException e) {
+                // Do nothing
+            }
+        }
         client.closeConnection();
         System.exit(0);
     }

@@ -100,12 +100,12 @@ public abstract class ServerBasis {
 
         List<GameEvent> events = MatchController.getInstance().leaveGame(user.getUsername());
         events.stream().filter(e -> e.eventType().equals(MessageType.LEFT_LOBBY_EVENT)).findFirst().ifPresent(e -> e.getTargetPlayers().add(user.getUsername()));
+
+        user.notifyEvents(events);
         if (notContainsError(events)) {
             user.setState(UserState.LOBBY_SELECTION);
             user.setLobby(null);
         }
-
-        user.notifyEvents(events);
     }
 
     public static void pickComponent(User user, Integer id) {

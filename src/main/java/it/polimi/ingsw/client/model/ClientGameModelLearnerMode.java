@@ -19,11 +19,6 @@ public class ClientGameModelLearnerMode extends ClientGameModel {
     }
 
     @Override
-    public void cardPileLooked(String username, int deckIndex) {
-        throw new RuntimeException("Card piles aren't learner mode flight");
-    }
-
-    @Override
     public void cardPileLooked(String username, int deckIndex, List<ClientCard> cards) {
         throw new RuntimeException("Card piles aren't learner mode flight");
     }

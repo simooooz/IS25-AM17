@@ -36,7 +36,7 @@ public class ModelFacadeLearnerMode extends ModelFacade {
 
     @Override
     public void endFlight(String username) {
-        throw new IllegalArgumentException("Match is in learner mode");
+        throw new IllegalArgumentException("You can't end flight in advance in learner mode");
     }
 
 }
