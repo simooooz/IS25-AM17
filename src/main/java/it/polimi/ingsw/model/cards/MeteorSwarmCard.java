@@ -60,7 +60,9 @@ public class MeteorSwarmCard extends Card{
     public void doSpecificCheck(PlayerState commandType, List<CannonComponent> cannons, String username, Board board) {
         PlayerData player = board.getPlayerEntityByUsername(username);
         if (commandType == PlayerState.WAIT_CANNONS) {
-            if (cannons.size() != 1) throw new IllegalArgumentException("Too many cannon components provided");
+            if (cannons.size() > 1) throw new IllegalArgumentException("Too many cannon components provided");
+            if (cannons.isEmpty()) return;
+
             CannonComponent chosenCannon = cannons.getFirst();
 
             List<Component> targets = meteors.get(meteorIndex).getTargets(player.getShip(), coords.getLast());

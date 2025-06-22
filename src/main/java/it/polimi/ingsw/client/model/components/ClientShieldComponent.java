@@ -1,6 +1,5 @@
 package it.polimi.ingsw.client.model.components;
 
-import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.common.dto.ShieldComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.DirectionType;
@@ -29,14 +28,6 @@ public final class ClientShieldComponent extends ClientComponent {
         DirectionType[] directions = DirectionType.values();
         this.directionsProtected[0] = directions[((this.directionsProtected[0].ordinal() + 1) % 4)];
         this.directionsProtected[1] = directions[((this.directionsProtected[1].ordinal() + 1) % 4)];
-    }
-
-    @Override
-    public void rotateComponent(ClientPlayer player, int rotations) {
-        super.rotateComponent(player, rotations);
-        DirectionType[] directions = DirectionType.values();
-        this.directionsProtected[0] = directions[((this.directionsProtected[0].ordinal() + rotations) % 4)];
-        this.directionsProtected[1] = directions[((this.directionsProtected[1].ordinal() + rotations) % 4)];
     }
 
     @Override

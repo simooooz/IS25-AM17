@@ -29,8 +29,7 @@ public class ViewTui implements UserInterface {
     private final BufferedReader reader;
 
     private final DisplayUpdater displayUpdater;
-
-    private final BlockingQueue<Runnable> uiUpdateQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Runnable> uiUpdateQueue = new LinkedBlockingQueue<>(); // TODO serve?
 
     private String localCommand = "";
 
@@ -43,7 +42,7 @@ public class ViewTui implements UserInterface {
 
     @Override
     public void onEvent(List<GameEvent> events) {
-        if (events.size() == 1 && events.getFirst().eventType() == MessageType.ERROR)
+        if (false)
             displayError((String) events.getFirst().getArgs()[0]);
         else {
             scheduleUpdate();
@@ -51,8 +50,8 @@ public class ViewTui implements UserInterface {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void scheduleUpdate() {
-        // TODO che fare con l'evento? Lo togliamo o lo mettiamo come parametro di updateDisplay?
         uiUpdateQueue.offer(() -> {
             clear();
             displayUpdater.updateDisplay();
@@ -60,6 +59,7 @@ public class ViewTui implements UserInterface {
         });
     }
 
+    // TODO cambiare con schedule at fixed rate
     private void startUpdateThread() {
         Thread updateThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
@@ -103,10 +103,10 @@ public class ViewTui implements UserInterface {
                     handleInGame(input);
                     break;
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
             Chroma.println("Command not valid. Please try again.", Chroma.RED);
             System.out.print("> ");
-        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+        } catch (IllegalArgumentException e) {
             Chroma.println(e.getMessage(), Chroma.RED);
             System.out.print("> ");
         }
@@ -121,17 +121,17 @@ public class ViewTui implements UserInterface {
 
         String lobbyName = InputUtility.requestString("Insert lobby name\n> ", true, 3, 18);
         if (lobbyName == null) {
-            displayUpdater.updateDisplay();
+            scheduleUpdate();
             return;
         }
         Integer maxPlayers = InputUtility.requestInt("Insert the number of players (2-4)\n> ", true, 2, 4);
         if (maxPlayers == null) {
-            displayUpdater.updateDisplay();
+            scheduleUpdate();
             return;
         }
         Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false)\n> ", true);
         if (learnerFlight == null) {
-            displayUpdater.updateDisplay();
+            scheduleUpdate();
             return;
         }
 
@@ -147,7 +147,7 @@ public class ViewTui implements UserInterface {
 
         String lobbyName = InputUtility.requestString("Insert lobby name\n> ", true, 3, 18);
         if (lobbyName == null) {
-            displayUpdater.updateDisplay();
+            scheduleUpdate();
             return;
         }
 
@@ -163,7 +163,7 @@ public class ViewTui implements UserInterface {
 
         Boolean learnerFlight = InputUtility.requestBoolean("Learner flight? (true/false)\n> ", true);
         if (learnerFlight == null) {
-            displayUpdater.updateDisplay();
+            scheduleUpdate();
             return;
         }
 
@@ -190,6 +190,7 @@ public class ViewTui implements UserInterface {
      *
      * @param input provided by the user to influence the game logic
      */
+    @SuppressWarnings("Duplicates")
     private void handleInGame(String input) {
         PlayerState state = client.getGameController().getModel().getPlayerState(client.getUsername());
 
@@ -369,16 +370,22 @@ public class ViewTui implements UserInterface {
             case WAIT_CANNONS, WAIT_ENGINES -> {
                 List<Integer> cannonComponentsIds = new ArrayList<>();
                 List<Integer> batteriesIds = new ArrayList<>();
+                if (!input.isBlank()) {
+                    String[] parts = input.trim().split("-");
+                    String[] ids;
 
-                if (!input.isBlank() && input.trim().split("-").length > 0) {
-                    String[] commands = input.split("-")[0].split(" ");
-                    cannonComponentsIds = Arrays.stream(commands)
-                            .map(Integer::parseInt)
-                            .toList();
-                    commands = input.split("-")[1].split(" ");
-                    batteriesIds = Arrays.stream(commands)
-                            .map(Integer::parseInt)
-                            .toList();
+                    if (parts.length > 0 && !parts[0].isBlank()) {
+                        ids = input.split("-")[0].split(" ");
+                        cannonComponentsIds = Arrays.stream(ids)
+                                .map(Integer::parseInt)
+                                .toList();
+                    }
+                    if (parts.length > 1 && !parts[1].isBlank()) {
+                        ids = input.split("-")[1].split(" ");
+                        batteriesIds = Arrays.stream(ids)
+                                .map(Integer::parseInt)
+                                .toList();
+                    }
                 }
                 if (state == PlayerState.WAIT_CANNONS)
                     client.send(MessageType.ACTIVATE_CANNONS, batteriesIds, cannonComponentsIds);
@@ -390,20 +397,22 @@ public class ViewTui implements UserInterface {
                 List<Integer> batteriesIds = new ArrayList<>();
                 if (!input.isBlank()) {
                     String[] parts = input.trim().split("-");
-                    String[] firstCommandList = parts[0].trim().split(" ");
 
-                    List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.name().toUpperCase()).toList();
-                    Integer currentId = null;
-                    for (String value : firstCommandList) {
-                        if (colors.contains(value.toUpperCase()) && newDisposition.containsKey(currentId))
-                            newDisposition.get(currentId).add(ColorType.valueOf(value.toUpperCase()));
-                        else {
-                            currentId = Integer.parseInt(value);
-                            newDisposition.put(currentId, new ArrayList<>());
+                    if (parts.length > 0 && !parts[0].isBlank()) {
+                        String[] firstCommandList = parts[0].trim().split(" ");
+                        List<String> colors = Arrays.stream(ColorType.values()).map(c -> c.name().toUpperCase()).toList();
+                        Integer currentId = null;
+                        for (String value : firstCommandList) {
+                            if (colors.contains(value.toUpperCase()) && newDisposition.containsKey(currentId))
+                                newDisposition.get(currentId).add(ColorType.valueOf(value.toUpperCase()));
+                            else {
+                                currentId = Integer.parseInt(value);
+                                newDisposition.put(currentId, new ArrayList<>());
+                            }
                         }
                     }
 
-                    if (state == PlayerState.WAIT_REMOVE_GOODS && !parts[1].isBlank()) {
+                    if (state == PlayerState.WAIT_REMOVE_GOODS && parts.length > 1 && !parts[1].isBlank()) {
                         batteriesIds = Arrays.stream(parts[1].trim().split(" "))
                                 .map(Integer::parseInt)
                                 .toList();
@@ -500,9 +509,9 @@ public class ViewTui implements UserInterface {
             int clientType = InputUtility.requestInt("Press 1 to choose socket client or 2 for RMI: ", false, 1, 2);
 
             if (clientType == 1)
-                this.client = new ClientSocket(this);
+                client = new ClientSocket(this);
             else if (clientType == 2)
-                this.client = new RMIClient(this);
+                client = new RMIClient(this);
             else
                 System.exit(-1);
 
@@ -521,7 +530,6 @@ public class ViewTui implements UserInterface {
     }
 
     public void handleDisconnect() {
-        // TODO send message disconnect ?
         Chroma.println("Bye!", Chroma.YELLOW_BOLD);
         client.closeConnection();
         System.exit(0);

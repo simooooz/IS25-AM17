@@ -14,8 +14,8 @@ public class InputUtility {
             String errorMessage) {
 
         T result;
+        System.out.print(message);
         do {
-            System.out.print(message);
             try {
                 String input = scanner.nextLine();
                 result = parser.apply(input);
@@ -25,10 +25,11 @@ public class InputUtility {
                     return result;
                 } else {
                     Chroma.println(errorMessage, Chroma.RED);
+                    System.out.print("> ");
                 }
             } catch (Exception e) {
                 Chroma.println(errorMessage, Chroma.RED);
-                System.out.println("> ");
+                System.out.print("> ");
                 result = null;
             }
         } while (true);

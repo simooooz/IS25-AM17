@@ -72,7 +72,7 @@ public class ClientPlanetCard extends ClientCard {
     public void printCardInfo(ClientGameModel model, ClientBoard board) {
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
-            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + planets.indexOf(landedPlayers.get(player.getUsername()))+1 + ")" : "(not landed)";
+            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + (planets.indexOf(landedPlayers.get(player.getUsername()))+1) + ")" : "(not landed)";
 
             switch (state) {
                 case DONE -> Chroma.println("- " + player.getUsername() + " has done " + landInfo, Chroma.YELLOW_BOLD);

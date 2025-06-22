@@ -42,8 +42,10 @@ public abstract class ServerBasis {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
-        user.setLobby(MatchController.getInstance().getLobby(user.getUsername()));
-        user.setState(UserState.IN_LOBBY);
+        if (notContainsError(events)) {
+            user.setLobby(MatchController.getInstance().getLobby(user.getUsername()));
+            user.setState(UserState.IN_LOBBY);
+        }
         user.notifyEvents(events);
     }
 
@@ -51,14 +53,20 @@ public abstract class ServerBasis {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().joinGame(user.getUsername(), lobbyName);
-        joinCommon(user, events);
+        if (notContainsError(events))
+            joinCommon(user, events);
+
+        user.notifyEvents(events);
     }
 
     public static void joinRandomLobby(User user, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().joinRandomGame(user.getUsername(), learnerMode);
-        joinCommon(user, events);
+        if (notContainsError(events))
+            joinCommon(user, events);
+
+        user.notifyEvents(events);
     }
 
     private static void joinCommon(User user, List<GameEvent> events) {
@@ -82,8 +90,6 @@ public abstract class ServerBasis {
                 case "test-2" -> events.addAll(user.getGameController().startTest(2));
             }
         }
-
-        user.notifyEvents(events);
     }
 
     public static void leaveGame(User user) {
@@ -91,8 +97,10 @@ public abstract class ServerBasis {
 
         List<GameEvent> events = MatchController.getInstance().leaveGame(user.getUsername());
         events.stream().filter(e -> e.eventType().equals(MessageType.LEFT_LOBBY_EVENT)).findFirst().ifPresent(e -> e.getTargetPlayers().add(user.getUsername()));
-        user.setState(UserState.LOBBY_SELECTION);
-        user.setLobby(null);
+        if (notContainsError(events)) {
+            user.setState(UserState.LOBBY_SELECTION);
+            user.setLobby(null);
+        }
 
         user.notifyEvents(events);
     }
@@ -227,6 +235,13 @@ public abstract class ServerBasis {
         if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
         List<GameEvent> events = user.getGameController().endFlight(user.getUsername());
         user.notifyEvents(events);
+    }
+
+    private static boolean notContainsError(List<GameEvent> events) {
+        for (GameEvent event : events)
+            if (event.eventType() == MessageType.ERROR)
+                return false;
+        return true;
     }
 
 }

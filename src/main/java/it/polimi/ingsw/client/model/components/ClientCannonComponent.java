@@ -1,6 +1,5 @@
 package it.polimi.ingsw.client.model.components;
 
-import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.common.dto.CannonComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.DirectionType;
@@ -31,13 +30,6 @@ public final class ClientCannonComponent extends ClientComponent {
         super.rotateComponent();
         DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3
         this.direction = directions[(this.direction.ordinal() + 1 % 4)];
-    }
-
-    @Override
-    public void rotateComponent(ClientPlayer player, int rotations) {
-        super.rotateComponent(player, rotations);
-        DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3
-        this.direction = directions[((this.direction.ordinal() + rotations) % 4)];
     }
 
     @Override

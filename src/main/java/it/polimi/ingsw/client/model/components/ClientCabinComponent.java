@@ -38,6 +38,14 @@ public final class ClientCabinComponent extends ClientComponent {
         this.humans = humans;
     }
 
+    public int getHumans() {
+        return humans;
+    }
+
+    public AlienType getAlien() {
+        return alien;
+    }
+
     @Override
     public void insertComponent(ClientPlayer player, int row, int col, int rotations, boolean weld) {
         if (isStarting) {
@@ -68,11 +76,4 @@ public final class ClientCabinComponent extends ClientComponent {
         }
     }
 
-    public AlienType getAlien() {
-        return alien;
-    }
-
-    public int getHumans() {
-        return humans;
-    }
 }

@@ -27,6 +27,10 @@ public final class ClientBatteryComponent extends ClientComponent {
         this.batteries = batteries;
     }
 
+    public int getBatteries() {
+        return batteries;
+    }
+
     @Override
     public List<String> icon() {
         String battery = "\uD83D\uDD0B";
@@ -35,7 +39,4 @@ public final class ClientBatteryComponent extends ClientComponent {
                 "    " + batteries + "/" + (isTriple ? 3 : 2) + "    "));
     }
 
-    public int getBatteries() {
-        return batteries;
-    }
 }

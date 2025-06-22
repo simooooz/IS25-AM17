@@ -46,6 +46,10 @@ public abstract class ClientGameModel {
         this.playersState = dto.playersState;
     }
 
+    public Map<String, PlayerState> getPlayersState() {
+        return playersState;
+    }
+
     public PlayerState getPlayerState(String username) {
         return playersState.get(username);
     }

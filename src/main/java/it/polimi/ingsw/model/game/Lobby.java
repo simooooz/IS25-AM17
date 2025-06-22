@@ -49,6 +49,8 @@ public class Lobby {
      * @param learnerMode true if is a test flight
      */
     public Lobby(String name, int maxPlayers, boolean learnerMode) {
+        if (maxPlayers < 2 || maxPlayers > 4) throw new IllegalArgumentException("Max number of allowed players must be between 2 and 4");
+
         this.state = LobbyState.WAITING;
         this.id = name;
         this.learnerMode = learnerMode;

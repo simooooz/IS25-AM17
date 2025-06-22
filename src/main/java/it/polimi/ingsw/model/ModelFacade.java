@@ -109,7 +109,7 @@ public abstract class ModelFacade {
     }
 
     public void lookCardPile(String username, int deckIndex) {
-        if (getPlayerState(username) != PlayerState.BUILD && getPlayerState(username) == PlayerState.LOOK_CARD_PILE) throw new IllegalStateException("State is not BUILDING");
+        if (getPlayerState(username) != PlayerState.BUILD && getPlayerState(username) != PlayerState.LOOK_CARD_PILE) throw new IllegalStateException("State is not BUILDING");
         else if (deckIndex < 0 || deckIndex > 2) throw new IllegalArgumentException("Invalid deck index");
         else if (board.getCardPilesWatchMap().containsValue(deckIndex)) throw new IllegalArgumentException("Another player is already looking this card pile");
 
@@ -217,7 +217,7 @@ public abstract class ModelFacade {
     private boolean areShipsReady() {
         List<PlayerData> totalPlayers;
         totalPlayers = Stream.concat(
-                board.getPlayers().stream().map(AbstractMap.SimpleEntry::getKey),
+                board.getPlayers().stream().map(AbstractMap.SimpleEntry::getKey).filter(p -> !p.hasEndedInAdvance()),
                 board.getStartingDeck().stream().filter(p -> !p.hasEndedInAdvance()))
             .toList();
         for (PlayerData player : totalPlayers)
@@ -230,8 +230,9 @@ public abstract class ModelFacade {
         if (getPlayerState(username) != PlayerState.WAIT_ALIEN) throw new IllegalStateException("State is not WAIT_ALIEN");
 
         for (int id : aliensIds.keySet()) { // Put alien in all cabins in aliensIds list
-            if (!(board.getMapIdComponents().get(id) instanceof CabinComponent cabin)) throw new CabinComponentNotValidException("Component is not a cabin");
-            cabin.setAlien(aliensIds.get(id), board.getPlayerEntityByUsername(username).getShip());
+            if (!board.getMapIdComponents().get(id).matchesType(CabinComponent.class))
+                throw new CabinComponentNotValidException("Component is not a cabin");
+            board.getMapIdComponents().get(id).castTo(CabinComponent.class).setAlien(aliensIds.get(id), board.getPlayerEntityByUsername(username).getShip());
         }
         setPlayerState(username, PlayerState.WAIT);
 
@@ -423,7 +424,36 @@ public abstract class ModelFacade {
         player.setLeftGame(true);
         player.endFlight();
 
+        player.getShip().getHandComponent().ifPresent(c -> c.releaseComponent(board, player));
+        releaseCardPile(username);
+
+        PlayerState state = getPlayerState(username);
+        if (state == PlayerState.CHECK && areShipsReady())
+            manageChooseAlienPhase(0);
+        else if (state == PlayerState.WAIT_ALIEN) {
+            int playerIndex = board.getPlayersByPos().indexOf(board.getPlayerEntityByUsername(username)) + 1;
+            manageChooseAlienPhase(playerIndex);
+        }
+        else if (state == PlayerState.DRAW_CARD) {
+            if (board.getPlayersByPos().size() > 1)
+                setPlayerState(board.getPlayersByPos().get(1).getUsername(), PlayerState.DRAW_CARD);
+            else {
+                endGame();
+                board.moveToStartingDeck(player);
+                return;
+            }
+        }
+
         board.moveToStartingDeck(player);
+
+        if (board.getCardPilePos() >= 0 && board.getCardPilePos() < board.getCardPile().size()) {
+            Card card = board.getCardPile().get(board.getCardPilePos());
+            boolean finish = card.doLeftGameEffects(state, this, board, username);
+            EventContext.emit(new CardUpdatedEvent(card));
+
+            if (finish) { board.pickNewCard(this); }
+        }
+
         setPlayerState(player.getUsername(), PlayerState.WAIT);
     }
 
