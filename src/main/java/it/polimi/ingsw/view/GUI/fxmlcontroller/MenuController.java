@@ -1,15 +1,15 @@
 package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
 import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
+import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.App;
 import it.polimi.ingsw.view.GUI.MessageDispatcher;
+import it.polimi.ingsw.view.GUI.SceneManager;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -17,7 +17,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.input.KeyCode;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -31,7 +30,6 @@ public class MenuController implements MessageHandler {
 
     @FXML private Label statusLabel;
     @FXML private AnchorPane sidePanel;
-    @FXML private Label sidePanelTitle;
     @FXML private VBox sidePanelContent;
 
     /**
@@ -39,39 +37,39 @@ public class MenuController implements MessageHandler {
      */
     @FXML
     public void initialize() {
+        MessageDispatcher.getInstance().registerHandler(this);
         setStatus("");
     }
 
 
     @FXML
-    private void handleCreateLobby(ActionEvent event) {
+    private void handleCreateLobby() {
         showCreateLobbyPanel();
     }
 
     @FXML
-    private void handleJoinLobby(ActionEvent event) {
+    private void handleJoinLobby() {
         showJoinLobbyPanel();
     }
 
     @FXML
-    private void handleJoinRandom(ActionEvent event) {
+    private void handleJoinRandom() {
         showJoinRandomPanel();
     }
 
     @FXML
-    private void handleExitGame(ActionEvent event) {
+    private void handleExitGame() {
         Platform.exit();
     }
 
-
     @FXML
-    private void closeSidePanel(ActionEvent event) {
+    private void closeSidePanel() {
         sidePanel.setVisible(false);
         setStatus("");
     }
 
     /**
-     * Displays the create lobby panel with input fields and mode selection.
+     * Displays create lobby panel with input fields and mode selection.
      */
     private void showCreateLobbyPanel() {
         sidePanelContent.getChildren().clear();
@@ -96,7 +94,7 @@ public class MenuController implements MessageHandler {
         learnerModeBtn.getStyleClass().add("toggle-button-selected");
         standardModeBtn.getStyleClass().add("toggle-button");
 
-        learnerModeBtn.setOnAction(e -> {
+        learnerModeBtn.setOnAction(_ -> {
             if (!selectedMode[0]) {
                 selectedMode[0] = true;
                 learnerModeBtn.getStyleClass().clear();
@@ -106,7 +104,7 @@ public class MenuController implements MessageHandler {
             }
         });
 
-        standardModeBtn.setOnAction(e -> {
+        standardModeBtn.setOnAction(_ -> {
             if (selectedMode[0]) {
                 selectedMode[0] = false;
                 standardModeBtn.getStyleClass().clear();
@@ -121,8 +119,22 @@ public class MenuController implements MessageHandler {
         modeButtonsBox.setAlignment(javafx.geometry.Pos.CENTER);
         modeButtonsBox.getChildren().addAll(learnerModeBtn, standardModeBtn);
 
+        Button createBtn = createCreateLobbyButton(nameField, playersField, selectedMode);
+
+        sidePanelContent.getChildren().addAll(
+            nameLabel, nameField,
+            playersLabel, playersField,
+            modeLabel, modeButtonsBox,
+            createBtn
+        );
+
+        sidePanel.setVisible(true);
+        setStatus("Enter lobby details");
+    }
+
+    private Button createCreateLobbyButton(TextField nameField, TextField playersField, boolean[] selectedMode) {
         Button createBtn = new Button("Create Lobby");
-        createBtn.setOnAction(e -> {
+        createBtn.setOnAction(_ -> {
             String lobbyName = nameField.getText().trim();
             String maxPlayers = playersField.getText().trim();
 
@@ -151,18 +163,9 @@ public class MenuController implements MessageHandler {
             // Send create lobby request to server
             setStatus("Creating lobby...");
             App.getClientInstance().send(MessageType.CREATE_LOBBY, lobbyName, Integer.valueOf(maxPlayers), selectedMode[0]);
-            closeSidePanel(null);
+            closeSidePanel();
         });
-
-        sidePanelContent.getChildren().addAll(
-                nameLabel, nameField,
-                playersLabel, playersField,
-                modeLabel, modeButtonsBox,
-                createBtn
-        );
-
-        sidePanel.setVisible(true);
-        setStatus("Enter lobby details");
+        return createBtn;
     }
 
     /**
@@ -182,7 +185,7 @@ public class MenuController implements MessageHandler {
         });
 
         Button joinBtn = new Button("Join Lobby");
-        joinBtn.setOnAction(e -> joinLobbyById(idField.getText().trim()));
+        joinBtn.setOnAction(_ -> joinLobbyById(idField.getText().trim()));
 
         sidePanelContent.getChildren().addAll(idLabel, idField, joinBtn);
         sidePanel.setVisible(true);
@@ -198,17 +201,17 @@ public class MenuController implements MessageHandler {
         Label modeLabel = new Label("Select Game Mode:");
 
         Button learnerModeBtn = new Button("Learner Mode");
-        learnerModeBtn.setOnAction(e -> {
+        learnerModeBtn.setOnAction(_ -> {
             setStatus("Finding learner random lobby...");
             App.getClientInstance().send(MessageType.JOIN_RANDOM_LOBBY, true);
-            closeSidePanel(null);
+            closeSidePanel();
         });
 
         Button standardModeBtn = new Button("Standard Mode");
-        standardModeBtn.setOnAction(e -> {
+        standardModeBtn.setOnAction(_ -> {
             setStatus("Finding standard random lobby...");
             App.getClientInstance().send(MessageType.JOIN_RANDOM_LOBBY, false);
-            closeSidePanel(null);
+            closeSidePanel();
         });
 
         sidePanelContent.getChildren().addAll(modeLabel, learnerModeBtn, standardModeBtn);
@@ -227,66 +230,33 @@ public class MenuController implements MessageHandler {
 
         setStatus("Joining lobby...");
         App.getClientInstance().send(MessageType.JOIN_LOBBY, lobbyId);
-        closeSidePanel(null);
+        closeSidePanel();
     }
 
     /**
      * Updates the status label with a normal message.
      */
     private void setStatus(String message) {
-        if (statusLabel != null) {
-            statusLabel.setText(message);
-            statusLabel.getStyleClass().removeAll("error-text", "success-text");
-            statusLabel.getStyleClass().add("status-text");
-        }
+        statusLabel.setText(message);
+        statusLabel.getStyleClass().removeAll("error-text", "success-text");
+        statusLabel.getStyleClass().add("status-text");
     }
 
     /**
      * Updates the status label with an error message in red.
      */
     private void setErrorStatus(String message) {
-        if (statusLabel != null) {
-            statusLabel.setText(message);
-            statusLabel.getStyleClass().removeAll("status-text", "success-text");
-            statusLabel.getStyleClass().add("error-text");
-        }
-    }
-
-
-    /**
-     * Navigates to a new scene by loading the specified FXML file and controller.
-     */
-    private <T extends MessageHandler> void navigateToScene(String fxmlPath, Class<T> controllerClass) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent view = loader.load();
-
-            T controller = loader.getController();
-            MessageDispatcher.getInstance().unregisterHandler(this);
-            MessageDispatcher.getInstance().registerHandler(controller);
-
-            Scene scene = sidePanel.getScene();
-            if (scene != null) {
-                scene.setRoot(view);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            setErrorStatus("Error loading interface");
-        }
+        statusLabel.setText(message);
+        statusLabel.getStyleClass().removeAll("status-text", "success-text");
+        statusLabel.getStyleClass().add("error-text");
     }
 
     @Override
     public void handleMessage(GameEvent event) {
-        switch (event.eventType()) {
-            case CREATED_LOBBY_EVENT, JOINED_LOBBY_EVENT -> Platform.runLater(() -> {
-                // Server confirmed lobby creation/join - navigate to waiting room
-                navigateToScene("/fxml/waitingRoom.fxml", WaitingRoomController.class);
-            });
-            case ERROR -> Platform.runLater(() -> {
-                // Server returned error
-                setErrorStatus("Error: Unable to process request");
-            });
+        switch (event) {
+            case CreatedLobbyEvent _, JoinedLobbyEvent _ -> SceneManager.navigateToScene("/fxml/waitingRoom.fxml", this);
+            case GameErrorEvent _ -> setErrorStatus("Error: Unable to process request");
+            default -> {}
         }
     }
 

@@ -15,16 +15,11 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class App extends Application implements UserInterface {
 
     private static Client client;
-    private Parent root;
-    private static Stage primaryStage;
-
-    public static Stage getPrimaryStage() {
-        return primaryStage;
-    }
 
     @Override
     public void start() {
@@ -33,35 +28,23 @@ public class App extends Application implements UserInterface {
             try {
                 start(new Stage());
             } catch (Exception e) {
-                e.printStackTrace();
+                System.exit(-1);
             }
         });
     }
 
     @Override
     public void start(Stage stage) throws IOException {
-        primaryStage = stage;
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
-        this.root = loader.load();
-
-        // init main controller
-        LoginController loginController = loader.getController();
-        MessageDispatcher.getInstance().registerHandler(loginController);
-
-        Scene scene = new Scene(root, 1280, 800);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        stage.setScene(scene);
-        stage.setTitle("Galaxy Trucker");
-        stage.setFullScreen(true);
-        stage.show();
+        SceneManager.init(stage);
 
         // client init
         new Thread(() -> {
             try {
                 client = new ClientSocket(this);
+                Platform.runLater(() -> SceneManager.navigateToScene("/fxml/login.fxml", null));
             } catch (Exception e) {
-                Platform.runLater(() -> displayError("Errore durante la connessione: " + e.getMessage()));
+                e.printStackTrace();
+                displayError("Errore durante la connessione: " + e.getMessage());
             }
         }).start();
     }
@@ -78,6 +61,7 @@ public class App extends Application implements UserInterface {
 
     @Override
     public void displayError(String message) {
+        // TODO
         // Assicurati che gli errori vengano mostrati nel thread JavaFX
         Platform.runLater(() -> {
             try {
@@ -103,6 +87,8 @@ public class App extends Application implements UserInterface {
     }
 
     @Override
-    public void clear() {}
+    public void clear() {
+        // TODO
+    }
 
 }

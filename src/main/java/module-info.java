@@ -13,6 +13,7 @@ module it.polimi.ingsw {
     exports it.polimi.ingsw.controller;
 
     exports it.polimi.ingsw.network.exceptions;
+    exports it.polimi.ingsw.network.messages;
 
     exports it.polimi.ingsw.common.model.enums;
     exports it.polimi.ingsw.common.model.events;
@@ -30,6 +31,7 @@ module it.polimi.ingsw {
 
     requires com.fasterxml.jackson.datatype.jdk8;
     requires com.fasterxml.jackson.databind;
+    requires java.desktop;
 
     opens it.polimi.ingsw.model.factory to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.model.cards to com.fasterxml.jackson.databind;
@@ -40,6 +42,6 @@ module it.polimi.ingsw {
 
     exports it.polimi.ingsw.network.rmi to java.rmi;
 
-    exports it.polimi.ingsw.view.GUI to javafx.graphics, javafx.fxml;
-    opens it.polimi.ingsw.view.GUI to javafx.fxml;
+    exports it.polimi.ingsw.view.GUI.fxmlcontroller to javafx.graphics, javafx.fxml;
+    opens it.polimi.ingsw.view.GUI.fxmlcontroller to javafx.fxml;
 }
