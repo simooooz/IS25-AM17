@@ -152,15 +152,21 @@ public class MatchController {
      * @param gameID   id of lobby/game
      */
     public synchronized List<GameEvent> rejoinGame(String username, String gameID) {
-        if (checkIfIsAnotherLobby(username)) throw new PlayerAlreadyInException("Player is already in another lobby");
-
-        Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
-        Lobby lobby = lobbyOptional
-                .filter(l -> l.getState() == LobbyState.IN_GAME)
-                .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
-
         EventContext.clear();
-        lobby.rejoinPlayer(username);
+
+        try {
+            if (checkIfIsAnotherLobby(username)) throw new PlayerAlreadyInException("Player is already in another lobby");
+
+            Optional<Lobby> lobbyOptional = Optional.ofNullable(lobbies.get(gameID));
+            Lobby lobby = lobbyOptional
+                    .filter(l -> l.getState() == LobbyState.IN_GAME)
+                    .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
+
+            lobby.rejoinPlayer(username);
+        } catch (RuntimeException e) { // Don't rejoin and return empty list
+            EventContext.clear();
+            return List.of();
+        }
 
         return EventContext.getAndClear();
     }

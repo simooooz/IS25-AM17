@@ -30,9 +30,12 @@ public abstract class ServerBasis {
         // Check previous sessions
         User oldUser = User.popInactiveUser(username);
         if (oldUser != null && oldUser.getLobby() != null && oldUser.getLobby().getState() == LobbyState.IN_GAME) { // Rejoin
-            events.addAll(MatchController.getInstance().rejoinGame(username, oldUser.getLobby().getGameID()));
-            user.setLobby(oldUser.getLobby());
-            user.setState(UserState.IN_GAME);
+            List<GameEvent> rejoinEvents = MatchController.getInstance().rejoinGame(username, oldUser.getLobby().getGameID());
+            if (!rejoinEvents.isEmpty()) {
+                events.addAll(rejoinEvents);
+                user.setLobby(oldUser.getLobby());
+                user.setState(UserState.IN_GAME);
+            }
         }
 
         user.notifyEvents(events);
