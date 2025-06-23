@@ -163,8 +163,7 @@ public abstract class Board {
         );
     }
 
-    // TODO check
-    public List<PlayerData> calcRanking() {
+    public void calcRanking() {
         List<PlayerData> players = Stream.concat(
                 this.getPlayersByPos().stream(),
                 this.getStartingDeck().stream()
@@ -211,9 +210,6 @@ public abstract class Board {
                 .filter(p -> p.getShip().countExposedConnectors() == Arrays.stream(exposedConnectors).min().orElseThrow())
                 .forEach(p -> p.setCredits(p.getCredits() + getRankingMostBeautifulShipReward()));
 
-        return players.stream()
-                .sorted(Comparator.comparingInt(PlayerData::getCredits).reversed())
-                .toList();
     }
 
     public BoardDTO toDto() {
