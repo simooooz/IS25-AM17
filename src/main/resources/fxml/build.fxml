@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1400.0" style="-fx-background-color: linear-gradient(to bottom, #0f0f23, #1a1a3a);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.GUI.fxmlcontroller.BuildController">
+
+    <!-- Main container -->
+    <HBox spacing="15" style="-fx-font-family: 'Impact'; -fx-padding: 16;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <!-- PANNELLO SINISTRO: Componenti -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS">
+
+            <!-- Componenti grid -->
+            <FlowPane fx:id="componentsFlowPane" alignment="TOP_LEFT" hgap="3" prefWrapLength="400" prefWidth="500" prefHeight="1000" vgap="3" VBox.vgrow="ALWAYS">
+            </FlowPane>
+
+            <!-- Info componenti -->
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label fx:id="componentsCountLabel" style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;" text="Componenti: 0">
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Label>
+                
+            </HBox>
+
+        </VBox>
+
+        <!-- PANNELLO CENTRALE: Nave + Pile + Clessidra -->
+        <VBox prefWidth="0.0" spacing="15" style="-fx-padding: 20; -fx-background-radius: 8;">
+
+            <!-- PILE DI CARTE E CLESSIDRA -->
+            <HBox alignment="CENTER" prefHeight="120" spacing="8">
+
+                <!-- Pile di carte a sinistra -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+
+                    <!-- pile 1 -->
+                    <VBox alignment="CENTER" spacing="5" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 8; -fx-padding: 8;">
+
+                        <!-- stack di carte -->
+                        <StackPane fx:id="pile1" alignment="CENTER">
+                            <ImageView fx:id="pile1Card1" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 3, 0, 1, 1);">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                            <ImageView fx:id="pile1Card2" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 1, 1);" translateX="2" translateY="-2">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                            <ImageView fx:id="pile1Card3" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 1, 0, 1, 1);" translateX="4" translateY="-4">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                        </StackPane>
+
+                    </VBox>
+
+                    <!-- pile 2 -->
+                    <VBox alignment="CENTER" spacing="5" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 8; -fx-padding: 8;">
+
+                        <!-- stack di carte -->
+                        <StackPane fx:id="pile2" alignment="CENTER">
+                            <ImageView fx:id="pile2Card1" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 3, 0, 1, 1);">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                            <ImageView fx:id="pile2Card2" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 1, 1);" translateX="2" translateY="-2">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                            <ImageView fx:id="pile2Card3" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 1, 0, 1, 1);" translateX="4" translateY="-4">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                        </StackPane>
+
+                    </VBox>
+
+                    <!-- pile 3 -->
+                    <VBox alignment="CENTER" spacing="5" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 8; -fx-padding: 8;">
+
+                        <!-- stack di carte -->
+                        <StackPane fx:id="pile3" alignment="CENTER">
+                            <ImageView fx:id="pile3Card1" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 3, 0, 1, 1);">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                            <ImageView fx:id="pile3Card2" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 1, 1);" translateX="2" translateY="-2">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                            <ImageView fx:id="pile3Card3" fitHeight="90" fitWidth="70" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 1, 0, 1, 1);" translateX="4" translateY="-4">
+                                <image>
+                                    <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
+                                </image>
+                            </ImageView>
+                        </StackPane>
+
+                    </VBox>
+
+                </HBox>
+
+                <!-- Spazio centrale proporzionale -->
+                <Region prefHeight="112.0" prefWidth="110.0" HBox.hgrow="ALWAYS" />
+
+                <!-- CLESSIDRA a destra -->
+                <VBox alignment="CENTER" spacing="3" style="-fx-background-color: rgba(243,156,18,0.2); -fx-background-radius: 8; -fx-padding: 12; -fx-border-color: #f39c12; -fx-border-width: 2; -fx-border-radius: 8;">
+
+                    <Label style="-fx-text-fill: #f39c12; -fx-font-size: 12px; -fx-font-weight: bold;" text="⏳ TEMPO">
+                        <font>
+                            <Font name="System Bold" size="12.0" />
+                        </font>
+                    </Label>
+
+                    <!-- Clessidra visuale -->
+                    <StackPane fx:id="timerContainer" alignment="CENTER">
+                        <ImageView fx:id="hourglassIcon" fitHeight="65" fitWidth="50" preserveRatio="true">
+                            <!-- Puoi usare un'icona SVG o un'immagine -->
+                        </ImageView>
+
+                        <!-- Timer numerico -->
+                        <Label fx:id="timerLabel" style="-fx-text-fill: #f39c12; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.7); -fx-background-radius: 4; -fx-padding: 4;" text="05:00">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                    </StackPane>
+
+                </VBox>
+
+            </HBox>
+
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <!-- NAVE CORRENTE -->
+            <VBox alignment="CENTER" spacing="10">
+
+                <!-- Container per la nave centrata -->
+                <StackPane fx:id="shipContainer" alignment="CENTER" VBox.vgrow="ALWAYS">
+
+                    <!-- Immagine di sfondo della nave -->
+                    <ImageView fx:id="shipImageView" fitHeight="350.0" fitWidth="450.0" preserveRatio="true" />
+
+                    <!-- Griglia nave sovrapposta -->
+                    <GridPane fx:id="shipGrid" alignment="CENTER" hgap="2" maxHeight="915.0" maxWidth="450.0" prefHeight="915.0" prefWidth="86.0" vgap="2">
+                        <!-- Le celle verranno create dinamicamente nel controller -->
+                    </GridPane>
+
+                </StackPane>
+            </VBox>
+
+        </VBox>
+
+    </HBox>
+
+</AnchorPane>

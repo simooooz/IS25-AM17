@@ -265,6 +265,9 @@ public class ViewTui implements UserInterface {
                         try {
                             int row = Integer.parseInt(commands[2]) - 5;
                             int col = Integer.parseInt(commands[3]) - 4;
+
+                            int oldRow = client.getGameController().getModel().getBoard().getMapIdComponents().get(Integer.parseInt(commands[1])).getY();
+                            int oldCol = client.getGameController().getModel().getBoard().getMapIdComponents().get(Integer.parseInt(commands[1])).getX();
                             client.getGameController().moveComponent(client.getUsername(), Integer.parseInt(commands[1]), row, col, 0);
 
                             if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
@@ -272,7 +275,7 @@ public class ViewTui implements UserInterface {
                             else // No previous local command
                                 localCommand = input + " 0";
 
-                            ClientEventBus.getInstance().publish(new ComponentMovedEvent(client.getUsername(), Integer.parseInt(commands[1]), row, col));
+                            ClientEventBus.getInstance().publish(new ComponentMovedEvent(client.getUsername(), Integer.parseInt(commands[1]), oldRow, oldCol, row, col));
                         } catch (RuntimeException e) {
                             // Propagate general exceptions
                             throw new IllegalArgumentException(e.getMessage());

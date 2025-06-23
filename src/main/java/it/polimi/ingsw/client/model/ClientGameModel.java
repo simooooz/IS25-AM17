@@ -113,12 +113,15 @@ public abstract class ClientGameModel {
         ClientShip ship = board.getPlayerEntityByUsername(username).getShip();
         ClientComponent component = board.getMapIdComponents().get(componentId);
 
+        int oldX = component.getX();
+        int oldY = component.getY();
+
         ship.getDashboard()[component.getY()][component.getX()] = Optional.empty();
         component.setX(col);
         component.setY(row);
         ship.getDashboard()[row][col] = Optional.of(component);
 
-        ClientEventBus.getInstance().publish(new ComponentMovedEvent(username, componentId, row, col));
+        ClientEventBus.getInstance().publish(new ComponentMovedEvent(username, componentId, oldY, oldX, row, col));
     }
 
     public void componentRotated(int componentId, int num) {

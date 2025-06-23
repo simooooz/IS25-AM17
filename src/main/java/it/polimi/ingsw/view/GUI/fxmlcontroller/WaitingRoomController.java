@@ -151,7 +151,7 @@ public class WaitingRoomController implements MessageHandler {
                     }
                 }
             }
-            case MatchStartedEvent _ -> SceneManager.navigateToScene("/fxml/gameFlight.fxml", this);
+            case MatchStartedEvent _ -> SceneManager.navigateToScene("/fxml/build.fxml", this);
             case GameErrorEvent e -> showError(e.message());
             default -> {}
         }

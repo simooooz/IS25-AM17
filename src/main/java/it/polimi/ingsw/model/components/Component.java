@@ -203,13 +203,16 @@ public sealed class Component permits
         else if (ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("New position isn't valid or is already occupied"); // Check if new position is valid
 
+        int oldRow = y;
+        int oldCol = x;
+
         ship.getDashboard()[y][x] = Optional.empty();
         this.x = col;
         this.y = row;
         ship.getDashboard()[row][col] = Optional.of(this);
 
         rotateComponent(player, rotations);
-        EventContext.emit(new ComponentMovedEvent(player.getUsername(), id, row, col));
+        EventContext.emit(new ComponentMovedEvent(player.getUsername(), id, oldRow, oldCol, row, col));
     }
 
     public void rotateComponent(PlayerData player, int rotations) {

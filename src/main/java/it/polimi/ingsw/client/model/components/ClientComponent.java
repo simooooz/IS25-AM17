@@ -56,6 +56,10 @@ public sealed class ClientComponent permits
         return y;
     }
 
+    public ConnectorType[] getConnectors() {
+        return connectors;
+    }
+
     public void insertComponent(ClientPlayer player, int row, int col, int rotations, boolean weld) {
         ClientShip ship = player.getShip();
 
