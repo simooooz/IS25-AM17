@@ -126,6 +126,8 @@ public sealed class Component permits
         Ship ship = player.getShip();
         if (board.getCommonComponents().contains(this) || !shown)
             throw new ComponentNotValidException("This component is already released");
+        if (ship.getReserves().contains(this))
+            throw new ComponentNotValidException("You can't release reserves");
         if (inserted)
             throw new ComponentNotValidException("Component is already welded");
 
@@ -203,23 +205,20 @@ public sealed class Component permits
         else if (ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("New position isn't valid or is already occupied"); // Check if new position is valid
 
-        int oldRow = y;
-        int oldCol = x;
-
         ship.getDashboard()[y][x] = Optional.empty();
         this.x = col;
         this.y = row;
         ship.getDashboard()[row][col] = Optional.of(this);
 
         rotateComponent(player, rotations);
-        EventContext.emit(new ComponentMovedEvent(player.getUsername(), id, oldRow, oldCol, row, col));
+        EventContext.emit(new ComponentMovedEvent(player.getUsername(), id, row, col));
     }
 
     public void rotateComponent(PlayerData player, int rotations) {
         if (rotations % 4 == 0) return;
         Ship ship = player.getShip();
-        if ((ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) && (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)))
-            throw new ComponentNotValidException("Component isn't in hand or in dashboard");
+        if ((ship.getDashboard(y, x).isEmpty() || !ship.getDashboard(y, x).get().equals(this)) && (ship.getHandComponent().isEmpty() || !ship.getHandComponent().get().equals(this)) && !ship.getReserves().contains(this))
+            throw new ComponentNotValidException("Component isn't in hand or in dashboard or in reserves");
 
         if (inserted)
             throw new ComponentNotValidException("Component is already welded");

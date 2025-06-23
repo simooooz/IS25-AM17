@@ -61,6 +61,10 @@ public class ClientPlayer {
         this.leftMatch = leftMatch;
     }
 
+    public boolean isLeftMatch() {
+        return leftMatch;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

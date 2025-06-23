@@ -116,11 +116,11 @@ public class ClientGameController {
         model.playerRejoined(username);
     }
 
-    public void insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
+    public void insertComponent(String username, int componentId, int row, int col, int rotations) {
         if (model.getPlayerState(username) == PlayerState.LOOK_CARD_PILE) model.cardPileReleased(username);
         else if (model.getPlayerState(username) != PlayerState.BUILD) throw new IllegalStateException("Player is not building");
 
-        model.insertComponent(username, componentId, row, col, rotations, weld);
+        model.insertComponent(username, componentId, row, col, rotations);
     }
 
     public void moveComponent(String username, int componentId, int row, int col, int rotations) {

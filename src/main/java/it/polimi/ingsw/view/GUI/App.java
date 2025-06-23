@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
-import it.polimi.ingsw.view.GUI.fxmlcontroller.LoginController;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.application.Platform;

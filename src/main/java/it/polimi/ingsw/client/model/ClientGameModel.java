@@ -46,10 +46,6 @@ public abstract class ClientGameModel {
         this.playersState = dto.playersState;
     }
 
-    public Map<String, PlayerState> getPlayersState() {
-        return playersState;
-    }
-
     public PlayerState getPlayerState(String username) {
         return playersState.get(username);
     }
@@ -113,15 +109,12 @@ public abstract class ClientGameModel {
         ClientShip ship = board.getPlayerEntityByUsername(username).getShip();
         ClientComponent component = board.getMapIdComponents().get(componentId);
 
-        int oldX = component.getX();
-        int oldY = component.getY();
-
         ship.getDashboard()[component.getY()][component.getX()] = Optional.empty();
         component.setX(col);
         component.setY(row);
         ship.getDashboard()[row][col] = Optional.of(component);
 
-        ClientEventBus.getInstance().publish(new ComponentMovedEvent(username, componentId, oldY, oldX, row, col));
+        ClientEventBus.getInstance().publish(new ComponentMovedEvent(username, componentId, row, col));
     }
 
     public void componentRotated(int componentId, int num) {
@@ -243,15 +236,18 @@ public abstract class ClientGameModel {
         ClientPlayer player = board.getPlayerEntityByUsername(username);
         ClientComponent component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
+        if (num % 4 == 0) return;
 
         component.rotateComponent(player, num);
+        ClientEventBus.getInstance().publish(new ComponentRotatedEvent(componentId, num));
     }
 
-    public void insertComponent(String username, int componentId, int row, int col, int rotations, boolean weld) {
+    public void insertComponent(String username, int componentId, int row, int col, int rotations) {
         ClientPlayer player = board.getPlayerEntityByUsername(username);
         ClientComponent component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
 
+        boolean weld = false;
         ClientShip ship = player.getShip();
         if (!ship.validPositions(row, col) || ship.getDashboard(row, col).isPresent())
             throw new ComponentNotValidException("The position where to insert it is not valid"); // Check if new position is valid
@@ -268,6 +264,7 @@ public abstract class ClientGameModel {
             throw new ComponentNotValidException("Component to insert isn't in hand or in reserves");
 
         component.insertComponent(player, row, col, rotations, weld);
+        ClientEventBus.getInstance().publish(new ComponentInsertedEvent(username, componentId, row, col));
     }
 
     public void moveComponent(String username, int componentId, int row, int col, int rotations) {
@@ -284,6 +281,7 @@ public abstract class ClientGameModel {
             throw new ComponentNotValidException("New position isn't valid or is already occupied"); // Check if new position is valid
 
         component.moveComponent(player, row, col, rotations);
+        ClientEventBus.getInstance().publish(new ComponentMovedEvent(username, componentId, row, col));
     }
 
     public ClientBoard getBoard() {

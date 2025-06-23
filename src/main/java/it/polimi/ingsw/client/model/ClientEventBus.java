@@ -1,6 +1,5 @@
 package it.polimi.ingsw.client.model;
 
-import it.polimi.ingsw.common.model.events.BatchEndedEvent;
 import it.polimi.ingsw.common.model.events.GameEvent;
 
 import java.util.ArrayList;

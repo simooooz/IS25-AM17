@@ -1,14 +1,21 @@
 package it.polimi.ingsw.view.TUI;
 
 import it.polimi.ingsw.client.model.ClientEventBus;
+import it.polimi.ingsw.client.model.components.ClientComponent;
+import it.polimi.ingsw.client.model.events.CardPileLookedEvent;
+import it.polimi.ingsw.client.model.events.CardRevealedEvent;
+import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
+import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.common.model.events.game.ComponentInsertedEvent;
-import it.polimi.ingsw.common.model.events.game.ComponentMovedEvent;
-import it.polimi.ingsw.common.model.events.game.ComponentRotatedEvent;
+import it.polimi.ingsw.common.model.events.game.*;
+import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -38,8 +45,41 @@ public class ViewTui implements UserInterface {
 
     @Override
     public void onEvent(List<GameEvent> events) {
-        scheduleUpdate();
-        events.stream().filter(e -> e.eventType() == MessageType.ERROR).findFirst().ifPresent(e -> displayError((String) e.getArgs()[0]));
+        boolean toUpdate = false;
+        for (GameEvent event : events) {
+            if (toUpdate) break;
+            switch (event) {
+                case ComponentPickedEvent _, ComponentReleasedEvent _, SyncAllEvent _, MatchStartedEvent _, HourglassMovedEvent _, CardRevealedEvent _,
+                     CardUpdatedEvent _, FlightEndedEvent _, CreatedLobbyEvent _, JoinedLobbyEvent _, LeftLobbyEvent _,
+                     UsernameOkEvent _, GameErrorEvent _, PlayersStateUpdatedEvent _, PlayersPositionUpdatedEvent _, CreditsUpdatedEvent _ -> toUpdate = true;
+                case ComponentRotatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());
+                case BatteriesUpdatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());
+                case CrewUpdatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());
+                case GoodsUpdatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());
+                case ComponentInsertedEvent e -> toUpdate = e.username().equals(client.getUsername());
+                case ComponentMovedEvent e -> toUpdate = e.username().equals(client.getUsername());
+                case ComponentReservedEvent e -> toUpdate = e.username().equals(client.getUsername());
+                case ComponentDestroyedEvent e -> toUpdate = e.username().equals(client.getUsername());
+                case ShipBrokenEven e -> toUpdate = e.username().equals(client.getUsername());
+                case CardPileLookedEvent e -> toUpdate = e.username().equals(client.getUsername());
+                case CardPileReleasedEvent e -> toUpdate = e.username().equals(client.getUsername());
+                default -> {}
+            }
+        }
+
+        if (toUpdate) {
+            scheduleUpdate();
+            events.stream().filter(e -> e.eventType() == MessageType.ERROR).findFirst().ifPresent(e -> displayError((String) e.getArgs()[0]));
+        }
+    }
+
+    private boolean isToUpdateByComponentId(Integer id) {
+        boolean toUpdate;
+        ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
+        ClientShip ship = client.getGameController().getModel().getBoard().getPlayerEntityByUsername(client.getUsername()).getShip();
+        Optional<ClientComponent> shipC = ship.getDashboard(component.getY(), component.getX());
+        toUpdate = (shipC.isPresent() && shipC.get().equals(component)) || (ship.getComponentInHand().isPresent() && ship.getComponentInHand().get().equals(component)) || ship.getReserves().contains(component);
+        return toUpdate;
     }
 
     private void scheduleUpdate() {
@@ -209,32 +249,12 @@ public class ViewTui implements UserInterface {
                         client.send(MessageType.PICK_COMPONENT, Integer.parseInt(commands[1]));
                     }
                     case "release" -> {
-                        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", revert rotations
-                            try {
-                                int times = 4 - (Integer.parseInt(localCommand.split(" ")[4]) % 4);
-                                client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
-                            } catch (RuntimeException e) {
-                                // Propagate general exceptions
-                                throw new IllegalArgumentException(e.getMessage());
-                            }
-                        }
                         revertRotation();
-
                         localCommand = "";
                         client.send(MessageType.RELEASE_COMPONENT, Integer.parseInt(commands[1]));
                     }
                     case "reserve" -> {
-                        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", revert rotations
-                            try {
-                                int times = 4 - (Integer.parseInt(localCommand.split(" ")[4]) % 4);
-                                client.getGameController().rotateComponent(client.getUsername(), Integer.parseInt(localCommand.split(" ")[1]), times);
-                            } catch (RuntimeException e) {
-                                // Propagate general exceptions
-                                throw new IllegalArgumentException(e.getMessage());
-                            }
-                        }
                         revertRotation();
-
                         localCommand = "";
                         client.send(MessageType.RESERVE_COMPONENT, Integer.parseInt(commands[1]));
                     }
@@ -244,7 +264,7 @@ public class ViewTui implements UserInterface {
                             int row = Integer.parseInt(commands[2]) - 5;
                             int col = Integer.parseInt(commands[3]) - 4;
                             input = String.join(" ", "insert", commands[1], String.valueOf(row), String.valueOf(col));
-                            client.getGameController().insertComponent(client.getUsername(), Integer.parseInt(commands[1]), row, col, 0, false);
+                            client.getGameController().insertComponent(client.getUsername(), Integer.parseInt(commands[1]), row, col, 0);
 
                             if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("rotate")) // Previous local command was "rotate"
                                 localCommand = String.join(" ", "insert", commands[1], String.valueOf(row), String.valueOf(col), localCommand.split(" ")[2]);
@@ -254,7 +274,6 @@ public class ViewTui implements UserInterface {
                             } else // No previous local command
                                 localCommand = input + " 0";
 
-                            ClientEventBus.getInstance().publish(new ComponentInsertedEvent(client.getUsername(), Integer.parseInt(commands[1]), row, col));
                         } catch (RuntimeException e) {
                             // Propagate general exceptions
                             throw new IllegalArgumentException(e.getMessage());
@@ -265,9 +284,6 @@ public class ViewTui implements UserInterface {
                         try {
                             int row = Integer.parseInt(commands[2]) - 5;
                             int col = Integer.parseInt(commands[3]) - 4;
-
-                            int oldRow = client.getGameController().getModel().getBoard().getMapIdComponents().get(Integer.parseInt(commands[1])).getY();
-                            int oldCol = client.getGameController().getModel().getBoard().getMapIdComponents().get(Integer.parseInt(commands[1])).getX();
                             client.getGameController().moveComponent(client.getUsername(), Integer.parseInt(commands[1]), row, col, 0);
 
                             if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
@@ -275,7 +291,6 @@ public class ViewTui implements UserInterface {
                             else // No previous local command
                                 localCommand = input + " 0";
 
-                            ClientEventBus.getInstance().publish(new ComponentMovedEvent(client.getUsername(), Integer.parseInt(commands[1]), oldRow, oldCol, row, col));
                         } catch (RuntimeException e) {
                             // Propagate general exceptions
                             throw new IllegalArgumentException(e.getMessage());
@@ -294,7 +309,6 @@ public class ViewTui implements UserInterface {
                             else // No previous local command
                                 localCommand = input;
 
-                            ClientEventBus.getInstance().publish(new ComponentRotatedEvent(Integer.parseInt(commands[1]), times));
                         } catch (RuntimeException e) {
                             // Propagate general exceptions
                             throw new IllegalArgumentException(e.getMessage());
@@ -455,6 +469,7 @@ public class ViewTui implements UserInterface {
 
     }
 
+    @SuppressWarnings("Duplicates")
     private void revertRotation() {
         if (localCommand.split(" ").length > 0 && (localCommand.split(" ")[0].equals("rotate") || localCommand.split(" ")[0].equals("insert"))) { // Previous local command was "rotate" or "insert", revert it
             try {
