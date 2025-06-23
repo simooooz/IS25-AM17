@@ -29,7 +29,7 @@ public final class ClientCannonComponent extends ClientComponent {
     public void rotateComponent() {
         super.rotateComponent();
         DirectionType[] directions = DirectionType.values(); // NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3
-        this.direction = directions[(this.direction.ordinal() + 1 % 4)];
+        this.direction = directions[((this.direction.ordinal() + 1) % 4)];
     }
 
     @Override

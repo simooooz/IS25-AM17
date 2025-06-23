@@ -122,6 +122,17 @@ public class GameController {
         return EventContext.getAndClear();
     }
 
+    public synchronized List<GameEvent> releaseCardPile(String username) {
+        EventContext.clear();
+
+        try {
+            model.releaseCardPile(username);
+        } catch (RuntimeException e) {
+            EventContext.emit(new GameErrorEvent(e.getMessage()));
+        }
+        return EventContext.getAndClear();
+    }
+
     public synchronized List<GameEvent> moveHourglass(String username, Consumer<List<GameEvent>> callback) {
         EventContext.clear();
 

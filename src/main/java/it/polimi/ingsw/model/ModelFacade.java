@@ -455,8 +455,8 @@ public abstract class ModelFacade {
         }
 
         board.moveToStartingDeck(player);
-
-        if (board.getCardPilePos() >= 0 && board.getCardPilePos() < board.getCardPile().size()) {
+        boolean noneInDrawCard = getPlayersState().values().stream().noneMatch(s -> s == PlayerState.DRAW_CARD);
+        if (noneInDrawCard && board.getCardPilePos() >= 0 && board.getCardPilePos() < board.getCardPile().size()) {
             Card card = board.getCardPile().get(board.getCardPilePos());
             boolean finish = card.doLeftGameEffects(state, this, board, username);
             EventContext.emit(new CardUpdatedEvent(card));

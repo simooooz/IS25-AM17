@@ -97,6 +97,11 @@ public class ClientBoardLearnerMode extends ClientBoard {
         throw new RuntimeException("Hourglass is not in learner mode flight");
     }
 
+    @Override
+    public int getHourglassPos() {
+        throw new RuntimeException("Hourglass is not in learner mode flight");
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     public String toString(String username, PlayerState state) {

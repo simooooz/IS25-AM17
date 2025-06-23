@@ -264,6 +264,13 @@ public enum MessageType {
         }
     },
 
+    RELEASE_CARD_PILE {
+        @Override
+        public void execute(ClientHandler user, Message message) {
+            Server.releaseCardPile(user);
+        }
+    },
+
     CARD_PILE_LOOKED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {

@@ -85,6 +85,8 @@ public abstract class ClientBoard {
 
     public abstract void moveHourglass();
 
+    public abstract int getHourglassPos();
+
     public abstract String toString(String username, PlayerState state);
 
 }

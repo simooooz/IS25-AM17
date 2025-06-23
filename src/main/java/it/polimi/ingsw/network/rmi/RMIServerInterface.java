@@ -40,6 +40,8 @@ public interface RMIServerInterface extends Remote {
 
     void lookCardPileHandler(String sessionCode, Integer pileIndex) throws RemoteException;
 
+    void releaseCardPileHandler(String sessionCode) throws RemoteException;
+
     void moveHourglassHandler(String sessionCode) throws RemoteException;
 
     void setReadyHandler(String sessionCode) throws RemoteException;

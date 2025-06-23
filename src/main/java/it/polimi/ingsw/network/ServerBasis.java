@@ -150,6 +150,12 @@ public abstract class ServerBasis {
         user.notifyEvents(events);
     }
 
+    public static void releaseCardPile(User user) {
+        if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
+        List<GameEvent> events = user.getGameController().releaseCardPile(user.getUsername());
+        user.notifyEvents(events);
+    }
+
     public static void moveHourglass(User user) {
         if (user.getState() != UserState.IN_GAME) throw new IllegalStateException("User is not in state MATCH");
         List<GameEvent> events = user.getGameController().moveHourglass(user.getUsername(), user::notifyEvents);

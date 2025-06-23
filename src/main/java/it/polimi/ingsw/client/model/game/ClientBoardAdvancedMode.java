@@ -127,6 +127,11 @@ public class ClientBoardAdvancedMode extends ClientBoard {
     }
 
     @Override
+    public int getHourglassPos() {
+        return hourglassPos;
+    }
+
+    @Override
     public void startMatch(ClientGameModel model) {
         this.hourglassPos = 3;
         rotateHourglass();

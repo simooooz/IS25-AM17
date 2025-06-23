@@ -203,6 +203,12 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     }
 
     @Override
+    public void releaseCardPileHandler(String sessionCode) throws RemoteException {
+        User user = getUserInRmiSessions(sessionCode);
+        releaseCardPile(user);
+    }
+
+    @Override
     public void moveHourglassHandler(String sessionCode) throws RemoteException {
         User user = getUserInRmiSessions(sessionCode);
         moveHourglass(user);

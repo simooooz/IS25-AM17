@@ -41,6 +41,10 @@ public abstract class ClientCard {
         this.isLearner = isLearner;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public ClientCard() {}
 
     public void printCardInfo(ClientGameModel model, ClientBoard board) {}
