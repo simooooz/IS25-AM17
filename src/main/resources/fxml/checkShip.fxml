@@ -25,7 +25,7 @@
         </VBox>
 
         <!-- end check fase button -->
-        <Button fx:id="checkBtn" mnemonicParsing="false"
+        <Button fx:id="doneBtn" mnemonicParsing="false"
                 text="Done"
                 styleClass="button"
                 onMouseClicked="#updateShip">
