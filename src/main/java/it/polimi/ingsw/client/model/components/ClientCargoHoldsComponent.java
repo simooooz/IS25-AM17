@@ -26,6 +26,10 @@ public final class ClientCargoHoldsComponent extends ClientComponent {
         this.goods = dto.goods;
     }
 
+    public int getNumber() {
+        return number;
+    }
+
     public List<ColorType> getGoods() {
         return goods;
     }

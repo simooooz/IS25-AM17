@@ -25,6 +25,10 @@ public final class ClientEngineComponent extends ClientComponent {
         this.isDouble = dto.isDouble;
     }
 
+    public boolean isDouble() {
+        return isDouble;
+    }
+
     @Override
     public void rotateComponent() {
         super.rotateComponent();

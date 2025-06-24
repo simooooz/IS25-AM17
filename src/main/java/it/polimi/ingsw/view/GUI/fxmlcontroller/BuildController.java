@@ -470,7 +470,7 @@ public class BuildController implements MessageHandler, Initializable {
 
     @SuppressWarnings("Duplicates")
     @FXML
-    private void leftGameHandler() {
+    private void leaveGameHandler() {
         if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert", otherwise don't change it
             client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
             localCommand = "";
@@ -480,6 +480,11 @@ public class BuildController implements MessageHandler, Initializable {
 
     @FXML
     public void setReadyHandler(ActionEvent event) {
+        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
+            client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
+
+        localCommand = "";
+
         client.send(MessageType.SET_READY);
         event.consume();
     }
@@ -547,11 +552,13 @@ public class BuildController implements MessageHandler, Initializable {
                     }
 
                     Rectangle slot = (Rectangle) shipGrid.lookup("#slot_"+e.row()+"_"+e.col());
-                    slot.removeEventHandler(MouseEvent.MOUSE_ENTERED, slotOnMouseEnteredHandler);
-                    slot.removeEventHandler(MouseEvent.MOUSE_EXITED, slotOnMouseExitedHandler);
-                    slot.removeEventHandler(DragEvent.DRAG_OVER, slotDragOverHandler);
-                    slot.removeEventHandler(DragEvent.DRAG_DROPPED, slotDragDroppedHandler);
-                    slotMap.put(component.getId(), slot);
+                    if (slot != null) {
+                        slot.removeEventHandler(MouseEvent.MOUSE_ENTERED, slotOnMouseEnteredHandler);
+                        slot.removeEventHandler(MouseEvent.MOUSE_EXITED, slotOnMouseExitedHandler);
+                        slot.removeEventHandler(DragEvent.DRAG_OVER, slotDragOverHandler);
+                        slot.removeEventHandler(DragEvent.DRAG_DROPPED, slotDragDroppedHandler);
+                        slotMap.put(component.getId(), slot);
+                    }
                 }
                 else { // Not your action
                     GridPane playerGrid = (GridPane) otherPlayersContainer.lookup("#ship_"+e.username());
@@ -689,11 +696,12 @@ public class BuildController implements MessageHandler, Initializable {
                 if (e.states().get(client.getUsername()) == PlayerState.WAIT)
                     setReadyButton.setVisible(false);
 
-                System.out.println(e.states().get(client.getUsername()));
                 boolean allReady = e.states().values().stream().noneMatch(s -> s == PlayerState.BUILD || s == PlayerState.LOOK_CARD_PILE);
-                System.out.println(allReady);
                 if (allReady) {
-                    SceneManager.navigateToScene("/fxml/gameFlight.fxml", this);
+                    SceneManager.navigateToScene("/fxml/gameFlight.fxml", this, (FlightPhaseController controller) -> {
+                        controller.setImageMap(componentMap);
+                    });
+
                     return;
                 }
 
@@ -718,7 +726,7 @@ public class BuildController implements MessageHandler, Initializable {
             }
             case LeftLobbyEvent e -> {
                 if (e.username().equals(client.getUsername())) // Your action
-                    SceneManager.navigateToScene("/fxml/menu.fxml", this);
+                    SceneManager.navigateToScene("/fxml/menu.fxml", this, null);
                 else // Not your action
                     ((Label) otherPlayersContainer.lookup("#state_"+e.username())).setText("left game");
             }

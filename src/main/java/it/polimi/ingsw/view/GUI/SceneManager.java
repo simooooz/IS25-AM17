@@ -4,11 +4,11 @@ import it.polimi.ingsw.view.GUI.fxmlcontroller.MessageHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class SceneManager {
 
@@ -19,12 +19,15 @@ public class SceneManager {
         primaryStage = stage;
     }
 
-    public static <T extends MessageHandler> void navigateToScene(String fxmlPath, MessageHandler oldController) {
+    public static <T extends MessageHandler> void navigateToScene(String fxmlPath, MessageHandler oldController, Consumer<T> callback) {
         MessageDispatcher.getInstance().setTransitioning(true);
 
         try {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent view = loader.load();
+
+            if (callback != null)
+                callback.accept(loader.getController());
 
             if (oldController != null)
                 MessageDispatcher.getInstance().unregisterHandler(oldController);

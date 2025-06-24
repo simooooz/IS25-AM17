@@ -40,7 +40,7 @@ public class App extends Application implements UserInterface {
         new Thread(() -> {
             try {
                 client = new ClientSocket(this);
-                Platform.runLater(() -> SceneManager.navigateToScene("/fxml/login.fxml", null));
+                Platform.runLater(() -> SceneManager.navigateToScene("/fxml/login.fxml", null, null));
             } catch (Exception e) {
                 e.printStackTrace();
                 displayError("Errore durante la connessione: " + e.getMessage());

@@ -254,7 +254,7 @@ public class MenuController implements MessageHandler {
     @Override
     public void handleMessage(GameEvent event) {
         switch (event) {
-            case CreatedLobbyEvent _, JoinedLobbyEvent _ -> SceneManager.navigateToScene("/fxml/waitingRoom.fxml", this);
+            case CreatedLobbyEvent _, JoinedLobbyEvent _ -> SceneManager.navigateToScene("/fxml/waitingRoom.fxml", this, null);
             case GameErrorEvent _ -> setErrorStatus("Error: Unable to process request");
             default -> {}
         }

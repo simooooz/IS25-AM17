@@ -118,7 +118,7 @@
             <HBox alignment="CENTER_RIGHT">
 
                 <Button prefWidth="200" maxWidth="200"
-                        onAction="#leftGameHandler" styleClass="button-danger"
+                        onAction="#leaveGameHandler" styleClass="button-danger"
                         text="Leave game"/>
 
                 <Button fx:id="setReadyButton" prefWidth="200" maxWidth="200"

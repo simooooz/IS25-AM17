@@ -145,7 +145,7 @@ public class LoginController implements MessageHandler {
     @Override
     public void handleMessage(GameEvent event) {
         switch (event) {
-            case UsernameOkEvent _ -> SceneManager.navigateToScene("/fxml/menu.fxml", this);
+            case UsernameOkEvent _ -> SceneManager.navigateToScene("/fxml/menu.fxml", this, null);
             case GameErrorEvent _ -> {
                 showError("Connection failed. Please try again.");
                 hideHint();

@@ -144,14 +144,14 @@ public class WaitingRoomController implements MessageHandler {
                     String currentUsername = App.getClientInstance().getUsername();
 
                     if (playerName.equals(currentUsername))
-                        SceneManager.navigateToScene("/fxml/menu.fxml", this);
+                        SceneManager.navigateToScene("/fxml/menu.fxml", this, null);
                     else {
                         currentPlayers.remove(playerName);
                         updatePlayersList();
                     }
                 }
             }
-            case MatchStartedEvent _ -> SceneManager.navigateToScene("/fxml/build.fxml", this);
+            case MatchStartedEvent _ -> SceneManager.navigateToScene("/fxml/build.fxml", this, null);
             case GameErrorEvent e -> showError(e.message());
             default -> {}
         }

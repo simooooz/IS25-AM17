@@ -121,6 +121,7 @@ public class ClientSocket extends Client {
 
     public void sendObject(Object data) throws ClientException {
         try {
+            this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {

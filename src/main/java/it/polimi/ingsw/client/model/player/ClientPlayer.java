@@ -76,4 +76,14 @@ public class ClientPlayer {
         return sb.toString();
     }
 
+    public String toRawString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(username);
+        if (leftMatch)
+            sb.append(" (left game)");
+        else if (endedInAdvance)
+            sb.append(" (ended flight)");
+        return sb.toString();
+    }
+
 }

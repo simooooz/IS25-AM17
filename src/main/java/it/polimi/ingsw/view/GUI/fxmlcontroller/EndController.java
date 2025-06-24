@@ -123,7 +123,7 @@ public class EndController implements MessageHandler, Initializable {
     @Override
     public void handleMessage(GameEvent event) {
         if (Objects.requireNonNull(event) instanceof LeftLobbyEvent) {
-            SceneManager.navigateToScene("/fxml/menu.fxml", this);
+            SceneManager.navigateToScene("/fxml/menu.fxml", this, null);
         }
     }
 
