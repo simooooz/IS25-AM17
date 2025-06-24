@@ -466,24 +466,20 @@
       "isLearner": false,
       "meteors": [
         {
-          "isBig": false,
-          "directionFrom": "NORTH"
-        },
-        {
-          "isBig": false,
+          "isBig": true,
           "directionFrom": "NORTH"
         },
         {
           "isBig": true,
-          "directionFrom": "WEST"
+          "directionFrom": "NORTH"
         },
         {
           "isBig": false,
-          "directionFrom": "WEST"
+          "directionFrom": "SOUTH"
         },
         {
           "isBig": false,
-          "directionFrom": "WEST"
+          "directionFrom": "SOUTH"
         }
       ]
     },
@@ -494,53 +490,29 @@
       "isLearner": false,
       "meteors": [
         {
-          "isBig": true,
-          "directionFrom": "NORTH"
-        },
-        {
-          "isBig": true,
+          "isBig": false,
           "directionFrom": "NORTH"
         },
         {
           "isBig": false,
-          "directionFrom": "SOUTH"
+          "directionFrom": "NORTH"
+        },
+        {
+          "isBig": true,
+          "directionFrom": "EAST"
         },
         {
           "isBig": false,
-          "directionFrom": "SOUTH"
+          "directionFrom": "EAST"
+        },
+        {
+          "isBig": false,
+          "directionFrom": "EAST"
         }
       ]
     },
     {
       "id": 33,
-      "type": "MeteorSwarmCard",
-      "level": 2,
-      "isLearner": false,
-      "meteors": [
-        {
-          "isBig": false,
-          "directionFrom": "NORTH"
-        },
-        {
-          "isBig": false,
-          "directionFrom": "NORTH"
-        },
-        {
-          "isBig": true,
-          "directionFrom": "EAST"
-        },
-        {
-          "isBig": false,
-          "directionFrom": "EAST"
-        },
-        {
-          "isBig": false,
-          "directionFrom": "EAST"
-        }
-      ]
-    },
-    {
-      "id": 34,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -573,7 +545,7 @@
       "days": 4
     },
     {
-      "id": 35,
+      "id": 34,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -596,7 +568,7 @@
       "days": 3
     },
     {
-      "id": 36,
+      "id": 35,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -636,7 +608,7 @@
       "days": 2
     },
     {
-      "id": 37,
+      "id": 36,
       "type": "PlanetCard",
       "level": 2,
       "isLearner": false,
@@ -666,7 +638,7 @@
       "days": 3
     },
     {
-      "id": 38,
+      "id": 37,
       "type": "CombactZoneCard",
       "level": 2,
       "isLearner": false,
@@ -714,7 +686,7 @@
       ]
     },
     {
-      "id": 39,
+      "id": 38,
       "type": "AbandonedShipCard",
       "level": 2,
       "isLearner": false,
@@ -723,7 +695,7 @@
       "days": 1
     },
     {
-      "id": 40,
+      "id": 39,
       "type": "AbandonedShipCard",
       "level": 2,
       "isLearner": false,
@@ -732,7 +704,7 @@
       "days": 2
     },
     {
-      "id": 41,
+      "id": 40,
       "type": "AbandonedStationCard",
       "level": 2,
       "isLearner": false,
@@ -744,7 +716,7 @@
           }
     },
     {
-      "id": 42,
+      "id": 41,
       "type": "AbandonedStationCard",
       "level": 1,
       "isLearner": false,
