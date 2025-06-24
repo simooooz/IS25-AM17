@@ -60,7 +60,7 @@ public class ViewTui implements UserInterface {
                 case ComponentMovedEvent e -> toUpdate = e.username().equals(client.getUsername());
                 case ComponentReservedEvent e -> toUpdate = e.username().equals(client.getUsername());
                 case ComponentDestroyedEvent e -> toUpdate = e.username().equals(client.getUsername());
-                case ShipBrokenEven e -> toUpdate = e.username().equals(client.getUsername());
+                case ShipBrokenEvent e -> toUpdate = e.username().equals(client.getUsername());
                 case CardPileLookedEvent e -> toUpdate = e.username().equals(client.getUsername());
                 case CardPileReleasedEvent e -> toUpdate = e.username().equals(client.getUsername());
                 default -> {}
