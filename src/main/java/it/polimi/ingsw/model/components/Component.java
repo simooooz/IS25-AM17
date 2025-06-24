@@ -254,7 +254,7 @@ public sealed class Component permits
             List<List<Integer>> newGroups = new ArrayList<>();
             for (List<Component> group : groups)
                 newGroups.add(group.stream().map(Component::getId).collect(Collectors.toList()));
-            EventContext.emit(new ShipBrokenEven(player.getUsername(), newGroups));
+            EventContext.emit(new ShipBrokenEvent(player.getUsername(), newGroups));
             return PlayerState.WAIT_SHIP_PART;
         }
         return PlayerState.DONE;

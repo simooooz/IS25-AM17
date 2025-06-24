@@ -6,7 +6,7 @@ import it.polimi.ingsw.network.messages.MessageType;
 
 import java.util.List;
 
-public record ShipBrokenEven(String username, List<List<Integer>> parts) implements GameEvent {
+public record ShipBrokenEvent(String username, List<List<Integer>> parts) implements GameEvent {
 
     @Override
     public MessageType eventType() {

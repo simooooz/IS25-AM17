@@ -11,11 +11,10 @@ import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 
 import java.util.List;
-import java.util.Set;
 
 public sealed interface GameEvent permits
         UniqueEvent, BatchStartedEvent, BatchEndedEvent, SyncAllEvent,
-        MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent, ShipBrokenEven,
+        MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent, ShipBrokenEvent,
         ComponentReleasedEvent, ComponentReservedEvent, ComponentRotatedEvent, ComponentDestroyedEvent,
         HourglassMovedEvent, CardPileLookedEvent, CardPileReleasedEvent, CardRevealedEvent, CardUpdatedEvent,
         it.polimi.ingsw.client.model.events.CardPileLookedEvent, it.polimi.ingsw.client.model.events.CardRevealedEvent, it.polimi.ingsw.client.model.events.CardUpdatedEvent,

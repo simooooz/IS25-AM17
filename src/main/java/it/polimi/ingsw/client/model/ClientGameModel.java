@@ -164,7 +164,7 @@ public abstract class ClientGameModel {
 
         ship.getBrokenParts().clear();
         ship.getBrokenParts().addAll(newParts);
-        ClientEventBus.getInstance().publish(new ShipBrokenEven(username, parts));
+        ClientEventBus.getInstance().publish(new ShipBrokenEvent(username, parts));
     }
 
     public void cardRevealed(ClientCard card) {

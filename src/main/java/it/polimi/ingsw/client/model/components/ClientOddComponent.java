@@ -22,6 +22,10 @@ public final class ClientOddComponent extends ClientComponent {
         this.type = dto.type;
     }
 
+    public AlienType getType() {
+        return type;
+    }
+
     @Override
     public List<String> icon() {
         String color = type.equals(AlienType.CANNON) ? Chroma.PURPLE_BOLD : Chroma.ORANGE_BOLD;
