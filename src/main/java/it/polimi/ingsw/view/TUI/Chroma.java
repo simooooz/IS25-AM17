@@ -19,9 +19,19 @@ public class Chroma {
     public static final String GREEN = "\033[0;32m";
     public static final String BLUE = "\033[0;34m";
     public static final String YELLOW = "\033[0;33m";
+    // Colore testo marrone
+    public static final String BROWN = "\033[38;5;94m";
+
+    // Colore background marrone
+    public static final String BROWN_BACKGROUND = "\033[48;5;94m";
 
     public static final String ORANGE = "\033[38;5;214m";
     public static final String PURPLE = "\033[0;35m";
+    public static final String CYAN = "\033[0;36m";
+    public static final String MAGENTA = "\033[0;35m";
+    public static final String MAROON = "\033[38;5;88m";
+
+
 
     // bold
     public static final String BLACK_BOLD = "\033[1;30m";

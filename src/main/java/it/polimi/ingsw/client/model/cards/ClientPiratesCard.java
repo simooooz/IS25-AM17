@@ -49,8 +49,8 @@ public class ClientPiratesCard extends ClientEnemiesCard {
 
         cardLines.add(divider);
 
-        for (ClientCannonFire c : cannonFires) {
-            String meteorRow = vBorder + "       " + c.toString() + "\t   " + vBorder;
+        for (int i=0; i<cannonFires.size(); i++) {
+            String meteorRow = vBorder + Constants.inTheMiddle(i<coords.size()? String.valueOf(coords.get(i)): "       ", 7) + cannonFires.get(i).toString() +"\t   " + vBorder;
             cardLines.add(meteorRow);
         }
 

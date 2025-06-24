@@ -35,7 +35,7 @@ public final class ClientCargoHoldsComponent extends ClientComponent {
         String text;
         if (number == 2) {
             if (goods.size() == 1)
-                text = goods.getFirst().toString() + "   " + Chroma.color("   " , getColor());
+                text = goods.getFirst().toString() + "   " + Chroma.color("  " , getColor());
             else if (goods.size() == 2)
                 text = goods.getFirst().toString() + "   " + goods.get(1).toString();
             else
@@ -45,7 +45,7 @@ public final class ClientCargoHoldsComponent extends ClientComponent {
             if (goods.size() == 1)
                 text = goods.getFirst().toString() + " " + Chroma.color("  " , getColor()) + " " + Chroma.color("  " , getColor());
             else if (goods.size() == 2)
-                text = goods.getFirst().toString() + " "   + goods.get(1).toString() + "  " + Chroma.color("  " , getColor());
+                text = goods.getFirst().toString() + " "  + goods.get(1).toString() + " " + Chroma.color("  " , getColor());
             else if (goods.size() == 3)
                 text = goods.getFirst().toString() + " "  + goods.get(1).toString() + " " + goods.get(2).toString();
             else

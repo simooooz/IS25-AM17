@@ -1,6 +1,8 @@
 package it.polimi.ingsw.client.model.cards.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import it.polimi.ingsw.Constants;
+
 import java.util.List;
 
 public class ClientCannonFirePenaltyCombatZone extends ClientPenaltyCombatZone {
@@ -19,9 +21,9 @@ public class ClientCannonFirePenaltyCombatZone extends ClientPenaltyCombatZone {
             if (i == 0)
                 fires.append("\t   │\n");
             else if (i == cannonFires.size())
-                fires.append("│       ").append(cannonFires.get(i - 1).toString());
+                fires.append("│").append(Constants.inTheMiddle(i-1<coords.size()? String.valueOf(coords.get(i-1)): "       ", 7)).append(cannonFires.get(i - 1).toString());
             else {
-                fires.append("│       ").append(cannonFires.get(i - 1).toString()).append("\t   │\n");
+                fires.append("│").append(Constants.inTheMiddle(i-1<coords.size()? String.valueOf(coords.get(i-1)): "       ", 7)).append(cannonFires.get(i - 1).toString()).append("\t   │\n");
             }
         }
 

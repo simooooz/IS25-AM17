@@ -19,7 +19,7 @@ public enum ClientMalusType {
     CREW {
         @Override
         public String toString() {
-            return "👨🏻‍🚀";
+            return "👨";
         }
     }
 

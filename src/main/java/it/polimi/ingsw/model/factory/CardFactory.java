@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-// RIMOSSO: import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import it.polimi.ingsw.model.cards.SlaversCard;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.model.cards.utils.*;
@@ -22,17 +21,14 @@ import it.polimi.ingsw.model.cards.PlanetCard;
 import it.polimi.ingsw.model.cards.SmugglersCard;
 import it.polimi.ingsw.model.cards.StardustCard;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.*;
 
 
 public abstract class CardFactory {
 
     protected final List<Card> cardPile;
-    // MODIFICATO: Rimosso .registerModule(new Jdk8Module())
     private static final ObjectMapper mapper = createStaticObjectMapper();
 
     public CardFactory() {
@@ -43,16 +39,13 @@ public abstract class CardFactory {
         return cardPile;
     }
 
-    // AGGIUNTO: Metodo statico per creare ObjectMapper
     private static ObjectMapper createStaticObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Prova a registrare JDK8 module se disponibile
         try {
             Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
             objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
         } catch (ClassNotFoundException e) {
-            // JDK8 module non disponibile, continua senza
         }
 
         return objectMapper;
@@ -78,13 +71,10 @@ public abstract class CardFactory {
     private ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Prova a registrare JDK8 module se disponibile
         try {
             Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
-            // Se arriviamo qui, la classe esiste
             objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
         } catch (ClassNotFoundException e) {
-            // JDK8 module non disponibile, continua senza
         }
 
         return objectMapper;

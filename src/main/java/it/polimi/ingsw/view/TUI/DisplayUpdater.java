@@ -339,21 +339,20 @@ public class DisplayUpdater {
         if (!board.getCardPile().isEmpty()) {
             if (board.getAllPlayers().stream().noneMatch(e -> ViewTui.getClientInstance().getGameController().getModel().getPlayerState(e.getUsername()) == PlayerState.DRAW_CARD || ViewTui.getClientInstance().getGameController().getModel().getPlayerState(e.getUsername()) == PlayerState.END)) {
                 if (board.getCardPile().size() > 1) {
-                    Chroma.println("\nPrevious card\tActual card", Chroma.GREY_BOLD);
-                    System.out.println(Constants.displayCards(List.of(board.getCardPile().get(board.getCardPile().size()-2), board.getCardPile().getLast()), 2));
+                    Chroma.println("\n    " + Constants.inTheMiddle("Previous card", 24) + "        " + Constants.inTheMiddle("Current card", 24), Chroma.GREY_BOLD);
+                    System.out.println(Constants.displayCards(List.of(board.getCardPile().get(board.getCardPile().size() - 2), board.getCardPile().getLast()), 2));
                 }
                 else {
-                    Chroma.println("\nActual card", Chroma.GREY_BOLD);
+                    Chroma.println("\n    " + Constants.inTheMiddle("Current card", 24), Chroma.GREY_BOLD);
                     System.out.println(Constants.displayCards(List.of(board.getCardPile().getLast()), 1));
                 }
                 board.getCardPile().getLast().printCardInfo(ViewTui.getClientInstance().getGameController().getModel(), board);
             }
             else {
-                Chroma.println("Previous card", Chroma.GREY_BOLD);
-                System.out.println(board.getCardPile().getLast());
+                Chroma.println("    " + Constants.inTheMiddle("Previous card", 24), Chroma.GREY_BOLD);
+                System.out.println(Constants.displayCards(List.of(board.getCardPile().getLast()), 1));
             }
         }
-
     }
 
 }

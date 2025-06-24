@@ -42,8 +42,8 @@ public class ClientMeteorSwarmCard extends ClientCard {
         String divider = leftDivider + Constants.repeat(hBorder, 22) + rightDivider;
         cardLines.add(divider);
 
-        for (ClientMeteor m : meteors) {
-            String meteorRow = vBorder + "       " + m.toString() +"\t   " + vBorder;
+        for (int i=0; i<meteors.size(); i++) {
+            String meteorRow = vBorder + Constants.inTheMiddle(i<coords.size()? String.valueOf(coords.get(i)): "       ", 7) + meteors.get(i).toString() +"\t   " + vBorder;
             cardLines.add(meteorRow);
         }
 

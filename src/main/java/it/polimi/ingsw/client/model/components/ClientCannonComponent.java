@@ -42,8 +42,8 @@ public final class ClientCannonComponent extends ClientComponent {
         };
         return new ArrayList<>(List.of(
                 Chroma.color("┌    " + arrow + "    ┐", Chroma.PURPLE),
-                isDouble ? Chroma.color("│  🔥" + "🔥\t│", Chroma.PURPLE)
-                        : Chroma.color("│   " + "🔥" + "  \t│", Chroma.PURPLE)
+                isDouble ? Chroma.color("│  💥" + "💥\t│", Chroma.PURPLE)
+                        : Chroma.color("│   " + "💥" + "  \t│", Chroma.PURPLE)
         ));
     }
 
