@@ -175,6 +175,9 @@ public class CombatZoneCard extends Card {
     @SuppressWarnings("Duplicates")
     @Override
     public boolean doLeftGameEffects(PlayerState state, ModelFacade model, Board board, String username) {
+        if (board.getPlayersByPos().size() < 2)
+            return true;
+
         if ( // Player was the worst
             state == PlayerState.WAIT_REMOVE_CREW || state == PlayerState.WAIT_REMOVE_GOODS ||
             state == PlayerState.WAIT_ROLL_DICES || state == PlayerState.WAIT_SHIP_PART ||
@@ -186,17 +189,17 @@ public class CombatZoneCard extends Card {
         int indexOfLeftPlayer = players.indexOf(player);
 
         if (playerIndex > indexOfLeftPlayer) {
-            players.remove(playerIndex);
+            players.remove(indexOfLeftPlayer);
             playerIndex--;
         }
         else if (playerIndex == indexOfLeftPlayer) {
-            players.remove(playerIndex);
+            players.remove(indexOfLeftPlayer);
             return autoCheckPlayers(model, board);
         }
         else
-            players.remove(playerIndex);
+            players.remove(indexOfLeftPlayer);
 
-        return false;
+        return playerIndex == players.size() && autoCheckPlayers(model, board);
     }
 
 }

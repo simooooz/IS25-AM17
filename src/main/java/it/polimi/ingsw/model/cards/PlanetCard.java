@@ -114,17 +114,17 @@ public class PlanetCard extends Card{
         int indexOfLeftPlayer = players.indexOf(player);
 
         if (playerIndex > indexOfLeftPlayer) {
-            players.remove(playerIndex);
+            players.remove(indexOfLeftPlayer);
             playerIndex--;
         }
         else if (playerIndex == indexOfLeftPlayer) {
-            players.remove(playerIndex);
+            players.remove(indexOfLeftPlayer);
             return autoCheckPlayers(model, board);
         }
         else
-            players.remove(playerIndex);
+            players.remove(indexOfLeftPlayer);
 
-        return false;
+        return playerIndex == players.size() && autoCheckPlayers(model, board);
     }
 
 }
