@@ -6,6 +6,7 @@ import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.cards.ClientPlanetCard;
 import it.polimi.ingsw.client.model.components.*;
 import it.polimi.ingsw.client.model.events.CardRevealedEvent;
+import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.AlienType;
@@ -1227,6 +1228,7 @@ public class FlightPhaseController implements MessageHandler {
                 MessageType.PLAYERS_POSITION_UPDATED_EVENT,
                 MessageType.JOINED_LOBBY_EVENT,
                 MessageType.LEFT_LOBBY_EVENT,
+                MessageType.CARD_UPDATED_EVENT,
                 MessageType.CARD_REVEALED_EVENT
         ).contains(messageType);
     }
