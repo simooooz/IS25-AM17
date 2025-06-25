@@ -38,6 +38,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -317,6 +318,125 @@ public class FlightPhaseController implements MessageHandler {
         event.consume();
     };
 
+    EventHandler<MouseEvent> checkShipPaneMouseEnteredHandler = event -> {
+        ((Pane) event.getSource()).setOpacity(0.3);
+        event.consume();
+    };
+
+    EventHandler<MouseEvent> checkShipPaneMouseExitedHandler = event -> {
+        ((Pane) event.getSource()).setOpacity(1);
+        event.consume();
+    };
+
+    EventHandler<MouseEvent> checkShipPaneMouseClickedHandler =event -> {
+        Pane pane = (Pane) event.getSource();
+        ImageView imageView = pane.getChildren().stream()
+                .filter(node -> node instanceof ImageView)
+                .map(node -> (ImageView) node)
+                .filter(iv -> iv.getId().startsWith("component"))
+                .findFirst()
+                .orElse(null);
+        assert imageView != null;
+        int id = Integer.parseInt(imageView.getId().split("_")[1]);
+
+        if (list1.contains(id)) {
+            list1.removeAll(List.of(id));
+            pane.addEventHandler(MouseEvent.MOUSE_ENTERED, checkShipPaneMouseEnteredHandler);
+            pane.addEventHandler(MouseEvent.MOUSE_EXITED, checkShipPaneMouseExitedHandler);
+            pane.setOpacity(1);
+        }
+        else {
+            list1.add(id);
+            pane.removeEventHandler(MouseEvent.MOUSE_ENTERED, checkShipPaneMouseEnteredHandler);
+            pane.removeEventHandler(MouseEvent.MOUSE_EXITED, checkShipPaneMouseExitedHandler);
+            pane.setOpacity(0.3);
+        }
+        mainButton.setDisable(list1.isEmpty());
+    };
+
+    EventHandler<MouseEvent> chooseShipPartPaneMouseEnteredHandler = event -> {
+        Pane pane = (Pane) event.getSource();
+        ImageView imageView = pane.getChildren().stream()
+                .filter(node -> node instanceof ImageView)
+                .map(node -> (ImageView) node)
+                .filter(iv -> iv.getId().startsWith("component"))
+                .findFirst()
+                .orElse(null);
+        assert imageView != null;
+        int componentId = Integer.parseInt(imageView.getId().split("_")[1]); // Hovered component id
+
+        for (List<Integer> part : shipParts)
+            if (part.contains(componentId)) { // Part to save
+                for (Integer componentsToStyle : part)
+                    paneMap.get(componentsToStyle).setOpacity(1);
+            }
+            else { // Part to drop
+                for (Integer componentsToStyle : part)
+                    paneMap.get(componentsToStyle).setOpacity(0.3);
+            }
+
+        event.consume();
+    };
+
+    EventHandler<MouseEvent> chooseShipPartPaneMouseExitedHandler = event -> {
+        for (List<Integer> part : shipParts)
+            for (Integer componentsToStyle : part)
+                paneMap.get(componentsToStyle).setOpacity(1);
+        event.consume();
+    };
+
+    EventHandler<MouseEvent> chooseShipPartPaneMouseClickedHandler =event -> {
+        Pane pane = (Pane) event.getSource();
+        ImageView imageView = pane.getChildren().stream()
+                .filter(node -> node instanceof ImageView)
+                .map(node -> (ImageView) node)
+                .filter(iv -> iv.getId().startsWith("component"))
+                .findFirst()
+                .orElse(null);
+        assert imageView != null;
+        int id = Integer.parseInt(imageView.getId().split("_")[1]);
+
+        Integer partId = null;
+        for (List<Integer> part : shipParts)
+            if (part.contains(id)) {
+                partId = shipParts.indexOf(part);
+                break;
+            }
+
+        assert partId != null;
+        if (partId.equals(index)) { // Click on previous clicked part
+            for (List<Integer> part : shipParts) // Set opacity 1 for all components and add listeners
+                for (Integer componentsToStyle : part) {
+                    paneMap.get(componentsToStyle).setOpacity(1);
+                    paneMap.get(componentsToStyle).addEventHandler(MouseEvent.MOUSE_ENTERED, chooseShipPartPaneMouseEnteredHandler);
+                    paneMap.get(componentsToStyle).addEventHandler(MouseEvent.MOUSE_EXITED, chooseShipPartPaneMouseExitedHandler);
+                }
+            index = null;
+        }
+        else { // Save partId
+            for (List<Integer> part : shipParts)
+                if (part.contains(id)) { // Part to save
+                    for (Integer componentsToStyle : part)
+                        paneMap.get(componentsToStyle).setOpacity(1);
+                }
+                else { // Part to drop
+                    for (Integer componentsToStyle : part)
+                        paneMap.get(componentsToStyle).setOpacity(0.3);
+                }
+            index = partId;
+
+            for (List<Integer> part : shipParts) // Remove all listeners
+                for (Integer componentsToStyle : part) {
+                    paneMap.get(componentsToStyle).removeEventHandler(MouseEvent.MOUSE_ENTERED, chooseShipPartPaneMouseEnteredHandler);
+                    paneMap.get(componentsToStyle).removeEventHandler(MouseEvent.MOUSE_EXITED, chooseShipPartPaneMouseExitedHandler);
+                }
+        }
+
+        mainButton.setDisable(index == null);
+        event.consume();
+    };
+
+
     @FXML
     public void initialize() {
         MessageDispatcher.getInstance().registerHandler(this);
@@ -341,6 +461,7 @@ public class FlightPhaseController implements MessageHandler {
         );
         instructionManager.reset();
     }
+
     private void loadImages() {
         Image playerShipImg;
         Image cardBackImg;
@@ -437,30 +558,6 @@ public class FlightPhaseController implements MessageHandler {
         // Add all
         addTilesToPlayerShip(tilesGrid, ship, OTHER_PLAYERS_TILE_WIDTH, OTHER_PLAYERS_TILE_HEIGHT);
         shipPane.getChildren().addAll(shipImageView, tilesGrid);
-
-        // Set click animation
-        shipPane.setOnMouseClicked(_ -> {
-            ParallelTransition zoomIn = createZoomToCenterAnimation(shipPane, Duration.millis(500));
-
-            zoomIn.setOnFinished(_ -> {
-                Scene scene = shipPane.getScene();
-                EventHandler<MouseEvent> clickOutsideHandler = new EventHandler<>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if (!shipPane.contains(shipPane.sceneToLocal(event.getSceneX(), event.getSceneY()))) { // Click outside
-                            ParallelTransition zoomOut = createZoomBackAnimation(shipPane, Duration.millis(500));
-                            zoomOut.play();
-                            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
-                        }
-                    }
-                };
-
-                scene.addEventHandler(MouseEvent.MOUSE_CLICKED, clickOutsideHandler); // Add event handler
-
-            });
-
-            zoomIn.play();
-        });
 
         return shipPane;
     }
@@ -678,169 +775,6 @@ public class FlightPhaseController implements MessageHandler {
         }
     }
 
-    public ParallelTransition createZoomToCenterAnimation(Node node, Duration duration) {
-        Scene scene = node.getScene();
-
-        Parent originalParent = node.getParent();
-        Bounds originalBounds = node.getBoundsInParent();
-        node.setUserData(new RestoreData(originalParent, originalBounds.getMinX(), originalBounds.getMinY()));
-
-        Parent root = scene.getRoot();
-        if (root instanceof Pane rootPane) {
-
-            // Remove from original container
-            if (originalParent instanceof Pane) {
-                ((Pane) originalParent).getChildren().remove(node);
-            }
-
-            // Convert coordinates
-            Bounds boundsInScene = originalParent.localToScene(originalBounds);
-            double newX = boundsInScene.getMinX();
-            double newY = boundsInScene.getMinY();
-
-            // Find absolute position
-            node.setLayoutX(newX);
-            node.setLayoutY(newY);
-            node.setTranslateX(0);
-            node.setTranslateY(0);
-
-            // Add fixed
-            rootPane.getChildren().add(node);
-        }
-
-        double sceneWidth = scene.getWidth();
-        double sceneHeight = scene.getHeight();
-        double centerX = sceneWidth / 2;
-        double centerY = sceneHeight / 2;
-
-        // Actual position
-        Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-        double currentCenterX = boundsInScene.getMinX() + boundsInScene.getWidth() / 2;
-        double currentCenterY = boundsInScene.getMinY() + boundsInScene.getHeight() / 2;
-
-        double translateX = centerX - currentCenterX;
-        double translateY = centerY - currentCenterY;
-
-        // Zoom 2x
-        ScaleTransition scaleTransition = new ScaleTransition(duration, node);
-        scaleTransition.setFromX(1.0);
-        scaleTransition.setFromY(1.0);
-        scaleTransition.setToX(2.0);
-        scaleTransition.setToY(2.0);
-
-        // Translate
-        TranslateTransition translateTransition = new TranslateTransition(duration, node);
-        translateTransition.setFromX(node.getTranslateX());
-        translateTransition.setFromY(node.getTranslateY());
-        translateTransition.setToX(node.getTranslateX() + translateX);
-        translateTransition.setToY(node.getTranslateY() + translateY);
-
-        ParallelTransition parallelTransition = new ParallelTransition();
-        parallelTransition.getChildren().addAll(scaleTransition, translateTransition);
-
-        return parallelTransition;
-    }
-
-    public ParallelTransition createZoomBackAnimation(Node node, Duration duration) {
-
-        RestoreData restoreData = (RestoreData) node.getUserData();
-        if (restoreData == null) return null;
-
-        ScaleTransition scaleTransition = new ScaleTransition(duration, node);
-        scaleTransition.setToX(1.0);
-        scaleTransition.setToY(1.0);
-
-        TranslateTransition translateTransition = new TranslateTransition(duration, node);
-        translateTransition.setToX(0);
-        translateTransition.setToY(0);
-
-        ParallelTransition parallelTransition = new ParallelTransition();
-        parallelTransition.getChildren().addAll(scaleTransition, translateTransition);
-
-        parallelTransition.setOnFinished(e -> {
-            Scene scene = node.getScene();
-            Parent root = scene.getRoot();
-
-            if (root instanceof Pane) {
-                ((Pane) root).getChildren().remove(node);
-            }
-
-            if (restoreData.originalParent instanceof Pane) {
-                node.setLayoutX(restoreData.originalX);
-                node.setLayoutY(restoreData.originalY);
-                node.setTranslateX(0);
-                node.setTranslateY(0);
-                node.setScaleX(1.0);
-                node.setScaleY(1.0);
-                ((Pane) restoreData.originalParent).getChildren().add(node);
-            }
-            node.setUserData(null);
-
-        });
-
-        return parallelTransition;
-    }
-
-    private void setupShipPartMode() {
-        Map<Integer, Color> partColors = new HashMap<>();
-
-        for (int i = 0; i < shipParts.size(); i++) {
-            double hue = (360.0 / shipParts.size()) * i;
-            Color distinctColor = Color.hsb(hue, 0.7, 0.8);
-            partColors.put(i, distinctColor);
-        }
-
-        paneMap.forEach((id, pane) -> {
-
-            Integer partId = null;
-            for (List<Integer> part : shipParts)
-                if (part.contains(id))
-                    partId = shipParts.indexOf(part);
-            Integer finalPartId = partId;
-            System.out.println("PART ID "+ partId + "COMPONWNR ID " + id);
-            Color partColor = partColors.get(partId);
-            Color transparentColor = partColor.deriveColor(0, 1, 1, 0.5);
-            String cssColor = String.format("rgba(%d, %d, %d, %.2f)",
-                (int)(transparentColor.getRed() * 255),
-                (int)(transparentColor.getGreen() * 255),
-                (int)(transparentColor.getBlue() * 255),
-                transparentColor.getOpacity());
-            pane.setStyle("-fx-background-color: " + cssColor + ";");
-
-            pane.setOnMouseEntered(e -> {
-                shipParts.get(finalPartId).forEach(componentId -> {
-                    String color = String.format("rgba(%d, %d, %d, %.2f)",
-                        (int)(partColor.brighter().getRed() * 255),
-                        (int)(partColor.brighter().getGreen() * 255),
-                        (int)(partColor.brighter().getBlue() * 255),
-                        partColor.brighter().getOpacity());
-                    pane.setStyle("-fx-background-color: " + color + ";");
-                });
-                e.consume();
-            });
-
-            pane.setOnMouseExited(e -> {
-                Color exitColor = finalPartId.equals(index) ? partColor.brighter() : partColor.deriveColor(0, 1, 1, 0.5);
-                shipParts.get(finalPartId).forEach(componentId -> {
-                    String color = String.format("rgba(%d, %d, %d, %.2f)",
-                        (int)(exitColor.getRed() * 255),
-                        (int)(exitColor.getGreen() * 255),
-                        (int)(exitColor.getBlue() * 255),
-                            exitColor.getOpacity());
-                    pane.setStyle("-fx-background-color: " + color + ";");
-                });
-                e.consume();
-            });
-
-            pane.setOnMouseClicked(e -> {
-                index = finalPartId.equals(index) ? null : finalPartId;
-                mainButton.setDisable(index == null);
-                e.consume();
-            });
-
-        });
-    }
-
     private void updateBoard() {
         StringBuilder sb = new StringBuilder();
         for (SimpleEntry<ClientPlayer, Integer> player : model.getBoard().getPlayers()) {
@@ -858,6 +792,15 @@ public class FlightPhaseController implements MessageHandler {
         if (sb.isEmpty())
             sb.append("none");
         playersStartingDeckLabel.setText(sb.toString());
+    }
+
+    private void paneRemoveAllListeners(Pane p) {
+        p.removeEventHandler(MouseEvent.MOUSE_ENTERED, chooseShipPartPaneMouseEnteredHandler);
+        p.removeEventHandler(MouseEvent.MOUSE_EXITED, chooseShipPartPaneMouseExitedHandler);
+        p.removeEventHandler(MouseEvent.MOUSE_CLICKED, chooseShipPartPaneMouseClickedHandler);
+        p.removeEventHandler(MouseEvent.MOUSE_ENTERED, checkShipPaneMouseEnteredHandler);
+        p.removeEventHandler(MouseEvent.MOUSE_EXITED, checkShipPaneMouseExitedHandler);
+        p.removeEventHandler(MouseEvent.MOUSE_CLICKED, checkShipPaneMouseClickedHandler);
     }
 
     @SuppressWarnings("Duplicates")
@@ -906,11 +849,9 @@ public class FlightPhaseController implements MessageHandler {
         mainButton.setDisable(false);
         mainButton.setVisible(true);
         mainButton.setOnAction(null);
-        for (Pane pane : paneMap.values()) {
-            pane.setOnMouseClicked(null);
-            pane.setOnMouseEntered(null);
-            pane.setOnMouseExited(null);
-        }
+
+        for (Pane pane : paneMap.values())
+            paneRemoveAllListeners(pane);
 
         // Disable flow pane
         flowPane.getChildren().clear();
@@ -930,27 +871,11 @@ public class FlightPhaseController implements MessageHandler {
                 mainButton.setOnAction(_ -> client.send(MessageType.CHECK_SHIP, list1));
 
                 paneMap.forEach((id, pane) -> {
-                    pane.setOnMouseEntered(_ -> {
-                        if (list1.contains(id))
-                            pane.setStyle("-fx-background-color: darkred;");
-                        else
-                            pane.setStyle("-fx-background-color: orange;");
-                    });
-
-                    pane.setOnMouseExited(_ -> {
-                        if (list1.contains(id))
-                            pane.setStyle("-fx-background-color: red;");
-                        else
-                            pane.setStyle("-fx-background-color: transparent;");
-                    });
-
-                    pane.setOnMouseClicked(_ -> {
-                        if (list1.contains(id))
-                            list1.remove(id);
-                        else
-                            list1.add(id);
-                        mainButton.setDisable(list1.isEmpty());
-                    });
+                    if (shipGrid.lookup("#component_"+id) != null) {
+                        pane.addEventHandler(MouseEvent.MOUSE_ENTERED, checkShipPaneMouseEnteredHandler);
+                        pane.addEventHandler(MouseEvent.MOUSE_EXITED, checkShipPaneMouseExitedHandler);
+                        pane.addEventHandler(MouseEvent.MOUSE_CLICKED, checkShipPaneMouseClickedHandler);
+                    }
                 });
             }
             case WAIT_ALIEN -> {
@@ -1050,6 +975,14 @@ public class FlightPhaseController implements MessageHandler {
             case WAIT_SHIP_PART -> {
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> client.send(MessageType.CHOOSE_SHIP_PART, index));
+
+                paneMap.forEach((id, pane) -> {
+                    if (shipGrid.lookup("#component_"+id) != null) { // Only component that are in main ship
+                        pane.addEventHandler(MouseEvent.MOUSE_ENTERED, chooseShipPartPaneMouseEnteredHandler);
+                        pane.addEventHandler(MouseEvent.MOUSE_EXITED, chooseShipPartPaneMouseExitedHandler);
+                        pane.addEventHandler(MouseEvent.MOUSE_CLICKED, chooseShipPartPaneMouseClickedHandler);
+                    }
+                });
             }
             case WAIT_REMOVE_CREW -> {
                 // Enable flow pane
@@ -1079,8 +1012,10 @@ public class FlightPhaseController implements MessageHandler {
                 flowPane.addEventHandler(DragEvent.DRAG_OVER, acceptDragOverHandler);
                 flowPane.addEventHandler(DragEvent.DRAG_DROPPED, flowPaneDragDroppedHandler);
 
-                List<ColorType> reward = model.getBoard().getCardPile().getLast().getReward(client.getUsername());
-                createObjectsInFlowPane(reward.size(), reward.stream().map(c -> "/images/objects/good-"+c.name().toLowerCase()+".png").toList());
+                if (state == PlayerState.WAIT_GOODS) {
+                    List<ColorType> reward = model.getBoard().getCardPile().getLast().getReward(client.getUsername());
+                    createObjectsInFlowPane(reward.size(), reward.stream().map(c -> "/images/objects/good-"+c.name().toLowerCase()+".png").toList());
+                }
 
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
@@ -1187,18 +1122,6 @@ public class FlightPhaseController implements MessageHandler {
         }
     }
 
-    private static class RestoreData {
-        final Parent originalParent;
-        final double originalX;
-        final double originalY;
-
-        RestoreData(Parent parent, double x, double y) {
-            this.originalParent = parent;
-            this.originalX = x;
-            this.originalY = y;
-        }
-    }
-
     private void showCardInfo(ClientCard card) {
         // Ottieni direttamente la stringa dalle informazioni della carta
         String cardInfo = card.printCardInfo(client.getGameController().getModel(), client.getGameController().getModel().getBoard());
@@ -1271,7 +1194,8 @@ public class FlightPhaseController implements MessageHandler {
                     changeComponentObjects(component, 0, List.of());
                     imageMap.get(e.id()).removeEventHandler(DragEvent.DRAG_OVER, acceptDragOverHandler);
                     imageMap.get(e.id()).removeEventHandler(DragEvent.DRAG_DROPPED, componentDragDroppedHandler);
-                    p.setOnMouseClicked(null);
+
+                    paneRemoveAllListeners(p);
 
                     GridPane grid = (GridPane) p.getParent();
                     grid.getChildren().remove(p);
@@ -1289,10 +1213,7 @@ public class FlightPhaseController implements MessageHandler {
                     instructionManager.showSuccessMessage("Component removed successfully");
                 }
             }
-            case ShipBrokenEvent e -> {
-                this.shipParts = new ArrayList<>(e.parts());
-                setupShipPartMode();
-            }
+            case ShipBrokenEvent e -> this.shipParts = new ArrayList<>(e.parts());
             case BatteriesUpdatedEvent e -> {
                 ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(e.id());
                 changeComponentObjects(component, e.batteries(), List.of("/images/objects/battery.png"));

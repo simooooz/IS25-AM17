@@ -524,10 +524,11 @@ public class BuildController implements MessageHandler, Initializable {
     @SuppressWarnings("Duplicates")
     @FXML
     public void setReadyHandler(ActionEvent event) {
-        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
+        if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert"
+            componentMap.get(Integer.parseInt(localCommand.split(" ")[1])).setRotate(0);
             client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
-
-        localCommand = "";
+            localCommand = "";
+        }
 
         client.send(MessageType.SET_READY);
         event.consume();
