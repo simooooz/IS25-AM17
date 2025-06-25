@@ -28,7 +28,12 @@ public abstract class ServerBasis {
             user.setUsername(username);
             user.setState(UserState.LOBBY_SELECTION);
             events.add(new UsernameOkEvent(username));
+        } catch (IllegalArgumentException e) {
+           user.sendGameEvent(new GameErrorEvent("Username not found"));
+           return;
+        }
 
+        try {
             // Check previous sessions
             User oldUser = User.popInactiveUser(username);
             if (oldUser != null && oldUser.getLobby() != null && oldUser.getLobby().getState() == LobbyState.IN_GAME) { // Rejoin

@@ -144,7 +144,7 @@ public class ClientBoardAdvancedMode extends ClientBoard {
         StringBuilder sb = new StringBuilder();
 
         switch (state) {
-            case BUILD, WAIT_ALIEN, LOOK_CARD_PILE -> {
+            case BUILD, LOOK_CARD_PILE -> {
                 sb.append(Constants.displayComponents(commonComponents, 8));
 
                 sb.append("\nHourglass position: ").append(hourglassPos).append(hourglassPos == 0 ? " (last!)" : "");
@@ -158,7 +158,7 @@ public class ClientBoardAdvancedMode extends ClientBoard {
                     sb.append("- ").append(player).append("\n");
             }
 
-            case DRAW_CARD, WAIT, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, WAIT_SHIP_PART, DONE -> {
+            case DRAW_CARD, WAIT, WAIT_ALIEN, WAIT_CANNONS, WAIT_ENGINES, WAIT_GOODS, WAIT_REMOVE_GOODS, WAIT_ROLL_DICES, WAIT_REMOVE_CREW, WAIT_SHIELD, WAIT_BOOLEAN, WAIT_INDEX, WAIT_SHIP_PART, DONE -> {
                 if (DisplayUpdater.getPhase().equals("build")) {
                     sb.append("\nHourglass position: ").append(hourglassPos).append(hourglassPos == 0 ? " (last!)" : "");
                     sb.append("\nTime left: ").append(timeLeft).append("\n");
