@@ -22,6 +22,21 @@ public class ClientPlanetCard extends ClientCard {
 
     public ClientPlanetCard() {}
 
+    public List<ClientPlanet> getPlanets() {
+        return planets;
+    }
+
+    @Override
+    public List<ColorType> getReward(String username) {
+        Map<ColorType, Integer> reward = landedPlayers.get(username).getRewards();
+        List<ColorType> rewardsList = new ArrayList<>();
+        reward.forEach((c, num) -> {
+            for (int i=0; i<num; i++)
+                rewardsList.add(c);
+        });
+        return rewardsList;
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     public String toString() {

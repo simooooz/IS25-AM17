@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.ClientGameModel;
+import it.polimi.ingsw.common.model.enums.ColorType;
+
+import java.util.List;
 
 
 /**
@@ -46,6 +49,10 @@ public abstract class ClientCard {
     }
 
     public ClientCard() {}
+
+    public List<ColorType> getReward(String username) {
+        throw new RuntimeException("Method not valid");
+    }
 
     public void printCardInfo(ClientGameModel model, ClientBoard board) {}
 

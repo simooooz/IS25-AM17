@@ -21,6 +21,15 @@ public class ClientAbandonedStationCard extends ClientCard {
 
     public ClientAbandonedStationCard() {}
 
+    public List<ColorType> getReward(String username) {
+        List<ColorType> rewardsList = new ArrayList<>();
+        goods.forEach((c, num) -> {
+            for (int i=0; i<num; i++)
+                rewardsList.add(c);
+        });
+        return rewardsList;
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     public String toString() {

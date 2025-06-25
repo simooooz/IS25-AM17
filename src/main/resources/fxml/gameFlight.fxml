@@ -136,7 +136,7 @@
                                     </padding>
                                 </Label>
 
-                                <Label fx:id="playersInGameLabel">
+                                <Label fx:id="playersInGameLabel" wrapText="true">
                                     <font>
                                         <Font name="System" size="14.0" />
                                     </font>
@@ -185,12 +185,22 @@
                                     </children>
                                 </Pane>
 
+                                <HBox
+                                        fx:id="indexBooleanButtonsContainer"
+                                        visible="false"
+                                        maxHeight="100.0" maxWidth="450.0"
+                                        minHeight="100.0" minWidth="450.0"
+                                        alignment="CENTER">
+
+                                </HBox>
+
                                 <!-- Container per oggetti drag and drop -->
                                 <FlowPane fx:id="flowPane"
                                           maxHeight="100.0" maxWidth="450.0"
                                           minHeight="100.0" minWidth="450.0"
                                           prefHeight="100.0" prefWidth="450.0"
                                           style="-fx-background-color: #1a0d2e;"
+                                          visible="false"
                                           hgap="10.0" vgap="10.0" alignment="CENTER">
                                     <padding>
                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

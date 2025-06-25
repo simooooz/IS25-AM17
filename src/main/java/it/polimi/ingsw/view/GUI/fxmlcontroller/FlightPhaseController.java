@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.GUI.fxmlcontroller;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.cards.ClientCard;
+import it.polimi.ingsw.client.model.cards.ClientPlanetCard;
 import it.polimi.ingsw.client.model.components.*;
 import it.polimi.ingsw.client.model.events.CardRevealedEvent;
 import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
@@ -24,6 +25,7 @@ import it.polimi.ingsw.view.GUI.SceneManager;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -35,6 +37,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -62,6 +65,7 @@ public class FlightPhaseController implements MessageHandler {
     @FXML private ImageView playerShipImage;
     @FXML private GridPane shipGrid;
     @FXML public FlowPane flowPane;
+    @FXML public HBox indexBooleanButtonsContainer;
 
     @FXML private Button mainButton;
     @FXML private Button endFlightButton;
@@ -110,8 +114,24 @@ public class FlightPhaseController implements MessageHandler {
             sourceComponent = client.getGameController().getModel().getBoard().getMapIdComponents().get(sourceComponentId);
         }
 
-        System.out.println("Source: " + sourceId);
-        if (state == PlayerState.WAIT_CANNONS && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_CANNONS
+        if (state == PlayerState.WAIT_ALIEN && object.contains("alien")) { // Alien in WAIT_ALIEN
+            List<Class<?>> allowedClasses = List.of(ClientCabinComponent.class);
+            if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
+                if (
+                    destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is allowed component
+                    destComponent instanceof ClientCabinComponent && objectsMap.get(destComponentId).size() == 2
+                ) {
+                    System.out.println("Mi muovo");
+                    changeComponentObjects(destComponent, 0, List.of());
+                    moveComponentObject(objectImageView, destId);
+                    if (sourceId.contains("component")) {
+                        changeComponentObjects(sourceComponent, 2, List.of("/images/objects/human.png"));
+                    }
+                    event.setDropCompleted(true);
+                }
+            }
+        }
+        else if (state == PlayerState.WAIT_CANNONS && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_CANNONS
             List<Class<?>> allowedClasses = Arrays.asList(ClientCannonComponent.class, ClientBatteryComponent.class);
             if (allowedClasses.containsAll(List.of(destComponent.getClass(), sourceComponent.getClass()))) {
                 System.out.println("Tra le classi permesse, source: " + sourceComponent.getClass() + " dest: " + destComponent.getClass());
@@ -226,7 +246,16 @@ public class FlightPhaseController implements MessageHandler {
             sourceComponent = client.getGameController().getModel().getBoard().getMapIdComponents().get(sourceComponentId);
         }
 
-        if (state == PlayerState.WAIT_REMOVE_GOODS && object.equals("battery")) { // Battery in WAIT_REMOVE_GOODS
+        if (state == PlayerState.WAIT_ALIEN && object.contains("alien")) { // Alien in WAIT_ALIEN
+            List<Class<?>> allowedClasses = List.of(ClientCabinComponent.class);
+            if (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass())) { // Source is allowed component
+                System.out.println("Mi muovo");
+                moveComponentObject(objectImageView, destId);
+                changeComponentObjects(sourceComponent, 2, List.of("/images/objects/human.png"));
+                event.setDropCompleted(true);
+            }
+        }
+        else if (state == PlayerState.WAIT_REMOVE_GOODS && object.equals("battery")) { // Battery in WAIT_REMOVE_GOODS
             List<Class<?>> allowedClasses = List.of(ClientBatteryComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
                 System.out.println("Mi muovo");
@@ -277,7 +306,8 @@ public class FlightPhaseController implements MessageHandler {
         if (
             ((state == PlayerState.WAIT_CANNONS || state == PlayerState.WAIT_ENGINES || state == PlayerState.WAIT_SHIELD || state == PlayerState.WAIT_REMOVE_GOODS) && object.equals("battery")) ||
             ((state == PlayerState.WAIT_GOODS || state == PlayerState.WAIT_REMOVE_GOODS) && object.contains("good")) ||
-            (state == PlayerState.WAIT_REMOVE_CREW && (object.contains("alien") || object.equals("human")))
+            (state == PlayerState.WAIT_REMOVE_CREW && (object.contains("alien") || object.equals("human"))) ||
+            (state == PlayerState.WAIT_ALIEN && object.contains("alien"))
         ) {
             Dragboard db = iv.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
@@ -307,13 +337,13 @@ public class FlightPhaseController implements MessageHandler {
     private void loadImages() {
         Image playerShipImg;
         Image cardBackImg;
-        if (client.getLobby().isLearnerMode()){
+        if (!client.getLobby().isLearnerMode()) {
             playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg")));
             cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
         }
         else {
             playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg")));
-            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_0121.jpg")));
+            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
         }
 
         playerShipImage.setImage(playerShipImg);
@@ -324,8 +354,11 @@ public class FlightPhaseController implements MessageHandler {
         this.imageMap = imageMap;
         loadImages();
         updateBoard();
-        setupPlayerShipTilesContainer();
-        syncAction();
+
+        Platform.runLater(() -> {
+            setupPlayerShipTilesContainer();
+            syncAction();
+        });
     }
 
     private void setupPlayerShipTilesContainer() {
@@ -371,8 +404,23 @@ public class FlightPhaseController implements MessageHandler {
         tilesGrid.setLayoutY(shipImageView.getLayoutY());
         tilesGrid.setPrefWidth(shipImageView.getFitWidth());
         tilesGrid.setPrefHeight(shipImageView.getFitHeight());
-        // tilesGrid.setStyle("-fx-grid-lines-visible: true;");
         tilesGrid.setPadding(new Insets(9.8, 10.0, 9.8, 10.0)); // Circa la metà dei valori originali
+
+        for (int i = 0; i < Constants.SHIP_ROWS; i++) {
+            RowConstraints rowConstraint = new RowConstraints();
+            rowConstraint.setMinHeight(OTHER_PLAYERS_TILE_HEIGHT);
+            rowConstraint.setPrefHeight(OTHER_PLAYERS_TILE_HEIGHT);
+            rowConstraint.setMaxHeight(OTHER_PLAYERS_TILE_HEIGHT);
+            tilesGrid.getRowConstraints().add(rowConstraint);
+        }
+
+        for (int i = 0; i < Constants.SHIP_COLUMNS; i++) {
+            ColumnConstraints colConstraint = new ColumnConstraints();
+            colConstraint.setMinWidth(OTHER_PLAYERS_TILE_WIDTH);
+            colConstraint.setPrefWidth(OTHER_PLAYERS_TILE_WIDTH);
+            colConstraint.setMaxWidth(OTHER_PLAYERS_TILE_WIDTH);
+            tilesGrid.getColumnConstraints().add(colConstraint);
+        }
 
         // Add all
         addTilesToPlayerShip(tilesGrid, ship, OTHER_PLAYERS_TILE_WIDTH, OTHER_PLAYERS_TILE_HEIGHT);
@@ -442,7 +490,7 @@ public class FlightPhaseController implements MessageHandler {
         }
     }
 
-    public Pane createShipComponent(ClientComponent component, double width, double height) {
+    private Pane createShipComponent(ClientComponent component, double width, double height) {
         Pane imagePane = new Pane();
         ImageView componentImage = imageMap.get(component.getId());
         componentImage.addEventHandler(DragEvent.DRAG_OVER, acceptDragOverHandler);
@@ -459,7 +507,8 @@ public class FlightPhaseController implements MessageHandler {
         return imagePane;
     }
 
-    public void changeComponentObjects(ClientComponent component, int n, List<String> imagesPath) {
+    @SuppressWarnings("Duplicates")
+    private void changeComponentObjects(ClientComponent component, int n, List<String> imagesPath) {
         Pane componentPane = paneMap.get(component.getId());
         List<ImageView> objects = objectsMap.get(component.getId());
         if (objects == null) {
@@ -499,8 +548,8 @@ public class FlightPhaseController implements MessageHandler {
                 overlayImage.setPreserveRatio(true);
 
                 double spacing3 = (baseWidth - (3 * overlaySize)) / 4;
-                double overlayX = baseX + spacing3 + (objects.size() * (overlaySize + spacing3));
-                double overlayY = baseY + ((objects.size() % 2 == 0 ? 1 : -1)* baseHeight / 5) + (baseHeight - overlaySize) / 2;
+                double overlayX = spacing3 + (objects.size() * (overlaySize + spacing3));
+                double overlayY = ((objects.size() % 2 == 0 ? 1 : -1)* baseHeight / 5) + (baseHeight - overlaySize) / 2;
 
                 overlayImage.setLayoutX(overlayX);
                 overlayImage.setLayoutY(overlayY);
@@ -525,7 +574,7 @@ public class FlightPhaseController implements MessageHandler {
         }
     }
 
-    public void moveComponentObject(ImageView object, String destId) {
+    private void moveComponentObject(ImageView object, String destId) {
         // Remove from source
         String sourceId = objectsMap.entrySet().stream()
             .filter(e -> e.getValue().contains(object))
@@ -567,7 +616,43 @@ public class FlightPhaseController implements MessageHandler {
         }
     }
 
-    public void reorderComponentObjects(int componentId) {
+    private void clearObjectsFromCannonsShieldsEngines() {
+        objectsMap.forEach((id, _) -> {
+            ClientComponent component = model.getBoard().getMapIdComponents().get(id);
+            switch (component) {
+                case ClientCannonComponent _, ClientEngineComponent _, ClientShieldComponent _ -> changeComponentObjects(component, 0, List.of());
+                default -> {}
+            }
+        });
+    }
+
+    @SuppressWarnings("Duplicates")
+    private void createObjectsInFlowPane(int n, List<String> imagesPath) {
+        double overlaySize = Math.min(TILE_WIDTH / 3.2, TILE_HEIGHT / 3.2);
+        for (int i = 0; i < n; i++) {
+            ImageView overlayImage = new ImageView();
+            String path = i < imagesPath.size() ? imagesPath.get(i) : imagesPath.getLast();
+            overlayImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+
+            if (path.contains("battery"))
+                overlayImage.setUserData("battery");
+            else if (path.contains("good"))
+                overlayImage.setUserData("good-"+path.split("-")[1].split("\\.")[0]);
+            else if (path.contains("human"))
+                overlayImage.setUserData("human");
+            else if (path.contains("alien"))
+                overlayImage.setUserData("alien-"+path.split("-")[1].split("\\.")[0]);
+
+            overlayImage.setFitWidth(overlaySize);
+            overlayImage.setFitHeight(overlaySize);
+            overlayImage.setPreserveRatio(true);
+
+            overlayImage.addEventHandler(MouseEvent.DRAG_DETECTED, objectDragDetectedHandler);
+            flowPane.getChildren().add(overlayImage);
+        }
+    }
+
+    private void reorderComponentObjects(int componentId) {
         Pane pane = paneMap.get(componentId);
         List<ImageView> objects = objectsMap.get(componentId);
         for (int i = 0; i < objects.size(); i++) {
@@ -687,9 +772,10 @@ public class FlightPhaseController implements MessageHandler {
         return parallelTransition;
     }
 
-    public void updateBoard() {
+    private void updateBoard() {
         StringBuilder sb = new StringBuilder();
-        for (SimpleEntry<ClientPlayer, Integer> player : client.getGameController().getModel().getBoard().getPlayers()) {
+        for (SimpleEntry<ClientPlayer, Integer> player : model.getBoard().getPlayers()) {
+            System.out.println("In game  " + player.getKey().toRawString());
             sb.append(player.getValue().toString()).append(" ").append(player.getKey().toRawString()).append(" | ").append(player.getKey().getCredits()).append(" credits\n");
         }
         if (sb.isEmpty())
@@ -714,6 +800,14 @@ public class FlightPhaseController implements MessageHandler {
         HBox centralBox = overlayManager.getCentralHBox();
         centralBox.setAlignment(Pos.CENTER);
         centralBox.setSpacing(10);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.getStyleClass().add("scroll-pane");
+        scrollPane.maxWidth(1200);
+        scrollPane.minWidth(300);
+        scrollPane.setStyle("-fx-background: transparent; -fx-border-color: transparent;");
+        scrollPane.setContent(centralBox);
 
         for (ClientCard card : model.getBoard().getCardPile()) {
             ImageView iw = new ImageView();
@@ -742,8 +836,7 @@ public class FlightPhaseController implements MessageHandler {
     private void syncAction() {
         this.state = client.getGameController().getModel().getPlayerState(client.getUsername());
 
-        list1.clear();
-        list2.clear();
+        clearObjectsFromCannonsShieldsEngines();
 
         mainButton.setDisable(false);
         mainButton.setVisible(true);
@@ -755,9 +848,14 @@ public class FlightPhaseController implements MessageHandler {
         }
 
         // Disable flow pane
+        flowPane.getChildren().clear();
         flowPane.setVisible(false);
         flowPane.removeEventHandler(DragEvent.DRAG_OVER, acceptDragOverHandler);
         flowPane.removeEventHandler(DragEvent.DRAG_DROPPED, flowPaneDragDroppedHandler);
+
+        // Disable WAIT_INDEX and WAIT_BOOLEAN buttons
+        indexBooleanButtonsContainer.setVisible(false);
+        indexBooleanButtonsContainer.getChildren().clear();
 
         switch (state) {
             case CHECK -> {
@@ -791,13 +889,21 @@ public class FlightPhaseController implements MessageHandler {
                 });
             }
             case WAIT_ALIEN -> {
+                // Enable flow pane
+                flowPane.setVisible(true);
+                flowPane.addEventHandler(DragEvent.DRAG_OVER, acceptDragOverHandler);
+                flowPane.addEventHandler(DragEvent.DRAG_DROPPED, flowPaneDragDroppedHandler);
+                createObjectsInFlowPane(2, List.of("/images/objects/alien-engine.png", "/images/objects/alien-cannon.png"));
+
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
                     Map<Integer, AlienType> alienMap = new HashMap<>();
-                        for (int i = 0; i < list1.size(); i++) {
-                            ClientOddComponent odd = (ClientOddComponent) client.getGameController().getModel().getBoard().getMapIdComponents().get(list2.get(i));
-                            alienMap.put(list1.get(i), odd.getType());
+                    objectsMap.forEach((id, objects) -> {
+                        if (objects.size() == 1) {
+                            AlienType alien = ((String) objects.getFirst().getUserData()).contains("cannon") ? AlienType.CANNON : AlienType.ENGINE;
+                            alienMap.put(id, alien);
                         }
+                    });
                     client.send(MessageType.CHOOSE_ALIEN, alienMap);
                 });
             }
@@ -808,8 +914,10 @@ public class FlightPhaseController implements MessageHandler {
             case WAIT_CANNONS -> {
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
+                    list1.clear();
+                    list2.clear();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
+                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
                         switch (component) {
                             case ClientCannonComponent _ -> {
                                 if (!objects.isEmpty())
@@ -828,8 +936,10 @@ public class FlightPhaseController implements MessageHandler {
             case WAIT_ENGINES -> {
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
+                    list1.clear();
+                    list2.clear();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
+                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
                         switch (component) {
                             case ClientEngineComponent _ -> {
                                 if (!objects.isEmpty())
@@ -852,8 +962,9 @@ public class FlightPhaseController implements MessageHandler {
             case WAIT_SHIELD -> {
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
+                    list2.clear();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
+                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
                         if (component instanceof ClientBatteryComponent c) {
                             for (int i = objects.size(); i < c.getBatteries(); i++)
                                 list2.add(id);
@@ -875,18 +986,15 @@ public class FlightPhaseController implements MessageHandler {
 
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
+                    list1.clear();
                     objectsMap.forEach((id, objects) -> {
-                       ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
+                       ClientComponent component = model.getBoard().getMapIdComponents().get(id);
                        if (component instanceof ClientCabinComponent c) {
                            int crewInCabin = c.getAlien() != null ? 1 : c.getHumans();
                            for (int i = objects.size(); i < crewInCabin; i++)
                                list1.add(id);
                        }
                     });
-
-                    for (Integer i : list1)
-                        System.out.println(i + " ");
-
                     client.send(MessageType.REMOVE_CREW, list1);
                 });
             }
@@ -896,11 +1004,15 @@ public class FlightPhaseController implements MessageHandler {
                 flowPane.addEventHandler(DragEvent.DRAG_OVER, acceptDragOverHandler);
                 flowPane.addEventHandler(DragEvent.DRAG_DROPPED, flowPaneDragDroppedHandler);
 
+                List<ColorType> reward = model.getBoard().getCardPile().getLast().getReward(client.getUsername());
+                createObjectsInFlowPane(reward.size(), reward.stream().map(c -> "/images/objects/good-"+c.name().toLowerCase()+".png").toList());
+
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
+                    list2.clear();
                     Map<Integer, List<ColorType>> newDisposition = new HashMap<>();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(id);
+                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
                         switch (component) {
                             case ClientCargoHoldsComponent _ -> {
                                 List<ColorType> goods = objects.stream()
@@ -915,19 +1027,79 @@ public class FlightPhaseController implements MessageHandler {
                             default -> {}
                         }
                     });
-                    if (state == PlayerState.WAIT_GOODS)
-                        client.send(MessageType.UPDATE_GOODS, newDisposition);
-                    else {
-                        client.send(MessageType.UPDATE_GOODS, newDisposition, list2);
-                    }
+                    client.send(MessageType.UPDATE_GOODS, newDisposition, list2);
                 });
             }
             case WAIT_INDEX -> {
                 mainButton.setText("Done");
+
+                // Show WAIT_INDEX buttons
+                List<Button> planetsButtons = new ArrayList<>();
+                if (model.getBoard().getCardPile().getLast() instanceof ClientPlanetCard card) {
+                    for (int i=0; i<card.getPlanets().size(); i++) {
+                        Button planetButton = new Button(String.valueOf(i));
+                        planetButton.getStyleClass().clear();
+                        planetButton.getStyleClass().add("toggle-button");
+                        planetButton.setStyle("-fx-pref-width: 20; -fx-padding: 5;");
+
+                        Integer finalI = i;
+                        planetButton.setOnAction(_ -> {
+                            System.out.println("ORA " + index + " VOGLIO " + finalI);
+                            if (finalI.equals(index)) {
+                                index = null;
+                                planetButton.getStyleClass().clear();
+                                planetButton.getStyleClass().add("toggle-button");
+                            }
+                            else {
+                                index = finalI;
+                                planetButton.getStyleClass().clear();
+                                planetButton.getStyleClass().add("toggle-button-selected");
+                                planetsButtons.stream().filter(b -> !b.equals(planetButton)).forEach(b -> {
+                                    b.getStyleClass().clear();
+                                    b.getStyleClass().add("toggle-button");
+                                });
+                            }
+                        });
+                        planetsButtons.add(planetButton);
+                    }
+                    indexBooleanButtonsContainer.getChildren().addAll(planetsButtons);
+                    indexBooleanButtonsContainer.setVisible(true);
+                }
+
                 mainButton.setOnAction(_ -> client.send(MessageType.GET_INDEX, index));
             }
             case WAIT_BOOLEAN -> {
                 mainButton.setText("Done");
+
+                // Show WAIT_BOOLEAN buttons
+                Button acceptBtn = new Button("Take reward");
+                Button declineBtn = new Button("Decline"); // Default
+                acceptBtn.getStyleClass().clear();
+                acceptBtn.getStyleClass().add("toggle-button");
+                declineBtn.getStyleClass().clear();
+                declineBtn.getStyleClass().add("toggle-button-selected");
+
+                acceptBtn.setOnAction(_ -> {
+                    if (!decision) {
+                        decision = true;
+                        acceptBtn.getStyleClass().clear();
+                        acceptBtn.getStyleClass().add("toggle-button-selected");
+                        declineBtn.getStyleClass().clear();
+                        declineBtn.getStyleClass().add("toggle-button");
+                    }
+                });
+                declineBtn.setOnAction(_ -> {
+                    if (decision) {
+                        decision = false;
+                        declineBtn.getStyleClass().clear();
+                        declineBtn.getStyleClass().add("toggle-button-selected");
+                        acceptBtn.getStyleClass().clear();
+                        acceptBtn.getStyleClass().add("toggle-button");
+                    }
+                });
+                indexBooleanButtonsContainer.getChildren().addAll(acceptBtn, declineBtn);
+                indexBooleanButtonsContainer.setVisible(true);
+
                 mainButton.setOnAction(_ -> client.send(MessageType.GET_BOOLEAN, decision));
             }
             case WAIT, DONE -> {
