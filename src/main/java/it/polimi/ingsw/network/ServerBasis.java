@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
@@ -21,21 +22,25 @@ public abstract class ServerBasis {
 
     public static void setUsername(User user, String username) {
         if (user.getState() != UserState.USERNAME) throw new IllegalStateException("User is not in state USERNAME");
-
-        user.setUsername(username);
-        user.setState(UserState.LOBBY_SELECTION);
         List<GameEvent> events = new ArrayList<>();
-        events.add(new UsernameOkEvent(username));
 
-        // Check previous sessions
-        User oldUser = User.popInactiveUser(username);
-        if (oldUser != null && oldUser.getLobby() != null && oldUser.getLobby().getState() == LobbyState.IN_GAME) { // Rejoin
-            List<GameEvent> rejoinEvents = MatchController.getInstance().rejoinGame(username, oldUser.getLobby().getGameID());
-            if (!rejoinEvents.isEmpty()) {
-                events.addAll(rejoinEvents);
-                user.setLobby(oldUser.getLobby());
-                user.setState(UserState.IN_GAME);
+        try {
+            user.setUsername(username);
+            user.setState(UserState.LOBBY_SELECTION);
+            events.add(new UsernameOkEvent(username));
+
+            // Check previous sessions
+            User oldUser = User.popInactiveUser(username);
+            if (oldUser != null && oldUser.getLobby() != null && oldUser.getLobby().getState() == LobbyState.IN_GAME) { // Rejoin
+                List<GameEvent> rejoinEvents = MatchController.getInstance().rejoinGame(username, oldUser.getLobby().getGameID());
+                if (!rejoinEvents.isEmpty()) {
+                    events.addAll(rejoinEvents);
+                    user.setLobby(oldUser.getLobby());
+                    user.setState(UserState.IN_GAME);
+                }
             }
+        } catch (RuntimeException  e) {
+            events.add(new GameErrorEvent(e.getMessage()));
         }
 
         user.notifyEvents(events);
