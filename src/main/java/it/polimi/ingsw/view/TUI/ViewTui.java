@@ -385,13 +385,13 @@ public class ViewTui implements UserInterface {
                     String[] ids;
 
                     if (parts.length > 0 && !parts[0].isBlank()) {
-                        ids = input.split("-")[0].split(" ");
+                        ids = parts[0].trim().split(" ");
                         cannonComponentsIds = Arrays.stream(ids)
                                 .map(Integer::parseInt)
                                 .toList();
                     }
                     if (parts.length > 1 && !parts[1].isBlank()) {
-                        ids = input.split("-")[1].split(" ");
+                        ids = parts[1].trim().split(" ");
                         batteriesIds = Arrays.stream(ids)
                                 .map(Integer::parseInt)
                                 .toList();

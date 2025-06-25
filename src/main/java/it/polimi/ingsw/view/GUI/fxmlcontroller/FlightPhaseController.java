@@ -6,7 +6,6 @@ import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.cards.ClientPlanetCard;
 import it.polimi.ingsw.client.model.components.*;
 import it.polimi.ingsw.client.model.events.CardRevealedEvent;
-import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.AlienType;
@@ -38,13 +37,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.util.*;
@@ -53,8 +52,8 @@ import java.util.List;
 
 public class FlightPhaseController implements MessageHandler {
 
-    @FXML public Label playersInGameLabel;
-    @FXML public Label playersStartingDeckLabel;
+    @FXML public Text playersInGameLabel;
+    @FXML public Text playersStartingDeckLabel;
 
     private OverlayManager overlayManager;
     @FXML public AnchorPane root;
@@ -70,9 +69,7 @@ public class FlightPhaseController implements MessageHandler {
     @FXML private Button mainButton;
     @FXML private Button endFlightButton;
 
-    // Data structures
     private ObservableList<String> logMessages;
-    private List<OtherPlayerShipContainer> otherPlayersShips = new ArrayList<>();
 
     private Client client;
     private ClientGameModel model;
@@ -81,8 +78,10 @@ public class FlightPhaseController implements MessageHandler {
     private final Map<Integer, Pane> paneMap = new HashMap<>();
     private Map<Integer, ImageView> imageMap = new HashMap<>();
     private final Map<Integer, List<ImageView>> objectsMap = new HashMap<>();
+
     private final List<Integer> list1 = new ArrayList<>();
     private final List<Integer> list2 = new ArrayList<>();
+    private List<List<Integer>> shipParts = new ArrayList<>();
     private Integer index = null;
     private boolean decision = false;
 
@@ -121,7 +120,6 @@ public class FlightPhaseController implements MessageHandler {
                     destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is allowed component
                     destComponent instanceof ClientCabinComponent && objectsMap.get(destComponentId).size() == 2
                 ) {
-                    System.out.println("Mi muovo");
                     changeComponentObjects(destComponent, 0, List.of());
                     moveComponentObject(objectImageView, destId);
                     if (sourceId.contains("component")) {
@@ -134,40 +132,34 @@ public class FlightPhaseController implements MessageHandler {
         else if (state == PlayerState.WAIT_CANNONS && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_CANNONS
             List<Class<?>> allowedClasses = Arrays.asList(ClientCannonComponent.class, ClientBatteryComponent.class);
             if (allowedClasses.containsAll(List.of(destComponent.getClass(), sourceComponent.getClass()))) {
-                System.out.println("Tra le classi permesse, source: " + sourceComponent.getClass() + " dest: " + destComponent.getClass());
                 if (
                     (destComponent instanceof ClientCannonComponent && objectsMap.get(destComponentId).isEmpty() && ((ClientCannonComponent) destComponent).isDouble()) ||
                     (destComponent instanceof ClientBatteryComponent && objectsMap.get(destComponentId).size() < ((ClientBatteryComponent) destComponent).getBatteries() )
                 ) {
-                    System.out.println("Mi muovo");
                     moveComponentObject(objectImageView, destId);
                     event.setDropCompleted(true);
                 }
             }
         }
         else if (state == PlayerState.WAIT_ENGINES && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_ENGINES
-            System.out.println("Tra le classi permesse, source: " + sourceComponent.getClass() + " dest: " + destComponent.getClass());
             List<Class<?>> allowedClasses = Arrays.asList(ClientEngineComponent.class, ClientBatteryComponent.class);
             if (allowedClasses.containsAll(List.of(destComponent.getClass(), sourceComponent.getClass()))) {
                 if (
                     (destComponent instanceof ClientEngineComponent && objectsMap.get(destComponentId).isEmpty()) && ((ClientEngineComponent) destComponent).isDouble() ||
                     (destComponent instanceof ClientBatteryComponent && objectsMap.get(destComponentId).size() < ((ClientBatteryComponent) destComponent).getBatteries() )
                 ) {
-                    System.out.println("Mi muovo");
                     moveComponentObject(objectImageView, destId);
                     event.setDropCompleted(true);
                 }
             }
         }
         else if (state == PlayerState.WAIT_SHIELD && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_SHIELD
-            System.out.println("Tra le classi permesse, source: " + sourceComponent.getClass() + " dest: " + destComponent.getClass());
             List<Class<?>> allowedClasses = Arrays.asList(ClientShieldComponent.class, ClientBatteryComponent.class);
             if (allowedClasses.containsAll(List.of(destComponent.getClass(), sourceComponent.getClass()))) {
                 if (
                     (destComponent instanceof ClientShieldComponent && objectsMap.get(destComponentId).isEmpty()) ||
                     (destComponent instanceof ClientBatteryComponent && objectsMap.get(destComponentId).size() < ((ClientBatteryComponent) destComponent).getBatteries() )
                 ) {
-                    System.out.println("Mi muovo");
                     moveComponentObject(objectImageView, destId);
                     event.setDropCompleted(true);
                 }
@@ -180,7 +172,6 @@ public class FlightPhaseController implements MessageHandler {
                     destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is flow pane or allowed component
                     destComponent instanceof ClientBatteryComponent && objectsMap.get(destComponentId).size() < ((ClientBatteryComponent) destComponent).getBatteries()
                 ) {
-                    System.out.println("Mi muovo");
                     moveComponentObject(objectImageView, destId);
                     event.setDropCompleted(true);
                 }
@@ -206,7 +197,6 @@ public class FlightPhaseController implements MessageHandler {
                     destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is flow pane or allowed component
                     destComponent instanceof ClientCabinComponent && objectsMap.get(destComponentId).size() < ((ClientCabinComponent) destComponent).getHumans()
                 ) {
-                    System.out.println("Mi muovo");
                     moveComponentObject(objectImageView, destId);
                     event.setDropCompleted(true);
                 }
@@ -220,7 +210,6 @@ public class FlightPhaseController implements MessageHandler {
                     objectsMap.get(destComponentId).isEmpty() &&
                     ((ClientCabinComponent) destComponent).getAlien() != null && ((ClientCabinComponent) destComponent).getAlien().toString().equals(object.toUpperCase().split("-")[1])
                 ) {
-                    System.out.println("Mi muovo");
                     moveComponentObject(objectImageView, destId);
                     event.setDropCompleted(true);
                 }
@@ -404,7 +393,7 @@ public class FlightPhaseController implements MessageHandler {
         tilesGrid.setLayoutY(shipImageView.getLayoutY());
         tilesGrid.setPrefWidth(shipImageView.getFitWidth());
         tilesGrid.setPrefHeight(shipImageView.getFitHeight());
-        tilesGrid.setPadding(new Insets(9.8, 10.0, 9.8, 10.0)); // Circa la metà dei valori originali
+        tilesGrid.setPadding(new Insets(9.8, 10.0, 9.8, 10.0));
 
         for (int i = 0; i < Constants.SHIP_ROWS; i++) {
             RowConstraints rowConstraint = new RowConstraints();
@@ -425,9 +414,6 @@ public class FlightPhaseController implements MessageHandler {
         // Add all
         addTilesToPlayerShip(tilesGrid, ship, OTHER_PLAYERS_TILE_WIDTH, OTHER_PLAYERS_TILE_HEIGHT);
         shipPane.getChildren().addAll(shipImageView, tilesGrid);
-
-        OtherPlayerShipContainer containerData = new OtherPlayerShipContainer(shipPane, tilesGrid, shipImageView);
-        otherPlayersShips.add(containerData);
 
         // Set click animation
         shipPane.setOnMouseClicked(_ -> {
@@ -772,6 +758,66 @@ public class FlightPhaseController implements MessageHandler {
         return parallelTransition;
     }
 
+    private void setupShipPartMode() {
+        Map<Integer, Color> partColors = new HashMap<>();
+
+        for (int i = 0; i < shipParts.size(); i++) {
+            double hue = (360.0 / shipParts.size()) * i;
+            Color distinctColor = Color.hsb(hue, 0.7, 0.8);
+            partColors.put(i, distinctColor);
+        }
+
+        paneMap.forEach((id, pane) -> {
+
+            Integer partId = null;
+            for (List<Integer> part : shipParts)
+                if (part.contains(id))
+                    partId = shipParts.indexOf(part);
+            Integer finalPartId = partId;
+            System.out.println("PART ID "+ partId + "COMPONWNR ID " + id);
+            Color partColor = partColors.get(partId);
+            Color transparentColor = partColor.deriveColor(0, 1, 1, 0.5);
+            String cssColor = String.format("rgba(%d, %d, %d, %.2f)",
+                (int)(transparentColor.getRed() * 255),
+                (int)(transparentColor.getGreen() * 255),
+                (int)(transparentColor.getBlue() * 255),
+                transparentColor.getOpacity());
+            pane.setStyle("-fx-background-color: " + cssColor + ";");
+
+            pane.setOnMouseEntered(e -> {
+                shipParts.get(finalPartId).forEach(componentId -> {
+                    String color = String.format("rgba(%d, %d, %d, %.2f)",
+                        (int)(partColor.brighter().getRed() * 255),
+                        (int)(partColor.brighter().getGreen() * 255),
+                        (int)(partColor.brighter().getBlue() * 255),
+                        partColor.brighter().getOpacity());
+                    pane.setStyle("-fx-background-color: " + color + ";");
+                });
+                e.consume();
+            });
+
+            pane.setOnMouseExited(e -> {
+                Color exitColor = finalPartId.equals(index) ? partColor.brighter() : partColor.deriveColor(0, 1, 1, 0.5);
+                shipParts.get(finalPartId).forEach(componentId -> {
+                    String color = String.format("rgba(%d, %d, %d, %.2f)",
+                        (int)(exitColor.getRed() * 255),
+                        (int)(exitColor.getGreen() * 255),
+                        (int)(exitColor.getBlue() * 255),
+                            exitColor.getOpacity());
+                    pane.setStyle("-fx-background-color: " + color + ";");
+                });
+                e.consume();
+            });
+
+            pane.setOnMouseClicked(e -> {
+                index = finalPartId.equals(index) ? null : finalPartId;
+                mainButton.setDisable(index == null);
+                e.consume();
+            });
+
+        });
+    }
+
     private void updateBoard() {
         StringBuilder sb = new StringBuilder();
         for (SimpleEntry<ClientPlayer, Integer> player : model.getBoard().getPlayers()) {
@@ -853,9 +899,11 @@ public class FlightPhaseController implements MessageHandler {
         flowPane.removeEventHandler(DragEvent.DRAG_OVER, acceptDragOverHandler);
         flowPane.removeEventHandler(DragEvent.DRAG_DROPPED, flowPaneDragDroppedHandler);
 
-        // Disable WAIT_INDEX and WAIT_BOOLEAN buttons
+        // Disable WAIT_INDEX and WAIT_BOOLEAN buttons and reset index and decision
         indexBooleanButtonsContainer.setVisible(false);
         indexBooleanButtonsContainer.getChildren().clear();
+        index = null;
+        decision = false;
 
         switch (state) {
             case CHECK -> {
@@ -976,7 +1024,7 @@ public class FlightPhaseController implements MessageHandler {
             }
             case WAIT_SHIP_PART -> {
                 mainButton.setText("Done");
-                mainButton.setOnAction(_ -> client.send(MessageType.CHOOSE_SHIP_PART, 0));
+                mainButton.setOnAction(_ -> client.send(MessageType.CHOOSE_SHIP_PART, index));
             }
             case WAIT_REMOVE_CREW -> {
                 // Enable flow pane
@@ -1009,6 +1057,7 @@ public class FlightPhaseController implements MessageHandler {
 
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
+                    System.out.println("OK");
                     list2.clear();
                     Map<Integer, List<ColorType>> newDisposition = new HashMap<>();
                     objectsMap.forEach((id, objects) -> {
@@ -1018,6 +1067,7 @@ public class FlightPhaseController implements MessageHandler {
                                 List<ColorType> goods = objects.stream()
                                     .map(iv -> ColorType.valueOf(((String) iv.getUserData()).split("-")[1].toUpperCase()))
                                     .toList();
+                                System.out.println("AGGIUNGO ID " + id + " SIZE " + goods.size());
                                 newDisposition.put(id, goods);
                             }
                             case ClientBatteryComponent c -> {
@@ -1044,7 +1094,6 @@ public class FlightPhaseController implements MessageHandler {
 
                         Integer finalI = i;
                         planetButton.setOnAction(_ -> {
-                            System.out.println("ORA " + index + " VOGLIO " + finalI);
                             if (finalI.equals(index)) {
                                 index = null;
                                 planetButton.getStyleClass().clear();
@@ -1102,81 +1151,9 @@ public class FlightPhaseController implements MessageHandler {
 
                 mainButton.setOnAction(_ -> client.send(MessageType.GET_BOOLEAN, decision));
             }
-            case WAIT, DONE -> {
-                mainButton.setVisible(false);
-            }
+            case WAIT, DONE -> mainButton.setVisible(false);
+            case END -> SceneManager.navigateToScene("/fxml/end.fxml", this, null);
         }
-    }
-
-    private void setToggleClickEvent(ClientComponent component, Pane p, List<Integer> list, DropShadow shadow) {
-        p.setOnMouseClicked(_ -> {
-            if (list.contains(component.getId())) {
-                list.remove(component.getId());
-                p.setEffect(null);
-            }
-            else {
-                list.add(component.getId());
-                p.setEffect(shadow);
-            }
-        });
-    }
-
-    private static class Effects {
-
-        private static final DropShadow cannonShadow = new DropShadow();
-        private static final DropShadow engineShadow = new DropShadow();
-        private static final DropShadow batteryShadow = new DropShadow();
-        private static final DropShadow grayShadow = new DropShadow();
-
-        public Effects() {
-            cannonShadow.setColor(Color.MEDIUMPURPLE);
-            cannonShadow.setRadius(15.0);
-            cannonShadow.setSpread(0.7);
-            cannonShadow.setOffsetX(0);
-            cannonShadow.setOffsetY(0);
-
-            engineShadow.setColor(Color.DARKORANGE);
-            engineShadow.setRadius(15.0);
-            engineShadow.setSpread(0.7);
-            engineShadow.setOffsetX(0);
-            engineShadow.setOffsetY(0);
-
-            batteryShadow.setColor(Color.GOLD);
-            batteryShadow.setRadius(15.0);
-            batteryShadow.setSpread(0.7);
-            batteryShadow.setOffsetX(0);
-            batteryShadow.setOffsetY(0);
-
-            grayShadow.setColor(Color.GRAY);
-            grayShadow.setRadius(15.0);
-            grayShadow.setSpread(0.7);
-            grayShadow.setOffsetX(0);
-            grayShadow.setOffsetY(0);
-        }
-
-    }
-
-    // Classe helper per contenere i dati di una nave di un altro giocatore
-    private static class OtherPlayerShipContainer {
-        private final Pane container;
-        private final GridPane tilesPane;
-        private final ImageView shipImageView;
-
-        private final double width;
-        private final double height;
-
-        public OtherPlayerShipContainer(Pane container, GridPane tilesPane, ImageView shipImageView) {
-            this.container = container;
-            this.tilesPane = tilesPane;
-            this.shipImageView = shipImageView;
-
-            this.width = tilesPane.getChildren().getFirst().getBoundsInLocal().getWidth();
-            this.height = tilesPane.getChildren().getFirst().getBoundsInLocal().getHeight();
-        }
-
-        public Pane getContainer() { return container; }
-        public Pane getTilesPane() { return tilesPane; }
-        public ImageView getShipImageView() { return shipImageView; }
     }
 
     private static class RestoreData {
@@ -1201,12 +1178,12 @@ public class FlightPhaseController implements MessageHandler {
                 MessageType.CREW_UPDATED_EVENT,
                 MessageType.GOODS_UPDATED_EVENT,
                 MessageType.FLIGHT_ENDED_EVENT,
+                MessageType.SHIP_BROKEN_EVENT,
                 MessageType.CREDITS_UPDATED_EVENT,
                 MessageType.PLAYERS_POSITION_UPDATED_EVENT,
                 MessageType.JOINED_LOBBY_EVENT,
                 MessageType.LEFT_LOBBY_EVENT,
-                MessageType.CARD_REVEALED_EVENT,
-                MessageType.CARD_UPDATED_EVENT
+                MessageType.CARD_REVEALED_EVENT
         ).contains(messageType);
     }
 
@@ -1255,6 +1232,10 @@ public class FlightPhaseController implements MessageHandler {
                     }
                 }
             }
+            case ShipBrokenEvent e -> {
+                this.shipParts = new ArrayList<>(e.parts());
+                setupShipPartMode();
+            }
             case BatteriesUpdatedEvent e -> {
                 ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(e.id());
                 changeComponentObjects(component, e.batteries(), List.of("/images/objects/battery.png"));
@@ -1281,9 +1262,6 @@ public class FlightPhaseController implements MessageHandler {
             case CardRevealedEvent e -> {
                 Image cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/"+e.card().getId()+".jpg")));
                 currentCardImage.setImage(cardBackImg);
-            }
-            case CardUpdatedEvent e -> {
-
             }
             case FlightEndedEvent e -> {
                 if (e.username().equals(client.getUsername()))

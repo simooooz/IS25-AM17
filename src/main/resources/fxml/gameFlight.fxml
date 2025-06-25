@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.text.Text?>
 <AnchorPane
         fx:id="root"
         xmlns="http://javafx.com/javafx/11.0.1"
@@ -40,7 +41,7 @@
                     </padding>
                 </VBox>
 
-                <!-- PARTE CENTRALE: Carta attuale e log -->
+                <!-- Central VBOX -->
                 <VBox prefWidth="450.0" spacing="15.0" style="-fx-background-color: #1a0d2e; -fx-background-radius: 10;">
                     <children>
                         <!-- Sezione Log -->
@@ -56,16 +57,15 @@
                             </children>
                         </VBox>
 
-                        <!-- Sezione Carta Attuale -->
+                        <!-- Actual card -->
                         <VBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
                             <children>
-                                <Label text="Carta Attuale" textFill="WHITE">
+                                <Label text="Actual card" textFill="WHITE">
                                     <font>
                                         <Font name="System Bold" size="14.0" />
                                     </font>
                                 </Label>
 
-                                <!-- Container per la carta attuale -->
                                 <ImageView fx:id="currentCardImage" fitHeight="226.0" fitWidth="176.0" layoutX="2.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" style="-fx-padding: 10" />
 
                                 <!-- All cards -->
@@ -136,11 +136,11 @@
                                     </padding>
                                 </Label>
 
-                                <Label fx:id="playersInGameLabel" wrapText="true">
+                                <Text fx:id="playersInGameLabel" wrappingWidth="450">
                                     <font>
                                         <Font name="System" size="14.0" />
                                     </font>
-                                </Label>
+                                </Text>
 
                                 <Label text="Starting deck:" textFill="WHITE">
                                     <font>
