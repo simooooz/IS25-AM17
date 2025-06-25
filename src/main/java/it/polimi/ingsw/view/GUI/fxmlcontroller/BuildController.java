@@ -19,6 +19,7 @@ import it.polimi.ingsw.view.GUI.OverlayManager;
 import it.polimi.ingsw.view.GUI.SceneManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,6 +37,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 
@@ -49,6 +51,7 @@ public class BuildController implements MessageHandler, Initializable {
     @FXML public Label timeLeft;
     @FXML public Label hourglassPos;
     @FXML public VBox timerContainer;
+    @FXML public HBox cardsAndTimerContainer;
 
     @FXML public Button setReadyButton;
     @FXML public Label statusLabel;
@@ -181,7 +184,14 @@ public class BuildController implements MessageHandler, Initializable {
         loadShipImage();
         setupComponentMap();
         setupPlayersShip();
-        startCountdown();
+
+        setupRightPanelEffects();
+
+        if (client.getLobby().isLearnerMode()) {
+            cardsAndTimerContainer.setVisible(false);
+        } else {
+            startCountdown();
+        }
 
         this.overlayManager = new OverlayManager(root);
 
@@ -252,7 +262,12 @@ public class BuildController implements MessageHandler, Initializable {
         shipImageView.setLayoutY(2.0);
         shipImageView.setPickOnBounds(true);
         shipImageView.setPreserveRatio(true);
-        shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg"))));
+        if (!client.getLobby().isLearnerMode()) {
+            shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg"))));
+        }
+        else {
+            shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg"))));
+        }
 
         Pane shipPane = new Pane();
         shipPane.setPrefHeight(shipImageView.getBoundsInLocal().getHeight());
@@ -330,10 +345,17 @@ public class BuildController implements MessageHandler, Initializable {
                     if (component.isPresent())
                         placeComponent(shipGrid, componentMap.get(component.get().getId()), row, col, true);
                     else {
-                        Rectangle slot = createShipSlot(row, col);
-                        shipGrid.add(slot, col, row);
+                        if(!client.getLobby().isLearnerMode()){
+                            Rectangle slot = createShipSlot(row, col);
+                            shipGrid.add(slot, col, row);
+                        }
+                        else {
+                            if (row != 0 && (col != 5 || col != 6)) {
+                                Rectangle slot = createShipSlot(row, col);
+                                shipGrid.add(slot, col, row);
+                            }
+                        }
                     }
-
                 }
                 else {
                     Rectangle emptySlot = new Rectangle(TILE_WIDTH, TILE_WIDTH);
@@ -349,14 +371,44 @@ public class BuildController implements MessageHandler, Initializable {
 
     private Rectangle createShipSlot(int row, int col) {
         Rectangle slot = new Rectangle(TILE_WIDTH, TILE_HEIGHT);
-        slot.setFill(Color.TRANSPARENT);
         slot.setId("slot_" + row + "_" + col);
-        slot.setStroke(Color.rgb(150, 150, 255, 0.6));
         slot.setStrokeWidth(1.5);
         slot.setOpacity(0.8);
 
-        slot.addEventHandler(MouseEvent.MOUSE_ENTERED, slotOnMouseEnteredHandler);
-        slot.addEventHandler(MouseEvent.MOUSE_EXITED, slotOnMouseExitedHandler);
+        if (row == 0 && (col == 5 || col == 6)) {
+
+            slot.setFill(Color.rgb(80, 80, 120, 0.3));
+            slot.setStroke(Color.rgb(100, 100, 180, 0.8));
+
+            slot.setTranslateY(-3);
+            slot.setTranslateX(3);
+
+            slot.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+                Rectangle reserveSlot = (Rectangle) event.getTarget();
+                reserveSlot.setFill(Color.rgb(120, 120, 160, 0.5));
+                reserveSlot.setStroke(Color.rgb(140, 140, 200));
+                reserveSlot.setStrokeWidth(2);
+                event.consume();
+            });
+
+            slot.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+                Rectangle reserveSlot = (Rectangle) event.getTarget();
+                reserveSlot.setFill(Color.rgb(80, 80, 120, 0.3));
+                reserveSlot.setStroke(Color.rgb(100, 100, 180, 0.8));
+                reserveSlot.setStrokeWidth(1.5);
+                event.consume();
+            });
+        } else {
+            // Stile normale per le altre celle
+            slot.setFill(Color.TRANSPARENT);
+            slot.setStroke(Color.rgb(150, 150, 255, 0.6));
+
+            // Event handler normali
+            slot.addEventHandler(MouseEvent.MOUSE_ENTERED, slotOnMouseEnteredHandler);
+            slot.addEventHandler(MouseEvent.MOUSE_EXITED, slotOnMouseExitedHandler);
+        }
+
+        // Event handler per drag and drop (comuni a tutte le celle)
         slot.addEventHandler(DragEvent.DRAG_OVER, slotDragOverHandler);
         slot.addEventHandler(DragEvent.DRAG_DROPPED, slotDragDroppedHandler);
 
@@ -377,7 +429,7 @@ public class BuildController implements MessageHandler, Initializable {
             iv.setImage(image);
         }
         else {
-            iv.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/sfondo.jpg"))));
+            iv.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/tiles/GT-new_tiles_16_for web157.jpg"))));
         }
 
         if (!component.isInserted()) {
@@ -450,11 +502,27 @@ public class BuildController implements MessageHandler, Initializable {
 
         if (timeRemaining == 0 && (hourglassPos > 1) || (hourglassPos == 1 && client.getGameController().getModel().getBoard().getPlayersByPos().stream().anyMatch(p -> p.getUsername().equals(client.getUsername())))) {
             timeLeft.setText("ROTATE");
+            timeLeft.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 6; -fx-padding: 8;");
             timerContainer.setOnMouseClicked(_ -> client.send(MessageType.MOVE_HOURGLASS));
+            timerContainer.setStyle(timerContainer.getStyle() + "; -fx-cursor: hand;");
         }
-        else if (timeRemaining <= 10 && hourglassPos == 0)
-            timeLeft.setStyle("-fx-text-fill: red;");
+        else if (timeRemaining <= 10 && hourglassPos == 0) {
+            timeLeft.setStyle("-fx-text-fill: #ff4444; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 6; -fx-padding: 8;");
+            // Effetto di pulsazione per il timer container quando il tempo scade
+            timerContainer.setStyle(
+                    "-fx-background-color: rgba(255,68,68,0.2); " +
+                            "-fx-background-radius: 12; " +
+                            "-fx-border-color: #ff4444; " +
+                            "-fx-border-width: 2; " +
+                            "-fx-border-radius: 12; " +
+                            "-fx-effect: dropshadow(gaussian, rgba(255,0,0,0.6), 8, 0.0, 0, 0);"
+            );
+        }
+        else {
+            timeLeft.setStyle("-fx-text-fill: #f39c12; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 6; -fx-padding: 8;");
+        }
     }
+
 
     @SuppressWarnings("Duplicates")
     @FXML
@@ -512,11 +580,77 @@ public class BuildController implements MessageHandler, Initializable {
     }
 
     private void loadShipImage() {
-        String shipImagePath = "/images/cardboard/cardboard-1b.jpg";
+        String shipImagePath = "";
+        if (!client.getLobby().isLearnerMode()) {
+            shipImagePath = "/images/cardboard/cardboard-1b.jpg";
+            System.out.println("Using learner mode image: " + shipImagePath);
+        } else {
+            shipImagePath = "/images/cardboard/cardboard-1.jpg";
+            System.out.println("Using normal mode image: " + shipImagePath);
+        }
+
         Image shipImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(shipImagePath)));
         shipImageView.setImage(shipImage);
+        shipImageView.setFitWidth(1000);
         shipImageView.setPreserveRatio(true);
+
+        // Centra l'immagine rispetto alla griglia
+        double gridWidth = shipGrid.getPrefWidth();
+        double gridHeight = shipGrid.getPrefHeight();
+        double imageWidth = shipImageView.getFitWidth();
+        double imageHeight = shipImageView.getBoundsInLocal().getHeight();
+
+        shipImageView.setLayoutX((gridWidth - imageWidth) / 2);
+        shipImageView.setLayoutY((gridHeight - imageHeight) / 2);
+
         shipImageView.setOpacity(0.3);
+    }
+
+    /**
+     * Metodo per configurare gli effetti hover e la stilizzazione della parte destra
+     * Aggiungi questo metodo alla classe BuildController
+     */
+    private void setupRightPanelEffects() {
+        setupCardPileEffects(pile_0);
+        setupCardPileEffects(pile_1);
+        setupCardPileEffects(pile_2);
+        setupTimerContainerEffects();
+    }
+
+    private void setupCardPileEffects(ImageView pile) {
+        // Effetti hover per le carte
+        pile.setOnMouseEntered(event -> {
+            pile.setScaleX(1.08);
+            pile.setScaleY(1.08);
+            pile.setStyle(pile.getStyle() + "; -fx-effect: dropshadow(gaussian, rgba(243,156,18,0.8), 10, 0.0, 3, 3);");
+        });
+
+        pile.setOnMouseExited(event -> {
+            pile.setScaleX(1.0);
+            pile.setScaleY(1.0);
+            pile.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;");
+        });
+    }
+
+    private void setupTimerContainerEffects() {
+        // Aggiunge un effetto di pulsazione quando il tempo è in scadenza
+        timerContainer.setOnMouseEntered(event -> {
+            if (timeRemaining <= 10) {
+                timerContainer.setStyle(timerContainer.getStyle() +
+                        "; -fx-effect: dropshadow(gaussian, rgba(255,0,0,0.6), 8, 0.0, 0, 0);");
+            }
+        });
+
+        timerContainer.setOnMouseExited(event -> {
+            timerContainer.setStyle(
+                    "-fx-background-color: rgba(243,156,18,0.15); " +
+                            "-fx-background-radius: 12; " +
+                            "-fx-border-color: #f39c12; " +
+                            "-fx-border-width: 2; " +
+                            "-fx-border-radius: 12; " +
+                            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2);"
+            );
+        });
     }
 
     @Override
