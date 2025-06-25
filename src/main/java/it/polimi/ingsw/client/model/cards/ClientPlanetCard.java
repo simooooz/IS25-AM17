@@ -84,18 +84,27 @@ public class ClientPlanetCard extends ClientCard {
     }
 
     @Override
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
             String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + (planets.indexOf(landedPlayers.get(player.getUsername()))+1) + ")" : "(not landed)";
 
             switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done " + landInfo, Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_GOODS -> Chroma.println("- " + player.getUsername() + " is collecting the reward (updating goods) " + landInfo, Chroma.YELLOW_BOLD);
-                case WAIT_INDEX -> Chroma.println("- " + player.getUsername() + " is choosing the planet", Chroma.YELLOW_BOLD);
+                case DONE -> {
+                    return "- " + player.getUsername() + " has done " + landInfo;
+                }
+                case WAIT -> {
+                    return "- " + player.getUsername() + " is waiting";
+                }
+                case WAIT_GOODS -> {
+                    return "- " + player.getUsername() + " is collecting the reward (updating goods) ";
+                }
+                case WAIT_INDEX -> {
+                    return "- " + player.getUsername() + " is choosing the planet";
+                }
             }
         }
+        return "";
     }
 
 }

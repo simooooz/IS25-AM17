@@ -78,17 +78,26 @@ public class ClientAbandonedStationCard extends ClientCard {
     }
 
     @Override
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_BOOLEAN -> Chroma.println("- " + player.getUsername() + " is choosing if visit station or not", Chroma.YELLOW_BOLD);
-                case WAIT_GOODS -> Chroma.println("- " + player.getUsername() + " is adding goods", Chroma.YELLOW_BOLD);
+                case DONE -> {
+                    return "- " + player.getUsername() + " has done";
+                }
+                case WAIT -> {
+                    return "- " + player.getUsername() + " is waiting";
+                }
+                case WAIT_BOOLEAN -> {
+                    return "- " + player.getUsername() + " is choosing if visit station or not";
+                }
+                case WAIT_GOODS -> {
+                    return "- " + player.getUsername() + " is adding goods";
+                }
             }
         }
+        return "";
     }
 
 
