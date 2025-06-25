@@ -36,6 +36,7 @@ public class SceneManager {
                 Scene scene = new Scene(view, 1280, 800);
                 scene.getStylesheets().add(Objects.requireNonNull(SceneManager.class.getResource("/style.css")).toExternalForm());
                 primaryStage.setScene(scene);
+                primaryStage.setFullScreen(true);
                 primaryStage.setTitle("Galaxy Trucker");
                 primaryStage.setFullScreen(true);
                 primaryStage.show();

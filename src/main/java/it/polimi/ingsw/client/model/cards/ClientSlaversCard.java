@@ -67,20 +67,23 @@ public class ClientSlaversCard extends ClientEnemiesCard {
     }
 
     @Override
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
+        StringBuilder str = new StringBuilder();
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_BOOLEAN -> Chroma.println("- " + player.getUsername() + " is choosing if take the reward or not", Chroma.YELLOW_BOLD);
-                case WAIT_REMOVE_CREW -> Chroma.println("- " + player.getUsername() + " has to pay his penalty (removing crew)", Chroma.YELLOW_BOLD);
-                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate double cannons or not", Chroma.YELLOW_BOLD);
+                case DONE -> str.append("- " + player.getUsername() + " has done" + "\n");
+                case WAIT -> str.append("- " + player.getUsername() + " is waiting" + "\n");
+                case WAIT_BOOLEAN -> str.append("- " + player.getUsername() + " is choosing if take the reward or not" + "\n");
+                case WAIT_REMOVE_CREW -> str.append("- " + player.getUsername() + " has to pay his penalty (removing crew)" + "\n");
+                case WAIT_CANNONS -> str.append("- " + player.getUsername() + " is choosing if activate double cannons or not" + "\n");
             }
         }
-        Chroma.println("Slavers are" + (enemiesDefeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
+        str.append("Slavers are" + (enemiesDefeated ? " " : " not ") + "defeated" + "\n");
+        return str.toString();
     }
+
 
 
 }

@@ -76,24 +76,27 @@ public class ClientCombatZoneCard extends ClientCard {
     }
 
     @Override
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
+        StringBuilder str = new StringBuilder();
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_SHIP_PART -> Chroma.println("- " + player.getUsername() + " is choosing which part of ship to keep", Chroma.YELLOW_BOLD);
-                case WAIT_SHIELD -> Chroma.println("- " + player.getUsername() + " is choosing if activate a shield or not", Chroma.YELLOW_BOLD);
-                case WAIT_REMOVE_GOODS -> Chroma.println("- " + player.getUsername() + " has to pay his penalty (removing goods)", Chroma.YELLOW_BOLD);
-                case WAIT_REMOVE_CREW -> Chroma.println("- " + player.getUsername() + " has to pay his penalty (removing crew)", Chroma.YELLOW_BOLD);
-                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate double cannons or not", Chroma.YELLOW_BOLD);
-                case WAIT_ENGINES -> Chroma.println("- " + player.getUsername() + " is choosing if activate double engines or not", Chroma.YELLOW_BOLD);
-                case WAIT_ROLL_DICES -> Chroma.println("- " + player.getUsername() + " is rolling dices", Chroma.YELLOW_BOLD);
+                case DONE -> str.append("- " + player.getUsername()).append(" has done" + "\n");
+                case WAIT -> str.append("- " + player.getUsername() + " is waiting");
+                case WAIT_SHIP_PART -> str.append("- " + player.getUsername() + " is choosing which part of ship to keep" + "\n");
+                case WAIT_SHIELD -> str.append("- " + player.getUsername() + " is choosing if activate a shield or not" + "\n");
+                case WAIT_REMOVE_GOODS -> str.append("- " + player.getUsername() + " has to pay his penalty (removing goods)" + "\n");
+                case WAIT_REMOVE_CREW -> str.append("- " + player.getUsername() + " has to pay his penalty (removing crew)" + "\n");
+                case WAIT_CANNONS -> str.append("- " + player.getUsername() + " is choosing if activate double cannons or not" + "\n");
+                case WAIT_ENGINES -> str.append("- " + player.getUsername() + " is choosing if activate double engines or not" + "\n");
+                case WAIT_ROLL_DICES -> str.append("- " + player.getUsername() + " is rolling dices" + "\n");
             }
         }
-        Chroma.println("Fighting at war line n." + (warLineIndex+1), Chroma.YELLOW_BOLD);
-        worst.getKey().ifPresent(p -> Chroma.println("Actually the worst player is " + p + " with a score of " + worst.getValue(), Chroma.YELLOW_BOLD));
+        str.append("Fighting at war line n." + (warLineIndex+1));
+        str.append("\n");
+        worst.getKey().ifPresent(p -> str.append("Actually the worst player is " + p + " with a score of " + worst.getValue() + "\n"));
+        return str.toString();
     }
 
 

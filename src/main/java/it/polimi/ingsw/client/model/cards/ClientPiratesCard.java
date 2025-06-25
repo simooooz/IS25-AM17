@@ -72,28 +72,30 @@ public class ClientPiratesCard extends ClientEnemiesCard {
     }
 
     @Override
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
+        StringBuilder str = new StringBuilder();
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
             String def = defeatedPlayers.contains(player.getUsername()) ? "(defeated)" : "";
 
             switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done " + def, Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting " + def, Chroma.YELLOW_BOLD);
-                case WAIT_BOOLEAN -> Chroma.println("- " + player.getUsername() + " is choosing if take the reward or not", Chroma.YELLOW_BOLD);
-                case WAIT_SHIELD -> Chroma.println("- " + player.getUsername() + " is choosing if activate a shield or not " + def, Chroma.YELLOW_BOLD);
-                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate double cannons or not " + def, Chroma.YELLOW_BOLD);
-                case WAIT_ROLL_DICES -> Chroma.println("- " + player.getUsername() + " is rolling dices " + def, Chroma.YELLOW_BOLD);
-                case WAIT_SHIP_PART -> Chroma.println("- " + player.getUsername() + " might have lost part of his ship " + def, Chroma.YELLOW_BOLD);
+                case DONE -> str.append("- " + player.getUsername() + " has done " + def + "\n");
+                case WAIT -> str.append("- " + player.getUsername() + " is waiting " + def + "\n");
+                case WAIT_BOOLEAN -> str.append("- " + player.getUsername() + " is choosing if take the reward or not" + "\n");
+                case WAIT_SHIELD -> str.append("- " + player.getUsername() + " is choosing if activate a shield or not " + def + "\n");
+                case WAIT_CANNONS -> str.append("- " + player.getUsername() + " is choosing if activate double cannons or not " + def + "\n");
+                case WAIT_ROLL_DICES -> str.append("- " + player.getUsername() + " is rolling dices " + def + "\n");
+                case WAIT_SHIP_PART -> str.append("- " + player.getUsername() + " might have lost part of his ship " + def + "\n");
             }
         }
-        Chroma.println("Pirates are" + (enemiesDefeated ? " " : " not ") + "defeated", Chroma.YELLOW_BOLD);
+        str.append("Pirates are" + (enemiesDefeated ? " " : " not ") + "defeated" + "\n");
 
         if (enemiesDefeated && board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
-            Chroma.println("Cannon fire n." + (cannonIndex+1) + " is hitting at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
+            str.append("Cannon fire n." + (cannonIndex+1) + " is hitting at coord: " + coords.getLast() + "\n");
         else if (cannonIndex > 0)
-            Chroma.println("Previous cannon fire n." + (cannonIndex) + " has come at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
+            str.append("Previous cannon fire n." + (cannonIndex) + " has come at coord: " + coords.getLast() + "\n");
 
+        return str.toString();
     }
 
 

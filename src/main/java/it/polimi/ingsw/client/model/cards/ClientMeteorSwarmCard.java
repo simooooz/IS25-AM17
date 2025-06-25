@@ -56,24 +56,25 @@ public class ClientMeteorSwarmCard extends ClientCard {
     }
 
     @Override
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
+        StringBuilder str = new StringBuilder();
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_SHIP_PART -> Chroma.println("- " + player.getUsername() + " is choosing which part of ship to keep", Chroma.YELLOW_BOLD);
-                case WAIT_SHIELD -> Chroma.println("- " + player.getUsername() + " is choosing if activate a shield or not", Chroma.YELLOW_BOLD);
-                case WAIT_CANNONS -> Chroma.println("- " + player.getUsername() + " is choosing if activate a double cannon or not", Chroma.YELLOW_BOLD);
-                case WAIT_ROLL_DICES -> Chroma.println("- " + player.getUsername() + " is rolling dices", Chroma.YELLOW_BOLD);
+                case DONE -> str.append("- " + player.getUsername() + " has done" + "\n");
+                case WAIT -> str.append("- " + player.getUsername() + " is waiting" + "\n");
+                case WAIT_SHIP_PART -> str.append("- " + player.getUsername() + " is choosing which part of ship to keep" + "\n");
+                case WAIT_SHIELD -> str.append("- " + player.getUsername() + " is choosing if activate a shield or not" + "\n");
+                case WAIT_CANNONS -> str.append("- " + player.getUsername() + " is choosing if activate a double cannon or not" + "\n");
+                case WAIT_ROLL_DICES -> str.append("- " + player.getUsername() + " is rolling dices" + "\n");
             }
         }
-
         if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
-            Chroma.println("Meteor n." + (meteorIndex+1) + " is hitting at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
+            str.append("Meteor n." + (meteorIndex+1) + " is hitting at coord: " + coords.getLast() + "\n");
         else if (meteorIndex > 0)
-            Chroma.println("Previous meteor n." + (meteorIndex) + " has come at coord: " + coords.getLast(), Chroma.YELLOW_BOLD);
+            str.append("Previous meteor n." + (meteorIndex) + " has come at coord: " + coords.getLast() + "\n");
+        return str.toString();
     }
 
 
