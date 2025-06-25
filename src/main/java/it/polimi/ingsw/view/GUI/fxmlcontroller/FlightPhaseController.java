@@ -189,7 +189,7 @@ public class FlightPhaseController implements MessageHandler {
             List<Class<?>> allowedClasses = List.of(ClientCargoHoldsComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
                 if (
-                    destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is flow pane or allowed component
+                    destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is allowed component
                     destComponent instanceof ClientCargoHoldsComponent && objectsMap.get(destComponentId).size() < ((ClientCargoHoldsComponent) destComponent).getNumber()
                 ) {
                     System.out.println("Mi muovo");
@@ -893,14 +893,10 @@ public class FlightPhaseController implements MessageHandler {
     }
 
     @FXML
-    private void leaveGameHandler() {
-        client.send(MessageType.LEAVE_GAME);
-    }
+    private void leaveGameHandler() { client.send(MessageType.LEAVE_GAME); }
 
     @FXML
-    private void endFlightHandler() {
-        client.send(MessageType.END_FLIGHT);
-    }
+    private void endFlightHandler() { client.send(MessageType.END_FLIGHT); }
 
     private void syncAction() {
         this.state = client.getGameController().getModel().getPlayerState(client.getUsername());
@@ -935,7 +931,6 @@ public class FlightPhaseController implements MessageHandler {
 
                 paneMap.forEach((id, pane) -> {
                     pane.setOnMouseEntered(_ -> {
-
                         if (list1.contains(id))
                             pane.setStyle("-fx-background-color: darkred;");
                         else
@@ -954,7 +949,6 @@ public class FlightPhaseController implements MessageHandler {
                             list1.remove(id);
                         else
                             list1.add(id);
-
                         mainButton.setDisable(list1.isEmpty());
                     });
                 });
@@ -970,9 +964,11 @@ public class FlightPhaseController implements MessageHandler {
                 mainButton.setOnAction(_ -> {
                     Map<Integer, AlienType> alienMap = new HashMap<>();
                     objectsMap.forEach((id, objects) -> {
-                        if (objects.size() == 1) {
-                            AlienType alien = ((String) objects.getFirst().getUserData()).contains("cannon") ? AlienType.CANNON : AlienType.ENGINE;
-                            alienMap.put(id, alien);
+                        if (shipGrid.lookup("#component_"+id) != null) { // Count only objects in my components
+                            if (objects.size() == 1) {
+                                AlienType alien = ((String) objects.getFirst().getUserData()).contains("cannon") ? AlienType.CANNON : AlienType.ENGINE;
+                                alienMap.put(id, alien);
+                            }
                         }
                     });
                     client.send(MessageType.CHOOSE_ALIEN, alienMap);
@@ -988,17 +984,19 @@ public class FlightPhaseController implements MessageHandler {
                     list1.clear();
                     list2.clear();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
-                        switch (component) {
-                            case ClientCannonComponent _ -> {
-                                if (!objects.isEmpty())
-                                    list1.add(id);
+                        if (shipGrid.lookup("#component_"+id) != null) { // Count only objects in my components
+                            ClientComponent component = model.getBoard().getMapIdComponents().get(id);
+                            switch (component) {
+                                case ClientCannonComponent _ -> {
+                                    if (!objects.isEmpty())
+                                        list1.add(id);
+                                }
+                                case ClientBatteryComponent c -> {
+                                    for (int i = objects.size(); i < c.getBatteries(); i++)
+                                        list2.add(id);
+                                }
+                                default -> {}
                             }
-                            case ClientBatteryComponent c -> {
-                                for (int i = objects.size(); i < c.getBatteries(); i++)
-                                    list2.add(id);
-                            }
-                            default -> {}
                         }
                     });
                     client.send(MessageType.ACTIVATE_CANNONS, list2, list1);
@@ -1010,17 +1008,19 @@ public class FlightPhaseController implements MessageHandler {
                     list1.clear();
                     list2.clear();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
-                        switch (component) {
-                            case ClientEngineComponent _ -> {
-                                if (!objects.isEmpty())
-                                    list1.add(id);
+                        if (shipGrid.lookup("#component_"+id) != null) { // Count only objects in my components
+                            ClientComponent component = model.getBoard().getMapIdComponents().get(id);
+                            switch (component) {
+                                case ClientEngineComponent _ -> {
+                                    if (!objects.isEmpty())
+                                        list1.add(id);
+                                }
+                                case ClientBatteryComponent c -> {
+                                    for (int i = objects.size(); i < c.getBatteries(); i++)
+                                        list2.add(id);
+                                }
+                                default -> {}
                             }
-                            case ClientBatteryComponent c -> {
-                                for (int i = objects.size(); i < c.getBatteries(); i++)
-                                    list2.add(id);
-                            }
-                            default -> {}
                         }
                     });
                     client.send(MessageType.ACTIVATE_ENGINES, list2, list1);
@@ -1035,10 +1035,12 @@ public class FlightPhaseController implements MessageHandler {
                 mainButton.setOnAction(_ -> {
                     list2.clear();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
-                        if (component instanceof ClientBatteryComponent c) {
-                            for (int i = objects.size(); i < c.getBatteries(); i++)
-                                list2.add(id);
+                        if (shipGrid.lookup("#component_"+id) != null) { // Count only objects in my components
+                            ClientComponent component = model.getBoard().getMapIdComponents().get(id);
+                            if (component instanceof ClientBatteryComponent c) {
+                                for (int i = objects.size(); i < c.getBatteries(); i++)
+                                    list2.add(id);
+                            }
                         }
                     });
                     if (list2.size() > 1) {} // TODO set error troppi shield attivati
@@ -1059,11 +1061,13 @@ public class FlightPhaseController implements MessageHandler {
                 mainButton.setOnAction(_ -> {
                     list1.clear();
                     objectsMap.forEach((id, objects) -> {
-                       ClientComponent component = model.getBoard().getMapIdComponents().get(id);
-                       if (component instanceof ClientCabinComponent c) {
-                           int crewInCabin = c.getAlien() != null ? 1 : c.getHumans();
-                           for (int i = objects.size(); i < crewInCabin; i++)
-                               list1.add(id);
+                        if (shipGrid.lookup("#component_"+id) != null) { // Count only objects in my components
+                            ClientComponent component = model.getBoard().getMapIdComponents().get(id);
+                            if (component instanceof ClientCabinComponent c) {
+                                int crewInCabin = c.getAlien() != null ? 1 : c.getHumans();
+                                for (int i = objects.size(); i < crewInCabin; i++)
+                                    list1.add(id);
+                            }
                        }
                     });
                     client.send(MessageType.REMOVE_CREW, list1);
@@ -1080,24 +1084,24 @@ public class FlightPhaseController implements MessageHandler {
 
                 mainButton.setText("Done");
                 mainButton.setOnAction(_ -> {
-                    System.out.println("OK");
                     list2.clear();
                     Map<Integer, List<ColorType>> newDisposition = new HashMap<>();
                     objectsMap.forEach((id, objects) -> {
-                        ClientComponent component = model.getBoard().getMapIdComponents().get(id);
-                        switch (component) {
-                            case ClientCargoHoldsComponent _ -> {
-                                List<ColorType> goods = objects.stream()
-                                    .map(iv -> ColorType.valueOf(((String) iv.getUserData()).split("-")[1].toUpperCase()))
-                                    .toList();
-                                System.out.println("AGGIUNGO ID " + id + " SIZE " + goods.size());
-                                newDisposition.put(id, goods);
+                        if (shipGrid.lookup("#component_"+id) != null) { // Count only objects in my components
+                            ClientComponent component = model.getBoard().getMapIdComponents().get(id);
+                            switch (component) {
+                                case ClientCargoHoldsComponent _ -> {
+                                    List<ColorType> goods = objects.stream()
+                                        .map(iv -> ColorType.valueOf(((String) iv.getUserData()).split("-")[1].toUpperCase()))
+                                        .toList();
+                                    newDisposition.put(id, goods);
+                                }
+                                case ClientBatteryComponent c -> {
+                                    for (int i = objects.size(); i < c.getBatteries(); i++)
+                                        list2.add(id);
+                                }
+                                default -> {}
                             }
-                            case ClientBatteryComponent c -> {
-                                for (int i = objects.size(); i < c.getBatteries(); i++)
-                                    list2.add(id);
-                            }
-                            default -> {}
                         }
                     });
                     client.send(MessageType.UPDATE_GOODS, newDisposition, list2);
@@ -1276,7 +1280,7 @@ public class FlightPhaseController implements MessageHandler {
                     paneMap.remove(e.id());
                     objectsMap.remove(e.id());
 
-                    if (state == PlayerState.CHECK) {
+                    if (state == PlayerState.CHECK) { // User has to continue to check ship
                         list1.clear();
                         mainButton.setDisable(true);
                     }
@@ -1329,9 +1333,7 @@ public class FlightPhaseController implements MessageHandler {
                     instructionManager.showSuccessMessage("New card revealed: " + e.card().getId());
                 }
             }
-            case CardUpdatedEvent e -> {
-                showCardInfo(e.card());
-            }
+            case CardUpdatedEvent e -> showCardInfo(e.card());
             case FlightEndedEvent e -> {
                 if (e.username().equals(client.getUsername()))
                     endFlightButton.setVisible(false);
