@@ -295,14 +295,28 @@ public class FlightPhaseController implements MessageHandler {
         MessageDispatcher.getInstance().registerHandler(this);
         this.client = App.getClientInstance();
         this.model = client.getGameController().getModel();
+
+        if (client.getLobby().isLearnerMode()) {
+            endFlightButton.setVisible(false);
+            endFlightButton.setDisable(true);
+        }
+
         this.overlayManager = new OverlayManager(root);
     }
 
     private void loadImages() {
-        Image playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg")));
-        playerShipImage.setImage(playerShipImg);
+        Image playerShipImg;
+        Image cardBackImg;
+        if (client.getLobby().isLearnerMode()){
+            playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg")));
+            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+        }
+        else {
+            playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg")));
+            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_0121.jpg")));
+        }
 
-        Image cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+        playerShipImage.setImage(playerShipImg);
         currentCardImage.setImage(cardBackImg);
     }
 
