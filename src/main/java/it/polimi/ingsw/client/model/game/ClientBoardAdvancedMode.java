@@ -97,11 +97,6 @@ public class ClientBoardAdvancedMode extends ClientBoard {
 
     }
 
-    @Override
-    public List<ClientCard> getLookedCards() {
-        return lookedCards;
-    }
-
     private void rotateHourglass() {
         if (hourglassPos > 0) {
             timeLeft = 10;

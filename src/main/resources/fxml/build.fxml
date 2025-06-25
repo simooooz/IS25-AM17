@@ -7,60 +7,52 @@
 
 <AnchorPane fx:id="root" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-color: linear-gradient(to bottom, #0f0f23, #1a1a3a);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.GUI.fxmlcontroller.BuildController">
 
-    <!-- Main container - Layout a 2 colonne -->
+    <!-- Main container -->
     <HBox spacing="15" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-        <!-- PANNELLO SINISTRO: Componenti (70% dello spazio) -->
+        <!-- LEFT PART - COMMON AND OTHER PLAYERS  -->
         <VBox maxWidth="980" prefWidth="980" spacing="10" style=";" HBox.hgrow="ALWAYS">
 
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="410.0" style="-fx-background: transparent; -fx-border-color: transparent;" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
-                <!-- Flow pane con padding aumentato tra i componenti -->
-                <FlowPane fx:id="componentsFlowPane" hgap="8" style="-fx-padding: 10;" vgap="8">
-                </FlowPane>
+                <FlowPane fx:id="componentsFlowPane" hgap="8" style="-fx-padding: 10;" vgap="8" />
             </ScrollPane>
 
-            <!-- Other players ship container con altezza fissa -->
-            <HBox fx:id="otherPlayersContainer" maxHeight="296.0" minHeight="240.0" prefHeight="296.0" spacing="2.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10; -fx-spacing: 20 0 0 0;">
-            </HBox>
+            <!-- Other players -->
+            <HBox fx:id="otherPlayersContainer" maxHeight="296.0" minHeight="240.0" prefHeight="296.0" spacing="2.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10; -fx-spacing: 20 0 0 0;" />
 
         </VBox>
 
-        <!-- PANNELLO DESTRO: Layout a 3 fasce verticali (30% dello spazio) -->
+        <!-- RIGHT SIDE - CARDS, TIMER, SHIP AND BUTTONS -->
         <VBox maxWidth="700" HBox.hgrow="NEVER">
 
-            <!-- FASCIA SUPERIORE: Carte e Clessidra -->
             <HBox fx:id="cardsAndTimerContainer" alignment="CENTER" prefHeight="200.0" prefWidth="472.0" spacing="25" style="-fx-background-color: rgba(0,0,0,0.1); -fx-background-radius: 15;">
 
-                <!-- Pile di Carte -->
+                <!-- Card piles -->
                 <HBox alignment="CENTER" spacing="20">
 
-                    <!-- Carta Pile 0 -->
-                    <ImageView fx:id="pile_0" fitHeight="120" fitWidth="120" onMouseClicked="#lookCardPile" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;">
-                        <image>
-                            <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
-                        </image>
+                    <ImageView fx:id="pile_0" fitHeight="120" fitWidth="120" onMouseClicked="#lookCardPile"
+                               preserveRatio="true"
+                               style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;">
+                        <Image url="@../images/cards/GT-cards_II_IT_0121.jpg"/>
                     </ImageView>
 
-                    <!-- Carta Pile 1 -->
-                    <ImageView fx:id="pile_1" fitHeight="120" fitWidth="120" onMouseClicked="#lookCardPile" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;">
-                        <image>
-                            <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
-                        </image>
+                    <ImageView fx:id="pile_1" fitHeight="120" fitWidth="120" onMouseClicked="#lookCardPile"
+                               preserveRatio="true"
+                               style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;">
+                        <Image url="@../images/cards/GT-cards_II_IT_0121.jpg"/>
                     </ImageView>
 
-                    <!-- Carta Pile 2 -->
-                    <ImageView fx:id="pile_2" fitHeight="120" fitWidth="120" onMouseClicked="#lookCardPile" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;">
-                        <image>
-                            <Image url="@../images/cards/GT-cards_II_IT_0121.jpg" />
-                        </image>
+                    <ImageView fx:id="pile_2" fitHeight="120" fitWidth="120" onMouseClicked="#lookCardPile"
+                               preserveRatio="true"
+                               style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;">
+                        <Image url="@../images/cards/GT-cards_II_IT_0121.jpg"/>
                     </ImageView>
 
                 </HBox>
 
-                <!-- Spazio centrale -->
                 <Region HBox.hgrow="ALWAYS" />
 
-                <!-- Clessidra/Timer Container - Più largo -->
+                <!-- TIMER -->
                 <VBox fx:id="timerContainer" alignment="CENTER" maxHeight="170" maxWidth="190" prefHeight="170" prefWidth="190" spacing="20" style="-fx-background-color: rgba(243,156,18,0.15); -fx-background-radius: 12; -fx-padding: 15; -fx-border-color: #f39c12; -fx-border-width: 2; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2);">
 
                     <Label style="-fx-text-fill: #f39c12; -fx-font-size: 14px; -fx-font-weight: bold;" text="⏳ TIME">
@@ -81,31 +73,27 @@
                         </font>
                     </Label>
 
-                </VBox>
+                </VBox> <!-- END TIMER -->
 
             </HBox>
 
-            <!-- FASCIA CENTRALE: Nave -->
+            <!-- MAIN SHIP -->
             <VBox alignment="CENTER" spacing="10" VBox.vgrow="ALWAYS">
-                <StackPane fx:id="shipContainer" alignment="CENTER">
-
+                <StackPane>
                     <ImageView fx:id="shipImageView" fitHeight="400.0" fitWidth="513.0" preserveRatio="true" />
-
-                    <GridPane fx:id="shipGrid" alignment="CENTER" hgap="2" maxHeight="915.0" maxWidth="487.0" prefHeight="354.0" prefWidth="487.0" vgap="2">
-                    </GridPane>
-
+                    <GridPane fx:id="shipGrid" alignment="CENTER" hgap="2" maxHeight="915.0" maxWidth="487.0" prefHeight="354.0" prefWidth="487.0" vgap="2" />
                 </StackPane>
-
-                <Label fx:id="statusLabel" alignment="CENTER" styleClass="error-text" />
             </VBox>
 
-            <!-- FASCIA INFERIORE: Pulsanti -->
-            <HBox alignment="CENTER" prefHeight="80" spacing="20" style="-fx-background-color: rgba(0,0,0,0.1); -fx-background-radius: 15;">
+            <!-- ERROR TEXT -->
+            <HBox alignment="CENTER" spacing="10">
+                <Label fx:id="statusLabel" textAlignment="CENTER" wrapText="true" maxWidth="400" styleClass="error-text" />
+            </HBox>
 
+            <!-- BUTTONS -->
+            <HBox alignment="CENTER" prefHeight="80" spacing="20">
                 <Button maxWidth="200" onAction="#leaveGameHandler" prefWidth="200" styleClass="button-danger" text="Leave game" />
-
                 <Button fx:id="setReadyButton" maxWidth="200" onAction="#setReadyHandler" prefWidth="200" styleClass="button" text="Set ready" />
-
             </HBox>
 
         </VBox>

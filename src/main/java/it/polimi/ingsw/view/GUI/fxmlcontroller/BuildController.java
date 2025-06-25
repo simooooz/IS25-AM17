@@ -19,7 +19,6 @@ import it.polimi.ingsw.view.GUI.OverlayManager;
 import it.polimi.ingsw.view.GUI.SceneManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -37,7 +36,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 
@@ -109,9 +107,11 @@ public class BuildController implements MessageHandler, Initializable {
             if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("rotate")) // Previous local command was "rotate"
                 localCommand = String.join(" ", "insert", String.valueOf(componentId), String.valueOf(slotRow), String.valueOf(slotCol), localCommand.split(" ")[2]);
             else if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert" (ex. of a reserve)
+                componentMap.get(Integer.parseInt(localCommand.split(" ")[1])).setRotate(0);
                 client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
                 localCommand = input + " 0";
-            } else // No previous local command
+            }
+            else // No previous local command
                 localCommand = input + " 0";
 
             event.setDropCompleted(true);
@@ -140,17 +140,31 @@ public class BuildController implements MessageHandler, Initializable {
 
     EventHandler<MouseEvent> slotOnMouseEnteredHandler = event -> {
         Rectangle slot = (Rectangle) event.getTarget();
-        slot.setFill(Color.LIGHTBLUE.deriveColor(0, 1, 1, 0.4));
-        slot.setStroke(Color.LIGHTBLUE);
-        slot.setStrokeWidth(2);
+        if (slot.getId().equals("slot_0_5") || slot.getId().equals("slot_0_6")) {
+            slot.setFill(Color.rgb(120, 120, 160, 0.5));
+            slot.setStroke(Color.rgb(140, 140, 200));
+            slot.setStrokeWidth(2);
+        }
+        else {
+            slot.setFill(Color.LIGHTBLUE.deriveColor(0, 1, 1, 0.4));
+            slot.setStroke(Color.LIGHTBLUE);
+            slot.setStrokeWidth(2);
+        }
         event.consume();
     };
 
     EventHandler<MouseEvent> slotOnMouseExitedHandler = event -> {
         Rectangle slot = (Rectangle) event.getTarget();
-        slot.setFill(Color.TRANSPARENT);
-        slot.setStroke(Color.rgb(150, 150, 255, 0.6));
-        slot.setStrokeWidth(1.5);
+        if (slot.getId().equals("slot_0_5") || slot.getId().equals("slot_0_6")) {
+            slot.setFill(Color.rgb(80, 80, 120, 0.3));
+            slot.setStroke(Color.rgb(100, 100, 180, 0.8));
+            slot.setStrokeWidth(1.5);
+        }
+        else {
+            slot.setFill(Color.TRANSPARENT);
+            slot.setStroke(Color.rgb(150, 150, 255, 0.6));
+            slot.setStrokeWidth(1.5);
+        }
         event.consume();
     };
 
@@ -185,11 +199,12 @@ public class BuildController implements MessageHandler, Initializable {
         setupComponentMap();
         setupPlayersShip();
 
-        setupRightPanelEffects();
-
-        if (client.getLobby().isLearnerMode()) {
+        if (client.getLobby().isLearnerMode())
             cardsAndTimerContainer.setVisible(false);
-        } else {
+        else {
+            setupCardPileEffects(pile_0);
+            setupCardPileEffects(pile_1);
+            setupCardPileEffects(pile_2);
             startCountdown();
         }
 
@@ -217,12 +232,26 @@ public class BuildController implements MessageHandler, Initializable {
         });
     }
 
+    private void setupCardPileEffects(ImageView pile) {
+        pile.setOnMouseEntered(_ -> {
+            pile.setScaleX(1.08);
+            pile.setScaleY(1.08);
+            pile.setStyle(pile.getStyle() + "; -fx-effect: dropshadow(gaussian, rgba(243,156,18,0.8), 10, 0.0, 3, 3);");
+        });
+
+        pile.setOnMouseExited(_ -> {
+            pile.setScaleX(1.0);
+            pile.setScaleY(1.0);
+            pile.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;");
+        });
+    }
+
     private void setupComponentMap() {
         List<ClientComponent> components = client.getGameController().getModel().getBoard().getMapIdComponents().values().stream().toList();
         for (ClientComponent c : components) {
             ImageView iv = createComponentImage(c);
             componentMap.put(c.getId(), iv);
-            if (!c.isInserted())
+            if (client.getGameController().getModel().getBoard().getCommonComponents().contains(c))
                 componentsFlowPane.getChildren().add(iv);
         }
     }
@@ -262,12 +291,11 @@ public class BuildController implements MessageHandler, Initializable {
         shipImageView.setLayoutY(2.0);
         shipImageView.setPickOnBounds(true);
         shipImageView.setPreserveRatio(true);
-        if (!client.getLobby().isLearnerMode()) {
+
+        if (!client.getLobby().isLearnerMode())
             shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg"))));
-        }
-        else {
+        else
             shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg"))));
-        }
 
         Pane shipPane = new Pane();
         shipPane.setPrefHeight(shipImageView.getBoundsInLocal().getHeight());
@@ -286,30 +314,6 @@ public class BuildController implements MessageHandler, Initializable {
         // Add all
         setupOtherPlayerShipGrid(tilesGrid, player.getShip());
         shipPane.getChildren().addAll(shipImageView, tilesGrid);
-
-        // Set click animation
-//        shipPane.setOnMouseClicked(_ -> {
-//            ParallelTransition zoomIn = createZoomToCenterAnimation(shipPane, Duration.millis(500));
-//
-//            zoomIn.setOnFinished(_ -> {
-//                Scene scene = shipPane.getScene();
-//                EventHandler<MouseEvent> clickOutsideHandler = new EventHandler<>() {
-//                    @Override
-//                    public void handle(MouseEvent event) {
-//                        if (!shipPane.contains(shipPane.sceneToLocal(event.getSceneX(), event.getSceneY()))) { // Click outside
-//                            ParallelTransition zoomOut = createZoomBackAnimation(shipPane, Duration.millis(500));
-//                            zoomOut.play();
-//                            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
-//                        }
-//                    }
-//                };
-//
-//                scene.addEventHandler(MouseEvent.MOUSE_CLICKED, clickOutsideHandler); // Add event handler
-//
-//            });
-//
-//            zoomIn.play();
-//        });
 
         return shipPane;
     }
@@ -340,21 +344,12 @@ public class BuildController implements MessageHandler, Initializable {
         for (int row = 0; row < Constants.SHIP_ROWS; row++) {
             for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
                 if (ship.validPositions(row, col) || (row == 0 && col == 5) || (row == 0 && col == 6)) {
-
                     Optional<ClientComponent> component = ship.getDashboard(row, col);
                     if (component.isPresent())
                         placeComponent(shipGrid, componentMap.get(component.get().getId()), row, col, true);
-                    else {
-                        if(!client.getLobby().isLearnerMode()){
-                            Rectangle slot = createShipSlot(row, col);
-                            shipGrid.add(slot, col, row);
-                        }
-                        else {
-                            if (row != 0 && (col != 5 || col != 6)) {
-                                Rectangle slot = createShipSlot(row, col);
-                                shipGrid.add(slot, col, row);
-                            }
-                        }
+                    else if (!client.getLobby().isLearnerMode() || ((row != 0 || col != 5) && (row != 0 || col != 6))) {
+                        Rectangle slot = createShipSlot(row, col);
+                        shipGrid.add(slot, col, row);
                     }
                 }
                 else {
@@ -375,40 +370,21 @@ public class BuildController implements MessageHandler, Initializable {
         slot.setStrokeWidth(1.5);
         slot.setOpacity(0.8);
 
-        if (row == 0 && (col == 5 || col == 6)) {
-
+        if (row == 0 && (col == 5 || col == 6)) { // Reserves
             slot.setFill(Color.rgb(80, 80, 120, 0.3));
             slot.setStroke(Color.rgb(100, 100, 180, 0.8));
 
             slot.setTranslateY(-3);
             slot.setTranslateX(3);
 
-            slot.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-                Rectangle reserveSlot = (Rectangle) event.getTarget();
-                reserveSlot.setFill(Color.rgb(120, 120, 160, 0.5));
-                reserveSlot.setStroke(Color.rgb(140, 140, 200));
-                reserveSlot.setStrokeWidth(2);
-                event.consume();
-            });
-
-            slot.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
-                Rectangle reserveSlot = (Rectangle) event.getTarget();
-                reserveSlot.setFill(Color.rgb(80, 80, 120, 0.3));
-                reserveSlot.setStroke(Color.rgb(100, 100, 180, 0.8));
-                reserveSlot.setStrokeWidth(1.5);
-                event.consume();
-            });
-        } else {
-            // Stile normale per le altre celle
+        }
+        else { // Normal slots
             slot.setFill(Color.TRANSPARENT);
             slot.setStroke(Color.rgb(150, 150, 255, 0.6));
-
-            // Event handler normali
-            slot.addEventHandler(MouseEvent.MOUSE_ENTERED, slotOnMouseEnteredHandler);
-            slot.addEventHandler(MouseEvent.MOUSE_EXITED, slotOnMouseExitedHandler);
         }
 
-        // Event handler per drag and drop (comuni a tutte le celle)
+        slot.addEventHandler(MouseEvent.MOUSE_ENTERED, slotOnMouseEnteredHandler);
+        slot.addEventHandler(MouseEvent.MOUSE_EXITED, slotOnMouseExitedHandler);
         slot.addEventHandler(DragEvent.DRAG_OVER, slotDragOverHandler);
         slot.addEventHandler(DragEvent.DRAG_DROPPED, slotDragDroppedHandler);
 
@@ -428,9 +404,8 @@ public class BuildController implements MessageHandler, Initializable {
             Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
             iv.setImage(image);
         }
-        else {
+        else
             iv.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/tiles/GT-new_tiles_16_for web157.jpg"))));
-        }
 
         if (!component.isInserted()) {
             iv.setOnMouseEntered(_ -> {
@@ -448,8 +423,8 @@ public class BuildController implements MessageHandler, Initializable {
 
                 if (client.getGameController().getModel().getBoard().getCommonComponents().contains(component)) { // Component picked from flow pane
                     if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) { // Previous local command was "insert"
+                        componentMap.get(Integer.parseInt(localCommand.split(" ")[1])).setRotate(0);
                         client.send(MessageType.INSERT_COMPONENT, Integer.parseInt(localCommand.split(" ")[1]), Integer.parseInt(localCommand.split(" ")[2]), Integer.parseInt(localCommand.split(" ")[3]), Integer.parseInt(localCommand.split(" ")[4]));
-                        System.out.println(localCommand);
                     }
                     localCommand = "";
                     client.send(MessageType.PICK_COMPONENT, component.getId());
@@ -500,7 +475,7 @@ public class BuildController implements MessageHandler, Initializable {
         timeLeft.setText(String.valueOf(timeRemaining));
         int hourglassPos = client.getGameController().getModel().getBoard().getHourglassPos();
 
-        if (timeRemaining == 0 && (hourglassPos > 1) || (hourglassPos == 1 && client.getGameController().getModel().getBoard().getPlayersByPos().stream().anyMatch(p -> p.getUsername().equals(client.getUsername())))) {
+        if (timeRemaining == 0) {
             timeLeft.setText("ROTATE");
             timeLeft.setStyle("-fx-text-fill: #00ff00; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 6; -fx-padding: 8;");
             timerContainer.setOnMouseClicked(_ -> client.send(MessageType.MOVE_HOURGLASS));
@@ -508,7 +483,8 @@ public class BuildController implements MessageHandler, Initializable {
         }
         else if (timeRemaining <= 10 && hourglassPos == 0) {
             timeLeft.setStyle("-fx-text-fill: #ff4444; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 6; -fx-padding: 8;");
-            // Effetto di pulsazione per il timer container quando il tempo scade
+
+            // Pulse effect
             timerContainer.setStyle(
                     "-fx-background-color: rgba(255,68,68,0.2); " +
                             "-fx-background-radius: 12; " +
@@ -522,7 +498,6 @@ public class BuildController implements MessageHandler, Initializable {
             timeLeft.setStyle("-fx-text-fill: #f39c12; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-color: rgba(0,0,0,0.8); -fx-background-radius: 6; -fx-padding: 8;");
         }
     }
-
 
     @SuppressWarnings("Duplicates")
     @FXML
@@ -546,6 +521,7 @@ public class BuildController implements MessageHandler, Initializable {
         client.send(MessageType.LEAVE_GAME);
     }
 
+    @SuppressWarnings("Duplicates")
     @FXML
     public void setReadyHandler(ActionEvent event) {
         if (localCommand.split(" ").length > 0 && localCommand.split(" ")[0].equals("insert")) // Previous local command was "insert"
@@ -570,31 +546,22 @@ public class BuildController implements MessageHandler, Initializable {
         iv.setImage(image);
     }
 
-    /**
-     * Gets the client ship from the game model.
-     *
-     * @return The ClientShip instance for the current player
-     */
     private ClientShip getClientShip(String username) {
         return client.getGameController().getModel().getBoard().getPlayerEntityByUsername(username).getShip();
     }
 
     private void loadShipImage() {
-        String shipImagePath = "";
-        if (!client.getLobby().isLearnerMode()) {
+        String shipImagePath;
+        if (!client.getLobby().isLearnerMode())
             shipImagePath = "/images/cardboard/cardboard-1b.jpg";
-            System.out.println("Using learner mode image: " + shipImagePath);
-        } else {
+        else
             shipImagePath = "/images/cardboard/cardboard-1.jpg";
-            System.out.println("Using normal mode image: " + shipImagePath);
-        }
 
         Image shipImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(shipImagePath)));
         shipImageView.setImage(shipImage);
         shipImageView.setFitWidth(1000);
         shipImageView.setPreserveRatio(true);
 
-        // Centra l'immagine rispetto alla griglia
         double gridWidth = shipGrid.getPrefWidth();
         double gridHeight = shipGrid.getPrefHeight();
         double imageWidth = shipImageView.getFitWidth();
@@ -606,53 +573,7 @@ public class BuildController implements MessageHandler, Initializable {
         shipImageView.setOpacity(0.3);
     }
 
-    /**
-     * Metodo per configurare gli effetti hover e la stilizzazione della parte destra
-     * Aggiungi questo metodo alla classe BuildController
-     */
-    private void setupRightPanelEffects() {
-        setupCardPileEffects(pile_0);
-        setupCardPileEffects(pile_1);
-        setupCardPileEffects(pile_2);
-        setupTimerContainerEffects();
-    }
-
-    private void setupCardPileEffects(ImageView pile) {
-        // Effetti hover per le carte
-        pile.setOnMouseEntered(event -> {
-            pile.setScaleX(1.08);
-            pile.setScaleY(1.08);
-            pile.setStyle(pile.getStyle() + "; -fx-effect: dropshadow(gaussian, rgba(243,156,18,0.8), 10, 0.0, 3, 3);");
-        });
-
-        pile.setOnMouseExited(event -> {
-            pile.setScaleX(1.0);
-            pile.setScaleY(1.0);
-            pile.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2); -fx-cursor: hand;");
-        });
-    }
-
-    private void setupTimerContainerEffects() {
-        // Aggiunge un effetto di pulsazione quando il tempo è in scadenza
-        timerContainer.setOnMouseEntered(event -> {
-            if (timeRemaining <= 10) {
-                timerContainer.setStyle(timerContainer.getStyle() +
-                        "; -fx-effect: dropshadow(gaussian, rgba(255,0,0,0.6), 8, 0.0, 0, 0);");
-            }
-        });
-
-        timerContainer.setOnMouseExited(event -> {
-            timerContainer.setStyle(
-                    "-fx-background-color: rgba(243,156,18,0.15); " +
-                            "-fx-background-radius: 12; " +
-                            "-fx-border-color: #f39c12; " +
-                            "-fx-border-width: 2; " +
-                            "-fx-border-radius: 12; " +
-                            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.0, 2, 2);"
-            );
-        });
-    }
-
+    @SuppressWarnings("Duplicates")
     @Override
     public void handleMessage(GameEvent event) {
         switch (event) {
@@ -802,7 +723,7 @@ public class BuildController implements MessageHandler, Initializable {
             }
             case ComponentRotatedEvent e -> {
                 ImageView iv = componentMap.get(e.id());
-                iv.setRotate(e.rotations()*90 + (e.rotations() == 1 ? iv.getRotate() : 0));
+                iv.setRotate(iv.getRotate() + e.rotations()*90);
             }
             case CardPileLookedEvent e -> {
 
@@ -832,9 +753,9 @@ public class BuildController implements MessageHandler, Initializable {
 
                 boolean allReady = e.states().values().stream().noneMatch(s -> s == PlayerState.BUILD || s == PlayerState.LOOK_CARD_PILE);
                 if (allReady) {
-                    SceneManager.navigateToScene("/fxml/gameFlight.fxml", this, (FlightPhaseController controller) -> {
-                        controller.setImageMap(componentMap);
-                    });
+                    SceneManager.navigateToScene("/fxml/gameFlight.fxml", this, (FlightPhaseController controller) ->
+                        controller.setImageMap(componentMap)
+                    );
 
                     return;
                 }
@@ -859,8 +780,11 @@ public class BuildController implements MessageHandler, Initializable {
 
             }
             case LeftLobbyEvent e -> {
-                if (e.username().equals(client.getUsername())) // Your action
+                if (e.username().equals(client.getUsername())) { // Your action
+                    if (timeline != null)
+                        timeline.stop();
                     SceneManager.navigateToScene("/fxml/menu.fxml", this, null);
+                }
                 else // Not your action
                     ((Label) otherPlayersContainer.lookup("#state_"+e.username())).setText("left game");
             }

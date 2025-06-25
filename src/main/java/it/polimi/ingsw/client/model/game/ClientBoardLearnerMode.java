@@ -88,11 +88,6 @@ public class ClientBoardLearnerMode extends ClientBoard {
     }
 
     @Override
-    public List<ClientCard> getLookedCards() {
-        throw new RuntimeException("Card piles aren't learner mode flight");
-    }
-
-    @Override
     public void moveHourglass() {
         throw new RuntimeException("Hourglass is not in learner mode flight");
     }

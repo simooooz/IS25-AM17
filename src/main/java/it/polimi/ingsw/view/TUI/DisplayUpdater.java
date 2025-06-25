@@ -2,17 +2,26 @@ package it.polimi.ingsw.view.TUI;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.ClientGameModel;
+import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DisplayUpdater {
-    
 
-    public DisplayUpdater() {}
+    private List<ClientCard> lookedCards;
+
+    public DisplayUpdater() {
+        lookedCards = new ArrayList<>();
+    }
+
+    public List<ClientCard> getLookedCards() {
+        return lookedCards;
+    }
 
     public void updateDisplay() {
         switch (ViewTui.getClientInstance().getState()) {
@@ -65,7 +74,7 @@ public class DisplayUpdater {
                 System.out.println(board.toString(ViewTui.getClientInstance().getUsername(), state));
                 System.out.println(ship.toString(ViewTui.getClientInstance().getUsername(), state));
                 if (state == PlayerState.LOOK_CARD_PILE)
-                    System.out.println(Constants.displayCards(board.getLookedCards(), 3));
+                    System.out.println(Constants.displayCards(lookedCards, 3));
 
                 Chroma.println(
                        "[ship <username>]            - view <username>'s ship\n" +

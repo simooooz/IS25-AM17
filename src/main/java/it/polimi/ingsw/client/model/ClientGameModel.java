@@ -136,7 +136,6 @@ public abstract class ClientGameModel {
     }
 
     public void cardPileReleased(String username) {
-        board.getLookedCards().clear();
         ClientEventBus.getInstance().publish(new CardPileReleasedEvent(username));
     }
 
@@ -236,7 +235,6 @@ public abstract class ClientGameModel {
         ClientPlayer player = board.getPlayerEntityByUsername(username);
         ClientComponent component = board.getMapIdComponents().get(componentId);
         if (component == null) throw new ComponentNotValidException("Invalid component id");
-        if (num % 4 == 0) return;
 
         component.rotateComponent(player, num);
         ClientEventBus.getInstance().publish(new ComponentRotatedEvent(componentId, num));

@@ -81,8 +81,6 @@ public abstract class ClientBoard {
 
     public abstract void startMatch(ClientGameModel model);
 
-    public abstract List<ClientCard> getLookedCards();
-
     public abstract void moveHourglass();
 
     public abstract int getHourglassPos();
