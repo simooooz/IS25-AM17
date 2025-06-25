@@ -428,8 +428,7 @@ public sealed abstract class Ship permits
                     if (!component.get().checkComponent(this))
                         valid = false;
                 }
-
-        return valid || components == 1;
+        return (valid && calcShipParts().size()==1) || components == 1;
     }
 
     /**
