@@ -346,7 +346,7 @@ public class DisplayUpdater {
                     Chroma.println("\n    " + Constants.inTheMiddle("Current card", 24), Chroma.GREY_BOLD);
                     System.out.println(Constants.displayCards(List.of(board.getCardPile().getLast()), 1));
                 }
-                board.getCardPile().getLast().printCardInfo(ViewTui.getClientInstance().getGameController().getModel(), board);
+                System.out.println(board.getCardPile().getLast().printCardInfo(ViewTui.getClientInstance().getGameController().getModel(), board));
             }
             else {
                 Chroma.println("    " + Constants.inTheMiddle("Previous card", 24), Chroma.GREY_BOLD);

@@ -54,6 +54,8 @@ public abstract class ClientCard {
         throw new RuntimeException("Method not valid");
     }
 
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {}
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
+        return "";
+    }
 
 } 

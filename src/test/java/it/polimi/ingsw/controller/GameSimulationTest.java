@@ -294,6 +294,7 @@ public class GameSimulationTest {
 
 
         controller.pickComponent("Davide", 72);
+
         controller.reserveComponent("Davide", 72);
 
         controller.pickComponent("Davide", 83);
@@ -1450,45 +1451,104 @@ public class GameSimulationTest {
     }
 
     @Test
-    public void testThirdCompleteGame() {
+    public void testCheckingShip() {
 
         // Building Ships
+        List<String> usernames = new ArrayList<>(List.of("Tommaso", "Simone"));
+        controller = new GameController(usernames, false);
+        controller.startMatch();
 
-        // Player 1 Ship Check
+        controller.pickComponent("Tommaso", 38);
+        controller.rotateComponent("Tommaso", 38, 1);
+        controller.insertComponent("Tommaso", 38, 2, 2, 0, true);
 
-        // Player 2 Ship Check
+        controller.pickComponent("Tommaso", 63);
+        controller.insertComponent("Tommaso", 63, 2, 4, 0, true);
 
-        // Player 3 Ship Check
+        controller.setReady("Tommaso");
 
-        // Alien Management
+        controller.pickComponent("Simone", 127);
+        controller.insertComponent("Simone", 127, 1, 1, 0, true);
 
-        // Card Deck Initialization
+        controller.pickComponent("Simone", 156);
+        controller.insertComponent("Simone", 156, 2, 0, 3, true);
 
-        // Card 1
+        controller.pickComponent("Simone", 15);
+        controller.insertComponent("Simone", 15, 3, 0, 2, true);
 
-        // Card 2
+        controller.pickComponent("Simone", 102);
+        controller.insertComponent("Simone", 102, 1, 3, 0, true);
 
-        // Card 3
+        controller.pickComponent("Simone", 126);
+        controller.insertComponent("Simone", 126, 1, 4, 0, true);
 
-        // Card 4
+        controller.pickComponent("Simone", 41);
+        controller.insertComponent("Simone", 41, 2, 2, 0, true);
 
-        // Card 5
+        controller.pickComponent("Simone", 60);
+        controller.insertComponent("Simone", 60, 2, 4, 1, true);
 
-        // Card 6
+        controller.pickComponent("Simone", 17);
+        controller.insertComponent("Simone", 17, 2, 5, 1, true);
 
-        // Card 7
+        controller.pickComponent("Simone", 20);
+        controller.insertComponent("Simone", 20, 2, 6, 0, true);
 
-        // Card 8
+        controller.pickComponent("Simone", 46);
+        controller.insertComponent("Simone", 46, 3, 1, 3, true);
 
-        // Card 9
+        controller.pickComponent("Simone", 95);
+        controller.insertComponent("Simone", 95, 3, 3, 0, true);
 
-        // Card 10
+        controller.pickComponent("Simone", 146);
+        controller.insertComponent("Simone", 146, 3, 4, 2, true);
 
-        // Card 11
+        controller.pickComponent("Simone", 30);
+        controller.insertComponent("Simone", 30, 3, 5, 0, true);
 
-        // Card 12
+        controller.pickComponent("Simone", 14);
+        controller.insertComponent("Simone", 14, 4, 0, 0, true);
 
-        // Final Ranking
+        controller.pickComponent("Simone", 80);
+        controller.insertComponent("Simone", 80, 4, 1, 0, true);
+
+        controller.pickComponent("Simone", 88);
+        controller.insertComponent("Simone", 88, 4, 2, 0, true);
+
+        controller.pickComponent("Simone", 89);
+        controller.insertComponent("Simone", 89, 4, 4, 0, true);
+
+        controller.pickComponent("Simone", 44);
+        controller.insertComponent("Simone", 44, 4, 5, 0, true);
+
+        controller.setReady("Simone");
+
+        List<Integer> toRemoveTilesIDs = new ArrayList<>();
+        toRemoveTilesIDs.add(127);
+
+        controller.checkShip("Simone", toRemoveTilesIDs);
+
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            controller.drawCard("Tommaso");
+        });
+        assertEquals("State is not DRAW_CARD", exception.getMessage());
+
+        toRemoveTilesIDs.clear();
+        toRemoveTilesIDs.add(156);
+        toRemoveTilesIDs.add(15);
+
+        controller.checkShip("Simone", toRemoveTilesIDs);
+
+        toRemoveTilesIDs.clear();
+        toRemoveTilesIDs.add(46);
+        toRemoveTilesIDs.add(14);
+        toRemoveTilesIDs.add(80);
+        toRemoveTilesIDs.add(88);
+
+        controller.checkShip("Simone", toRemoveTilesIDs);
+
+        controller.drawCard("Tommaso");
 
     }
 

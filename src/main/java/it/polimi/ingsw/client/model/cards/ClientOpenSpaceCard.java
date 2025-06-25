@@ -48,16 +48,23 @@ public class ClientOpenSpaceCard extends ClientCard {
     }
 
     @Override
-    public void printCardInfo(ClientGameModel model, ClientBoard board) {
+    public String printCardInfo(ClientGameModel model, ClientBoard board) {
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> Chroma.println("- " + player.getUsername() + " has done", Chroma.YELLOW_BOLD);
-                case WAIT -> Chroma.println("- " + player.getUsername() + " is waiting", Chroma.YELLOW_BOLD);
-                case WAIT_ENGINES -> Chroma.println("- " + player.getUsername() + " is choosing if activate double engines or not", Chroma.YELLOW_BOLD);
+                case DONE -> {
+                    return "- " + player.getUsername() + " has done";
+                }
+                case WAIT -> {
+                    return "- " + player.getUsername() + " is waiting";
+                }
+                case WAIT_ENGINES -> {
+                    return "- " + player.getUsername() + " is choosing if activate double engines or not";
+                }
             }
         }
+        return "";
     }
 
 }

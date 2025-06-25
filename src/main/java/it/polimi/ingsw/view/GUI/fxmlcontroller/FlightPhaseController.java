@@ -69,11 +69,18 @@ public class FlightPhaseController implements MessageHandler {
     @FXML private Button mainButton;
     @FXML private Button endFlightButton;
 
+    @FXML private Label statusLabel;
+    @FXML private ScrollPane statusScrollPane;
+
+    @FXML private Label instructionLabel;      // Label per le istruzioni
+    @FXML private Label mainStatusLabel;       // Label per il messaggio di stato principale
+
     private ObservableList<String> logMessages;
 
     private Client client;
     private ClientGameModel model;
     private PlayerState state;
+    private InstructionDisplayManager instructionManager;
 
     private final Map<Integer, Pane> paneMap = new HashMap<>();
     private Map<Integer, ImageView> imageMap = new HashMap<>();
@@ -321,8 +328,18 @@ public class FlightPhaseController implements MessageHandler {
         }
 
         this.overlayManager = new OverlayManager(root);
+        initializeStatus();
+        initializeInstructionManager();
     }
 
+    private void initializeInstructionManager() {
+        this.instructionManager = new InstructionDisplayManager(
+                client,
+                instructionLabel,
+                mainStatusLabel
+        );
+        instructionManager.reset();
+    }
     private void loadImages() {
         Image playerShipImg;
         Image cardBackImg;
@@ -380,7 +397,12 @@ public class FlightPhaseController implements MessageHandler {
         shipImageView.setLayoutY(2.0);
         shipImageView.setPickOnBounds(true);
         shipImageView.setPreserveRatio(true);
-        shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg"))));
+        if (!client.getLobby().isLearnerMode()) {
+            shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg"))));
+        }
+        else {
+            shipImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg"))));
+        }
         shipImageView.setStyle("-fx-background-color: #0d0520; -fx-border-color: #8a2be2; -fx-border-width: 2; -fx-background-radius: 10;");
 
         Pane shipPane = new Pane();
@@ -1154,6 +1176,10 @@ public class FlightPhaseController implements MessageHandler {
             case WAIT, DONE -> mainButton.setVisible(false);
             case END -> SceneManager.navigateToScene("/fxml/end.fxml", this, null);
         }
+
+        if (instructionManager != null) {
+            instructionManager.updateInstructions();
+        }
     }
 
     private static class RestoreData {
@@ -1166,6 +1192,24 @@ public class FlightPhaseController implements MessageHandler {
             this.originalX = x;
             this.originalY = y;
         }
+    }
+
+    private void showCardInfo(ClientCard card) {
+        // Ottieni direttamente la stringa dalle informazioni della carta
+        String cardInfo = card.printCardInfo(client.getGameController().getModel(), client.getGameController().getModel().getBoard());
+
+        // Aggiorna il label nella sezione status
+        statusLabel.setText(cardInfo);
+
+        // Scrolla automaticamente all'inizio
+        statusScrollPane.setVvalue(0.0);
+    }
+
+// Aggiungi anche questo metodo per inizializzare la sezione status vuota:
+
+    private void initializeStatus() {
+        statusLabel.setText("Waiting for game events...");
+        statusScrollPane.setVvalue(0.0);
     }
 
     @Override
@@ -1194,6 +1238,10 @@ public class FlightPhaseController implements MessageHandler {
 
                 if (state != e.states().get(client.getUsername()))
                     syncAction();
+
+                if (instructionManager != null) {
+                    instructionManager.onPlayerStateChanged();
+                }
 
                 // Check if card is covered
                 if (e.states().containsValue(PlayerState.DRAW_CARD)) {
@@ -1231,6 +1279,9 @@ public class FlightPhaseController implements MessageHandler {
                         mainButton.setDisable(true);
                     }
                 }
+                if (instructionManager != null) {
+                    instructionManager.showSuccessMessage("Component removed successfully");
+                }
             }
             case ShipBrokenEvent e -> {
                 this.shipParts = new ArrayList<>(e.parts());
@@ -1239,11 +1290,17 @@ public class FlightPhaseController implements MessageHandler {
             case BatteriesUpdatedEvent e -> {
                 ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(e.id());
                 changeComponentObjects(component, e.batteries(), List.of("/images/objects/battery.png"));
+                if (instructionManager != null) {
+                    instructionManager.showSuccessMessage("Batteries updated");
+                }
             }
             case CrewUpdatedEvent e -> {
                 ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(e.id());
                 String path = "/images/objects/" + (e.alien() != null ? ("alien-"+e.alien().toString().toLowerCase()) : "human") + ".png";
                 changeComponentObjects(component, e.alien() != null ? 1 : e.humans(), List.of(path));
+                if (instructionManager != null) {
+                    instructionManager.showSuccessMessage("Crew updated successfully");
+                }
             }
             case GoodsUpdatedEvent e -> {
                 ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(e.id());
@@ -1251,6 +1308,9 @@ public class FlightPhaseController implements MessageHandler {
                 for (ColorType good : e.goods())
                     paths.add("/images/objects/good-" + good.name().toLowerCase() + ".png");
                 changeComponentObjects(component, e.goods().size(), paths);
+                if (instructionManager != null) {
+                    instructionManager.showSuccessMessage("Goods updated successfully");
+                }
             }
             case CreditsUpdatedEvent _, PlayersPositionUpdatedEvent _, JoinedLobbyEvent _ -> updateBoard();
             case LeftLobbyEvent e -> {
@@ -1262,6 +1322,13 @@ public class FlightPhaseController implements MessageHandler {
             case CardRevealedEvent e -> {
                 Image cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/"+e.card().getId()+".jpg")));
                 currentCardImage.setImage(cardBackImg);
+                showCardInfo(e.card());
+                if (instructionManager != null) {
+                    instructionManager.showSuccessMessage("New card revealed: " + e.card().getId());
+                }
+            }
+            case CardUpdatedEvent e -> {
+                showCardInfo(e.card());
             }
             case FlightEndedEvent e -> {
                 if (e.username().equals(client.getUsername()))
