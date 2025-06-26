@@ -17,6 +17,7 @@ public class Chroma {
 
     public static final String RED = "\033[0;31m";
     public static final String GREEN = "\033[0;32m";
+    public static final String DARK_GREEN = "\033[38;5;22m";
     public static final String BLUE = "\033[0;34m";
     public static final String YELLOW = "\033[0;33m";
     // Colore testo marrone
@@ -50,11 +51,12 @@ public class Chroma {
     public static final String WHITE_BACKGROUND = "\033[48;2;255;255;255m";
 
     public static final String RED_BACKGROUND = "\033[41m";
-    public static final String GREEN_BACKGROUND = "\033[42m";
+    public static final String DARK_GREEN_BACKGROUND = "\033[48;5;22m";
     public static final String BLUE_BACKGROUND = "\033[48;5;25m";
     public static final String DARKBLUE_BACKGROUND = "\033[48;5;18m";
     public static final String YELLOW_BACKGROUND = "\033[43m";
-    public static final String GREY_BACKGROUND = "\033[48;5;245m";
+    public static final String LIGHT_GREY_BACKGROUND = "\033[48;5;250m";
+    public static final String DARK_GREY_BACKGROUND = "\033[48;5;240m";
 
     public static final String ORANGE_BACKGROUND = "\033[48;5;214m";
     public static final String PURPLE_BACKGROUND = "\033[48;5;97m";

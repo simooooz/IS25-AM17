@@ -83,7 +83,7 @@ public class ClientCombatZoneCard extends ClientCard {
 
             switch (state) {
                 case DONE -> str.append("- " + player.getUsername()).append(" has done" + "\n");
-                case WAIT -> str.append("- " + player.getUsername() + " is waiting");
+                case WAIT -> str.append("- " + player.getUsername() + " is waiting" +"\n");
                 case WAIT_SHIP_PART -> str.append("- " + player.getUsername() + " is choosing which part of ship to keep" + "\n");
                 case WAIT_SHIELD -> str.append("- " + player.getUsername() + " is choosing if activate a shield or not" + "\n");
                 case WAIT_REMOVE_GOODS -> str.append("- " + player.getUsername() + " has to pay his penalty (removing goods)" + "\n");

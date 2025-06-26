@@ -18,7 +18,7 @@ public enum ColorType {
     GREEN {
         @Override
         public String toString() {
-            return Chroma.color("  " , Chroma.GREEN_BACKGROUND);
+            return Chroma.color("  " , Chroma.DARK_GREEN_BACKGROUND);
         }
     },
     BLUE {

@@ -1,10 +1,13 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.model.cards.*;
 import it.polimi.ingsw.model.cards.utils.*;
 
+import it.polimi.ingsw.model.exceptions.BatteryComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;
+import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static it.polimi.ingsw.common.model.enums.DirectionType.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,12 +38,19 @@ public class GameSimulationTest {
 
         // Building Ships
 
+
         controller.pickComponent("Tommaso", 102);
         controller.insertComponent("Tommaso", 102, 0, 2, 0, true);
 
+        controller.lookCardPile("Tommaso", 0);
+
         controller.pickComponent("Tommaso", 16);
         controller.rotateComponent("Tommaso", 16, 3);
-        controller.insertComponent("Tommaso", 16, 0, 4, 0, true);
+        controller.insertComponent("Tommaso", 16, 1, 1, 0, false);
+        controller.moveComponent("Tommaso", 16, 0, 4, 0);
+
+        controller.pickComponent("Tommaso", 60);
+        controller.releaseComponent("Tommaso", 60);
 
         controller.pickComponent("Tommaso", 113);
         controller.rotateComponent("Tommaso", 113, 3);
@@ -292,14 +303,18 @@ public class GameSimulationTest {
         controller.pickComponent("Davide", 156);
         controller.insertComponent("Davide", 156, 3, 6, 0, true);
 
-
         controller.pickComponent("Davide", 72);
-
         controller.reserveComponent("Davide", 72);
 
         controller.pickComponent("Davide", 83);
         controller.reserveComponent("Davide", 83);
 
+        controller.moveHourglass("Tommaso", new Consumer<List<GameEvent>>() {
+            @Override
+            public void accept(List<GameEvent> gameEvents) {
+
+            }
+        });
 
         controller.setReady("Tommaso");
         controller.setReady("Simone");
@@ -342,15 +357,15 @@ public class GameSimulationTest {
 
         //Alien management
 
-        Exception exception2 = assertThrows(IllegalStateException.class, () -> controller.chooseAlien("Simone", new HashMap<>()));
-        assertEquals("State is not WAIT_ALIEN", exception2.getMessage());
+        Exception exception = assertThrows(IllegalStateException.class, () -> controller.chooseAlien("Simone", new HashMap<>()));
+        assertEquals("State is not WAIT_ALIEN", exception.getMessage());
 
         controller.chooseAlien("Tommaso", new HashMap<>(Map.of(46, AlienType.ENGINE)));
 
         controller.chooseAlien("Simone", new HashMap<>(Map.of(51, AlienType.CANNON)));
 
-        Exception exception3 = assertThrows(CabinComponentNotValidException.class, () -> controller.chooseAlien("Davide", new HashMap<>(Map.of(41, AlienType.CANNON))));
-        assertEquals("Alien CANNON is not compatible with this cabin", exception3.getMessage());
+        exception = assertThrows(CabinComponentNotValidException.class, () -> controller.chooseAlien("Davide", new HashMap<>(Map.of(41, AlienType.CANNON))));
+        assertEquals("Alien CANNON is not compatible with this cabin", exception.getMessage());
 
         controller.chooseAlien("Davide", new HashMap<>(Map.of(39, AlienType.CANNON)));
 
@@ -434,6 +449,32 @@ public class GameSimulationTest {
         controller.drawCard("Tommaso");
 
         // First War Line
+
+        exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.activateCannons("Tommaso", new ArrayList<>(List.of(14)), new ArrayList<>(List.of(96)));
+        });
+        assertEquals("Battery component not valid", exception.getMessage());
+
+        exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.activateCannons("Tommaso", new ArrayList<>(List.of(16)), new ArrayList<>(List.of(118)));
+        });
+        assertEquals("Cannon component not valid", exception.getMessage());
+
+        exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.activateCannons("Tommaso", new ArrayList<>(List.of(16)), new ArrayList<>(List.of(102)));
+        });
+        assertEquals("Cannon component 102 is not double", exception.getMessage());
+
+        exception = assertThrows(RuntimeException.class, () -> {
+            controller.activateCannons("Tommaso", new ArrayList<>(List.of(16)), new ArrayList<>(List.of(134, 131)));
+        });
+        assertEquals("Inconsistent number of batteries", exception.getMessage());
+
+        exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.activateCannons("Tommaso", new ArrayList<>(List.of(16, 16)), new ArrayList<>(List.of(134, 134)));
+        });
+        assertEquals("Duplicate cannons", exception.getMessage());
+
         controller.activateCannons("Tommaso", new ArrayList<>(List.of(16, 16)), new ArrayList<>(List.of(134, 131)));
         assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().getBatteries());
 
@@ -448,6 +489,16 @@ public class GameSimulationTest {
 
         controller.activateEngines("Simone", new ArrayList<>(), new ArrayList<>());
         assertEquals(5, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().getBatteries());
+
+        exception = assertThrows(BatteryComponentNotValidException.class, () -> {
+            controller.updateGoods("Simone", new HashMap<>(), new ArrayList<>(List.of(14, 14)));
+        });
+        assertEquals("Too few battery components provided", exception.getMessage());
+
+        exception = assertThrows(BatteryComponentNotValidException.class, () -> {
+            controller.updateGoods("Simone", new HashMap<>(), new ArrayList<>(List.of(14, 14, 3, 3)));
+        });
+        assertEquals("Too many battery components provided", exception.getMessage());
 
         controller.updateGoods("Simone", new HashMap<>(), new ArrayList<>(List.of(14, 14, 3)));
         assertEquals(2, controller.getModel().getBoard().getPlayerEntityByUsername("Simone").getShip().getBatteries());
@@ -537,6 +588,17 @@ public class GameSimulationTest {
 
         controller.getIndex("Tommaso", 0);
         controller.getIndex("Simone", 2);
+
+        exception = assertThrows(IllegalArgumentException.class, () -> {
+            controller.getIndex("Davide", 0);
+        });
+        assertEquals("Planet not valid or already occupied", exception.getMessage());
+
+        exception = assertThrows(IllegalArgumentException.class, () -> {
+            controller.getIndex("Davide", 6);
+        });
+        assertEquals("Planet not valid or already occupied", exception.getMessage());
+
         controller.getIndex("Davide", 1);
 
         List<ColorType> good = new ArrayList<>(List.of(ColorType.GREEN));
@@ -653,6 +715,11 @@ public class GameSimulationTest {
         if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
         controller.chooseShipPart("Tommaso", 0);
+
+        exception = assertThrows(IndexOutOfBoundsException.class, () -> {
+            controller.chooseShipPart("Simone", 3);
+        });
+        assertEquals("Part index not valid", exception.getMessage());
 
         controller.chooseShipPart("Simone", 0);
 
@@ -1114,6 +1181,25 @@ public class GameSimulationTest {
         // Player 4 Ship Check
 
         // Alien Management
+        Exception exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.chooseAlien("Davide", new HashMap<>(Map.of(39, AlienType.ENGINE, 41, AlienType.CANNON)));
+        });
+        assertEquals("Cabin component not valid", exception.getMessage());
+
+        exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.chooseAlien("Davide", new HashMap<>(Map.of(34, AlienType.ENGINE, 41, AlienType.CANNON)));
+        });
+        assertEquals("Alien isn't compatible with staring cabin tile", exception.getMessage());
+
+        exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.chooseAlien("Davide", new HashMap<>(Map.of(45, AlienType.ENGINE)));
+        });
+        assertEquals("Alien ENGINE is not compatible with this cabin", exception.getMessage());
+
+        exception = assertThrows(ComponentNotValidException.class, () -> {
+            controller.chooseAlien("Davide", new HashMap<>(Map.of(51, AlienType.CANNON, 41, AlienType.CANNON)));
+        });
+        assertEquals("Alien CANNON is already present in the ship", exception.getMessage());
 
         controller.chooseAlien("Davide", new HashMap<>(Map.of(51, AlienType.ENGINE, 41, AlienType.CANNON)));
         controller.chooseAlien("Simone", new HashMap<>(Map.of(39, AlienType.CANNON)));
@@ -1411,6 +1497,11 @@ public class GameSimulationTest {
 
         controller.getBoolean("Davide", true);
 
+        exception = assertThrows(CabinComponentNotValidException.class, () -> {
+            controller.removeCrew("Davide", new ArrayList<>(List.of(45, 45, 45, 51, 34)));
+        });
+        assertEquals("Not enough crew in a cabin", exception.getMessage());
+
         controller.removeCrew("Davide", new ArrayList<>(List.of(45, 45, 41, 51, 34)));
 
         assertEquals(-2, controller.getModel().getBoard().getPlayers()
@@ -1547,6 +1638,11 @@ public class GameSimulationTest {
         toRemoveTilesIDs.add(88);
 
         controller.checkShip("Simone", toRemoveTilesIDs);
+
+        exception = assertThrows(IllegalStateException.class, () -> {
+            controller.activateEngines("Tommaso", new ArrayList<>(), new ArrayList<>());
+        });
+        assertEquals("State is not WAIT_ENGINES", exception.getMessage());
 
         controller.drawCard("Tommaso");
 
