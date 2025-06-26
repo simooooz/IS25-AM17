@@ -1,9 +1,7 @@
 package it.polimi.ingsw.network.socket.client;
 
 import it.polimi.ingsw.network.exceptions.ClientException;
-import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
-import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.network.socket.Sense;
 
 public class ListenLoopOfClient extends Thread {
@@ -23,7 +21,7 @@ public class ListenLoopOfClient extends Thread {
 
                 if (!(read instanceof Sense)) {
                     Message message = (Message) read;
-                    System.out.println("[CLIENT LISTEN LOOP] Received message: " + message.getMessageType());
+                    // System.out.println("[CLIENT LISTEN LOOP] Received message: " + message.getMessageType());
                     this.clientSocket.receive(message);
                 }
 

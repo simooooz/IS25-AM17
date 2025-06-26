@@ -4,8 +4,8 @@ import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.network.User;
 import it.polimi.ingsw.network.exceptions.ServerException;
-import it.polimi.ingsw.network.messages.ErrorMessage;
 import it.polimi.ingsw.network.messages.Message;
+import it.polimi.ingsw.network.messages.MessageType;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,7 +33,7 @@ public class ClientHandler extends User {
      * @throws IOException if there's an error setting up the connection
      */
     public ClientHandler(String connectionCode, Socket socket) throws IOException {
-        super(connectionCode, false, null);
+        super(connectionCode, null);
         this.socket = socket;
         this.output = new ObjectOutputStream(socket.getOutputStream());
         this.input = new ObjectInputStream(socket.getInputStream());
@@ -46,7 +46,7 @@ public class ClientHandler extends User {
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {
-            Server.getInstance().closeConnection(connectionCode);
+            SocketServer.getInstance().closeConnection(connectionCode);
         }
     }
 
@@ -54,19 +54,18 @@ public class ClientHandler extends User {
         try {
             return input.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            Server.getInstance().closeConnection(connectionCode);
+            SocketServer.getInstance().closeConnection(connectionCode);
             throw new ServerException("[CLIENT CONNECTION] Object is null or could not be read");
         }
     }
 
     @Override
-    public void sendGameEvent(GameEvent gameEvent) {
-        Message message = Constants.createMessage(gameEvent.eventType(), gameEvent.getArgs());
+    public void sendEvent(GameEvent event) {
+        Message message = Constants.createMessage(event.eventType(), event.getArgs());
 
         try {
             sendObject(message);
         } catch (ServerException e) {
-            e.printStackTrace();
             // Everything should be closed
         }
     }
@@ -75,10 +74,10 @@ public class ClientHandler extends User {
         try {
             message.execute(this);
         } catch (RuntimeException e) {
-            e.printStackTrace();
-            System.err.println("[CLIENT HANDLER] Receive method has caught a RuntimeException: " + e.getMessage());
+            // System.err.println("[CLIENT HANDLER] Receive method has caught a RuntimeException: " + e.getMessage());
             try {
-                this.sendObject(new ErrorMessage(e.getMessage()));
+                Message errorMessage = Constants.createMessage(MessageType.ERROR, e.getMessage());
+                this.sendObject(errorMessage);
             } catch (ServerException e1) {
                 // Everything should be closed
             }

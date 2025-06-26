@@ -511,9 +511,12 @@ public class ViewTui implements UserInterface {
 
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
-    public void start(int networkType) {
+    public void start(int networkType, String ip) {
 
-        client = networkType == 1 ? new ClientSocket(this) : new RMIClient(this);
+        if (ip.isBlank())
+            client = networkType == 1 ? new ClientSocket(this) : new RMIClient(this);
+        else
+            client = networkType == 1 ? new ClientSocket(this, ip) : new RMIClient(this, ip);
 
         clear();
         System.out.println("Welcome to");

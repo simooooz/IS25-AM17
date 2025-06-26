@@ -109,7 +109,7 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
     @Override
     public void registerClient(String sessionCode, ClientCallbackInterface callback) throws RemoteException {
         synchronized (sessions) {
-            sessions.put(sessionCode, new User(sessionCode,true, callback));
+            sessions.put(sessionCode, new User(sessionCode, callback));
         }
     }
 
@@ -128,8 +128,6 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
         user.setLastPing(System.currentTimeMillis());
     }
 
-    // Returns a boolean value
-    // true if username has been set, otherwise false
     @Override
     public void setUsernameHandler(String sessionCode, String username) throws RemoteException {
         User user = getUserInRmiSessions(sessionCode);

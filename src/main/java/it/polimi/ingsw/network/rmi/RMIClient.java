@@ -32,6 +32,22 @@ public class RMIClient extends Client {
     public RMIClient(UserInterface ui) {
         super(ui);
         this.sessionCode = UUID.randomUUID().toString();
+        connect();
+
+        // Start sending ping
+        scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
+    }
+
+    public RMIClient(UserInterface ui, String ip) {
+        super(ui);
+        this.sessionCode = UUID.randomUUID().toString();
+        connect(ip);
+
+        // Start sending ping
+        scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
+    }
+
+    private void connect() {
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
             try {
@@ -46,24 +62,47 @@ public class RMIClient extends Client {
                 break;
 
             } catch (ClientException | NotBoundException | RemoteException e) {
-                if (attempt == Constants.MAX_RETRIES) {
-                    System.out.println("[RMI CLIENT] Could not find or connect to server");
-                    System.exit(-1);
-                }
-
-                int delay = Math.min(Constants.BASE_DELAY * (int) Math.pow(2, attempt - 1), Constants.MAX_DELAY);
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    System.exit(-1);
-                }
+                backoff(attempt);
             }
 
         }
+    }
 
-        // Start sending ping
-        scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
+    private void connect(String ip) {
+        for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
+
+            try {
+                ServerInfo serverInfo = DiscoveryClient.findServer();
+                if (serverInfo == null) throw new ClientException();
+
+                Registry registry = LocateRegistry.getRegistry(ip, Constants.DEFAULT_RMI_PORT);
+                server = (RMIServerInterface) registry.lookup("ServerRMI");
+
+                clientCallback = new ClientCallback(this);
+                server.registerClient(sessionCode, clientCallback);
+                break;
+
+            } catch (ClientException | NotBoundException | RemoteException e) {
+                backoff(attempt);
+            }
+
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    private void backoff(int attempt) {
+        if (attempt == Constants.MAX_RETRIES) {
+            System.out.println("[RMI CLIENT] Could not find or connect to server");
+            System.exit(-1);
+        }
+
+        int delay = Math.min(Constants.BASE_DELAY * (int) Math.pow(2, attempt - 1), Constants.MAX_DELAY);
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            System.exit(-1);
+        }
     }
 
     private void sendPing() {
@@ -106,6 +145,7 @@ public class RMIClient extends Client {
                 case MOVE_COMPONENT -> server.moveComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
                 case ROTATE_COMPONENT -> server.rotateComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1]);
                 case LOOK_CARD_PILE -> server.lookCardPileHandler(sessionCode, (Integer) args[0]);
+                case RELEASE_CARD_PILE -> server.releaseCardPileHandler(sessionCode);
                 case MOVE_HOURGLASS -> server.moveHourglassHandler(sessionCode);
                 case SET_READY -> server.setReadyHandler(sessionCode);
                 case CHECK_SHIP -> server.checkShipHandler(sessionCode, (List<Integer>) args[0]);
@@ -123,8 +163,6 @@ public class RMIClient extends Client {
                 case END_FLIGHT -> server.endFlightHandler(sessionCode);
             }
         } catch (RemoteException | RuntimeException e) {
-            System.out.println("[RMI CLIENT] Remote exception: " + e.getMessage());
-            e.printStackTrace();
             ui.displayError(e.getMessage());
         }
     }

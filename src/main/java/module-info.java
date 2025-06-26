@@ -40,8 +40,12 @@ module it.polimi.ingsw {
     opens it.polimi.ingsw.client.model.cards.utils to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.common.model.enums to com.fasterxml.jackson.databind;
 
+    exports it.polimi.ingsw.network;
+    exports it.polimi.ingsw.network.socket.client;
+    exports it.polimi.ingsw.network.socket.server;
     exports it.polimi.ingsw.network.rmi to java.rmi;
 
+    exports it.polimi.ingsw.view;
     exports it.polimi.ingsw.view.GUI.fxmlcontroller to javafx.graphics, javafx.fxml;
     opens it.polimi.ingsw.view.GUI.fxmlcontroller to javafx.fxml;
 }

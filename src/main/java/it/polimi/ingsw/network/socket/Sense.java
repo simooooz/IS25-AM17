@@ -1,8 +1,5 @@
 package it.polimi.ingsw.network.socket;
 
-import it.polimi.ingsw.network.exceptions.ServerException;
-import it.polimi.ingsw.network.socket.server.Server;
-
 import java.io.Serializable;
 
 /**

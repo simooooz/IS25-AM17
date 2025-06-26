@@ -23,24 +23,22 @@ public class User {
     private final static List<User> activeUsers = new ArrayList<>();
     private final static List<User> inactiveUsers = new ArrayList<>();
 
+    private long lastPing;
     protected final String connectionCode;
     protected String username;
     private UserState state;
     private Lobby lobby;
 
     private final ClientCallbackInterface callback;
-    private long lastPing; // RMI only
 
-    public User(String connectionCode, boolean isRMI, ClientCallbackInterface callback) {
+    public User(String connectionCode, ClientCallbackInterface callback) {
         this.connectionCode = connectionCode;
         this.username = null;
         this.state = UserState.USERNAME;
         this.lobby = null;
 
         this.callback = callback;
-        if (isRMI) {
-            lastPing = System.currentTimeMillis();
-        }
+        lastPing = System.currentTimeMillis();
 
         synchronized (activeUsers) {
             activeUsers.add(this);
@@ -48,41 +46,37 @@ public class User {
     }
 
     public void notifyEvents(List<GameEvent> events) {
-        if (events.size() == 1) notifyGameEvent(events.getFirst());
+        if (events.size() == 1) notifyEvent(events.getFirst());
         else {
-            notifyGameEvent(new BatchStartedEvent());
+            notifyEvent(new BatchStartedEvent());
             for (GameEvent event : events)
-                notifyGameEvent(event);
-            notifyGameEvent(new BatchEndedEvent());
+                notifyEvent(event);
+            notifyEvent(new BatchEndedEvent());
         }
     }
 
-    public void notifyGameEvent(GameEvent gameEvent) {
+    public void notifyEvent(GameEvent event) {
         List<String> playersToNotify = new ArrayList<>();
-        if ((gameEvent.getVisibility() == EventVisibility.ALL_PLAYERS || gameEvent.getVisibility() == EventVisibility.OTHER_PLAYERS) && lobby != null)
+        if ((event.getVisibility() == EventVisibility.ALL_PLAYERS || event.getVisibility() == EventVisibility.OTHER_PLAYERS) && lobby != null)
             playersToNotify.addAll(lobby.getPlayers());
-        else if (gameEvent.getVisibility() == EventVisibility.PLAYER_ONLY)
+        else if (event.getVisibility() == EventVisibility.PLAYER_ONLY)
             playersToNotify.add(username);
-        else if (gameEvent.getVisibility() == EventVisibility.SPECIFIC_PLAYERS)
-            playersToNotify.addAll(gameEvent.getTargetPlayers());
+        else if (event.getVisibility() == EventVisibility.SPECIFIC_PLAYERS)
+            playersToNotify.addAll(event.getTargetPlayers());
 
-        if (gameEvent.getVisibility() == EventVisibility.OTHER_PLAYERS)
+        if (event.getVisibility() == EventVisibility.OTHER_PLAYERS)
             playersToNotify.remove(username);
 
         for (String playerToNotify : playersToNotify) {
             User userToNotify = User.getUser(playerToNotify);
-            userToNotify.sendGameEvent(gameEvent);
+            userToNotify.sendEvent(event);
         }
     }
 
-    // RMI -> args is list of parameters
-    // Socket -> args parameter has length 1 and is a message
-    public void sendGameEvent(GameEvent gameEvent) {
+    public void sendEvent(GameEvent event) {
         try {
-            this.getCallback().notifyGameEvent(gameEvent.eventType(), gameEvent.getArgs());
+            this.getCallback().notifyGameEvent(event.eventType(), event.getArgs());
         } catch (RemoteException e) {
-            System.out.println("[USER] Rmi callback remote exception: " + e.getMessage());
-            e.printStackTrace();
             // Error while notifying an update to a client
             // Just ignore it
         }
@@ -123,17 +117,14 @@ public class User {
         this.lobby = lobby;
     }
 
-    // RMI only
     public ClientCallbackInterface getCallback() {
         return callback;
     }
 
-    // RMI only
     public long getLastPing() {
         return lastPing;
     }
 
-    // RMI only
     public void setLastPing(long lastPing) {
         this.lastPing = lastPing;
     }

@@ -2,8 +2,6 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.controller.MatchController;
-import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
-import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
@@ -29,7 +27,7 @@ public abstract class ServerBasis {
             user.setState(UserState.LOBBY_SELECTION);
             events.add(new UsernameOkEvent(username));
         } catch (IllegalArgumentException e) {
-           user.sendGameEvent(new GameErrorEvent("Username not found"));
+           user.sendEvent(new GameErrorEvent(e.getMessage()));
            return;
         }
 
@@ -51,7 +49,7 @@ public abstract class ServerBasis {
         user.notifyEvents(events);
     }
 
-    public static void createLobby(User user, String name, Integer maxPlayers, Boolean learnerMode) throws PlayerAlreadyInException {
+    public static void createLobby(User user, String name, Integer maxPlayers, Boolean learnerMode) {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().createNewGame(user.getUsername(), maxPlayers, name, learnerMode);
@@ -62,7 +60,7 @@ public abstract class ServerBasis {
         user.notifyEvents(events);
     }
 
-    public static void joinLobby(User user, String lobbyName) throws LobbyNotFoundException, PlayerAlreadyInException {
+    public static void joinLobby(User user, String lobbyName) {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().joinGame(user.getUsername(), lobbyName);
@@ -72,7 +70,7 @@ public abstract class ServerBasis {
         user.notifyEvents(events);
     }
 
-    public static void joinRandomLobby(User user, Boolean learnerMode) throws LobbyNotFoundException, PlayerAlreadyInException {
+    public static void joinRandomLobby(User user, Boolean learnerMode) {
         if (user.getState() != UserState.LOBBY_SELECTION) throw new IllegalStateException("User is not in state LOBBY");
 
         List<GameEvent> events = MatchController.getInstance().joinRandomGame(user.getUsername(), learnerMode);

@@ -4,19 +4,27 @@ import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.ServerBasis;
 import it.polimi.ingsw.network.User;
 import it.polimi.ingsw.network.exceptions.ServerException;
+import it.polimi.ingsw.network.socket.Sense;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class Server extends ServerBasis implements Runnable {
+public class SocketServer extends ServerBasis implements Runnable {
 
-    private static Server instance;
+    private static SocketServer instance;
 
     private final ServerSocket serverSocket;
     private final HashMap<String, ClientHandler> connections;
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     /**
      * Constructor
@@ -24,7 +32,7 @@ public class Server extends ServerBasis implements Runnable {
      * @param port on which the server will listen
      * @throws ServerException if the port is invalid or the server cannot be started
      */
-    public Server(int port) throws ServerException {
+    public SocketServer(int port) throws ServerException {
         if (port < 0 || port > 65535)
             throw new ServerException("[SOCKET SERVER] Port is not valid");
 
@@ -32,7 +40,12 @@ public class Server extends ServerBasis implements Runnable {
 
         try {
             this.serverSocket = new ServerSocket(port);
+
+            // Check active clients every NETWORK_TIMEOUT * 2 (timeout is NETWORK_TIMEOUT and ping is sent every HEARTBEAT_INTERVAL)
+            scheduler.scheduleAtFixedRate(this::checkActiveClients, 10000, Constants.NETWORK_TIMEOUT * 2, TimeUnit.MILLISECONDS);
+
             System.out.println("[SOCKET SERVER] Server started on port " + port);
+
         } catch (IOException e) {
             throw new ServerException("[SOCKET SERVER] Server cannot be started: " + e.getMessage());
         }
@@ -46,7 +59,7 @@ public class Server extends ServerBasis implements Runnable {
      * @return server instance
      * @throws ServerException if the server is not instantiated
      */
-    public static Server getInstance() throws ServerException {
+    public static SocketServer getInstance() throws ServerException {
         if (instance != null) {
             return instance;
         }
@@ -60,9 +73,9 @@ public class Server extends ServerBasis implements Runnable {
      * @return the server instance
      * @throws ServerException if the server cannot be instantiated
      */
-    public static Server getInstance(int port) throws ServerException {
+    public static SocketServer getInstance(int port) throws ServerException {
         if (instance == null) {
-            instance = new Server(port);
+            instance = new SocketServer(port);
         }
         return instance;
     }
@@ -70,10 +83,9 @@ public class Server extends ServerBasis implements Runnable {
     /**
      * Opens a connection with a client
      *
-     * @return the connection code
      * @throws ServerException if there's an error accepting the client connection
      */
-    private String openConnection() throws ServerException {
+    private void openConnection() throws ServerException {
         String connectionCode = UUID.randomUUID().toString();
 
         synchronized (this.connections) {
@@ -83,7 +95,7 @@ public class Server extends ServerBasis implements Runnable {
 
         try {
             Socket socket = serverSocket.accept();
-            socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
+            // socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
             ClientHandler connection = new ClientHandler(connectionCode, socket);
 
             synchronized (this.connections) {
@@ -93,7 +105,6 @@ public class Server extends ServerBasis implements Runnable {
                 }
                 this.connections.put(connectionCode, connection);
             }
-            return connectionCode;
         } catch (IOException e) {
             throw new ServerException("[SOCKET SERVER] Error accepting client connection: " + e.getMessage());
         }
@@ -108,10 +119,32 @@ public class Server extends ServerBasis implements Runnable {
                 this.connections.remove(connectionCode);
             }
         }
-        System.out.println("[SOCKET SERVER] Connection " + connectionCode + " closed");
+    }
+
+    private void checkActiveClients() {
+        long now = System.currentTimeMillis();
+        Map<String, ClientHandler> connectionsCopy = new HashMap<>();
+
+        synchronized (connections) {
+            connectionsCopy = new HashMap<>(connectionsCopy);
+        }
+
+        for (ClientHandler clientHandler : connectionsCopy.values()) {
+            if (now - clientHandler.getLastPing() > Constants.NETWORK_TIMEOUT) {
+                try {
+                    clientHandler.sendObject(new Sense()); // Check if client is still active,
+                    clientHandler.setLastPing(System.currentTimeMillis());
+                } catch (ServerException e) {
+                    // Client not reachable
+                    // Connection has been closed by sendObject method
+                }
+            }
+        }
+
     }
 
     public void stop() {
+        scheduler.shutdownNow();
         Thread.currentThread().interrupt();
 
         synchronized (this.connections) {
@@ -136,8 +169,7 @@ public class Server extends ServerBasis implements Runnable {
         while (!Thread.interrupted()) {
 
             try {
-                String connectionCode = this.openConnection();
-                System.out.println("[SOCKET SERVER] Connection " + connectionCode + " opened");
+                this.openConnection();
             } catch (ServerException e) {
                 // Error while opening a new connection
                 // Ignore it
