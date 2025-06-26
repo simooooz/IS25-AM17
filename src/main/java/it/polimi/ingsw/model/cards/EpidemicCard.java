@@ -9,13 +9,56 @@ import it.polimi.ingsw.model.player.Ship;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Card implementation representing an epidemic outbreak event in the game.
+ * This card simulates the spread of disease among crew members in adjacent
+ * cabin components, causing crew losses due to contagion.
+ * <p>
+ * The epidemic affects all occupied cabins that are positioned adjacent to
+ * other occupied cabins on each player's ship. When the epidemic strikes,
+ * every cabin that is both occupied (contains crew) and adjacent to another
+ * occupied cabin loses one crew member, representing the spread of disease
+ * through close proximity.
+ * <p>
+ * The crew removal follows a priority system: human crew members are removed
+ * before alien crew members when both are present in the same cabin.
+ *
+ * @author Generated Javadoc
+ * @version 1.0
+ */
 public class EpidemicCard extends Card {
 
+    /**
+     * Constructs a new EpidemicCard with the specified parameters.
+     *
+     * @param id        the unique identifier of the card
+     * @param level     the level of the card
+     * @param isLearner whether this card is for learner mode
+     */
     public EpidemicCard(int id, int level, boolean isLearner) {
         super(id, level, isLearner);
     }
 
+    /**
+     * Executes the epidemic card by applying disease spread effects to all players' ships.
+     * <p>
+     * The epidemic process works as follows for each player:
+     * 1. Identifies all cabin components on the player's ship
+     * 2. Checks each pair of cabins to determine adjacency and occupancy
+     * 3. Marks cabins for crew reduction if they are both occupied and adjacent to other occupied cabins
+     * 4. Removes one crew member from each marked cabin using the priority system
+     * 5. Repeats the process for all players on the board
+     * <p>
+     * The epidemic affects cabins that meet both criteria:
+     * - The cabin contains at least one crew member (human or alien)
+     * - The cabin is physically adjacent to at least one other occupied cabin
+     * <p>
+     * This represents the realistic spread of contagious disease through close quarters.
+     *
+     * @param model the model facade providing access to game state
+     * @param board the game board containing all players and their ships
+     * @return true as the epidemic card executes immediately and completely
+     */
     @Override
     public boolean startCard(ModelFacade model, Board board) {
         for (PlayerData player : board.getPlayersByPos()) {
@@ -25,7 +68,7 @@ public class EpidemicCard extends Card {
             List<CabinComponent> toDecrease = new ArrayList<>();
 
             for (int i = 0; i < cabins.size(); i++) {
-                for (int j = i+1; j < cabins.size(); j++) {
+                for (int j = i + 1; j < cabins.size(); j++) {
 
                     if (cabins.get(i).isNearTo(cabins.get(j)) && (cabins.get(i).getHumans() > 0 || cabins.get(i).getAlien().isPresent()) && (cabins.get(j).getHumans() > 0 || cabins.get(j).getAlien().isPresent())) {
                         if (!checkEpidemic[i]) {
@@ -50,6 +93,21 @@ public class EpidemicCard extends Card {
         return true;
     }
 
+    /**
+     * Removes one crew member from the specified cabin component following priority rules.
+     * <p>
+     * The crew removal follows a hierarchical priority system to simulate realistic
+     * epidemic casualties:
+     * - If the cabin contains human crew members, removes one human
+     * - If the cabin contains no humans but has an alien, removes the alien
+     * - If the cabin is empty, no action is taken
+     * <p>
+     * This priority system reflects the assumption that human crew members are
+     * more susceptible to epidemic diseases than alien crew members.
+     *
+     * @param cabin the cabin component from which to remove crew
+     * @param ship  the ship containing the cabin, used for state updates
+     */
     private void decrementCrew(CabinComponent cabin, Ship ship) {
         if (cabin.getHumans() > 0)
             cabin.setHumans(cabin.getHumans() - 1, ship);

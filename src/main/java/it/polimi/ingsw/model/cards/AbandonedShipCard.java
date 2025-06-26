@@ -106,15 +106,12 @@ public class AbandonedShipCard extends Card {
         if (playerIndex > indexOfLeftPlayer) {
             players.remove(indexOfLeftPlayer);
             playerIndex--;
-        }
-        else if (playerIndex == indexOfLeftPlayer) {
+        } else if (playerIndex == indexOfLeftPlayer) {
             players.remove(indexOfLeftPlayer);
             return autoCheckPlayers(model);
-        }
-        else
+        } else
             players.remove(indexOfLeftPlayer);
 
         return false;
     }
-
 }
