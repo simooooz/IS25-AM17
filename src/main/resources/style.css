@@ -83,9 +83,9 @@
     -fx-translate-y: 1px;
 }
 
-.close-button {
+.close-button-small {
     -fx-font-family: 'Audiowide', monospace;
-    -fx-font-size: 16px;
+    -fx-font-size: 12px;
     -fx-background-color: linear-gradient(to bottom, #ff4444, #cc3333);
     -fx-text-fill: #ffffff;
     -fx-border-color: #ff6666;
@@ -93,6 +93,7 @@
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
     -fx-cursor: hand;
+    -fx-padding: 2px;
     -fx-effect: dropshadow(gaussian, rgba(255, 68, 68, 0.4), 4, 0, 0, 1);
 }
 
