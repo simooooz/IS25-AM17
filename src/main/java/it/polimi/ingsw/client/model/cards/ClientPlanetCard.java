@@ -88,7 +88,7 @@ public class ClientPlanetCard extends ClientCard {
         for (ClientPlayer player : board.getPlayersByPos()) {
 
             PlayerState state = model.getPlayerState(player.getUsername());
-            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + (planets.indexOf(landedPlayers.get(player.getUsername()))+1) + ")\n" : "(not landed)\n";
+            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + (planets.indexOf(landedPlayers.get(player.getUsername()))) + ")\n" : "(not landed)\n";
 
             switch (state) {
                 case DONE -> sb.append("- ").append(player.getUsername()).append(" has done ").append(landInfo);

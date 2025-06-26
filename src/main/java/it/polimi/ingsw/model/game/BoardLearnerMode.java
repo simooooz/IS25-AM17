@@ -45,17 +45,6 @@ public class BoardLearnerMode extends Board {
      * Initializes all learner mode components including simplified ships
      * and learner-specific card factory.
      *
-     * <p>During initialization:
-     * <ul>
-     * <li>Sets up component factory with standard components</li>
-     * <li>Assigns colors to players and creates learner mode ships</li>
-     * <li>Places starting cabins for each player at position (2,3,0)</li>
-     * <li>Initializes card pile with learner mode cards</li>
-     * </ul>
-     *
-     * <p>The initialization process is similar to other board modes but uses
-     * specialized learner components to provide a simplified gaming experience.
-     *
      * @param usernames the list of player usernames to initialize the game with
      * @throws IllegalArgumentException if usernames list is null or empty
      */
@@ -86,10 +75,6 @@ public class BoardLearnerMode extends Board {
      * Shuffles the card pile using simple randomization without any restrictions.
      * Unlike advanced mode, learner mode does not impose constraints on which
      * cards can appear at the top of the deck after shuffling.
-     *
-     * <p>This simplified shuffling mechanism makes the game more predictable
-     * and easier for new players to understand, removing strategic complications
-     * related to card positioning.
      */
     @Override
     public void shuffleCards() {
@@ -101,9 +86,6 @@ public class BoardLearnerMode extends Board {
      * Since learner mode focuses on simplicity, no special setup or
      * timing mechanisms are required when starting a match.
      *
-     * <p>This method intentionally performs no operations as learner mode
-     * is designed to be straightforward without complex initialization procedures.
-     *
      * @param model the model facade for managing game state (unused in learner mode)
      */
     @Override
@@ -113,8 +95,6 @@ public class BoardLearnerMode extends Board {
 
     /**
      * Card pile watching is not supported in learner mode.
-     * This feature is disabled to keep the gameplay simple and focused
-     * on basic mechanics rather than advanced strategic elements.
      *
      * @return this method does not return normally
      * @throws RuntimeException always thrown as card piles watching is not available
@@ -127,8 +107,6 @@ public class BoardLearnerMode extends Board {
 
     /**
      * Returns the board order positions for learner mode gameplay.
-     * These simplified positions provide a more straightforward turn order
-     * and player positioning system suitable for learning players.
      *
      * @return an array of integers representing the board order positions [4, 2, 1, 0]
      */
@@ -139,9 +117,6 @@ public class BoardLearnerMode extends Board {
 
     /**
      * Hourglass functionality is not supported in learner mode.
-     * Time-based mechanics are disabled to provide a pressure-free
-     * learning environment where players can take their time to understand
-     * the game mechanics.
      *
      * @param username the username of the player (unused)
      * @param model    the model facade (unused)
@@ -156,11 +131,7 @@ public class BoardLearnerMode extends Board {
 
     /**
      * Returns the reduced credit values awarded for different ranking positions
-     * in learner mode. These lower values create a more forgiving scoring system
-     * that encourages experimentation and learning rather than competitive play.
-     *
-     * <p>The reduced scoring helps new players focus on understanding game
-     * mechanics rather than worrying about maximizing points.
+     * in learner mode.
      *
      * @return an array of credit values for ranking positions [4, 3, 2, 1]
      */
@@ -171,11 +142,7 @@ public class BoardLearnerMode extends Board {
 
     /**
      * Returns the reduced reward value for having the most beautiful ship
-     * in learner mode. This lower bonus maintains the aesthetic aspect of
-     * the game while keeping scoring modest and encouraging for new players.
-     *
-     * <p>The reduced reward helps maintain game balance while still recognizing
-     * creative ship construction efforts.
+     * in learner mode.
      *
      * @return the credit reward value (2) for the most beautiful ship in learner mode
      */

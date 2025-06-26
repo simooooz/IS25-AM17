@@ -19,18 +19,6 @@ import java.util.function.Consumer;
  * Advanced mode implementation of the game board that extends the base Board class.
  * This version includes time management features and enhanced gameplay mechanics
  * such as timed rounds and specialized card handling.
- *
- * <p>The BoardAdvancedMode provides additional functionality over the standard board:
- * <ul>
- * <li>Time-based gameplay with hourglass mechanics</li>
- * <li>Card pile watching system for tracking player interactions</li>
- * <li>Enhanced ship construction with advanced mode ships</li>
- * <li>Modified scoring and ranking systems</li>
- * </ul>
- *
- * @author Generated Javadoc
- * @version 1.0
- * @since 1.0
  */
 public class BoardAdvancedMode extends Board {
 
@@ -49,15 +37,6 @@ public class BoardAdvancedMode extends Board {
      * Constructs a new BoardAdvancedMode with the specified player usernames.
      * Initializes all advanced mode components including time management,
      * specialized ships, and enhanced card factory.
-     *
-     * <p>During initialization:
-     * <ul>
-     * <li>Creates time management system</li>
-     * <li>Sets up component factory with advanced components</li>
-     * <li>Assigns colors to players and creates advanced mode ships</li>
-     * <li>Places starting cabins for each player</li>
-     * <li>Initializes card pile with advanced mode cards</li>
-     * </ul>
      *
      * @param usernames the list of player usernames to initialize the game with
      * @throws IllegalArgumentException if usernames list is null or empty
@@ -90,9 +69,6 @@ public class BoardAdvancedMode extends Board {
      * In advanced mode, the hourglass can only be moved by players who have completed
      * their ship construction when the hourglass is at position 1.
      *
-     * <p>This method validates that the player is eligible to move the hourglass
-     * and then starts the timer for the next phase of the game.
-     *
      * @param username the username of the player attempting to move the hourglass
      * @param model    the model facade for game state management
      * @param callback the callback function to handle generated game events
@@ -111,12 +87,7 @@ public class BoardAdvancedMode extends Board {
     }
 
     /**
-     * Shuffles the card pile ensuring that the first card is not a level 2 card.
-     * This method repeatedly shuffles until a non-level-2 card is at the top
-     * of the deck, maintaining game balance in advanced mode.
-     *
-     * <p>The shuffling continues until the top card's level is not equal to 2,
-     * preventing immediate access to high-level cards at the start of rounds.
+     * Shuffles the card pile ensuring that the first card is a level 2 card.
      */
     @Override
     public void shuffleCards() {
@@ -142,10 +113,6 @@ public class BoardAdvancedMode extends Board {
      * for the previous card if applicable. In advanced mode, this includes
      * additional processing for card transitions.
      *
-     * <p>If there was a previously active card (cardPilePos >= 0), this method
-     * triggers its end-card effects before proceeding with the standard
-     * card picking logic from the parent class.
-     *
      * @param model the model facade for managing game state changes
      */
     @Override
@@ -159,9 +126,6 @@ public class BoardAdvancedMode extends Board {
      * Returns the map tracking which card piles each player is watching.
      * This feature allows players to monitor specific card piles for
      * strategic planning in advanced mode.
-     *
-     * @return an unmodifiable view of the card piles watch map where
-     * keys are player usernames and values are card pile indices
      */
     @Override
     public Map<String, Integer> getCardPilesWatchMap() {
@@ -169,7 +133,7 @@ public class BoardAdvancedMode extends Board {
     }
 
     /**
-     * Returns the board order positions for advanced mode gameplay.
+     * Returns the board order starting positions for advanced mode gameplay.
      * These positions determine the turn order and player positioning
      * on the advanced mode board.
      *
@@ -194,8 +158,7 @@ public class BoardAdvancedMode extends Board {
 
     /**
      * Returns the reward value for having the most beautiful ship in advanced mode.
-     * This bonus is awarded to the player whose ship is deemed most aesthetically
-     * pleasing according to the game's criteria.
+     * (Lower number of exposed connectors)
      *
      * @return the credit reward value (4) for the most beautiful ship
      */
@@ -208,13 +171,7 @@ public class BoardAdvancedMode extends Board {
      * Converts the current board state to a Data Transfer Object (DTO)
      * including advanced mode specific information such as time remaining
      * and hourglass position.
-     *
-     * <p>This method extends the base board DTO with additional fields:
-     * <ul>
-     * <li>timeLeft - remaining time for the current phase</li>
-     * <li>hourglassPos - current position of the hourglass</li>
-     * </ul>
-     *
+
      * @return a BoardDTO containing the complete board state including
      * advanced mode specific timing information
      */

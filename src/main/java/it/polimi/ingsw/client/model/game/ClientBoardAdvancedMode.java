@@ -173,7 +173,8 @@ public class ClientBoardAdvancedMode extends ClientBoard {
 
             case END -> {
                 sb.append("\nRanking:\n");
-                for (ClientPlayer player : getAllPlayers())
+                List<ClientPlayer> ranking = getAllPlayers().stream().sorted((p1, p2) -> Integer.compare(p2.getCredits(), p1.getCredits())).toList();
+                for (ClientPlayer player : ranking)
                     sb.append("- ").append(player).append(" $").append(player.getCredits()).append("\n");
             }
         }

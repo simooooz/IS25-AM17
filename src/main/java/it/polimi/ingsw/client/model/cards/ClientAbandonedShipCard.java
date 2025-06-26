@@ -62,25 +62,26 @@ public class ClientAbandonedShipCard extends ClientCard {
 
     @Override
     public String printCardInfo(ClientGameModel model, ClientBoard board) {
+        StringBuilder str = new StringBuilder();
         for (ClientPlayer player : board.getPlayersByPos()) {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
                 case DONE -> {
-                    return "- " + player.getUsername() + " has done";
+                    str.append("- " + player.getUsername() + " has done\n");
                 }
                 case WAIT -> {
-                    return "- " + player.getUsername() + " is waiting";
+                    str.append("- " + player.getUsername() + " is waiting\n");
                 }
                 case WAIT_BOOLEAN -> {
-                    return "- " + player.getUsername() + " is choosing if visit ship or not";
+                   str.append("- " + player.getUsername() + " is choosing if visit ship or not\n");
                 }
                 case WAIT_REMOVE_CREW -> {
-                    return "- " + player.getUsername() + " is removing crew";
+                    str.append("- " + player.getUsername() + " is removing crew\n");
                 }
             }
         }
 
-        return "";
+        return str.toString();
     }
 }
