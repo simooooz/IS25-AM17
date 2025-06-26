@@ -8,7 +8,6 @@ import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.cards.utils.ClientPlanet;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
-import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,26 +84,20 @@ public class ClientPlanetCard extends ClientCard {
 
     @Override
     public String printCardInfo(ClientGameModel model, ClientBoard board) {
+        StringBuilder sb = new StringBuilder();
         for (ClientPlayer player : board.getPlayersByPos()) {
+
             PlayerState state = model.getPlayerState(player.getUsername());
-            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + (planets.indexOf(landedPlayers.get(player.getUsername()))+1) + ")" : "(not landed)";
+            String landInfo = landedPlayers.containsKey(player.getUsername()) ? "(landed at planet n." + (planets.indexOf(landedPlayers.get(player.getUsername()))+1) + ")\n" : "(not landed)\n";
 
             switch (state) {
-                case DONE -> {
-                    return "- " + player.getUsername() + " has done " + landInfo;
-                }
-                case WAIT -> {
-                    return "- " + player.getUsername() + " is waiting";
-                }
-                case WAIT_GOODS -> {
-                    return "- " + player.getUsername() + " is collecting the reward (updating goods) ";
-                }
-                case WAIT_INDEX -> {
-                    return "- " + player.getUsername() + " is choosing the planet";
-                }
+                case DONE -> sb.append("- ").append(player.getUsername()).append(" has done ").append(landInfo);
+                case WAIT -> sb.append("- ").append(player.getUsername()).append(" is waiting ").append(landInfo);
+                case WAIT_GOODS -> sb.append("- ").append(player.getUsername()).append(" is collecting the reward (updating goods)\n");
+                case WAIT_INDEX -> sb.append("- ").append(player.getUsername()).append(" is choosing the planet\n");
             }
         }
-        return "";
+        return sb.toString();
     }
 
 }

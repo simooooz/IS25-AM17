@@ -15,4 +15,17 @@ public class ClientPlanet {
         return rewards;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ClientPlanet that = (ClientPlanet) obj;
+
+        if (rewards == null && that.rewards == null) return true;
+        if (rewards == null || that.rewards == null) return false;
+        if (rewards.size() != that.rewards.size()) return false;
+
+        return rewards.equals(that.rewards);
+    }
+
 }
