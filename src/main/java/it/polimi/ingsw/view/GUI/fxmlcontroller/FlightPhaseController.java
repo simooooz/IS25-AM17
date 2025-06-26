@@ -446,7 +446,11 @@ public class FlightPhaseController implements MessageHandler {
 
         if (client.getLobby().isLearnerMode()) {
             endFlightButton.setVisible(false);
+            endFlightButton.setManaged(false);
             endFlightButton.setDisable(true);
+
+            HBox secondaryButtons = (HBox) endFlightButton.getParent();
+            secondaryButtons.setAlignment(Pos.CENTER);
         }
 
         this.overlayManager = new OverlayManager(root);
