@@ -14,7 +14,7 @@ import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
-import it.polimi.ingsw.network.socket.server.Server;
+import it.polimi.ingsw.network.socket.server.SocketServer;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -50,7 +50,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            Server.setUsername(user, castedMessage.getArg1());
+            SocketServer.setUsername(user, castedMessage.getArg1());
         }
     },
 
@@ -67,7 +67,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             TripleArgMessage<String, Integer, Boolean> castedMessage = (TripleArgMessage<String, Integer, Boolean>) message;
-            Server.createLobby(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
+            SocketServer.createLobby(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3());
         }
     },
 
@@ -84,7 +84,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Boolean> castedMessage = (SingleArgMessage<Boolean>) message;
-            Server.joinRandomLobby(user, castedMessage.getArg1());
+            SocketServer.joinRandomLobby(user, castedMessage.getArg1());
         }
     },
 
@@ -92,7 +92,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            Server.joinLobby(user, castedMessage.getArg1());
+            SocketServer.joinLobby(user, castedMessage.getArg1());
         }
     },
 
@@ -107,7 +107,7 @@ public enum MessageType {
     LEAVE_GAME {
         @Override
         public void execute(ClientHandler user, Message message) {
-            Server.leaveGame(user);
+            SocketServer.leaveGame(user);
         }
     },
 
@@ -156,7 +156,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            Server.pickComponent(user, castedMessage.getArg1());
+            SocketServer.pickComponent(user, castedMessage.getArg1());
         }
     },
 
@@ -172,7 +172,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            Server.releaseComponent(user, castedMessage.getArg1());
+            SocketServer.releaseComponent(user, castedMessage.getArg1());
         }
     },
 
@@ -188,7 +188,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            Server.reserveComponent(user, castedMessage.getArg1());
+            SocketServer.reserveComponent(user, castedMessage.getArg1());
         }
     },
 
@@ -204,7 +204,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             QuadrupleArgMessage<Integer, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<Integer, Integer, Integer, Integer>) message;
-            Server.insertComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
+            SocketServer.insertComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
         }
     },
 
@@ -220,7 +220,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             QuadrupleArgMessage<Integer, Integer, Integer, Integer> castedMessage = (QuadrupleArgMessage<Integer, Integer, Integer, Integer>) message;
-            Server.moveComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
+            SocketServer.moveComponent(user, castedMessage.getArg1(), castedMessage.getArg2(), castedMessage.getArg3(), castedMessage.getArg4());
         }
     },
 
@@ -236,7 +236,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             DoubleArgMessage<Integer, Integer> castedMessage = (DoubleArgMessage<Integer, Integer>) message;
-            Server.rotateComponent(user, castedMessage.getArg1(), castedMessage.getArg2());
+            SocketServer.rotateComponent(user, castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -260,14 +260,14 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            Server.lookCardPile(user, castedMessage.getArg1());
+            SocketServer.lookCardPile(user, castedMessage.getArg1());
         }
     },
 
     RELEASE_CARD_PILE {
         @Override
         public void execute(ClientHandler user, Message message) {
-            Server.releaseCardPile(user);
+            SocketServer.releaseCardPile(user);
         }
     },
 
@@ -291,7 +291,7 @@ public enum MessageType {
     MOVE_HOURGLASS {
         @Override
         public void execute(ClientHandler user, Message message) {
-            Server.moveHourglass(user);
+            SocketServer.moveHourglass(user);
         }
     },
 
@@ -305,7 +305,7 @@ public enum MessageType {
     SET_READY {
         @Override
         public void execute(ClientHandler user, Message message) {
-            Server.setReady(user);
+            SocketServer.setReady(user);
         }
     },
 
@@ -313,7 +313,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<List<Integer>> castedMessage = (SingleArgMessage<List<Integer>>) message;
-            Server.checkShip(user, castedMessage.getArg1());
+            SocketServer.checkShip(user, castedMessage.getArg1());
         }
     },
 
@@ -321,7 +321,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Map<Integer, AlienType>> castedMessage = (SingleArgMessage<Map<Integer, AlienType>>) message;
-            Server.chooseAlien(user, castedMessage.getArg1());
+            SocketServer.chooseAlien(user, castedMessage.getArg1());
         }
     },
 
@@ -329,7 +329,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            Server.chooseShipPart(user, castedMessage.getArg1());
+            SocketServer.chooseShipPart(user, castedMessage.getArg1());
         }
     },
 
@@ -352,7 +352,7 @@ public enum MessageType {
     DRAW_CARD {
         @Override
         public void execute(ClientHandler user, Message message) {
-            Server.drawCard(user);
+            SocketServer.drawCard(user);
         }
     },
 
@@ -378,7 +378,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             DoubleArgMessage<List<Integer>, List<Integer>> castedMessage = (DoubleArgMessage<List<Integer>, List<Integer>>) message;
-            Server.activateCannons(user, castedMessage.getArg1(), castedMessage.getArg2());
+            SocketServer.activateCannons(user, castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -386,7 +386,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             DoubleArgMessage<List<Integer>, List<Integer>> castedMessage = (DoubleArgMessage<List<Integer>, List<Integer>>) message;
-            Server.activateEngines(user, castedMessage.getArg1(), castedMessage.getArg2());
+            SocketServer.activateEngines(user, castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -394,7 +394,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            Server.activateShield(user, castedMessage.getArg1());
+            SocketServer.activateShield(user, castedMessage.getArg1());
         }
     },
 
@@ -410,7 +410,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             DoubleArgMessage<Map<Integer, List<ColorType>>, List<Integer>> castedMessage = (DoubleArgMessage<Map<Integer, List<ColorType>>, List<Integer>>) message;
-            Server.updateGoods(user, castedMessage.getArg1(), castedMessage.getArg2());
+            SocketServer.updateGoods(user, castedMessage.getArg1(), castedMessage.getArg2());
         }
     },
 
@@ -426,7 +426,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<List<Integer>> castedMessage = (SingleArgMessage<List<Integer>>) message;
-            Server.removeCrew(user, castedMessage.getArg1());
+            SocketServer.removeCrew(user, castedMessage.getArg1());
         }
     },
 
@@ -449,7 +449,7 @@ public enum MessageType {
     ROLL_DICES {
         @Override
         public void execute(ClientHandler user, Message message) {
-            Server.rollDices(user);
+            SocketServer.rollDices(user);
         }
     },
 
@@ -457,7 +457,7 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Boolean> castedMessage = (SingleArgMessage<Boolean>) message;
-            Server.getBoolean(user, castedMessage.getArg1());
+            SocketServer.getBoolean(user, castedMessage.getArg1());
         }
     },
 
@@ -465,14 +465,14 @@ public enum MessageType {
         @Override
         public void execute(ClientHandler user, Message message) {
             SingleArgMessage<Integer> castedMessage = (SingleArgMessage<Integer>) message;
-            Server.getIndex(user, castedMessage.getArg1());
+            SocketServer.getIndex(user, castedMessage.getArg1());
         }
     },
 
     END_FLIGHT {
         @Override
         public void execute(ClientHandler user, Message message) {
-            Server.endFlight(user);
+            SocketServer.endFlight(user);
         }
     },
 

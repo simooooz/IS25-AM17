@@ -4,7 +4,13 @@ import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.network.messages.*;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class Constants {
 
@@ -137,10 +143,51 @@ public abstract class Constants {
             case 2 -> message = new DoubleArgMessage<>(gameEvent, args[0], args[1]);
             case 3 -> message = new TripleArgMessage<>(gameEvent, args[0], args[1], args[2]);
             case 4 -> message = new QuadrupleArgMessage<>(gameEvent, args[0], args[1], args[2], args[3]);
-            default -> message = new ErrorMessage("Unknown message");
+            default -> message = new SingleArgMessage<>(MessageType.ERROR, "Unknown message");
         }
         return message;
     }
 
+    public static String getIPv4Address() throws SocketException {
+        String address = null;
+
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface ni = networkInterfaces.nextElement();
+
+            // Ignore inactive and virtual interfaces
+            if (!ni.isUp() || ni.isLoopback() || ni.isVirtual()) {
+                continue;
+            }
+
+            Enumeration<InetAddress> inetAddresses = ni.getInetAddresses();
+            while (inetAddresses.hasMoreElements()) {
+                InetAddress ia = inetAddresses.nextElement();
+
+                // Find IPv4 address
+                if (ia instanceof java.net.Inet4Address &&
+                        !ia.isLoopbackAddress() &&
+                        !ia.isLinkLocalAddress()) {
+                    address = ia.getHostAddress();
+                    break;
+                }
+            }
+            if (address != null) {
+                break; // Address found
+            }
+        }
+
+        return address;
+    }
+
+    public static boolean isValidIPv4(String ip) {
+        if (ip == null || ip.isEmpty())
+            return false;
+        String ipv4Regex = "^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+        Pattern pattern = Pattern.compile(ipv4Regex);
+        Matcher matcher = pattern.matcher(ip);
+        return matcher.matches();
+    }
 
 }

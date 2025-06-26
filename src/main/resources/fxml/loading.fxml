@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="128" styleClass="main-container" xmlns="http://javafx.com/javafx/23.0.1">
+
+    <!-- Header -->
+    <VBox alignment="CENTER">
+        <ImageView preserveRatio="true" fitWidth="800" fitHeight="300">
+            <Image url="@../images/logo.png"/>
+        </ImageView>
+    </VBox>
+
+</VBox>

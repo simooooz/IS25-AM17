@@ -17,6 +17,7 @@ public class DiscoveryServer implements Runnable {
         try {
             socket = new DatagramSocket(Constants.DISCOVERY_PORT);
             socket.setBroadcast(true);
+            System.out.println("[DISCOVERY SERVER] Server started on port " + Constants.DISCOVERY_PORT);
         } catch (SocketException e) {
             throw new ServerException("Discovery server cannot be started");
         }

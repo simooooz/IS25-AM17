@@ -32,7 +32,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
     @SuppressWarnings("unchecked")
     @Override
     public void notifyGameEvent(MessageType eventType, Object... args) throws RemoteException {
-        System.out.println("[CLIENT CALLBACK] Received call notifyGameEvent " + eventType);
+
         switch (eventType) {
             case ERROR -> ClientEventBus.getInstance().publish(new GameErrorEvent((String) args[0]));
             case BATCH_START -> ClientEventBus.getInstance().startBatch();
@@ -46,9 +46,7 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
                 client.setState(UserState.IN_LOBBY);
                 client.setLobby(new ClientLobby((String) args[0], (List<String>) args[1], (Boolean) args[2], (Integer) args[3]));
             }
-            case JOINED_LOBBY_EVENT -> {
-                client.getLobby().addPlayer((String) args[0]);
-            }
+            case JOINED_LOBBY_EVENT -> client.getLobby().addPlayer((String) args[0]);
             case LEFT_LOBBY_EVENT -> {
                 if (!args[0].equals(client.getUsername()))
                     client.getLobby().removePlayer((String) args[0]);
@@ -58,16 +56,16 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
                 }
             }
 
-            case MATCH_STARTED_EVENT -> {
-                client.setState(UserState.IN_GAME);
-                client.getLobby().initGame();
-            }
             case SYNC_ALL_EVENT -> {
                 ModelDTO dto = GameStateDTOFactory.deserializeDTO((String) args[0]);
 
                 client.setState(UserState.IN_GAME);
                 ClientLobby lobby = client.getLobby();
                 lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
+            }
+            case MATCH_STARTED_EVENT -> {
+                client.setState(UserState.IN_GAME);
+                client.getLobby().initGame();
             }
             case FLIGHT_ENDED_EVENT -> client.getGameController().flightEnded((String) args[0]);
             case PLAYERS_STATE_UPDATED_EVENT -> client.getGameController().playersStateUpdated((Map<String, PlayerState>) args[0]);

@@ -7,7 +7,6 @@ import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.network.messages.MessageType;
-import it.polimi.ingsw.view.TUI.ViewTui;
 import it.polimi.ingsw.view.UserInterface;
 
 public abstract class Client {
@@ -26,10 +25,6 @@ public abstract class Client {
 
     public ClientGameController getGameController() {
         return lobby.getGame();
-    }
-
-    public UserInterface getViewTui() {
-        return ui;
     }
 
     public ClientLobby getLobby() {

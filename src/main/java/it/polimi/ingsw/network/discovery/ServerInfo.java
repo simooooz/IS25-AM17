@@ -21,11 +21,11 @@ public class ServerInfo {
     public static String getLocalIPAddress() throws SocketException {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
-            NetworkInterface iface = interfaces.nextElement();
-            if (iface.isLoopback() || !iface.isUp())
+            NetworkInterface iFace = interfaces.nextElement();
+            if (iFace.isLoopback() || !iFace.isUp())
                 continue;
 
-            Enumeration<InetAddress> addresses = iface.getInetAddresses();
+            Enumeration<InetAddress> addresses = iFace.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress addr = addresses.nextElement();
                 if (addr instanceof Inet4Address && !addr.isLoopbackAddress())
