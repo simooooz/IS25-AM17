@@ -128,6 +128,8 @@ public class ClientBoardLearnerMode extends ClientBoard {
                     for (ClientPlayer player : startingDeck)
                         sb.append("- ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
                 }
+
+                sb.append(ColorType.RED).append("  ").append(4).append("\t").append(ColorType.YELLOW).append("  ").append(3).append("\t").append(ColorType.GREEN).append("  ").append(2).append("\t").append(ColorType.BLUE).append("  ").append(   1);
             }
 
             case END -> {
