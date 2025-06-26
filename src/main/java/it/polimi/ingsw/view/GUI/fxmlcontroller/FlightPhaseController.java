@@ -43,6 +43,12 @@ import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 
+
+/**
+ * Controller class for managing the flight phase of the game in the GUI.
+ * This class handles the main game board, player interactions, drag and drop operations,
+ * and various game states during the flight phase.
+ */
 public class FlightPhaseController implements MessageHandler {
 
     @FXML public Text playersInGameLabel;
@@ -71,6 +77,10 @@ public class FlightPhaseController implements MessageHandler {
     @FXML private Label instructionLabel;
 
     @FXML private Label errorLabel;
+
+    @FXML
+    private Label cardCounterLabel;
+    private int totalCards = 0;
 
     private Client client;
     private ClientGameModel model;
@@ -423,7 +433,11 @@ public class FlightPhaseController implements MessageHandler {
         event.consume();
     };
 
-
+    /**
+     * Initializes the flight phase controller.
+     * Sets up the client connection, game model, overlay manager, status display,
+     * and instruction manager. Also configures the UI based on learner mode settings.
+     */
     @FXML
     public void initialize() {
         MessageDispatcher.getInstance().registerHandler(this);
@@ -433,6 +447,9 @@ public class FlightPhaseController implements MessageHandler {
         this.overlayManager = new OverlayManager(root);
         initializeStatus();
         initializeInstructionManager();
+
+        if (client.getLobby().isLearnerMode()) totalCards = 8;
+        else totalCards = 12;
     }
 
     private void initializeInstructionManager() {
@@ -480,6 +497,19 @@ public class FlightPhaseController implements MessageHandler {
         pointImage.setImage(points);
     }
 
+    private void updateCardCounter() {
+        cardCounterLabel.setText("Cards played: " + (client.getGameController().getModel().getBoard().getCardPile().size()) + " / " + totalCards);
+    }
+
+
+    /**
+     * Sets the image map for game components and initializes the game board.
+     * This method is called to provide the controller with the mapping between
+     * component IDs and their corresponding ImageView objects.
+     *
+     * @param imageMap A map containing component IDs as keys and their corresponding
+     *                 ImageView objects as values
+     */
     public void setImageMap(Map<Integer, ImageView> imageMap) {
         this.imageMap = imageMap;
         loadImages();
@@ -801,6 +831,7 @@ public class FlightPhaseController implements MessageHandler {
             sb.append("none");
         playersStartingDeckLabel.setText(sb.toString());
         playersStartingDeckLabel.setStyle("-fx-fill: white !important;");
+        updateCardCounter();
     }
 
     private void paneRemoveAllListeners(Pane p) {
@@ -961,7 +992,7 @@ public class FlightPhaseController implements MessageHandler {
                 });
             }
             case WAIT_ROLL_DICES -> {
-                mainButton.setText("Roll dices");
+                mainButton.setText("Roll dice");
                 mainButton.setOnAction(_ -> client.send(MessageType.ROLL_DICES));
             }
             case WAIT_SHIELD -> {
@@ -1144,6 +1175,12 @@ public class FlightPhaseController implements MessageHandler {
         statusScrollPane.setVvalue(0.0);
     }
 
+    /**
+     * Determines whether this handler can process the given message type.
+     *
+     * @param messageType The type of message to check
+     * @return true if this handler can process the message type, false otherwise
+     */
     @Override
     public boolean canHandle(MessageType messageType) {
         return List.of(
@@ -1164,6 +1201,13 @@ public class FlightPhaseController implements MessageHandler {
         ).contains(messageType);
     }
 
+    /**
+     * Handles incoming game events and updates the UI accordingly.
+     * This method processes various types of game events such as player state updates,
+     * component destruction, battery updates, crew updates, goods updates, and more.
+     *
+     * @param event The game event to handle
+     */
     @Override
     public void handleMessage(GameEvent event) {
         switch (event) {
