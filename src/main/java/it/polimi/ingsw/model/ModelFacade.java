@@ -464,7 +464,8 @@ public abstract class ModelFacade {
             if (finish) { board.pickNewCard(this); }
         }
 
-        setPlayerState(player.getUsername(), PlayerState.WAIT);
+        if (getPlayerState(username) != PlayerState.END)
+            setPlayerState(username, PlayerState.WAIT);
     }
 
     public void rejoinGame(String username) {

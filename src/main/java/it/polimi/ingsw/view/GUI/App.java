@@ -85,9 +85,4 @@ public class App extends Application implements UserInterface {
         });
     }
 
-    @Override
-    public void clear() {
-        // TODO
-    }
-
 }

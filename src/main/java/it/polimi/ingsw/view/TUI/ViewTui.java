@@ -493,7 +493,6 @@ public class ViewTui implements UserInterface {
         }
     }
 
-    @Override
     public void clear() {
         try {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -512,7 +511,10 @@ public class ViewTui implements UserInterface {
 
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
-    public void start() {
+    public void start(int networkType) {
+
+        client = networkType == 1 ? new ClientSocket(this) : new RMIClient(this);
+
         clear();
         System.out.println("Welcome to");
         Chroma.println(
@@ -530,15 +532,6 @@ public class ViewTui implements UserInterface {
         try {
             System.out.print("Press ENTER to continue...");
             reader.readLine();
-
-            int clientType = InputUtility.requestInt("Press 1 to choose socket client or 2 for RMI: ", false, 1, 2);
-
-            if (clientType == 1)
-                client = new ClientSocket(this);
-            else if (clientType == 2)
-                client = new RMIClient(this);
-            else
-                System.exit(-1);
 
             displayUpdater.updateDisplay();
 

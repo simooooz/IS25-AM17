@@ -60,6 +60,7 @@ public class MenuController implements MessageHandler {
     @FXML
     private void handleExitGame() {
         Platform.exit();
+        System.exit(0);
     }
 
     @FXML
