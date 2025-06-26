@@ -8,7 +8,6 @@ import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.common.model.Pair;
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,20 +81,19 @@ public class ClientCombatZoneCard extends ClientCard {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> str.append("- " + player.getUsername()).append(" has done" + "\n");
-                case WAIT -> str.append("- " + player.getUsername() + " is waiting" +"\n");
-                case WAIT_SHIP_PART -> str.append("- " + player.getUsername() + " is choosing which part of ship to keep" + "\n");
-                case WAIT_SHIELD -> str.append("- " + player.getUsername() + " is choosing if activate a shield or not" + "\n");
-                case WAIT_REMOVE_GOODS -> str.append("- " + player.getUsername() + " has to pay his penalty (removing goods)" + "\n");
-                case WAIT_REMOVE_CREW -> str.append("- " + player.getUsername() + " has to pay his penalty (removing crew)" + "\n");
-                case WAIT_CANNONS -> str.append("- " + player.getUsername() + " is choosing if activate double cannons or not" + "\n");
-                case WAIT_ENGINES -> str.append("- " + player.getUsername() + " is choosing if activate double engines or not" + "\n");
-                case WAIT_ROLL_DICES -> str.append("- " + player.getUsername() + " is rolling dices" + "\n");
+                case DONE -> str.append("- ").append(player.getUsername()).append(" has done\n");
+                case WAIT -> str.append("- ").append(player.getUsername()).append(" is waiting\n");
+                case WAIT_SHIP_PART -> str.append("- ").append(player.getUsername()).append(" is choosing which part of ship to keep\n");
+                case WAIT_SHIELD -> str.append("- ").append(player.getUsername()).append(" is choosing if activate a shield or not\n");
+                case WAIT_REMOVE_GOODS -> str.append("- ").append(player.getUsername()).append(" has to pay his penalty (removing goods)\n");
+                case WAIT_REMOVE_CREW -> str.append("- ").append(player.getUsername()).append(" has to pay his penalty (removing crew)\n");
+                case WAIT_CANNONS -> str.append("- ").append(player.getUsername()).append(" is choosing if activate double cannons or not\n");
+                case WAIT_ENGINES -> str.append("- ").append(player.getUsername()).append(" is choosing if activate double engines or not\n");
+                case WAIT_ROLL_DICES -> str.append("- ").append(player.getUsername()).append(" is rolling dices\n");
             }
         }
-        str.append("Fighting at war line n." + (warLineIndex+1));
-        str.append("\n");
-        worst.getKey().ifPresent(p -> str.append("Actually the worst player is " + p + " with a score of " + worst.getValue() + "\n"));
+        str.append("Fighting at war line n.").append(warLineIndex + 1).append("\n");
+        worst.getKey().ifPresent(p -> str.append("Actually the worst player is ").append(p).append(" with a score of ").append(worst.getValue()));
         return str.toString();
     }
 

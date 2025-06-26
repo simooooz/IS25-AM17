@@ -10,7 +10,7 @@ import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
-import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 import it.polimi.ingsw.network.UserState;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.network.socket.server.ClientHandler;
@@ -28,7 +28,7 @@ public enum MessageType {
         @Override
         public void execute(ClientSocket client, Message message) {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
-            ClientEventBus.getInstance().publish(new GameErrorEvent(castedMessage.getArg1()));
+            ClientEventBus.getInstance().publish(new ErrorEvent(castedMessage.getArg1()));
         }
     },
 
@@ -130,9 +130,11 @@ public enum MessageType {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
             ModelDTO dto = GameStateDTOFactory.deserializeDTO(castedMessage.getArg1());
 
-            client.setState(UserState.IN_GAME);
-            ClientLobby lobby = client.getLobby();
-            lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
+            if (dto != null) {
+                client.setState(UserState.IN_GAME);
+                ClientLobby lobby = client.getLobby();
+                lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
+            }
         }
     },
 

@@ -2,16 +2,13 @@ package it.polimi.ingsw.client.model.factory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-// RIMOSSO: import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import it.polimi.ingsw.client.model.components.*;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,18 +53,11 @@ public class ClientComponentFactory {
         return startingCabins;
     }
 
-    protected JsonNode loadJsonConfig() {
+    private JsonNode loadJsonConfig() {
         ObjectMapper objectMapper = createObjectMapper();
 
         try {
-            InputStream configStream = getClass().getResourceAsStream("/factory.json");
-
-            if (configStream == null) {
-                throw new RuntimeException("Config file 'factory.json' not found in resources");
-            }
-
-            return objectMapper.readTree(configStream);
-
+            return objectMapper.readTree(getClass().getResourceAsStream("/factory.json"));
         } catch (IOException e) {
             throw new RuntimeException("Unable to parse config file", e);
         }
@@ -76,13 +66,11 @@ public class ClientComponentFactory {
     private ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Prova a registrare JDK8 module se disponibile
         try {
             Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
-            // Se arriviamo qui, la classe esiste
             objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
         } catch (ClassNotFoundException e) {
-            // JDK8 module non disponibile, continua senza
+            // JDK8 module not available, go ahead without
         }
 
         return objectMapper;
@@ -104,15 +92,19 @@ public class ClientComponentFactory {
 
         switch(type) {
             case "BatteryComponent":
-                boolean isTriple = componentJson.get("isTriple").booleanValue();;
+                boolean isTriple = componentJson.get("isTriple").booleanValue();
                 return new ClientBatteryComponent(id, connectors, isTriple);
 
-            case "CargoHoldsComponent", "SpecialCargoHoldsComponent":
+            case "CargoHoldsComponent":
                 int numberCargo = componentJson.get("number").asInt();
                 return new ClientCargoHoldsComponent(id, connectors, numberCargo);
 
+            case "SpecialCargoHoldsComponent":
+                int numberSpecialCargo = componentJson.get("number").asInt();
+                return new ClientSpecialCargoHoldsComponent(id, connectors, numberSpecialCargo);
+
             case "CabinComponent":
-                boolean isStartingCabin = componentJson.get("isStarting").booleanValue();;
+                boolean isStartingCabin = componentJson.get("isStarting").booleanValue();
                 return new ClientCabinComponent(id, connectors, isStartingCabin);
 
             case "Component":
@@ -120,7 +112,7 @@ public class ClientComponentFactory {
 
             case "EngineComponent":
                 DirectionType engineDirection = DirectionType.valueOf(componentJson.get("direction").asText());
-                boolean engineIsDouble = componentJson.get("isDouble").booleanValue();;
+                boolean engineIsDouble = componentJson.get("isDouble").booleanValue();
                 return new ClientEngineComponent(id, connectors, engineDirection, engineIsDouble);
 
             case "CannonComponent":
@@ -144,4 +136,5 @@ public class ClientComponentFactory {
                 throw new IllegalArgumentException("Unknown component type: " + type);
         }
     }
+
 }

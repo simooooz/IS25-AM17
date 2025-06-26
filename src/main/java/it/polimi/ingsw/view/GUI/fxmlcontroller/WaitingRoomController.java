@@ -3,8 +3,8 @@ package it.polimi.ingsw.view.GUI.fxmlcontroller;
 import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.client.model.game.ClientLobby;
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
+import it.polimi.ingsw.common.model.events.Event;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 import it.polimi.ingsw.common.model.events.game.MatchStartedEvent;
 import it.polimi.ingsw.common.model.events.game.SyncAllEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
@@ -161,7 +161,7 @@ public class WaitingRoomController implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(GameEvent event) {
+    public void handleMessage(Event event) {
         switch (event) {
             case JoinedLobbyEvent e -> {
                 String playerName = e.username();
@@ -190,7 +190,7 @@ public class WaitingRoomController implements MessageHandler {
                 else
                     skipBuildPhase();
             }
-            case GameErrorEvent e -> showError(e.message());
+            case ErrorEvent e -> showError(e.message());
             default -> {}
         }
     }

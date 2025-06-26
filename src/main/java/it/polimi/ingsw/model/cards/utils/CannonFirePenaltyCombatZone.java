@@ -66,7 +66,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     /**
      * Initiates the cannon fire penalty sequence by prompting for the first dice roll.
      * <p>
-     * The penalty begins with a dice roll to determine the impact coordinates
+     * The penalty begins with a dices roll to determine the impact coordinates
      * for the first cannon fire attack in the sequence.
      *
      * @param model    the model facade providing access to game state
@@ -83,7 +83,7 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
      * Processes dice roll command effects to determine cannon fire impact coordinates
      * and execute attack resolution.
      * <p>
-     * When a dice roll is completed:
+     * When a dices roll is completed:
      * 1. Records the rolled coordinates for the current cannon fire
      * 2. Executes the cannon fire attack using the rolled coordinates
      * 3. Determines the appropriate next state based on attack outcome

@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model.game.objects;
 
 import it.polimi.ingsw.common.model.events.EventContext;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.player.PlayerData;
 
@@ -109,7 +109,7 @@ public class Time {
      */
     private void rotateHourglass() {
         if (hourglassPos > 0) {
-            timeLeft = 10;
+            timeLeft = 61;
             hourglassPos--;
         }
     }
@@ -138,7 +138,7 @@ public class Time {
      * @param callback the consumer function to handle collected events when time expires
      * @throws RuntimeException if a timer is already active (timeLeft is not 0)
      */
-    public void startTimer(ModelFacade model, Consumer<List<GameEvent>> callback) {
+    public void startTimer(ModelFacade model, Consumer<List<Event>> callback) {
         if (timeLeft != 0) throw new RuntimeException("Time left is not 0");
         rotateHourglass();
 
@@ -157,7 +157,7 @@ public class Time {
                         for (PlayerData player : players)
                             model.setReady(player.getUsername());
 
-                        List<GameEvent> events = EventContext.getAndClear();
+                        List<Event> events = EventContext.getAndClear();
                         callback.accept(events);
                     }
                 }

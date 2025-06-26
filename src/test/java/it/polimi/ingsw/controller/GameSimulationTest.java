@@ -1,7 +1,7 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.cards.*;
 import it.polimi.ingsw.model.cards.utils.*;
 
@@ -11,11 +11,9 @@ import it.polimi.ingsw.model.exceptions.ComponentNotValidException;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
-import it.polimi.ingsw.model.player.PlayerData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -309,9 +307,9 @@ public class GameSimulationTest {
         controller.pickComponent("Davide", 83);
         controller.reserveComponent("Davide", 83);
 
-        controller.moveHourglass("Tommaso", new Consumer<List<GameEvent>>() {
+        controller.moveHourglass("Tommaso", new Consumer<List<Event>>() {
             @Override
-            public void accept(List<GameEvent> gameEvents) {
+            public void accept(List<Event> events) {
 
             }
         });

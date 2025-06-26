@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.model.game;
 
+import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.factory.ClientCardFactory;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
@@ -7,6 +8,7 @@ import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.common.dto.BoardDTO;
 import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 import it.polimi.ingsw.model.exceptions.PlayerNotFoundException;
 
 import java.util.AbstractMap.SimpleEntry;
@@ -33,7 +35,13 @@ public abstract class ClientBoard {
     }
 
     public ClientBoard(BoardDTO dto) {
-        this.cardPile = ClientCardFactory.deserializeCardList(dto.cardPile);
+        List<ClientCard> cards = ClientCardFactory.deserializeCardList(dto.cardPile);
+        if (cards != null)
+            this.cardPile = cards;
+        else {
+            this.cardPile = new ArrayList<>();
+            ClientEventBus.getInstance().publish(new ErrorEvent("Error while getting cards"));
+        }
     }
 
     public Map<Integer, ClientComponent> getMapIdComponents() {

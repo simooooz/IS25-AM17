@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.common.dto.BoardDTO;
 import it.polimi.ingsw.common.dto.GameStateDTOFactory;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.enums.PlayerState;
@@ -515,7 +515,7 @@ public abstract class Board {
      * @param model    the model facade for game state management
      * @param callback the callback function to handle time expiration events
      */
-    public abstract void moveHourglass(String username, ModelFacade model, Consumer<List<GameEvent>> callback);
+    public abstract void moveHourglass(String username, ModelFacade model, Consumer<List<Event>> callback);
 
     /**
      * Retrieves the board-specific starting position configuration.

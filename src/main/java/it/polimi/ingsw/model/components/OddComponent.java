@@ -43,7 +43,7 @@ public final class OddComponent extends Component {
 
     /**
      * Handles the effects of this odd component being destroyed, including alien crew management.
-     *
+     * <p>
      * When an odd component is destroyed, the method performs complex alien support validation:
      * 1. Calls the parent destruction logic to handle basic component removal
      * 2. Checks if there are any alien crew of the supported type currently on the ship

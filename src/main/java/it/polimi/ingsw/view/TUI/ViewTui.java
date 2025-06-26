@@ -10,7 +10,7 @@ import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.common.model.events.game.*;
 import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
@@ -44,14 +44,14 @@ public class ViewTui implements UserInterface {
     }
 
     @Override
-    public void onEvent(List<GameEvent> events) {
+    public void onEvent(List<Event> events) {
         boolean toUpdate = false;
-        for (GameEvent event : events) {
+        for (Event event : events) {
             if (toUpdate) break;
             switch (event) {
                 case ComponentPickedEvent _, ComponentReleasedEvent _, SyncAllEvent _, MatchStartedEvent _, HourglassMovedEvent _, CardRevealedEvent _,
                      CardUpdatedEvent _, FlightEndedEvent _, CreatedLobbyEvent _, JoinedLobbyEvent _, LeftLobbyEvent _,
-                     UsernameOkEvent _, GameErrorEvent _, PlayersStateUpdatedEvent _, PlayersPositionUpdatedEvent _, CreditsUpdatedEvent _ -> toUpdate = true;
+                     UsernameOkEvent _, ErrorEvent _, PlayersStateUpdatedEvent _, PlayersPositionUpdatedEvent _, CreditsUpdatedEvent _ -> toUpdate = true;
                 case ComponentRotatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());
                 case BatteriesUpdatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());
                 case CrewUpdatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());

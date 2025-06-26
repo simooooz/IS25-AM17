@@ -175,7 +175,7 @@ public abstract class EnemiesCard extends Card {
      * penalties applied to players who are defeated by the enemy forces.
      * <p>
      * This method is called when a player's firepower is insufficient to defeat
-     * the enemies and they must face the consequences of combat failure.
+     * the enemies, and they must face the consequences of combat failure.
      *
      * @param model  the model facade providing access to game state
      * @param player the player data for the defeated player

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.components;
 
+import it.polimi.ingsw.common.dto.CargoHoldsComponentDTO;
+import it.polimi.ingsw.common.dto.ComponentDTO;
 import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.model.exceptions.GoodNotValidException;
 import it.polimi.ingsw.common.model.enums.ColorType;
@@ -89,6 +91,17 @@ public final class CargoHoldsComponent extends SpecialCargoHoldsComponent {
             return (T) this;
         }
         throw new ClassCastException("Cannot cast CargoHoldsComponent to " + type.getName());
+    }
+
+    /**
+     * Creates a data transfer object representation of this cargo holds component.
+     * <p>
+     *
+     * @return a CargoHoldsComponentDTO containing this component's current state
+     */
+    @Override
+    public ComponentDTO toDTO() {
+        return new CargoHoldsComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), getNumber(), getGoods());
     }
 
 }

@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.events;
 
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.events.EventVisibility;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.network.messages.MessageType;
 
@@ -16,7 +16,7 @@ import it.polimi.ingsw.network.messages.MessageType;
  * @author Generated Javadoc
  * @version 1.0
  */
-public record CardUpdatedEvent(Card card) implements GameEvent {
+public record CardUpdatedEvent(Card card) implements Event {
 
     /**
      * Retrieves the message type identifier for this event.

@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.events;
 
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.events.EventVisibility;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.network.messages.MessageType;
 
@@ -19,7 +19,7 @@ import java.util.List;
  * @author Generated Javadoc
  * @version 1.0
  */
-public record CardPileLookedEvent(String username, Integer deckIndex, List<Card> cards) implements GameEvent {
+public record CardPileLookedEvent(String username, Integer deckIndex, List<Card> cards) implements Event {
 
     /**
      * Retrieves the message type identifier for this event.

@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
 import it.polimi.ingsw.client.model.player.ClientPlayer;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -95,7 +95,7 @@ public class EndController implements MessageHandler, Initializable {
     }
 
     @Override
-    public void handleMessage(GameEvent event) {
+    public void handleMessage(Event event) {
         if (Objects.requireNonNull(event) instanceof LeftLobbyEvent e) {
             if (e.username().equals(client.getUsername()))
                 SceneManager.navigateToScene("/fxml/menu.fxml", this, null);

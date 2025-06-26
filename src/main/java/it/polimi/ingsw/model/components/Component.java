@@ -74,7 +74,7 @@ public sealed class Component permits
 
     /**
      * Constructs a new Component with the specified properties.
-     * Initializes the component in a hidden, unwelded state ready for game interaction.
+     * Initializes the component in a hidden,not welded state ready for game interaction.
      *
      * @param id         the unique identifier for this component
      * @param connectors the array of connector types (North, East, South, West) defining connection capabilities
@@ -380,7 +380,7 @@ public sealed class Component permits
      * 5. Applies any requested rotations
      * 6. Emits movement events
      * <p>
-     * Only unwelded components can be moved.
+     * Only not welded components can be moved.
      *
      * @param player    the player moving this component
      * @param row       the new row position on the ship dashboard

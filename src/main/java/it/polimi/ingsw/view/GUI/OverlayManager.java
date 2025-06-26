@@ -1,16 +1,12 @@
 package it.polimi.ingsw.view.GUI;
 
-import it.polimi.ingsw.common.model.events.GameEvent;
-import javafx.event.Event;
+import it.polimi.ingsw.common.model.events.Event;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class OverlayManager {
 

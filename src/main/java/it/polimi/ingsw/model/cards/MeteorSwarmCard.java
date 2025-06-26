@@ -155,7 +155,7 @@ public class MeteorSwarmCard extends Card {
     /**
      * Processes dice roll command effects to determine meteor impact coordinates and trigger defenses.
      * <p>
-     * When a dice roll is completed:
+     * When dices roll is completed:
      * 1. Records the rolled coordinates for the current meteor
      * 2. Determines each player's required defensive response based on meteor impact
      * 3. Sets appropriate player states (DONE if unaffected, defensive actions if threatened)

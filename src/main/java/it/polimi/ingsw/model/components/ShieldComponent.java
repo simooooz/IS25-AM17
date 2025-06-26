@@ -31,7 +31,7 @@ public final class ShieldComponent extends Component {
 
     /**
      * Handles the insertion of this shield component into a player's ship with defensive system integration.
-     *
+     * <p>
      * When a shield component is inserted into the ship:
      * 1. The standard component insertion process is completed
      * 2. The shield's protected directions are registered with the ship's defensive systems
@@ -52,7 +52,7 @@ public final class ShieldComponent extends Component {
 
     /**
      * Handles shield rotation by updating both component orientation and defensive coverage.
-     *
+     * <p>
      * When a shield component is rotated:
      * 1. The standard component rotation process is completed
      * 2. The current protection directions are removed from the ship's defensive systems
@@ -79,7 +79,7 @@ public final class ShieldComponent extends Component {
 
     /**
      * Handles the effects of this shield component being destroyed, including defensive system updates.
-     *
+     * <p>
      * When a shield component is destroyed:
      * 1. The standard component destruction process is completed
      * 2. The shield's protection directions are removed from the ship's defensive systems

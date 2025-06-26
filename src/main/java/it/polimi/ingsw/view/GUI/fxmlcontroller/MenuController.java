@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
-import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
+import it.polimi.ingsw.common.model.events.Event;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -253,10 +253,10 @@ public class MenuController implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(GameEvent event) {
+    public void handleMessage(Event event) {
         switch (event) {
             case CreatedLobbyEvent _, JoinedLobbyEvent _ -> SceneManager.navigateToScene("/fxml/waitingRoom.fxml", this, null);
-            case GameErrorEvent e -> setErrorStatus(e.message());
+            case ErrorEvent e -> setErrorStatus(e.message());
             default -> {}
         }
     }

@@ -2,7 +2,6 @@ package it.polimi.ingsw.client.model.game;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.ClientGameModel;
-import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.client.model.factory.ClientComponentFactory;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
@@ -23,12 +22,10 @@ public class ClientBoardAdvancedMode extends ClientBoard {
     private int timeLeft;
     private int hourglassPos;
     private final Timer timer;
-    private final List<ClientCard> lookedCards;
 
     public ClientBoardAdvancedMode(List<String> usernames) {
         super();
         this.timer = new Timer();
-        this.lookedCards = new ArrayList<>();
 
         ClientComponentFactory componentFactory = new ClientComponentFactory();
         this.commonComponents = new ArrayList<>(componentFactory.getComponents());
@@ -56,7 +53,6 @@ public class ClientBoardAdvancedMode extends ClientBoard {
         this.timer = new Timer();
         if (timeLeft > 0) startTimer();
 
-        this.lookedCards = new ArrayList<>();
         this.mapIdComponents = new HashMap<>();
         for (Integer id : dto.mapIdComponents.keySet()) {
             ClientComponent component = GameStateDTOFactory.componentFromDTO(dto.mapIdComponents.get(id));
@@ -99,7 +95,7 @@ public class ClientBoardAdvancedMode extends ClientBoard {
 
     private void rotateHourglass() {
         if (hourglassPos > 0) {
-            timeLeft = 10;
+            timeLeft = 60;
             hourglassPos--;
         }
     }

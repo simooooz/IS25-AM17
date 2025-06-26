@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
-import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
+import it.polimi.ingsw.common.model.events.Event;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.App;
@@ -143,10 +143,10 @@ public class LoginController implements MessageHandler {
      * @param event the game event received from the network layer
      */
     @Override
-    public void handleMessage(GameEvent event) {
+    public void handleMessage(Event event) {
         switch (event) {
             case UsernameOkEvent _ -> SceneManager.navigateToScene("/fxml/menu.fxml", this, null);
-            case GameErrorEvent _ -> {
+            case ErrorEvent _ -> {
                 showError("Username already taken");
                 hideHint();
             }

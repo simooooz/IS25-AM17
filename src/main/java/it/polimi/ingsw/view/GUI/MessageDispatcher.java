@@ -1,6 +1,6 @@
 package it.polimi.ingsw.view.GUI;
 
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.view.GUI.fxmlcontroller.MessageHandler;
 import javafx.application.Platform;
 
@@ -13,7 +13,7 @@ public class MessageDispatcher {
 
     private static MessageDispatcher instance;
     private final List<MessageHandler> handlers;
-    private final Queue<GameEvent> pendingEvents = new LinkedList<>();
+    private final Queue<Event> pendingEvents = new LinkedList<>();
     private boolean isTransitioning = false;
 
     private MessageDispatcher() {
@@ -44,7 +44,7 @@ public class MessageDispatcher {
 
     private void flushPendingEvents() {
         while (!pendingEvents.isEmpty()) {
-            GameEvent event = pendingEvents.poll();
+            Event event = pendingEvents.poll();
 
             for (MessageHandler handler : handlers)
                 if (handler.canHandle(event.eventType()))
@@ -52,7 +52,7 @@ public class MessageDispatcher {
         }
     }
 
-    public void dispatchMessage(GameEvent event) {
+    public void dispatchMessage(Event event) {
         Platform.runLater(() -> {
             if (isTransitioning) {
                 pendingEvents.offer(event);

@@ -1,8 +1,8 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.client.model.ClientEventBus;
-import it.polimi.ingsw.common.model.events.GameEvent;
-import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
+import it.polimi.ingsw.common.model.events.Event;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.rmi.RMIClient;
 import it.polimi.ingsw.network.socket.client.ClientSocket;
@@ -41,14 +41,14 @@ public class App extends Application implements UserInterface {
     public static Client getClientInstance() { return client; }
 
     @Override
-    public void onEvent(List<GameEvent> events) {
-        for (GameEvent event : events)
+    public void onEvent(List<Event> events) {
+        for (Event event : events)
             Platform.runLater(() -> MessageDispatcher.getInstance().dispatchMessage(event));
     }
 
     @Override
     public void displayError(String message) {
-        MessageDispatcher.getInstance().dispatchMessage(new GameErrorEvent(message));
+        MessageDispatcher.getInstance().dispatchMessage(new ErrorEvent(message));
     }
 
 }

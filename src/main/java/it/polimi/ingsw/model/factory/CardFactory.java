@@ -76,6 +76,7 @@ public abstract class CardFactory {
             Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
             objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
         } catch (ClassNotFoundException e) {
+            // Go ahead without it
         }
 
         return objectMapper;
@@ -87,8 +88,9 @@ public abstract class CardFactory {
      * @return the root JsonNode containing all card configuration data
      * @throws RuntimeException if the configuration file cannot be found or parsed
      */
+    @SuppressWarnings("Duplicates")
     protected JsonNode loadJsonConfig() {
-        ObjectMapper objectMapper = createObjectMapper();
+        ObjectMapper objectMapper = createStaticObjectMapper();
 
         try {
             InputStream configStream = getClass().getResourceAsStream("/factory.json");
@@ -105,29 +107,13 @@ public abstract class CardFactory {
     }
 
     /**
-     * Creates a new ObjectMapper instance with JDK8 module support.
-     *
-     * @return a new configured ObjectMapper instance
-     */
-    private ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
-            objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
-        } catch (ClassNotFoundException e) {
-        }
-
-        return objectMapper;
-    }
-
-    /**
      * Creates a specific card instance from JSON configuration data.
      * <p>
      * @param cardJson the JsonNode containing the card's configuration data
      * @return a fully configured Card instance of the appropriate type
      * @throws IllegalArgumentException if the card type is unknown or configuration is invalid
      */
+    @SuppressWarnings("Duplicates")
     protected Card createCard(JsonNode cardJson) {
         String type = cardJson.get("type").asText();
         int id = cardJson.get("id").asInt();
@@ -234,12 +220,12 @@ public abstract class CardFactory {
                 return new PlanetCard(id, level, isLearner, planets, days);
 
             case "CombactZoneCard":
-                JsonNode combactArray = cardJson.get("warLines");
-                List<WarLine> combact = new ArrayList<>();
-                for (int i = 0; i < combactArray.size(); i++) {
-                    JsonNode combactJson = combactArray.get(i);
-                    CriteriaType criteria = CriteriaType.valueOf(combactJson.get("CriteriaType").asText());
-                    JsonNode penaltyJson = combactJson.get("PenaltyCombatZone");
+                JsonNode combatArray = cardJson.get("warLines");
+                List<WarLine> combat = new ArrayList<>();
+                for (int i = 0; i < combatArray.size(); i++) {
+                    JsonNode combatJson = combatArray.get(i);
+                    CriteriaType criteria = CriteriaType.valueOf(combatJson.get("CriteriaType").asText());
+                    JsonNode penaltyJson = combatJson.get("PenaltyCombatZone");
                     String penaltyType = penaltyJson.get("type").asText();
                     PenaltyCombatZone penalty;
                     if (penaltyType.equals("CountablePenaltyZone")) {
@@ -259,9 +245,9 @@ public abstract class CardFactory {
                     } else {
                         throw new IllegalArgumentException("Unknown penalty type: " + penaltyType);
                     }
-                    combact.add(new WarLine(criteria, penalty));
+                    combat.add(new WarLine(criteria, penalty));
                 }
-                return new CombatZoneCard(id, level, isLearner, combact);
+                return new CombatZoneCard(id, level, isLearner, combat);
 
             default:
                 throw new IllegalArgumentException("Unknown card type: " + type);
@@ -279,9 +265,7 @@ public abstract class CardFactory {
         try {
             return mapper.writeValueAsString(card);
         } catch (JsonProcessingException e) {
-            // TODO che faccio?
-            e.printStackTrace();
-            throw new RuntimeException("Errore serializzazione carta: " + e.getMessage(), e);
+            return null;
         }
     }
 
@@ -297,8 +281,7 @@ public abstract class CardFactory {
             JavaType listType = mapper.getTypeFactory().constructCollectionType(List.class, Card.class);
             return mapper.writerFor(listType).writeValueAsString(cards);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Errore serializzazione carta: " + e.getMessage(), e);
+            return null;
         }
     }
 }

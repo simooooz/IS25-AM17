@@ -7,10 +7,10 @@ import java.util.Map;
 
 public class EventCollector {
 
-    private final List<GameEvent> regularEvents = new ArrayList<>();
-    private final Map<String, GameEvent> uniqueEvents = new HashMap<>();
+    private final List<Event> regularEvents = new ArrayList<>();
+    private final Map<String, Event> uniqueEvents = new HashMap<>();
 
-    public void addRegularEvent(GameEvent event) {
+    public void addRegularEvent(Event event) {
         regularEvents.add(event);
     }
 
@@ -18,8 +18,8 @@ public class EventCollector {
         uniqueEvents.put(event.getUniqueKey(), event);
     }
 
-    public List<GameEvent> getEvents() {
-        List<GameEvent> allEvents = new ArrayList<>();
+    public List<Event> getEvents() {
+        List<Event> allEvents = new ArrayList<>();
         allEvents.addAll(regularEvents);
         allEvents.addAll(uniqueEvents.values());
         return allEvents;

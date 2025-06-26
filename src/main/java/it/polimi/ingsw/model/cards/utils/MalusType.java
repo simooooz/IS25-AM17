@@ -36,7 +36,7 @@ public enum MalusType {
         /**
          * Applies a movement penalty to the specified player by moving them backward
          * on the flight path by the specified number of days.
-         *
+         * <p>
          * This penalty type executes immediately as it represents time-based setbacks
          * that cannot be avoided or mitigated by player choices. The movement is
          * calculated as a negative value to represent backward progress along the journey.
@@ -67,7 +67,7 @@ public enum MalusType {
         /**
          * Initiates a goods removal penalty that requires the player to select
          * which goods to surrender from their cargo holds.
-         *
+         * <p>
          * This penalty type requires player interaction as the player must choose
          * which specific goods to give up. The penalty amount is enforced through
          * validation during the goods removal process, but the player retains
@@ -97,7 +97,7 @@ public enum MalusType {
         /**
          * Initiates a crew removal penalty that requires the player to select
          * which crew members to lose from their ship's cabins.
-         *
+         * <p>
          * This penalty type requires player interaction as the player must choose
          * which cabins to affect and which crew members (human or alien) to lose.
          * The penalty amount is enforced through validation during the crew removal

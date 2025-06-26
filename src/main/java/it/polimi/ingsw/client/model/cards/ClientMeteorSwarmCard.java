@@ -7,7 +7,6 @@ import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.cards.utils.ClientMeteor;
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,18 +61,18 @@ public class ClientMeteorSwarmCard extends ClientCard {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> str.append("- " + player.getUsername() + " has done" + "\n");
-                case WAIT -> str.append("- " + player.getUsername() + " is waiting" + "\n");
-                case WAIT_SHIP_PART -> str.append("- " + player.getUsername() + " is choosing which part of ship to keep" + "\n");
-                case WAIT_SHIELD -> str.append("- " + player.getUsername() + " is choosing if activate a shield or not" + "\n");
-                case WAIT_CANNONS -> str.append("- " + player.getUsername() + " is choosing if activate a double cannon or not" + "\n");
-                case WAIT_ROLL_DICES -> str.append("- " + player.getUsername() + " is rolling dices" + "\n");
+                case DONE -> str.append("- ").append(player.getUsername()).append(" has done\n");
+                case WAIT -> str.append("- ").append(player.getUsername()).append(" is waiting\n");
+                case WAIT_SHIP_PART -> str.append("- ").append(player.getUsername()).append(" is choosing which part of ship to keep\n");
+                case WAIT_SHIELD -> str.append("- ").append(player.getUsername()).append(" is choosing if activate a shield or not\n");
+                case WAIT_CANNONS -> str.append("- ").append(player.getUsername()).append(" is choosing if activate a double cannon or not\n");
+                case WAIT_ROLL_DICES -> str.append("- ").append(player.getUsername()).append(" is rolling dices\n");
             }
         }
         if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
-            str.append("Meteor n." + (meteorIndex+1) + " is hitting at coord: " + coords.getLast() + "\n");
+            str.append("Meteor n.").append(meteorIndex + 1).append(" is hitting at coord: ").append(coords.getLast());
         else if (meteorIndex > 0)
-            str.append("Previous meteor n." + (meteorIndex) + " has come at coord: " + coords.getLast() + "\n");
+            str.append("Previous meteor n.").append(meteorIndex).append(" has come at coord: ").append(coords.getLast());
         return str.toString();
     }
 

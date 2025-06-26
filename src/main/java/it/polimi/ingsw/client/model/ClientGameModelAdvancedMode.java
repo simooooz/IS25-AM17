@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.events.CardPileLookedEvent;
 import it.polimi.ingsw.client.model.game.ClientBoardAdvancedMode;
 import it.polimi.ingsw.common.dto.ModelDTO;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 
 import java.util.List;
 
@@ -21,7 +22,10 @@ public class ClientGameModelAdvancedMode extends ClientGameModel {
 
     @Override
     public void cardPileLooked(String username, int deckIndex, List<ClientCard> cards) {
-        ClientEventBus.getInstance().publish(new CardPileLookedEvent(username, deckIndex, cards));
+        if (cards != null)
+            ClientEventBus.getInstance().publish(new CardPileLookedEvent(username, deckIndex, cards));
+        else
+            ClientEventBus.getInstance().publish(new ErrorEvent("Error while getting cards"));
     }
 
 }

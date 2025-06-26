@@ -10,6 +10,7 @@ import it.polimi.ingsw.common.model.enums.ConnectorType;
         @JsonSubTypes.Type(value = CabinComponentDTO.class, name = "CABIN"),
         @JsonSubTypes.Type(value = CannonComponentDTO.class, name = "CANNON"),
         @JsonSubTypes.Type(value = CargoHoldsComponentDTO.class, name = "CARGO_HOLDS"),
+        @JsonSubTypes.Type(value = SpecialCargoHoldsComponentDTO.class, name = "SPECIAL_CARGO_HOLDS"),
         @JsonSubTypes.Type(value = EngineComponentDTO.class, name = "ENGINE"),
         @JsonSubTypes.Type(value = OddComponentDTO.class, name = "ODD"),
         @JsonSubTypes.Type(value = ShieldComponentDTO.class, name = "SHIELD")

@@ -6,12 +6,12 @@ public class EventContext {
 
     private static final ThreadLocal<EventCollector> collector = ThreadLocal.withInitial(EventCollector::new);
 
-    public static void emit(GameEvent event) {
+    public static void emit(Event event) {
         event.emitTo(collector.get());
     }
 
-    public static List<GameEvent> getAndClear() {
-        List<GameEvent> events = collector.get().getEvents();
+    public static List<Event> getAndClear() {
+        List<Event> events = collector.get().getEvents();
         collector.get().clear();
         return events;
     }

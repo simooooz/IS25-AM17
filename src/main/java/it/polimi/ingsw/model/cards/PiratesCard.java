@@ -155,7 +155,7 @@ public class PiratesCard extends EnemiesCard {
      * Processes dice roll command effects to determine pirate cannon fire coordinates
      * and trigger defensive responses.
      * <p>
-     * When a dice roll is completed during the retaliation phase:
+     * When dices roll is completed during the retaliation phase:
      * 1. Records the rolled coordinates for the current cannon fire
      * 2. Determines each defeated player's required defensive response
      * 3. Sets appropriate player states based on cannon fire impact

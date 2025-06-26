@@ -1,6 +1,6 @@
 package it.polimi.ingsw.client.model;
 
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class ClientEventBus {
 
     private boolean inBatch = false;
     private boolean hasPendingChanges = false;
-    private List<GameEvent> events = new ArrayList<>();
+    private final List<Event> events = new ArrayList<>();
 
     private final List<ClientEventObserver> observers = new CopyOnWriteArrayList<>();
     private static ClientEventBus instance;
@@ -41,7 +41,7 @@ public class ClientEventBus {
         }
     }
 
-    public void publish(GameEvent event) {
+    public void publish(Event event) {
         events.add(event);
 
         if (inBatch)

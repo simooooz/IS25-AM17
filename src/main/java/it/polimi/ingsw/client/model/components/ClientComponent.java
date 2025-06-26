@@ -20,7 +20,7 @@ import static it.polimi.ingsw.Constants.inTheMiddle;
  */
 public sealed class ClientComponent permits
     ClientBatteryComponent, ClientCabinComponent, ClientCannonComponent,
-    ClientCargoHoldsComponent, ClientEngineComponent, ClientOddComponent, ClientShieldComponent
+    ClientSpecialCargoHoldsComponent, ClientEngineComponent, ClientOddComponent, ClientShieldComponent
 {
 
     private final int id;

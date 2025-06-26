@@ -1,7 +1,7 @@
 package it.polimi.ingsw.network.socket.server;
 
 import it.polimi.ingsw.Constants;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.network.User;
 import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.messages.Message;
@@ -60,7 +60,7 @@ public class ClientHandler extends User {
     }
 
     @Override
-    public void sendEvent(GameEvent event) {
+    public void sendEvent(Event event) {
         Message message = Constants.createMessage(event.eventType(), event.getArgs());
 
         try {

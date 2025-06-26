@@ -1,10 +1,10 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
+import it.polimi.ingsw.common.model.events.game.ErrorEvent;
 import it.polimi.ingsw.controller.exceptions.LobbyNotFoundException;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.common.model.events.EventContext;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.common.model.enums.LobbyState;
 
@@ -58,7 +58,7 @@ public class MatchController {
      * @param maxPlayers max number of allowed players
      * @param name       lobby's name
      */
-    public synchronized List<GameEvent> createNewGame(String username, int maxPlayers, String name, boolean learnerMode) {
+    public synchronized List<Event> createNewGame(String username, int maxPlayers, String name, boolean learnerMode) {
         EventContext.clear();
 
         try {
@@ -68,7 +68,7 @@ public class MatchController {
             lobbies.put(name, lobby);
             lobby.addPlayer(username); // Join in the newly created lobby
         } catch (RuntimeException e) {
-            EventContext.emit(new GameErrorEvent(e.getMessage()));
+            EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
         return EventContext.getAndClear();
@@ -80,7 +80,7 @@ public class MatchController {
      * @param username player's username
      * @param gameID   game to join
      */
-    public synchronized List<GameEvent> joinGame(String username, String gameID) {
+    public synchronized List<Event> joinGame(String username, String gameID) {
         EventContext.clear();
 
         try {
@@ -91,7 +91,7 @@ public class MatchController {
                     .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
             lobby.addPlayer(username);
         } catch (RuntimeException e) {
-            EventContext.emit(new GameErrorEvent(e.getMessage()));
+            EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
         return EventContext.getAndClear();
@@ -102,7 +102,7 @@ public class MatchController {
      *
      * @param username player's username
      */
-    public synchronized List<GameEvent> joinRandomGame(String username, boolean learnerMode) {
+    public synchronized List<Event> joinRandomGame(String username, boolean learnerMode) {
         EventContext.clear();
 
         try {
@@ -114,7 +114,7 @@ public class MatchController {
             Lobby lobby = availableLobbies.get(new Random().nextInt(availableLobbies.size()));
             lobby.addPlayer(username);
         } catch (RuntimeException e) {
-            EventContext.emit(new GameErrorEvent(e.getMessage()));
+            EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
         return EventContext.getAndClear();
@@ -125,7 +125,7 @@ public class MatchController {
      *
      * @param username player's username
      */
-    public synchronized List<GameEvent> leaveGame(String username) {
+    public synchronized List<Event> leaveGame(String username) {
         EventContext.clear();
 
         try {
@@ -139,7 +139,7 @@ public class MatchController {
             if (lobby.toDelete())
                 lobbies.remove(lobby.getGameID());
         } catch (RuntimeException e) {
-            EventContext.emit(new GameErrorEvent(e.getMessage()));
+            EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
         return EventContext.getAndClear();
@@ -151,7 +151,7 @@ public class MatchController {
      * @param username player's username
      * @param gameID   id of lobby/game
      */
-    public synchronized List<GameEvent> rejoinGame(String username, String gameID) {
+    public synchronized List<Event> rejoinGame(String username, String gameID) {
         EventContext.clear();
 
         try {

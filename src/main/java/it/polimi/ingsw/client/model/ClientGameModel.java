@@ -167,9 +167,12 @@ public abstract class ClientGameModel {
     }
 
     public void cardRevealed(ClientCard card) {
-        board.getCardPile().add(card);
-
-        ClientEventBus.getInstance().publish(new CardRevealedEvent(card));
+        if (card != null) {
+            board.getCardPile().add(card);
+            ClientEventBus.getInstance().publish(new CardRevealedEvent(card));
+        }
+        else
+            ClientEventBus.getInstance().publish(new ErrorEvent("Error while getting card"));
     }
 
     public void batteriesUpdated(int id, int batteries) {
@@ -195,10 +198,13 @@ public abstract class ClientGameModel {
     }
 
     public void cardUpdated(ClientCard card) {
-        board.getCardPile().removeLast();
-        board.getCardPile().add(card);
-
-        ClientEventBus.getInstance().publish(new CardUpdatedEvent(card));
+        if (card != null) {
+            board.getCardPile().removeLast();
+            board.getCardPile().add(card);
+            ClientEventBus.getInstance().publish(new CardUpdatedEvent(card));
+        }
+        else
+            ClientEventBus.getInstance().publish(new ErrorEvent("Error while updating card"));
     }
 
     public void creditsUpdated(String username, Integer credits) {

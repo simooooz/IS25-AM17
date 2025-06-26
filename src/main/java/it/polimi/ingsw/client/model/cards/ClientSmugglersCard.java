@@ -7,7 +7,6 @@ import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.enums.ColorType;
-import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,15 +87,15 @@ public class ClientSmugglersCard extends ClientEnemiesCard {
             PlayerState state = model.getPlayerState(player.getUsername());
 
             switch (state) {
-                case DONE -> str.append("- " + player.getUsername() + " has done" + "\n");
-                case WAIT -> str.append("- " + player.getUsername() + " is waiting" + "\n");
-                case WAIT_BOOLEAN -> str.append("- " + player.getUsername() + " is choosing if take the reward or not" + "\n");
-                case WAIT_GOODS -> str.append("- " + player.getUsername() + " is collecting the reward (updating goods)" + "\n");
-                case WAIT_REMOVE_GOODS -> str.append("- " + player.getUsername() + " has to pay his penalty (removing goods)" + "\n");
-                case WAIT_CANNONS -> str.append("- " + player.getUsername() + " is choosing if activate double cannons or not" + "\n");
+                case DONE -> str.append("- ").append(player.getUsername()).append(" has done\n");
+                case WAIT -> str.append("- ").append(player.getUsername()).append(" is waiting\n");
+                case WAIT_BOOLEAN -> str.append("- ").append(player.getUsername()).append(" is choosing if take the reward or not\n");
+                case WAIT_GOODS -> str.append("- ").append(player.getUsername()).append(" is collecting the reward (updating goods)\n");
+                case WAIT_REMOVE_GOODS -> str.append("- ").append(player.getUsername()).append(" has to pay his penalty (removing goods)\n");
+                case WAIT_CANNONS -> str.append("- ").append(player.getUsername()).append(" is choosing if activate double cannons or not\n");
             }
         }
-        str.append("Smugglers are" + (enemiesDefeated ? " " : " not ") + "defeated" + "\n");
+        str.append("Smugglers are").append(enemiesDefeated ? " " : " not ").append("defeated\n");
         return str.toString();
     }
 

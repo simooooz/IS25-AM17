@@ -8,10 +8,8 @@ import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -116,13 +114,11 @@ public class ComponentFactory {
     private ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Prova a registrare JDK8 module se disponibile
         try {
             Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
-            // Se arriviamo qui, la classe esiste
             objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
         } catch (ClassNotFoundException e) {
-            // JDK8 module non disponibile, continua senza
+            // JDK8 module not available, go ahead without it
         }
 
         return objectMapper;
@@ -157,7 +153,6 @@ public class ComponentFactory {
         switch (type) {
             case "BatteryComponent":
                 boolean isTriple = componentJson.get("isTriple").booleanValue();
-                ;
                 return new BatteryComponent(id, connectors, isTriple);
 
             case "CargoHoldsComponent":
@@ -166,7 +161,6 @@ public class ComponentFactory {
 
             case "CabinComponent":
                 boolean isStartingCabin = componentJson.get("isStarting").booleanValue();
-                ;
                 return new CabinComponent(id, connectors, isStartingCabin);
 
             case "Component":
@@ -179,7 +173,6 @@ public class ComponentFactory {
             case "EngineComponent":
                 DirectionType engineDirection = DirectionType.valueOf(componentJson.get("direction").asText());
                 boolean engineIsDouble = componentJson.get("isDouble").booleanValue();
-                ;
                 return new EngineComponent(id, connectors, engineDirection, engineIsDouble);
 
             case "CannonComponent":

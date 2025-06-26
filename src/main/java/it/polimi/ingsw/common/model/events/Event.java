@@ -12,7 +12,7 @@ import it.polimi.ingsw.network.messages.MessageType;
 
 import java.util.List;
 
-public sealed interface GameEvent permits
+public sealed interface Event permits
         UniqueEvent, BatchStartedEvent, BatchEndedEvent, SyncAllEvent,
         MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent, ShipBrokenEvent,
         ComponentReleasedEvent, ComponentReservedEvent, ComponentRotatedEvent, ComponentDestroyedEvent,
@@ -25,7 +25,7 @@ public sealed interface GameEvent permits
     EventVisibility getVisibility();
     Object[] getArgs();
 
-    default List<String> getTargetPlayers() { return List.of(); }; // Only for SPECIFIC_PLAYERS visibility
+    default List<String> getTargetPlayers() { return List.of(); } // Only for SPECIFIC_PLAYERS visibility
 
     default String getUniqueKey() { return null; }
 

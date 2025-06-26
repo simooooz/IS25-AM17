@@ -1,13 +1,11 @@
 package it.polimi.ingsw.client.model.cards;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.view.TUI.Chroma;
 
 import java.util.ArrayList;
 import java.util.List;

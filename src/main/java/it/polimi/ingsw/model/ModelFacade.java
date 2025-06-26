@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.common.model.events.EventContext;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.common.model.events.game.*;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.enums.PlayerState;
@@ -141,7 +141,7 @@ public abstract class ModelFacade {
         EventContext.emit(new CardPileReleasedEvent(username));
     }
 
-    public void moveHourglass(String username, Consumer<List<GameEvent>> callback) {
+    public void moveHourglass(String username, Consumer<List<Event>> callback) {
         if (
             getPlayerState(username) != PlayerState.BUILD &&
             getPlayerState(username) != PlayerState.LOOK_CARD_PILE &&

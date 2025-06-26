@@ -18,12 +18,11 @@ public class GameStateDTOFactory {
     private static ObjectMapper createStaticObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // Prova a registrare JDK8 module se disponibile
         try {
             Class.forName("com.fasterxml.jackson.datatype.jdk8.Jdk8Module");
             objectMapper.registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module());
         } catch (ClassNotFoundException e) {
-            // JDK8 module non disponibile, continua senza
+            // JDK8 module not available, go ahead without
         }
 
         return objectMapper;
@@ -65,6 +64,7 @@ public class GameStateDTOFactory {
             case CabinComponentDTO cabinDTO -> new ClientCabinComponent(cabinDTO);
             case CannonComponentDTO cannonDTO -> new ClientCannonComponent(cannonDTO);
             case CargoHoldsComponentDTO cargoDTO -> new ClientCargoHoldsComponent(cargoDTO);
+            case SpecialCargoHoldsComponentDTO specialCargoDTO -> new ClientSpecialCargoHoldsComponent(specialCargoDTO);
             case EngineComponentDTO engineDTO -> new ClientEngineComponent(engineDTO);
             case OddComponentDTO oddDTO -> new ClientOddComponent(oddDTO);
             case ShieldComponentDTO shieldDTO -> new ClientShieldComponent(shieldDTO);
@@ -76,9 +76,7 @@ public class GameStateDTOFactory {
         try {
             return mapper.writeValueAsString(dto);
         } catch (JsonProcessingException e) {
-            // TODO che faccio?
-            e.printStackTrace();
-            throw new RuntimeException("Errore serializzazione DTO: " + e.getMessage(), e);
+            return null;
         }
     }
 
@@ -86,9 +84,7 @@ public class GameStateDTOFactory {
         try {
             return mapper.readValue(jsonString, ModelDTO.class);
         } catch (JsonProcessingException e) {
-            // TODO che faccio?
-            e.printStackTrace();
-            throw new RuntimeException("Errore deserializzazione DTO: " + e.getMessage(), e);
+            return null;
         }
     }
 

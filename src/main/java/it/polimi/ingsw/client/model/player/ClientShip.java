@@ -86,6 +86,7 @@ public sealed abstract class ClientShip permits
         return brokenParts;
     }
 
+    @SuppressWarnings("Duplicates")
     public void printShip(StringBuilder output) {
         output.append("    ");
         for (int col = 0; col < Constants.SHIP_COLUMNS; col++) // Column label
@@ -136,103 +137,79 @@ public sealed abstract class ClientShip permits
         output.append("\n");
     }
 
+    @SuppressWarnings("Duplicates")
     private void printShipWithColoredParts(StringBuilder output) {
-        // Array di colori per le diverse parti
-        String[] partColors = {
-                Chroma.ORANGE,
-                Chroma.CYAN,
-                Chroma.MAGENTA,
-                Chroma.MAROON,
-
-        };
-
-        // Mappa per associare ogni componente al suo gruppo/colore
+        String[] partColors = {Chroma.ORANGE, Chroma.CYAN, Chroma.MAGENTA, Chroma.MAROON};
         Map<ClientComponent, Integer> componentToGroupIndex = new HashMap<>();
-        for (int i = 0; i < brokenParts.size(); i++) {
-            for (ClientComponent component : brokenParts.get(i)) {
+        for (int i = 0; i < brokenParts.size(); i++)
+            for (ClientComponent component : brokenParts.get(i))
                 componentToGroupIndex.put(component, i);
-            }
-        }
 
-        // Stampa intestazione colonne
         output.append("    ");
-        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
+        for (int col = 0; col < Constants.SHIP_COLUMNS; col++)
             output.append(Chroma.color(String.format("       %-2d       ", col + 4), Chroma.RESET));
-        }
         output.append("\n");
 
-        // Stampa griglia nave
+        // Print ship grid
         for (int row = 0; row < Constants.SHIP_ROWS; row++) {
             for (int componentRow = 0; componentRow < 5; componentRow++) {
 
-                // Etichetta riga
-                if (componentRow == 2) {
+                if (componentRow == 2)
                     output.append((row + 5)).append("   ");
-                } else {
+                else
                     output.append("    ");
-                }
 
                 for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
                     Optional<ClientComponent> componentOpt = getDashboard(row, col);
 
                     if (componentOpt.isPresent()) {
-                        // Determina il colore del gruppo per questo componente
+                        // Get group color
                         ClientComponent component = componentOpt.get();
                         Integer groupIndex = componentToGroupIndex.get(component);
                         String partColor = partColors[groupIndex];
 
-                        // Applica il colore alle linee del componente
+                        // Apply color to component
                         String[] cellLines = component.toString().split("\n");
                         String coloredLine = Chroma.color(cellLines[componentRow], partColor);
                         output.append(coloredLine).append(" ");
                     } else {
-                        // Cella vuota con colore di sfondo
                         String bgColor = getShipBgColor(row, col);
-
-                        if (componentRow == 0) {
+                        if (componentRow == 0)
                             output.append(Chroma.color(" ┌───────────┐ ", bgColor)).append(" ");
-                        } else if (componentRow == 4) {
+                        else if (componentRow == 4)
                             output.append(Chroma.color(" └───────────┘ ", bgColor)).append(" ");
-                        } else {
+                        else
                             output.append(Chroma.color(" │           │ ", bgColor)).append(" ");
-                        }
                     }
                 }
 
-                // Etichetta riga destra
-                if (componentRow == 2) {
+                if (componentRow == 2)
                     output.append("  ").append(row + 5);
-                }
 
                 output.append("\n");
             }
             output.append("\n");
         }
 
-        // Stampa piè di pagina colonne
         output.append("    ");
-        for (int col = 0; col < Constants.SHIP_COLUMNS; col++) {
+        for (int col = 0; col < Constants.SHIP_COLUMNS; col++)
             output.append(Chroma.color(String.format("       %-2d       ", col + 4), Chroma.RESET));
-        }
         output.append("\n\n");
 
-        // Stampa legenda dei colori
+        // Print color legend
         output.append("    Groups Colors Legend\n");
         for (int i = 0; i < brokenParts.size(); i++) {
             String partColor = partColors[i];
             List<ClientComponent> group = brokenParts.get(i);
 
-            // Mostra il colore e informazioni sul gruppo
+            // Show info
             output.append(String.format("Part %d: ", i));
             output.append(Chroma.color("████", partColor));
             output.append(String.format(" (%d components)", group.size()));
 
-
             output.append("\n");
         }
     }
-
-
 
     public abstract boolean validPositions(int row, int col);
 

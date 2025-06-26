@@ -2,7 +2,6 @@ package it.polimi.ingsw.client.model.game;
 
 import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.client.model.ClientGameModel;
-import it.polimi.ingsw.client.model.cards.ClientCard;
 import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.client.model.factory.ClientComponentFactory;
 import it.polimi.ingsw.client.model.player.ClientPlayer;

@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.events;
 
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.events.EventVisibility;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.network.messages.MessageType;
 
@@ -12,7 +12,7 @@ import it.polimi.ingsw.network.messages.MessageType;
  * during normal game flow where all players need to see the same card information.
  * <p>
  */
-public record CardRevealedEvent(Card card) implements GameEvent {
+public record CardRevealedEvent(Card card) implements Event {
 
     /**
      * Retrieves the message type identifier for this event.

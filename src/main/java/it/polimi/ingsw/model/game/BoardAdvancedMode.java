@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.common.dto.BoardDTO;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.CardFactoryAdvancedMode;
@@ -100,7 +100,7 @@ public class BoardAdvancedMode extends Board {
      *                                  because they haven't finished building their ship
      */
     @Override
-    public void moveHourglass(String username, ModelFacade model, Consumer<List<GameEvent>> callback) {
+    public void moveHourglass(String username, ModelFacade model, Consumer<List<Event>> callback) {
         if (timeManagement.getHourglassPos() == 1)
             getPlayersByPos().stream()
                     .filter(player -> player.getUsername().equals(username))

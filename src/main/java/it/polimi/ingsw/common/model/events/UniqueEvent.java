@@ -2,8 +2,8 @@ package it.polimi.ingsw.common.model.events;
 
 import it.polimi.ingsw.common.model.events.game.*;
 
-public sealed interface UniqueEvent extends GameEvent permits
-        GameErrorEvent, PlayersPositionUpdatedEvent, PlayersStateUpdatedEvent,
+public sealed interface UniqueEvent extends Event permits
+        ErrorEvent, PlayersPositionUpdatedEvent, PlayersStateUpdatedEvent,
         BatteriesUpdatedEvent, CrewUpdatedEvent, GoodsUpdatedEvent, CreditsUpdatedEvent
 {
 

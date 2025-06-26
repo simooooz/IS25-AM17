@@ -14,12 +14,12 @@ import java.util.Optional;
  * Utility class representing a cannon fire attack in the game.
  * This class handles the mechanics of incoming projectile attacks against player ships,
  * including trajectory calculation, hit detection, shield interaction, and component destruction.
- *
+ * <p>
  * Cannon fire attacks have different characteristics based on their size and direction:
  * - Big cannon fires cannot be deflected by shields and always cause damage if they hit
  * - Small cannon fires can be deflected by powered shields if the ship has protection on the attack side
  * - All cannon fires follow directional trajectories and only hit components in their path
- *
+ * <p>
  * The attack system uses coordinate-based targeting where dice rolls determine the
  * specific impact location, creating dynamic and unpredictable combat scenarios.
  *
@@ -47,13 +47,13 @@ public class CannonFire {
 
     /**
      * Executes the cannon fire attack against a player's ship at the specified coordinates.
-     *
+     * <p>
      * The attack resolution follows these steps:
      * 1. Validates that the coordinates are within the valid target range (4-10)
      * 2. Identifies target components in the projectile's path from the attack direction
      * 3. Determines if the attack can be deflected by shields (small projectiles only)
      * 4. Either prompts for shield usage or immediately destroys the target component
-     *
+     * <p>
      * Shield deflection is only possible for small cannon fires when:
      * - The ship has protection on the side being attacked
      * - The ship has available battery power to activate shields
@@ -81,7 +81,7 @@ public class CannonFire {
 
     /**
      * Retrieves the target component that would be hit by this cannon fire at the specified coordinates.
-     *
+     * <p>
      * This method performs target identification without executing the attack, useful for
      * validation, preview, or conditional logic. It follows the same trajectory calculation
      * as the hit method but only returns the target component without applying damage.

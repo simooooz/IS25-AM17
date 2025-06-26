@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.factory.CardFactory;
 import it.polimi.ingsw.model.factory.CardFactoryLearnerMode;
@@ -150,7 +150,7 @@ public class BoardLearnerMode extends Board {
      *                          in learner mode
      */
     @Override
-    public void moveHourglass(String username, ModelFacade model, Consumer<List<GameEvent>> callback) {
+    public void moveHourglass(String username, ModelFacade model, Consumer<List<Event>> callback) {
         throw new RuntimeException("Hourglass is not in learner mode flight");
     }
 

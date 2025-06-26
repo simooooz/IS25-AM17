@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.ModelFacade;
 import it.polimi.ingsw.model.cards.Card;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.model.components.BatteryComponent;
-import it.polimi.ingsw.model.components.CargoHoldsComponent;
 import it.polimi.ingsw.model.components.Component;
 import it.polimi.ingsw.model.components.SpecialCargoHoldsComponent;
 import it.polimi.ingsw.model.exceptions.CabinComponentNotValidException;

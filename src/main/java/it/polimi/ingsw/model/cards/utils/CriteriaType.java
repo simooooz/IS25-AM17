@@ -39,7 +39,7 @@ public enum CriteriaType {
     CREW {
         /**
          * Evaluates a player's crew count against the current worst performer.
-         *
+         * <p>
          * Compares the player's total crew count with the current worst value,
          * updating the worst performer if this player has fewer crew members.
          * Crew evaluation always completes immediately as it requires no player action.
@@ -71,13 +71,13 @@ public enum CriteriaType {
     CANNON {
         /**
          * Evaluates a player's cannon firepower against the current worst performer.
-         *
+         * <p>
          * The evaluation process:
          * 1. Calculates free cannon power from single cannons (plus alien bonus if applicable)
          * 2. Calculates potential double cannon power (limited by available batteries)
          * 3. Determines if the player can improve their standing with double cannon activation
          * 4. Either marks them as done or prompts for cannon selection based on capabilities
-         *
+         * <p>
          * Players with sufficient free cannon power compared to the current worst are
          * automatically marked as done. Players with potential double cannon improvements
          * are prompted to choose their cannon activation strategy.
@@ -129,13 +129,13 @@ public enum CriteriaType {
     ENGINE {
         /**
          * Evaluates a player's engine power against the current worst performer.
-         *
+         * <p>
          * The evaluation process:
          * 1. Calculates free engine power from single engines (plus alien bonus if applicable)
          * 2. Calculates potential double engine power (limited by available batteries)
          * 3. Determines if the player can improve their standing with double engine activation
          * 4. Either marks them as done or prompts for engine selection based on capabilities
-         *
+         * <p>
          * Players with sufficient free engine power compared to the current worst are
          * automatically marked as done. Players with potential double engine improvements
          * are prompted to choose their engine activation strategy.

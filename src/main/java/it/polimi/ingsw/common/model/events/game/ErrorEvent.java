@@ -4,7 +4,7 @@ import it.polimi.ingsw.common.model.events.EventVisibility;
 import it.polimi.ingsw.common.model.events.UniqueEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 
-public record GameErrorEvent(String message) implements UniqueEvent {
+public record ErrorEvent(String message) implements UniqueEvent {
 
     @Override
     public MessageType eventType() {

@@ -5,7 +5,7 @@ import it.polimi.ingsw.common.model.events.BatchStartedEvent;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.MatchController;
 import it.polimi.ingsw.common.model.events.EventVisibility;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.model.game.Lobby;
 import it.polimi.ingsw.common.model.enums.LobbyState;
 import it.polimi.ingsw.network.rmi.ClientCallbackInterface;
@@ -45,17 +45,17 @@ public class User {
         }
     }
 
-    public void notifyEvents(List<GameEvent> events) {
+    public void notifyEvents(List<Event> events) {
         if (events.size() == 1) notifyEvent(events.getFirst());
         else {
             notifyEvent(new BatchStartedEvent());
-            for (GameEvent event : events)
+            for (Event event : events)
                 notifyEvent(event);
             notifyEvent(new BatchEndedEvent());
         }
     }
 
-    public void notifyEvent(GameEvent event) {
+    public void notifyEvent(Event event) {
         List<String> playersToNotify = new ArrayList<>();
         if ((event.getVisibility() == EventVisibility.ALL_PLAYERS || event.getVisibility() == EventVisibility.OTHER_PLAYERS) && lobby != null)
             playersToNotify.addAll(lobby.getPlayers());
@@ -73,7 +73,7 @@ public class User {
         }
     }
 
-    public void sendEvent(GameEvent event) {
+    public void sendEvent(Event event) {
         try {
             this.getCallback().notifyGameEvent(event.eventType(), event.getArgs());
         } catch (RemoteException e) {
@@ -158,7 +158,7 @@ public class User {
         }
 
         if (user.lobby != null) {
-            List<GameEvent> events = MatchController.getInstance().leaveGame(user.getUsername());
+            List<Event> events = MatchController.getInstance().leaveGame(user.getUsername());
             if (user.lobby.getState() == LobbyState.IN_GAME) { // Player was gaming, add to inactive users
                 synchronized (inactiveUsers) {
                     inactiveUsers.add(user);

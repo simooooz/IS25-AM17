@@ -12,7 +12,7 @@ import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.common.model.events.game.*;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
@@ -1165,7 +1165,7 @@ public class FlightPhaseController implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(GameEvent event) {
+    public void handleMessage(Event event) {
         switch (event) {
             case PlayersStateUpdatedEvent e -> {
 
@@ -1268,7 +1268,7 @@ public class FlightPhaseController implements MessageHandler {
                     endFlightButton.setVisible(false);
                 updateBoard();
             }
-            case GameErrorEvent e -> {
+            case ErrorEvent e -> {
                 errorLabel.setText(e.message());
             }
             default -> {}

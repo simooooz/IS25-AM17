@@ -33,7 +33,6 @@ import java.util.List;
 })
 public abstract class ClientCard {
 
-    // TODO stampare id e livello?
     @JsonProperty private int id;
     @JsonProperty private int level;
     @JsonProperty protected boolean isLearner;
@@ -46,6 +45,14 @@ public abstract class ClientCard {
 
     public int getId() {
         return id;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public ClientCard() {}

@@ -7,7 +7,7 @@ import it.polimi.ingsw.client.model.events.CardPileLookedEvent;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
 import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.PlayerState;
-import it.polimi.ingsw.common.model.events.GameEvent;
+import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.common.model.events.game.*;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
@@ -577,7 +577,7 @@ public class BuildController implements MessageHandler, Initializable {
 
     @SuppressWarnings("Duplicates")
     @Override
-    public void handleMessage(GameEvent event) {
+    public void handleMessage(Event event) {
         switch (event) {
             case ComponentPickedEvent e -> {
                 ClientComponent component = client.getGameController().getModel().getBoard().getMapIdComponents().get(e.id());
@@ -797,7 +797,7 @@ public class BuildController implements MessageHandler, Initializable {
                 timerContainer.setOnMouseClicked(null);
                 startCountdown();
             }
-            case GameErrorEvent e -> statusLabel.setText(e.message());
+            case ErrorEvent e -> statusLabel.setText(e.message());
             default -> {}
         }
     }
