@@ -9,6 +9,4 @@ public interface ClientCallbackInterface extends Remote {
 
     void notifyGameEvent(MessageType eventType, Object... params) throws RemoteException;
 
-    void sendPong() throws RemoteException;
-
 }

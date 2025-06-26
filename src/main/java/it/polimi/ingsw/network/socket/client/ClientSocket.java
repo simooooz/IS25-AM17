@@ -29,7 +29,6 @@ public class ClientSocket extends Client {
     private ObjectOutputStream output;
     private ObjectInputStream input;
 
-    // private HeartbeatThread heartbeatThread;
     private ListenLoopOfClient listenLoop;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -43,9 +42,6 @@ public class ClientSocket extends Client {
 
         // Start sending ping
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
-
-        // heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
-        // heartbeatThread.start();
     }
 
     public ClientSocket(UserInterface ui, String ip) {
@@ -56,9 +52,6 @@ public class ClientSocket extends Client {
 
         // Start sending ping
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
-
-        // heartbeatThread = new HeartbeatThread(this, Constants.HEARTBEAT_INTERVAL);
-        // heartbeatThread.start();
     }
 
     private void connect() {
@@ -71,7 +64,9 @@ public class ClientSocket extends Client {
                 this.socket = new Socket(serverInfo.ipAddress, serverInfo.socketPort);
                 this.output = new ObjectOutputStream(socket.getOutputStream());
                 this.input = new ObjectInputStream(socket.getInputStream());
-                // this.socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
+                this.socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
+                this.socket.setKeepAlive(true);
+                this.socket.setTcpNoDelay(true);
                 break;
 
             } catch (ClientException | IOException e) {
@@ -88,7 +83,9 @@ public class ClientSocket extends Client {
                 this.socket = new Socket(ip, Constants.DEFAULT_SOCKET_PORT);
                 this.output = new ObjectOutputStream(socket.getOutputStream());
                 this.input = new ObjectInputStream(socket.getInputStream());
-                // this.socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
+                this.socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
+                this.socket.setKeepAlive(true);
+                this.socket.setTcpNoDelay(true);
                 break;
 
             } catch (IOException e) {
@@ -131,13 +128,13 @@ public class ClientSocket extends Client {
 
         if (this.listenLoop != null && this.listenLoop.isAlive()) {
             this.listenLoop.interrupt();
+            try {
+                this.listenLoop.join(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             this.listenLoop = null;
         }
-
-//        if (this.heartbeatThread != null && this.heartbeatThread.isAlive()) {
-//            this.heartbeatThread.interrupt();
-//            this.heartbeatThread = null;
-//        }
 
         try {
             this.input.close();

@@ -101,9 +101,4 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
 
     }
 
-    @Override
-    public void sendPong() throws RemoteException {
-        // Do nothing, it servers only to check if client is active
-    }
-
 }

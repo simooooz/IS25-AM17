@@ -9,11 +9,13 @@ import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 import it.polimi.ingsw.network.User;
 
 import java.rmi.NoSuchObjectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -29,11 +31,15 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-
     public RMIServer(int port) throws ServerException {
         this.sessions = new HashMap<>();
 
         try {
+            System.setProperty("sun.rmi.transport.tcp.responseTimeout", String.valueOf(Constants.NETWORK_TIMEOUT));
+            System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", "10000");
+            System.setProperty("sun.rmi.dgc.server.gcInterval", "3600000");
+            System.setProperty("sun.rmi.dgc.client.gcInterval", "3600000");
+
             registry = LocateRegistry.createRegistry(port);
             RMIServerInterface stub = (RMIServerInterface) UnicastRemoteObject.exportObject(this, port);
             registry.rebind("ServerRMI", stub);
@@ -41,8 +47,7 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
             throw new ServerException("[RMI SERVER] Server cannot be started: " + e.getMessage());
         }
 
-        // Check active clients every NETWORK_TIMEOUT * 2 (timeout is NETWORK_TIMEOUT and ping is sent every HEARTBEAT_INTERVAL)
-        scheduler.scheduleAtFixedRate(this::checkActiveClients, 10000, Constants.NETWORK_TIMEOUT * 2, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this::checkActiveClients, Constants.SERVER_CHECK_INTERVAL, Constants.SERVER_CHECK_INTERVAL, TimeUnit.MILLISECONDS);
         System.out.println("[RMI SERVER] Server started on port " + port);
     }
 
@@ -62,10 +67,20 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
 
     public void stop() {
         scheduler.shutdownNow();
+
+        synchronized (sessions) {
+            for (String sessionCode : new HashSet<>(sessions.keySet())) {
+                unregisterClient(sessionCode);
+            }
+            sessions.clear();
+        }
+
         if (registry != null) {
             try {
+                registry.unbind("ServerRMI");
+                UnicastRemoteObject.unexportObject(this, true);
                 UnicastRemoteObject.unexportObject(registry, true);
-            } catch (NoSuchObjectException e) {
+            } catch (NotBoundException | RemoteException e) {
                 // Do nothing
             }
             System.out.println("[RMI SERVER] Server closed...");
@@ -94,14 +109,8 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
             String sessionCode = entry.getKey();
             User user = entry.getValue();
 
-            if (now - user.getLastPing() > Constants.NETWORK_TIMEOUT) {
-                try {
-                    user.getCallback().sendPong(); // Check if client is still active,
-                    user.setLastPing(System.currentTimeMillis());
-                } catch (RemoteException e) {
-                    unregisterClient(sessionCode); // Client not reachable
-                }
-            }
+            if (now - user.getLastPing() > Constants.NETWORK_TIMEOUT)
+                unregisterClient(sessionCode);
         }
 
     }
@@ -124,8 +133,12 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
 
     @Override
     public void ping(String sessionCode) throws RemoteException {
-        User user = getUserInRmiSessions(sessionCode);
-        user.setLastPing(System.currentTimeMillis());
+        try {
+            User user = getUserInRmiSessions(sessionCode);
+            user.setLastPing(System.currentTimeMillis());
+        } catch (UserNotFoundException e) {
+            throw new RemoteException("Session expired: " + sessionCode);
+        }
     }
 
     @Override

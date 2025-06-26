@@ -4,12 +4,10 @@ import it.polimi.ingsw.Constants;
 import it.polimi.ingsw.network.ServerBasis;
 import it.polimi.ingsw.network.User;
 import it.polimi.ingsw.network.exceptions.ServerException;
-import it.polimi.ingsw.network.socket.Sense;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -40,12 +38,8 @@ public class SocketServer extends ServerBasis implements Runnable {
 
         try {
             this.serverSocket = new ServerSocket(port);
-
-            // Check active clients every NETWORK_TIMEOUT * 2 (timeout is NETWORK_TIMEOUT and ping is sent every HEARTBEAT_INTERVAL)
-            scheduler.scheduleAtFixedRate(this::checkActiveClients, 10000, Constants.NETWORK_TIMEOUT * 2, TimeUnit.MILLISECONDS);
-
+            scheduler.scheduleAtFixedRate(this::checkActiveClients, Constants.SERVER_CHECK_INTERVAL, Constants.SERVER_CHECK_INTERVAL, TimeUnit.MILLISECONDS);
             System.out.println("[SOCKET SERVER] Server started on port " + port);
-
         } catch (IOException e) {
             throw new ServerException("[SOCKET SERVER] Server cannot be started: " + e.getMessage());
         }
@@ -95,7 +89,9 @@ public class SocketServer extends ServerBasis implements Runnable {
 
         try {
             Socket socket = serverSocket.accept();
-            // socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
+            socket.setSoTimeout(Constants.NETWORK_TIMEOUT);
+            socket.setKeepAlive(true);
+            socket.setTcpNoDelay(true);
             ClientHandler connection = new ClientHandler(connectionCode, socket);
 
             synchronized (this.connections) {
@@ -123,22 +119,17 @@ public class SocketServer extends ServerBasis implements Runnable {
 
     private void checkActiveClients() {
         long now = System.currentTimeMillis();
-        Map<String, ClientHandler> connectionsCopy = new HashMap<>();
+        Map<String, ClientHandler> connectionsCopy;
 
         synchronized (connections) {
-            connectionsCopy = new HashMap<>(connectionsCopy);
+            connectionsCopy = new HashMap<>(connections);
         }
 
-        for (ClientHandler clientHandler : connectionsCopy.values()) {
-            if (now - clientHandler.getLastPing() > Constants.NETWORK_TIMEOUT) {
-                try {
-                    clientHandler.sendObject(new Sense()); // Check if client is still active,
-                    clientHandler.setLastPing(System.currentTimeMillis());
-                } catch (ServerException e) {
-                    // Client not reachable
-                    // Connection has been closed by sendObject method
-                }
-            }
+        for (Map.Entry<String, ClientHandler> entry : connectionsCopy.entrySet()) {
+            ClientHandler clientHandler = entry.getValue();
+            String connectionCode = entry.getKey();
+            if (now - clientHandler.getLastPing() > Constants.NETWORK_TIMEOUT)
+                closeConnection(connectionCode);
         }
 
     }

@@ -31,6 +31,10 @@ public class RMIClient extends Client {
 
     public RMIClient(UserInterface ui) {
         super(ui);
+
+        System.setProperty("sun.rmi.transport.tcp.responseTimeout", String.valueOf(Constants.NETWORK_TIMEOUT));
+        System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", "10000");
+
         this.sessionCode = UUID.randomUUID().toString();
         connect();
 
@@ -40,6 +44,10 @@ public class RMIClient extends Client {
 
     public RMIClient(UserInterface ui, String ip) {
         super(ui);
+
+        System.setProperty("sun.rmi.transport.tcp.responseTimeout", String.valueOf(Constants.NETWORK_TIMEOUT));
+        System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", "10000");
+
         this.sessionCode = UUID.randomUUID().toString();
         connect(ip);
 
@@ -72,9 +80,6 @@ public class RMIClient extends Client {
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
             try {
-                ServerInfo serverInfo = DiscoveryClient.findServer();
-                if (serverInfo == null) throw new ClientException();
-
                 Registry registry = LocateRegistry.getRegistry(ip, Constants.DEFAULT_RMI_PORT);
                 server = (RMIServerInterface) registry.lookup("ServerRMI");
 
@@ -82,7 +87,7 @@ public class RMIClient extends Client {
                 server.registerClient(sessionCode, clientCallback);
                 break;
 
-            } catch (ClientException | NotBoundException | RemoteException e) {
+            } catch (NotBoundException | RemoteException e) {
                 backoff(attempt);
             }
 

@@ -16,14 +16,15 @@ public abstract class Constants {
 
     public static final int DEFAULT_SOCKET_PORT = 4030;
     public static final int DEFAULT_RMI_PORT = 1099;
-    public static final String DEFAULT_HOST = "127.0.0.1";
-    public static final int HEARTBEAT_INTERVAL = 2000;
-    public static final int NETWORK_TIMEOUT = 4000;
-
     public static final int DISCOVERY_PORT = 4040;
+
+    public static final int HEARTBEAT_INTERVAL = 5000;
+    public static final int NETWORK_TIMEOUT = 15000;
+    public static final int SERVER_CHECK_INTERVAL = 7500;
+    public static final int DISCOVERY_TIMEOUT = 3000;
+
     public static final String DISCOVERY_MESSAGE = "GALAXY_TRUCKER_SERVER_DISCOVERY";
     public static final String DISCOVERY_RESPONSE = "GALAXY_TRUCKER_SERVER_FOUND";
-    public static final int DISCOVERY_TIMEOUT = 5000;
 
     public static final int MAX_RETRIES = 5;
     public static final int BASE_DELAY = 1000;

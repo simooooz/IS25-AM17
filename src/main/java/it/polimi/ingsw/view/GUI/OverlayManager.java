@@ -48,7 +48,7 @@ public class OverlayManager {
             event.consume();
         });
 
-        centralHBox.setOnMouseClicked(Event::consume);
+        centralHBox.setOnMouseClicked(event -> event.consume());
 
         overlayPane.setPrefWidth(scene.getWidth());
         overlayPane.setPrefHeight(scene.getHeight());
