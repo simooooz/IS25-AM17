@@ -15,6 +15,8 @@ import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.*;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -794,7 +796,12 @@ public class BuildController implements MessageHandler, Initializable {
                 timerContainer.setOnMouseClicked(null);
                 startCountdown();
             }
-            case ErrorEvent e -> statusLabel.setText(e.message());
+            case ErrorEvent e -> {
+                statusLabel.setText(e.message());
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(_ -> statusLabel.setText(""));
+                pause.play();
+            }
             default -> {}
         }
     }

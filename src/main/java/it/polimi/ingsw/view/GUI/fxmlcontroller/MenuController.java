@@ -9,6 +9,8 @@ import it.polimi.ingsw.view.GUI.App;
 import it.polimi.ingsw.view.GUI.MessageDispatcher;
 import it.polimi.ingsw.view.GUI.MessageHandler;
 import it.polimi.ingsw.view.GUI.SceneManager;
+import javafx.animation.PauseTransition;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.input.KeyCode;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -257,7 +260,12 @@ public class MenuController implements MessageHandler {
     public void handleMessage(Event event) {
         switch (event) {
             case SetLobbyEvent _, JoinedLobbyEvent _ -> SceneManager.navigateToScene("/fxml/waitingRoom.fxml", this, null);
-            case ErrorEvent e -> setErrorStatus(e.message());
+            case ErrorEvent e -> {
+                setErrorStatus(e.message());
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(_ -> setErrorStatus(""));
+                pause.play();
+            }
             default -> {}
         }
     }

@@ -19,6 +19,7 @@ import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.*;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -35,6 +36,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
@@ -1311,6 +1313,9 @@ public class FlightPhaseController implements MessageHandler {
             }
             case ErrorEvent e -> {
                 errorLabel.setText(e.message());
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(_ -> errorLabel.setText(""));
+                pause.play();
             }
             default -> {}
         }
