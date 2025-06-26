@@ -22,14 +22,16 @@ public class ComponentDTO {
     public int y;
     public boolean inserted;
     public boolean shown;
+    public int rotationCounter;
 
-    public ComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown) {
+    public ComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, int rotationCounter) {
         this.id = id;
         this.connectors = connectors;
         this.x = x;
         this.y = y;
         this.inserted = inserted;
         this.shown = shown;
+        this.rotationCounter = rotationCounter;
     }
 
     public ComponentDTO() {}

@@ -8,8 +8,8 @@ public class EngineComponentDTO extends ComponentDTO {
     public DirectionType direction;
     public boolean isDouble;
 
-    public EngineComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, DirectionType direction, boolean isDouble) {
-        super(id, connectors, x, y, inserted, shown);
+    public EngineComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, int rotationsCounter, DirectionType direction, boolean isDouble) {
+        super(id, connectors, x, y, inserted, shown, rotationsCounter);
         this.direction = direction;
         this.isDouble = isDouble;
     }

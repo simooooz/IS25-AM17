@@ -30,11 +30,14 @@ public sealed class ClientComponent permits
     private boolean inserted;
     private boolean shown;
 
+    private final int rotationsCounter;
+
     public ClientComponent(int id, ConnectorType[] connectors) {
         this.id = id;
         this.connectors = connectors;
         this.inserted = false;
         this.shown = false;
+        this.rotationsCounter = 0;
     }
 
     public ClientComponent(ComponentDTO dto) {
@@ -42,6 +45,7 @@ public sealed class ClientComponent permits
         this.connectors = dto.connectors;
         this.inserted = dto.inserted;
         this.shown = dto.shown;
+        this.rotationsCounter = dto.rotationCounter;
     }
 
     public int getId() {
@@ -54,6 +58,10 @@ public sealed class ClientComponent permits
 
     public int getY() {
         return y;
+    }
+
+    public int getRotationsCounter() {
+        return rotationsCounter;
     }
 
     public ConnectorType[] getConnectors() {

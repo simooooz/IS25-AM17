@@ -284,7 +284,7 @@ public final class CabinComponent extends Component {
      */
     @Override
     public ComponentDTO toDTO() {
-        return new CabinComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), alien, humans, isStarting);
+        return new CabinComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), alien, humans, isStarting);
     }
 
 }

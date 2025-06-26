@@ -171,7 +171,7 @@ public final class ShieldComponent extends Component {
      */
     @Override
     public ComponentDTO toDTO() {
-        return new ShieldComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), directionsProtected);
+        return new ShieldComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), directionsProtected);
     }
 
 }

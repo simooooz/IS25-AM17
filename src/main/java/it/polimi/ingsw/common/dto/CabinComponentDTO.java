@@ -9,8 +9,8 @@ public class CabinComponentDTO extends ComponentDTO {
     public int humans;
     public boolean isStarting;
 
-    public CabinComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, AlienType alien, int humans, boolean isStarting) {
-        super(id, connectors, x, y, inserted, shown);
+    public CabinComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, int rotationsCounter, AlienType alien, int humans, boolean isStarting) {
+        super(id, connectors, x, y, inserted, shown, rotationsCounter);
         this.alien = alien;
         this.humans = humans;
         this.isStarting = isStarting;

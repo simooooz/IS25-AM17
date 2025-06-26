@@ -76,6 +76,8 @@ public sealed class Component permits
      */
     private boolean shown;
 
+    private int rotationsCounter;
+
     /**
      * Constructs a new Component with the specified properties.
      * Initializes the component in a hidden, unwelded state ready for game interaction.
@@ -88,6 +90,7 @@ public sealed class Component permits
         this.connectors = connectors;
         this.inserted = false;
         this.shown = false;
+        this.rotationsCounter = 0;
     }
 
     /**
@@ -287,6 +290,7 @@ public sealed class Component permits
         else if (ship.getDashboard(y, x).isPresent() && ship.getDashboard(y, x).get().equals(this)) // Component to release is in dashboard
             ship.getDashboard()[y][x] = Optional.empty();
 
+        rotationsCounter = 0;
         board.getCommonComponents().add(this);
         EventContext.emit(new ComponentReleasedEvent(player.getUsername(), id));
     }
@@ -319,6 +323,7 @@ public sealed class Component permits
         } else
             throw new ComponentNotValidException("Component to reserve isn't in hand or in dashboard");
 
+        rotationsCounter = 0;
         ship.getReserves().add(this);
         EventContext.emit(new ComponentReservedEvent(player.getUsername(), id));
     }
@@ -454,6 +459,8 @@ public sealed class Component permits
             connectors = newConnectors;
         }
 
+        rotationsCounter = (rotationsCounter + rotations) % 4;
+
         EventContext.emit(new ComponentRotatedEvent(id, rotations % 4));
     }
 
@@ -557,6 +564,10 @@ public sealed class Component permits
         return shown;
     }
 
+    public int getRotationsCounter() {
+        return rotationsCounter;
+    }
+
     /**
      * Checks if this component matches the specified type.
      * <p>
@@ -606,7 +617,7 @@ public sealed class Component permits
      * @return a ComponentDTO containing this component's current state
      */
     public ComponentDTO toDTO() {
-        return new ComponentDTO(id, connectors, x, y, inserted, shown);
+        return new ComponentDTO(id, connectors, x, y, inserted, shown, rotationsCounter);
     }
 
 }

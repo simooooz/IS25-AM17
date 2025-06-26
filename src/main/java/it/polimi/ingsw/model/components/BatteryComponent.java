@@ -176,7 +176,7 @@ public final class BatteryComponent extends Component {
      */
     @Override
     public ComponentDTO toDTO() {
-        return new BatteryComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), isTriple, batteries);
+        return new BatteryComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), isTriple, batteries);
     }
 
 }

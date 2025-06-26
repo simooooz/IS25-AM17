@@ -7,8 +7,8 @@ public class ShieldComponentDTO extends ComponentDTO {
 
     public DirectionType[] directionsProtected;
 
-    public ShieldComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, DirectionType[] directionsProtected) {
-        super(id, connectors, x, y, inserted, shown);
+    public ShieldComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, int rotationsCounter, DirectionType[] directionsProtected) {
+        super(id, connectors, x, y, inserted, shown, rotationsCounter);
         this.directionsProtected = directionsProtected;
     }
 

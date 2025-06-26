@@ -211,7 +211,7 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
      */
     @Override
     public ComponentDTO toDTO() {
-        return new CargoHoldsComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), number, goods);
+        return new CargoHoldsComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), number, goods);
     }
 
 }

@@ -130,9 +130,9 @@ public enum MessageType {
             SingleArgMessage<String> castedMessage = (SingleArgMessage<String>) message;
             ModelDTO dto = GameStateDTOFactory.deserializeDTO(castedMessage.getArg1());
 
+            client.setState(UserState.IN_GAME);
             ClientLobby lobby = client.getLobby();
             lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
-            client.setState(UserState.IN_GAME);
         }
     },
 

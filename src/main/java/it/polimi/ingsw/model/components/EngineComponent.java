@@ -172,7 +172,7 @@ public final class EngineComponent extends Component {
      */
     @Override
     public ComponentDTO toDTO() {
-        return new EngineComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), direction, isDouble);
+        return new EngineComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), direction, isDouble);
     }
 
 }

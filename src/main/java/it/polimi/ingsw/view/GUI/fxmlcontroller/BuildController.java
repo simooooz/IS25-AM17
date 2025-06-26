@@ -450,6 +450,7 @@ public class BuildController implements MessageHandler, Initializable {
             });
         }
 
+        iv.setRotate(90*component.getRotationsCounter());
         return iv;
     }
 
@@ -662,6 +663,7 @@ public class BuildController implements MessageHandler, Initializable {
                 int slotCol = 4 + reservesSize;
                 Rectangle slot = (Rectangle) shipGrid.lookup("#slot_0_"+slotCol);
                 ImageView iv = componentMap.get(e.id());
+                iv.setRotate(0);
 
                 if (e.username().equals(client.getUsername())) { // Your action
                     if (!slotMap.containsKey(e.id())) { // It was in flow pane

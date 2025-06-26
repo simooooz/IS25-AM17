@@ -7,8 +7,8 @@ public class OddComponentDTO extends ComponentDTO {
 
     public AlienType type;
 
-    public OddComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, AlienType type) {
-        super(id, connectors, x, y, inserted, shown);
+    public OddComponentDTO(int id, ConnectorType[] connectors, int x, int y, boolean inserted, boolean shown, int rotationsCounter, AlienType type) {
+        super(id, connectors, x, y, inserted, shown, rotationsCounter);
         this.type = type;
     }
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.controller;
 
+import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.ClientGameModel;
 import it.polimi.ingsw.client.model.ClientGameModelAdvancedMode;
 import it.polimi.ingsw.client.model.ClientGameModelLearnerMode;
@@ -8,6 +9,7 @@ import it.polimi.ingsw.common.dto.ModelDTO;
 import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.common.model.enums.PlayerState;
+import it.polimi.ingsw.common.model.events.game.SyncAllEvent;
 import it.polimi.ingsw.model.exceptions.IllegalStateException;
 
 import java.util.*;
@@ -22,6 +24,7 @@ public class ClientGameController {
 
     public ClientGameController(boolean learnerMode, ModelDTO dto) {
         this.model = learnerMode ? new ClientGameModelLearnerMode(dto) : new ClientGameModelAdvancedMode(dto);
+        ClientEventBus.getInstance().publish(new SyncAllEvent(dto));
     }
 
     public void matchStarted() {

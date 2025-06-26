@@ -1,11 +1,15 @@
 package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
+import it.polimi.ingsw.client.model.components.ClientComponent;
 import it.polimi.ingsw.client.model.game.ClientLobby;
+import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.common.model.events.GameEvent;
 import it.polimi.ingsw.common.model.events.game.GameErrorEvent;
 import it.polimi.ingsw.common.model.events.game.MatchStartedEvent;
+import it.polimi.ingsw.common.model.events.game.SyncAllEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
+import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.App;
 import it.polimi.ingsw.view.GUI.MessageDispatcher;
@@ -13,17 +17,20 @@ import it.polimi.ingsw.view.GUI.SceneManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Controller for the waiting room interface.
  * Handles lobby state updates and player management.
  */
 public class WaitingRoomController implements MessageHandler {
+
+    private Client client;
 
     @FXML private Label lobbyNameLabel;
     @FXML private Label gameModeLabel;
@@ -37,10 +44,11 @@ public class WaitingRoomController implements MessageHandler {
 
     @FXML
     public void initialize() {
-        currentPlayers = new ArrayList<>();
         MessageDispatcher.getInstance().registerHandler(this);
+        this.client = App.getClientInstance();
+        currentPlayers = new ArrayList<>();
 
-        ClientLobby lobby = App.getClientInstance().getLobby();
+        ClientLobby lobby = client.getLobby();
         if (lobby != null) {
             setLobbyInfo(lobby.getGameID(), lobby.getMaxPlayers(), lobby.isLearnerMode());
 
@@ -86,15 +94,13 @@ public class WaitingRoomController implements MessageHandler {
      * Handles the leave lobby button action.
      */
     @FXML
-    private void handleLeaveLobby() {
-        App.getClientInstance().send(MessageType.LEAVE_GAME);
-    }
+    private void handleLeaveLobby() { client.send(MessageType.LEAVE_GAME); }
 
     /**
      * Updates the players list display.
      */
     private void updatePlayersList() {
-        ClientLobby lobby = App.getClientInstance().getLobby();
+        ClientLobby lobby = client.getLobby();
         if (lobby == null) return;
 
         int maxPlayers = lobby.getMaxPlayers();
@@ -127,6 +133,32 @@ public class WaitingRoomController implements MessageHandler {
         statusLabel.setText("Error: " + message);
         statusLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 16px; -fx-font-weight: bold;");
     }
+    
+    private void skipBuildPhase() {
+        Map<Integer, ImageView> componentMap = new HashMap<>();
+        List<ClientComponent> components = client.getGameController().getModel().getBoard().getMapIdComponents().values().stream().toList();
+
+        for (ClientComponent c : components) {
+            if (c.isInserted()) { // Only inserted components
+                ImageView iv = new ImageView();
+                iv.setFitWidth(70);
+                iv.setFitHeight(70);
+                iv.setPreserveRatio(true);
+                iv.setId("component_" + c.getId());
+
+                String imagePath = "/images/tiles/GT-new_tiles_16_for web" + c.getId() + ".jpg";
+                Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+                iv.setImage(image);
+                iv.setRotate(90*c.getRotationsCounter());
+
+                componentMap.put(c.getId(), iv);
+            }
+        }
+        System.out.println(componentMap.size());
+        SceneManager.navigateToScene("/fxml/gameFlight.fxml", this, (FlightPhaseController controller) ->
+            controller.setImageMap(componentMap)
+        );
+    }
 
     @Override
     public void handleMessage(GameEvent event) {
@@ -141,7 +173,7 @@ public class WaitingRoomController implements MessageHandler {
             case LeftLobbyEvent e -> {
                 if (e.getArgs().length > 0) {
                     String playerName = e.username();
-                    String currentUsername = App.getClientInstance().getUsername();
+                    String currentUsername = client.getUsername();
 
                     if (playerName.equals(currentUsername))
                         SceneManager.navigateToScene("/fxml/menu.fxml", this, null);
@@ -152,6 +184,12 @@ public class WaitingRoomController implements MessageHandler {
                 }
             }
             case MatchStartedEvent _ -> SceneManager.navigateToScene("/fxml/build.fxml", this, null);
+            case SyncAllEvent e -> {
+                if (e.dto().playersState.containsValue(PlayerState.BUILD) || e.dto().playersState.containsValue(PlayerState.LOOK_CARD_PILE))
+                    SceneManager.navigateToScene("/fxml/build.fxml", this, null);
+                else
+                    skipBuildPhase();
+            }
             case GameErrorEvent e -> showError(e.message());
             default -> {}
         }
@@ -163,6 +201,7 @@ public class WaitingRoomController implements MessageHandler {
                 MessageType.JOINED_LOBBY_EVENT,
                 MessageType.LEFT_LOBBY_EVENT,
                 MessageType.MATCH_STARTED_EVENT,
+                MessageType.SYNC_ALL_EVENT,
                 MessageType.ERROR
         ).contains(messageType);
     }

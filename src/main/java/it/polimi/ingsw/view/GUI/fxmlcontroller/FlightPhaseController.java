@@ -22,23 +22,15 @@ import it.polimi.ingsw.view.GUI.App;
 import it.polimi.ingsw.view.GUI.MessageDispatcher;
 import it.polimi.ingsw.view.GUI.OverlayManager;
 import it.polimi.ingsw.view.GUI.SceneManager;
-import javafx.animation.ParallelTransition;
-import javafx.animation.ScaleTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -46,7 +38,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
@@ -62,6 +53,7 @@ public class FlightPhaseController implements MessageHandler {
 
     @FXML private VBox otherPlayersContainer;
     @FXML private ImageView currentCardImage;
+    @FXML public ImageView previousCardImage;
 
     @FXML private ImageView playerShipImage;
     @FXML private GridPane shipGrid;
@@ -76,8 +68,6 @@ public class FlightPhaseController implements MessageHandler {
 
     @FXML private Label instructionLabel;      // Label per le istruzioni
     @FXML private Label mainStatusLabel;       // Label per il messaggio di stato principale
-
-    private ObservableList<String> logMessages;
 
     private Client client;
     private ClientGameModel model;
@@ -247,7 +237,6 @@ public class FlightPhaseController implements MessageHandler {
         if (state == PlayerState.WAIT_ALIEN && object.contains("alien")) { // Alien in WAIT_ALIEN
             List<Class<?>> allowedClasses = List.of(ClientCabinComponent.class);
             if (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass())) { // Source is allowed component
-                System.out.println("Mi muovo");
                 moveComponentObject(objectImageView, destId);
                 changeComponentObjects(sourceComponent, 2, List.of("/images/objects/human.png"));
                 event.setDropCompleted(true);
@@ -256,7 +245,6 @@ public class FlightPhaseController implements MessageHandler {
         else if (state == PlayerState.WAIT_REMOVE_GOODS && object.equals("battery")) { // Battery in WAIT_REMOVE_GOODS
             List<Class<?>> allowedClasses = List.of(ClientBatteryComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
-                System.out.println("Mi muovo");
                 moveComponentObject(objectImageView, destId);
                 event.setDropCompleted(true);
             }
@@ -264,7 +252,6 @@ public class FlightPhaseController implements MessageHandler {
         else if ((state == PlayerState.WAIT_REMOVE_GOODS || state == PlayerState.WAIT_GOODS) && object.contains("good")) { // Good in WAIT_REMOVE_GOODS or WAIT_GOODS
             List<Class<?>> allowedClasses = List.of(ClientCargoHoldsComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
-                System.out.println("Mi muovo");
                 moveComponentObject(objectImageView, destId);
                 event.setDropCompleted(true);
             }
@@ -272,7 +259,6 @@ public class FlightPhaseController implements MessageHandler {
         else if (state == PlayerState.WAIT_REMOVE_CREW && object.equals("human")) { // Human in WAIT_REMOVE_CREW
             List<Class<?>> allowedClasses = List.of(ClientCabinComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
-                System.out.println("Mi muovo");
                 moveComponentObject(objectImageView, destId);
                 event.setDropCompleted(true);
             }
@@ -280,7 +266,6 @@ public class FlightPhaseController implements MessageHandler {
         else if (state == PlayerState.WAIT_REMOVE_CREW && object.contains("alien")) { // Alien in WAIT_REMOVE_CREW
             List<Class<?>> allowedClasses = List.of(ClientCabinComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
-                System.out.println("Mi muovo");
                 moveComponentObject(objectImageView, destId);
                 event.setDropCompleted(true);
             }
@@ -443,11 +428,6 @@ public class FlightPhaseController implements MessageHandler {
         this.client = App.getClientInstance();
         this.model = client.getGameController().getModel();
 
-        if (client.getLobby().isLearnerMode()) {
-            endFlightButton.setVisible(false);
-            endFlightButton.setDisable(true);
-        }
-
         this.overlayManager = new OverlayManager(root);
         initializeStatus();
         initializeInstructionManager();
@@ -465,14 +445,29 @@ public class FlightPhaseController implements MessageHandler {
     private void loadImages() {
         Image playerShipImg;
         Image cardBackImg;
-        if (!client.getLobby().isLearnerMode()) {
-            playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg")));
-            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+
+        // Setup card image
+        if (!model.getBoard().getCardPile().isEmpty()) {
+            if (model.getBoard().getCardPile().size() > 1) {
+                previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().get(model.getBoard().getCardPile().size()-2).getId() + ".jpg")))));
+                previousCardImage.setVisible(true);
+            }
+            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/"+model.getBoard().getCardPile().getLast()+".jpg")));
         }
         else {
-            playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg")));
-            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
+            previousCardImage.setVisible(false);
+            if (!client.getLobby().isLearnerMode())
+                cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+            else
+                cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
         }
+
+        // Setup ship image
+        if (!client.getLobby().isLearnerMode())
+            playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg")));
+
+        else
+            playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg")));
 
         playerShipImage.setImage(playerShipImg);
         currentCardImage.setImage(cardBackImg);
@@ -483,13 +478,19 @@ public class FlightPhaseController implements MessageHandler {
         loadImages();
         updateBoard();
 
+        ClientPlayer player = model.getBoard().getPlayerEntityByUsername(client.getUsername());
+        if (client.getLobby().isLearnerMode() || player.hasEndedInAdvance()) {
+            endFlightButton.setVisible(false);
+            endFlightButton.setDisable(true);
+        }
+
         Platform.runLater(() -> {
-            setupPlayerShipTilesContainer();
+            setupShips();
             syncAction();
         });
     }
 
-    private void setupPlayerShipTilesContainer() {
+    private void setupShips() {
         for (ClientPlayer player : client.getGameController().getModel().getBoard().getAllPlayers()) {
             ClientShip ship = player.getShip();
             if (player.getUsername().equals(client.getUsername())) {
@@ -629,9 +630,6 @@ public class FlightPhaseController implements MessageHandler {
         double baseWidth = componentPane.boundsInLocalProperty().get().getWidth();
         double baseHeight = componentPane.boundsInLocalProperty().get().getHeight();
 
-        Bounds boundsInScene = componentPane.localToScene(componentPane.getBoundsInLocal());
-        double baseX = boundsInScene.getMinX();
-        double baseY = boundsInScene.getMinY();
         double overlaySize = Math.min(baseWidth / 3.2, baseHeight / 3.2);
 
         if (diff > 0) { // Add images
@@ -1176,6 +1174,10 @@ public class FlightPhaseController implements MessageHandler {
                 if (e.states().containsValue(PlayerState.DRAW_CARD)) {
                     Image cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
                     currentCardImage.setImage(cardBackImg);
+                    if (!model.getBoard().getCardPile().isEmpty()) {
+                        previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")))));
+                        previousCardImage.setVisible(true);
+                    }
                 }
 
             }

@@ -155,7 +155,7 @@ public final class OddComponent extends Component {
      */
     @Override
     public ComponentDTO toDTO() {
-        return new OddComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), type);
+        return new OddComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), type);
     }
 
 }

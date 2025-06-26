@@ -65,9 +65,9 @@ public class ClientCallback extends UnicastRemoteObject implements ClientCallbac
             case SYNC_ALL_EVENT -> {
                 ModelDTO dto = GameStateDTOFactory.deserializeDTO((String) args[0]);
 
+                client.setState(UserState.IN_GAME);
                 ClientLobby lobby = client.getLobby();
                 lobby.setGame(new ClientGameController(lobby.isLearnerMode(), dto));
-                client.setState(UserState.IN_GAME);
             }
             case FLIGHT_ENDED_EVENT -> client.getGameController().flightEnded((String) args[0]);
             case PLAYERS_STATE_UPDATED_EVENT -> client.getGameController().playersStateUpdated((Map<String, PlayerState>) args[0]);

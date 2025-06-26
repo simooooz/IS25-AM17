@@ -192,7 +192,7 @@ public final class CannonComponent extends Component {
      */
     @Override
     public ComponentDTO toDTO() {
-        return new CannonComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), direction, isDouble);
+        return new CannonComponentDTO(getId(), getConnectors(), getX(), getY(), isInserted(), isShown(), getRotationsCounter(), direction, isDouble);
     }
 
 }
