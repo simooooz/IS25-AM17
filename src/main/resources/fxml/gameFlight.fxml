@@ -1,42 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.control.Separator?>
-<AnchorPane
-        fx:id="root"
-        xmlns="http://javafx.com/javafx/11.0.1"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="it.polimi.ingsw.view.GUI.fxmlcontroller.FlightPhaseController"
->
+<AnchorPane fx:id="root" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.view.GUI.fxmlcontroller.FlightPhaseController">
     <children>
         <!-- Contenitore principale diviso in tre parti verticali -->
-        <HBox alignment="CENTER" spacing="10.0"
-              AnchorPane.bottomAnchor="0.0"
-              AnchorPane.leftAnchor="0.0"
-              AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="0.0">
+        <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <!-- PARTE SINISTRA: Navi degli altri giocatori -->
                 <VBox fx:id="otherPlayersContainer" prefWidth="300.0" spacing="10.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10;">
                     <children>
-                        <Label text="Altri Giocatori" textFill="WHITE">
-                            <font>
-                                <Font name="System Bold" size="16.0" />
-                            </font>
+                        <Label text="Other Players" style="-fx-text-fill: yellow; -fx-font-family: 'System Bold'; -fx-font-size: 25px;">
                         </Label>
 
                     </children>
@@ -73,34 +51,28 @@
                         <VBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
 
                             <!-- INSTRUCTIONS -->
-                            <VBox fx:id="instructionPanel" spacing="8.0"
-                                  style="-fx-background-color: rgba(74, 144, 226, 0.15); -fx-background-radius: 8; -fx-border-color: #4A90E2; -fx-border-width: 1; -fx-border-radius: 8;">
+                            <VBox fx:id="instructionPanel" prefHeight="179.0" prefWidth="532.0" spacing="8.0" style="-fx-background-color: rgba(74, 144, 226, 0.15); -fx-background-radius: 8; -fx-border-color: #4A90E2; -fx-border-width: 1; -fx-border-radius: 8;">
                                 <Label text="Game Status &amp; Instructions" textFill="WHITE">
                                     <font>
-                                        <Font name="System Bold" size="14.0"/>
+                                        <Font name="System Bold" size="14.0" />
                                     </font>
                                 </Label>
 
                                 <!-- Messaggio di stato principale -->
-                                <Label fx:id="mainStatusLabel"
-                                       style="-fx-background-color: rgba(74, 144, 226, 0.2); -fx-background-radius: 5; -fx-padding: 8; -fx-border-color: #4A90E2; -fx-border-width: 1; -fx-border-radius: 5;"
-                                       textFill="#4A90E2" wrapText="true">
+                                <Label fx:id="mainStatusLabel" style="-fx-background-color: rgba(74, 144, 226, 0.2); -fx-background-radius: 5; -fx-padding: 8; -fx-border-color: #4A90E2; -fx-border-width: 1; -fx-border-radius: 5;" textFill="#4A90E2" wrapText="true">
                                     <font>
-                                        <Font name="System Bold" size="13.0"/>
+                                        <Font name="System Bold" size="13.0" />
                                     </font>
                                 </Label>
 
                                 <!-- Separatore -->
-                                <Separator style="-fx-background-color: rgba(255, 255, 255, 0.3);"/>
+                                <Separator style="-fx-background-color: rgba(255, 255, 255, 0.3);" />
 
                                 <!-- Istruzioni dettagliate -->
-                                <ScrollPane maxHeight="90.0" minHeight="90.0" prefHeight="90.0"
-                                            style="-fx-background-color: transparent; -fx-border-color: transparent;">
-                                    <Label fx:id="instructionLabel"
-                                           style="-fx-background-color: transparent; -fx-padding: 5; -fx-line-spacing: 2;"
-                                           textFill="#CCCCCC" wrapText="true">
+                                <ScrollPane maxHeight="90.0" minHeight="90.0" prefHeight="90.0" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                                    <Label fx:id="instructionLabel" style="-fx-background-color: transparent; -fx-padding: 5; -fx-line-spacing: 2;" textFill="#CCCCCC" wrapText="true">
                                         <font>
-                                            <Font name="System" size="11.0"/>
+                                            <Font name="System" size="11.0" />
                                         </font>
                                     </Label>
                                 </ScrollPane>
@@ -135,23 +107,13 @@
 
                         <!-- MAIN BUTTON -->
                         <HBox alignment="CENTER" spacing="10">
-                            <Button
-                                fx:id="mainButton"
-                                minWidth="320.0"
-                                mnemonicParsing="false"
-                                prefHeight="12.0"
-                                alignment="CENTER"
-                                prefWidth="320.0"
-                                styleClass="button"
-                            />
+                            <Button fx:id="mainButton" alignment="CENTER" minWidth="320.0" mnemonicParsing="false" prefHeight="12.0" prefWidth="320.0" styleClass="button" />
                         </HBox>
 
                         <!-- SECONDARY BUTTONS -->
                         <HBox alignment="CENTER" spacing="20.0">
-                            <Button fx:id="endFlightButton" mnemonicParsing="false" onMouseClicked="#endFlightHandler"
-                                    styleClass="button" text="End flight"/>
-                            <Button mnemonicParsing="false" onMouseClicked="#leaveGameHandler"
-                                    styleClass="button-danger" text="Leave game"/>
+                            <Button fx:id="endFlightButton" mnemonicParsing="false" onMouseClicked="#endFlightHandler" styleClass="button" text="End flight" />
+                            <Button mnemonicParsing="false" onMouseClicked="#leaveGameHandler" styleClass="button-danger" text="Leave game" />
                         </HBox>
                     </children>
                     <padding>
@@ -159,52 +121,64 @@
                     </padding>
                 </VBox>
 
-                <!-- PARTE DESTRA: Propria nave e board -->
+                <!-- PARTE DESTRA: Immagine, Board Info e Propria nave -->
                 <VBox prefWidth="500.0" spacing="15.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10;">
                     <children>
-                        <!-- Sezione Board -->
+                        <!-- Sezione Board Info -->
                         <VBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <Label text="Board info" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
+                                <Label text="Board Info" style="-fx-text-fill: yellow; -fx-font-family: 'System Bold'; -fx-font-size: 25px;">
                                 </Label>
 
-                                <Label text="Players in game:" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
-                                    <padding>
-                                        <Insets bottom="5.0" top="20.0" />
-                                    </padding>
-                                </Label>
+                                <!-- Sezione divisa: Immagine a sinistra, Info a destra -->
+                                <HBox spacing="10.0" alignment="TOP_LEFT">
+                                    <children>
+                                        <!-- Parte sinistra: Immagine -->
+                                        <VBox alignment="CENTER" prefWidth="240.0" spacing="5.0">
+                                            <children>
+                                                <!-- Container per l'immagine -->
+                                                <Pane maxHeight="200.0" maxWidth="220.0" minHeight="200.0" minWidth="220.0"
+                                                      style="-fx-background-color: #1a0d2e; -fx-background-radius: 5;">
+                                                    <children>
+                                                        <ImageView fx:id="pointImage" fitHeight="190.0" fitWidth="210.0"
+                                                                   layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+                                                    </children>
+                                                </Pane>
+                                            </children>
+                                        </VBox>
 
-                                <Text textAlignment="CENTER" fx:id="playersInGameLabel" styleClass="label" wrappingWidth="450" />
+                                        <!-- Parte destra: Info -->
+                                        <VBox alignment="CENTER" prefWidth="240.0" spacing="5.0">
+                                            <children>
+                                                <Label text="Players in game:" style="-fx-text-fill: yellow; -fx-font-family: 'System Bold'; -fx-font-size: 18px;">
+                                                    <padding>
+                                                        <Insets bottom="5.0" top="10.0" />
+                                                    </padding>
+                                                </Label>
 
-                                <Label text="Starting deck:" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
-                                    <padding>
-                                        <Insets bottom="5.0" top="20.0" />
-                                    </padding>
-                                </Label>
+                                                <Text fx:id="playersInGameLabel" styleClass="label" textAlignment="CENTER" wrappingWidth="220" />
 
-                                <Text textAlignment="CENTER" styleClass="label" fx:id="playersStartingDeckLabel" />
+                                                <Label text="Starting deck:" style="-fx-text-fill: yellow; -fx-font-family: 'System Bold'; -fx-font-size: 18px;">
+                                                    <padding>
+                                                        <Insets bottom="5.0" top="10.0" />
+                                                    </padding>
+                                                </Label>
 
+                                                <Text fx:id="playersStartingDeckLabel" styleClass="label" textAlignment="CENTER" wrappingWidth="220" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
                             </children>
                         </VBox>
 
-                        <!-- Sezione Propria Nave -->
+                        <!-- Sezione Propria Nave (rimane come prima) -->
                         <VBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <Label text="Your ship" textFill="WHITE">
-                                    <font>
-                                        <Font name="System Bold" size="16.0" />
-                                    </font>
+
+                                <Label text="Your Ship" style="-fx-text-fill: yellow; -fx-font-family: 'System Bold'; -fx-font-size: 25px;">
                                     <padding>
-                                        <Insets bottom="5.0" top="40.0" />
+                                        <Insets bottom="5.0" top="20.0" />
                                     </padding>
                                 </Label>
 
@@ -215,15 +189,11 @@
                                         <ImageView fx:id="playerShipImage" fitHeight="396.0" fitWidth="446.0" layoutX="2.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" />
 
                                         <!-- GridPane per i tasselli della nave del giocatore -->
-                                        <GridPane fx:id="shipGrid"
-                                          layoutX="2.0" layoutY="2.0"
-                                          prefHeight="396.0" prefWidth="446.0"
-                                        />
+                                        <GridPane fx:id="shipGrid" layoutX="2.0" layoutY="2.0" prefHeight="396.0" prefWidth="446.0" />
                                     </children>
                                 </Pane>
 
                                 <HBox fx:id="indexBooleanButtonsContainer" alignment="CENTER" maxHeight="100.0" maxWidth="410.0" minHeight="100.0" minWidth="410.0" visible="false">
-
                                 </HBox>
 
                                 <!-- Container per oggetti drag and drop -->

@@ -63,6 +63,7 @@ public class FlightPhaseController implements MessageHandler {
     @FXML private VBox otherPlayersContainer;
     @FXML private ImageView currentCardImage;
 
+    @FXML private ImageView pointImage;
     @FXML private ImageView playerShipImage;
     @FXML private GridPane shipGrid;
     @FXML public FlowPane flowPane;
@@ -74,8 +75,8 @@ public class FlightPhaseController implements MessageHandler {
     @FXML private Label statusLabel;
     @FXML private ScrollPane statusScrollPane;
 
-    @FXML private Label instructionLabel;      // Label per le istruzioni
-    @FXML private Label mainStatusLabel;       // Label per il messaggio di stato principale
+    @FXML private Label instructionLabel;
+    @FXML private Label mainStatusLabel;
 
     private ObservableList<String> logMessages;
 
@@ -465,17 +466,21 @@ public class FlightPhaseController implements MessageHandler {
     private void loadImages() {
         Image playerShipImg;
         Image cardBackImg;
+        Image points;
         if (!client.getLobby().isLearnerMode()) {
             playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg")));
             cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+            points = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/Punteggistandardmode.png")));
         }
         else {
             playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg")));
             cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
+            points = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/PunteggiLearnermode.png")));
         }
 
         playerShipImage.setImage(playerShipImg);
         currentCardImage.setImage(cardBackImg);
+        pointImage.setImage(points);
     }
 
     public void setImageMap(Map<Integer, ImageView> imageMap) {
@@ -784,6 +789,8 @@ public class FlightPhaseController implements MessageHandler {
         if (sb.isEmpty())
             sb.append("none");
         playersInGameLabel.setText(sb.toString());
+        playersInGameLabel.setStyle("-fx-fill: white !important;");
+
 
         sb.setLength(0);
         for (ClientPlayer player : client.getGameController().getModel().getBoard().getStartingDeck()) {
@@ -792,6 +799,7 @@ public class FlightPhaseController implements MessageHandler {
         if (sb.isEmpty())
             sb.append("none");
         playersStartingDeckLabel.setText(sb.toString());
+        playersStartingDeckLabel.setStyle("-fx-fill: white !important;");
     }
 
     private void paneRemoveAllListeners(Pane p) {
