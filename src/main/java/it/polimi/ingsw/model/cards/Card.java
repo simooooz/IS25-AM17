@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract base class representing a card in the game.
- * Cards define various events and challenges that players encounter during their space journey,
- * ranging from environmental hazards to enemy encounters and trading opportunities.
- * <p>
  * The card system uses polymorphism to handle different types of encounters uniformly
  * while allowing each card type to implement its specific behavior. Cards support
  * JSON serialization with type information to preserve the specific card implementation
@@ -74,21 +70,20 @@ abstract public class Card {
     private final int id;
 
     /**
-     * The level of this card, indicating its difficulty or position in the game progression
+     * The level of this card
      */
     @JsonProperty
     private final int level;
 
     /**
-     * Whether this card is designed for learner mode (simplified gameplay)
+     * Whether this card is designed for learner mode
      */
     @JsonProperty
     private final boolean isLearner;
 
     /**
      * Constructs a new Card with the specified basic properties.
-     * These properties are shared by all card types and define the card's
-     * identity and placement within the game's progression system.
+     * These properties are shared by all card types.
      *
      * @param id        the unique identifier of this card
      * @param level     the level of this card indicating difficulty or progression
@@ -111,10 +106,6 @@ abstract public class Card {
 
     /**
      * Retrieves the level of this card.
-     * <p>
-     * The level indicates the card's difficulty or position in the game's
-     * progression system, with higher levels typically representing more
-     * challenging encounters or later stages of the journey.
      *
      * @return the level of this card
      */
@@ -124,10 +115,6 @@ abstract public class Card {
 
     /**
      * Retrieves whether this card is designed for learner mode.
-     * <p>
-     * Learner mode cards typically have simplified mechanics or reduced
-     * difficulty to help new players understand the game systems without
-     * overwhelming complexity.
      *
      * @return true if this card is for learner mode, false otherwise
      */
@@ -150,16 +137,14 @@ abstract public class Card {
     public abstract boolean startCard(ModelFacade model, Board board);
 
     /**
-     * Performs end-of-card cleanup and checks for flight termination conditions.
+     * Performs end-of-card cleanup and checks for flight termination conditions
+     * (only for standard mode).
      * <p>
      * This method handles standard game state maintenance that occurs at the
      * conclusion of most card encounters:
-     * - Checks for players with insufficient crew (accounting for alien crew bonuses)
+     * - Checks for players with insufficient humans
      * - Checks for players who have fallen too far behind the leader
      * - Terminates flights for players who fail these survival conditions
-     * <p>
-     * The 24-position gap rule ensures that players cannot fall so far behind
-     * that they effectively drop out of competitive play.
      *
      * @param board the game board containing all players and position information
      */
@@ -214,10 +199,6 @@ abstract public class Card {
      * - Players prioritize more valuable goods when forced to surrender items
      * - Battery components are used appropriately when goods are insufficient
      * - The total removal count matches the penalty requirement
-     * <p>
-     * The method implements a sophisticated validation system where players must
-     * surrender goods strategically, potentially using batteries to make up for
-     * insufficient valuable goods.
      *
      * @param commandType the command type being validated (must be WAIT_REMOVE_GOODS)
      * @param number      the number of goods that must be removed
@@ -291,7 +272,7 @@ abstract public class Card {
      * Processes command effects with integer parameters.
      * <p>
      * This method handles player actions that involve integer values, such as
-     * dice rolls, engine power, or other numerical choices. The base implementation
+     * dice rolls or planet index. The base implementation
      * throws an exception, requiring card types that support integer commands
      * to override this method with their specific logic.
      *
@@ -311,9 +292,8 @@ abstract public class Card {
      * Processes command effects with double parameters.
      * <p>
      * This method handles player actions that involve double values, such as
-     * cannon firepower calculations or other precise numerical values. The base
-     * implementation throws an exception, requiring card types that support
-     * double commands to override this method.
+     * cannon firepower calculations. The base implementation throws an exception,
+     * requiring card types that support double commands to override this method.
      *
      * @param commandType the type of command being executed
      * @param value       the double value associated with the command
@@ -331,7 +311,7 @@ abstract public class Card {
      * Processes command effects with boolean parameters.
      * <p>
      * This method handles player actions that involve boolean choices, such as
-     * accepting rewards, activating shields, or making yes/no decisions. The base
+     * accepting rewards or activating shields. The base
      * implementation throws an exception, requiring card types that support
      * boolean commands to override this method.
      *

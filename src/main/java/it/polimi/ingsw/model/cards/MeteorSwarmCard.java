@@ -25,11 +25,7 @@ import java.util.Optional;
  * Meteors that are not successfully defended against will destroy ship components.
  * <p>
  * The card uses dice rolls to determine the specific coordinates where each meteor
- * will impact, creating dynamic and unpredictable threat patterns that players
- * must respond to with their available defensive capabilities.
- *
- * @author Generated Javadoc
- * @version 1.0
+ * will impact.
  */
 public class MeteorSwarmCard extends Card {
 
