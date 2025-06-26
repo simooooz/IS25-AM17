@@ -24,14 +24,7 @@ import java.util.Map;
  * 2. Trading phase: Landed players conduct goods trading based on their chosen planet's rewards
  * <p>
  * Each planet can only accommodate one player, creating competition for the most
- * desirable landing sites. Players who land on planets receive movement benefits
- * (advancing their position by the specified number of days) at the end of the encounter.
- * <p>
- * The card enforces first-come-first-served planet allocation and provides validation
- * for goods trading based on each planet's specific reward structure.
- *
- * @author Generated Javadoc
- * @version 1.0
+ * desirable landing sites. Players who land on planets lose flight days at the end of the encounter.
  */
 public class PlanetCard extends Card {
 
@@ -48,7 +41,7 @@ public class PlanetCard extends Card {
     private final Map<String, Planet> landedPlayers;
 
     /**
-     * The number of flight days players advance for landing on planets
+     * The number of flight days players lose for landing on planets
      */
     @JsonProperty
     private final int days;
@@ -109,11 +102,10 @@ public class PlanetCard extends Card {
      * The method handles three main scenarios:
      * 1. Landing phase: Prompts players to choose planets while planets are available
      * 2. Trading phase transition: When all players have chosen, transitions to goods trading
-     * 3. Encounter completion: When all trading is done, applies movement benefits
+     * 3. Encounter completion: When all trading is done, applies lost of days
      * <p>
-     * Players who land on planets receive movement benefits in reverse order (last to first)
-     * to maintain proper positioning on the flight path. The movement is negative (backward)
-     * representing that landing on planets advances their journey progress.
+     * Players who land on planets lose days in reverse order (last to first)
+     * to maintain proper positioning on the flight path.
      *
      * @param model the model facade providing access to game state
      * @param board the game board containing all players and entities
@@ -220,9 +212,6 @@ public class PlanetCard extends Card {
      * Validates that the goods changes specified by the player conform to the rewards
      * available on their chosen planet. Each planet has specific goods that can be
      * traded, and this method ensures players only trade within those constraints.
-     * <p>
-     * The validation uses the parent class validation logic with the specific planet's
-     * reward structure as the allowed trading pattern.
      *
      * @param commandType the command type being validated
      * @param r           the rewards parameter (unused, overridden by planet rewards)

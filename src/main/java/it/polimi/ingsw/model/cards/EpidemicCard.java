@@ -17,8 +17,7 @@ import java.util.List;
  * The epidemic affects all occupied cabins that are positioned adjacent to
  * other occupied cabins on each player's ship. When the epidemic strikes,
  * every cabin that is both occupied (contains crew) and adjacent to another
- * occupied cabin loses one crew member, representing the spread of disease
- * through close proximity.
+ * occupied cabin loses one crew member.
  */
 public class EpidemicCard extends Card {
 

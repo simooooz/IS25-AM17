@@ -19,11 +19,7 @@ import java.util.*;
  * to activate additional engines using batteries for greater movement.
  * <p>
  * Players who fail to activate any engines (resulting in zero movement power)
- * face the consequence of ending their flight prematurely, representing being
- * stranded in open space without propulsion.
- *
- * @author Generated Javadoc
- * @version 1.0
+ * face the consequence of ending their flight prematurely (only for standard mode)
  */
 public class OpenSpaceCard extends Card {
 
@@ -87,8 +83,6 @@ public class OpenSpaceCard extends Card {
      * - If double engines available: prompts player to choose engine activation
      * 4. Once all players have acted, executes movement for all players simultaneously
      * <p>
-     * The movement calculation uses the most powerful double engines first (sorted in descending order)
-     * up to the limit of available batteries, representing optimal engine usage strategy.
      *
      * @param model the model facade providing access to game state
      * @param board the game board containing all players and entities
@@ -160,8 +154,7 @@ public class OpenSpaceCard extends Card {
      * Executes end-of-card effects, specifically handling players who failed to activate engines.
      * <p>
      * Players who recorded zero engine activation are considered stranded in open space
-     * and must end their flight prematurely. This represents the consequence of having
-     * no functional propulsion in the vastness of space.
+     * and must end their flight prematurely (only for standard mode).
      *
      * @param board the game board containing all players and entities
      */

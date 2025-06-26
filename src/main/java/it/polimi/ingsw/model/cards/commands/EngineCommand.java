@@ -22,11 +22,6 @@ import java.util.stream.Collectors;
  * <p>
  * The command validates that the specified batteries and engines are valid components
  * on the player's ship and that there are sufficient battery charges to power the engines.
- * Engine power is calculated from both single engines (automatically included) and
- * double engines (specified in the command parameters).
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class EngineCommand implements Command {
 

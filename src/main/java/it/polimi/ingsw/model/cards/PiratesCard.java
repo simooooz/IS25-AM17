@@ -22,15 +22,12 @@ import java.util.Optional;
  * 1. Initial combat phase: Players attempt to defeat pirates using cannon firepower
  * 2. Pirate retaliation phase: Defeated players face cannon fire attacks from pirates
  * <p>
- * Players who successfully defeat the pirates can choose to claim rewards (credits
- * and movement benefits) or decline them. Players who fail to defeat the pirates
+ * Players who successfully defeat the pirates can choose to claim rewards (credits)
+ * or decline them. Players who fail to defeat the pirates
  * are subjected to a series of cannon fire attacks that can destroy ship components.
  * <p>
  * The encounter includes defensive options during the retaliation phase, allowing
  * defeated players to use shields to protect against incoming pirate cannon fire.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class PiratesCard extends EnemiesCard {
 
@@ -227,7 +224,7 @@ public class PiratesCard extends EnemiesCard {
      * <p>
      * Handles two types of boolean commands:
      * 1. Reward choice (WAIT_BOOLEAN): Player decides whether to claim victory rewards
-     * - If accepted: player receives credits and movement benefits
+     * - If accepted: player receives credits and loses flight days
      * - If declined: player receives no rewards but avoids potential risks
      * 2. Shield activation (WAIT_SHIELD): Player attempts to defend against cannon fire
      * - If shield activated: player is protected from damage
@@ -268,12 +265,9 @@ public class PiratesCard extends EnemiesCard {
     }
 
     /**
-     * Processes ship part replacement command effects following component destruction
-     * from pirate cannon fire.
+     * Processes the effects of the command to choose the part of the ship to be retained
+     * following the destruction of components and the separation of the ship into two or more parts
      * <p>
-     * Handles the completion of ship part replacement after a component was destroyed
-     * by pirate retaliation fire. Marks the player as done and continues the encounter sequence.
-     *
      * @param commandType the type of command being executed (must be WAIT_SHIP_PART)
      * @param model       the model facade providing access to game state
      * @param board       the game board containing all players and entities

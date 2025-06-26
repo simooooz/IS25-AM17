@@ -17,17 +17,6 @@ import it.polimi.ingsw.model.player.Ship;
  * Batteries come in two variants with different power capacities:
  * - Standard batteries: Provide 2 energy units
  * - Triple batteries: Provide 3 energy units for enhanced power needs
- * <p>
- * Battery energy is consumed permanently when used, representing the depletion
- * of stored power. Each battery usage reduces both the component's charge and
- * the ship's total battery count, requiring strategic resource management.
- * <p>
- * The battery system is central to ship operations, as many advanced capabilities
- * depend on available power. Players must balance immediate tactical needs against
- * long-term resource conservation when deciding how to use their limited battery power.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public final class BatteryComponent extends Component {
 
@@ -61,8 +50,7 @@ public final class BatteryComponent extends Component {
      * <p>
      * This value represents the available energy that can be consumed for
      * powering ship systems. Once depleted to zero, the battery component
-     * can no longer provide power until recharged (though recharging is
-     * typically not available during normal gameplay).
+     * can no longer provide power until recharged.
      *
      * @return the number of battery charges currently available
      */
@@ -75,8 +63,7 @@ public final class BatteryComponent extends Component {
      * <p>
      * This method handles the permanent consumption of battery power, reducing
      * both the component's charge count and the ship's total available battery
-     * power. The operation is irreversible during normal gameplay, representing
-     * the permanent depletion of stored energy.
+     * power.
      * <p>
      * An event is emitted to notify the game system of the battery usage,
      * allowing UI updates and other systems to react to the power consumption.

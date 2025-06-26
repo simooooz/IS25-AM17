@@ -11,18 +11,8 @@ import it.polimi.ingsw.model.player.Ship;
 
 /**
  * Command implementation for activating shield protection in the game.
- * This command handles the activation of defensive shields, optionally powered
- * by a battery component to enhance the shield's effectiveness.
- * <p>
- * The command supports both powered and unpowered shield activation:
- * - Powered shields (with battery): Consume battery charge for enhanced protection
- * - Unpowered shields (without battery): Provide basic protection without resource consumption
- * <p>
- * The shield activation state is passed to the card's command effects to determine
- * the appropriate defensive benefits.
- *
- * @author Generated Javadoc
- * @version 1.0
+ * This command handles the activation of defensive shields, powered
+ * by a battery component.
  */
 public class ShieldCommand implements Command {
 
@@ -69,9 +59,6 @@ public class ShieldCommand implements Command {
      * 1. Validates that the battery component (if provided) is valid and has sufficient charge
      * 2. Consumes battery charge if a battery component is specified
      * 3. Applies the card's command effects with the shield activation state
-     * <p>
-     * The shield effectiveness is determined by whether a battery was used to power it,
-     * with powered shields typically providing superior protection compared to unpowered ones.
      *
      * @param card the card being executed that triggered this command
      * @return true if the shield command effects were successfully applied, false otherwise

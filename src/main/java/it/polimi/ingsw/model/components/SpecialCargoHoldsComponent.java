@@ -24,18 +24,6 @@ import java.util.List;
  * - Provide dynamic loading and unloading capabilities
  * - Integrate with the ship's overall goods inventory tracking
  * - Emit events for real-time inventory updates
- * <p>
- * The cargo system supports strategic resource management:
- * - Players must balance storage capacity against other ship components
- * - Goods can be dynamically rearranged between cargo holds
- * - Destruction of cargo holds results in permanent loss of stored goods
- * - Different cargo hold types create specialization decisions
- * <p>
- * This class serves as the base implementation for cargo storage, with subclasses
- * like CargoHoldsComponent adding specific restrictions (like red goods prohibition).
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public sealed class SpecialCargoHoldsComponent extends Component permits CargoHoldsComponent {
 
@@ -65,10 +53,6 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
 
     /**
      * Retrieves the maximum storage capacity of this cargo hold.
-     * <p>
-     * The capacity determines how many individual goods can be stored simultaneously
-     * in this cargo hold. Once the capacity is reached, no additional goods can be
-     * loaded until space is freed by unloading existing goods.
      *
      * @return the maximum number of goods this cargo hold can store
      */
@@ -79,10 +63,6 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
     /**
      * Retrieves the list of goods currently stored in this cargo hold.
      * <p>
-     * The returned list contains the actual goods stored, allowing inspection
-     * of cargo contents for trading decisions, encounter requirements, and
-     * strategic planning. The list reflects the current state of the cargo hold.
-     *
      * @return a list of ColorType values representing the stored goods
      */
     public List<ColorType> getGoods() {
@@ -97,9 +77,6 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
      * 2. Adds the good to the cargo hold's storage
      * 3. Updates the ship's total goods inventory
      * 4. Emits events for real-time inventory tracking
-     * <p>
-     * Subclasses can override this method to add additional restrictions,
-     * such as the red goods prohibition in standard cargo holds.
      *
      * @param good the color type of the good to load into the cargo hold
      * @param ship the ship containing this cargo hold and overall inventory
@@ -119,10 +96,7 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
      * 1. Validates that the cargo hold contains the specified good
      * 2. Removes the good from the cargo hold's storage
      * 3. Updates the ship's total goods inventory
-     * 4. Emits events for real-time inventory tracking
-     * <p>
-     * Subclasses can override this method to add additional restrictions,
-     * maintaining consistency with their loading restrictions.
+     * 4. Emits events for real-time inventory tracking.
      *
      * @param good the color type of the good to unload from the cargo hold
      * @param ship the ship containing this cargo hold and overall inventory
@@ -142,10 +116,6 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
      * 1. The standard component destruction process is completed
      * 2. All goods stored in the cargo hold are permanently lost
      * 3. The ship's total goods inventory is updated to reflect the losses
-     * <p>
-     * This represents the catastrophic loss of stored cargo when storage
-     * compartments are destroyed by damage, meteor impacts, or other destructive events.
-     * Players lose all goods that were stored in the destroyed cargo hold.
      *
      * @param player the player owning the ship where this component is being destroyed
      */
@@ -160,10 +130,6 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
     /**
      * Checks if this component matches the specified type.
      * <p>
-     * This method supports the type-safe component identification system
-     * used throughout the game for component filtering and selection.
-     * Only returns true for SpecialCargoHoldsComponent class checks, allowing
-     * distinction from other component types.
      *
      * @param type the class type to check against
      * @param <T>  the generic type parameter
@@ -177,13 +143,6 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
     /**
      * Safely casts this component to the specified type.
      * <p>
-     * This method provides type-safe casting for component operations
-     * that need to work with specific component types. Supports casting to:
-     * - SpecialCargoHoldsComponent (exact type)
-     * - Any type assignable from this class (including subclasses)
-     * <p>
-     * This flexibility allows the component to be used in contexts that
-     * expect either specialized cargo holds specifically or any assignable type.
      *
      * @param type the class type to cast to
      * @param <T>  the generic type parameter
@@ -202,10 +161,6 @@ public sealed class SpecialCargoHoldsComponent extends Component permits CargoHo
     /**
      * Creates a data transfer object representation of this cargo holds component.
      * <p>
-     * The DTO includes all relevant information about the cargo hold's current
-     * state, including its storage capacity, currently stored goods, position,
-     * and connection information. This is used for client-server communication
-     * and UI display purposes.
      *
      * @return a CargoHoldsComponentDTO containing this component's current state
      */

@@ -29,9 +29,6 @@ import java.util.stream.Collectors;
  * The command calculates the net change in goods (delta) by comparing the current state with the desired
  * new disposition of goods across all cargo holds. It validates cargo capacity constraints, special
  * good restrictions (like red goods requiring special cargo holds), and battery availability.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class GoodCommand implements Command {
 

@@ -12,9 +12,6 @@ import it.polimi.ingsw.model.cards.Card;
  * <p>
  * Implementations of this interface should handle all the necessary validation, state changes,
  * and side effects required for their specific action type.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public interface Command {
 

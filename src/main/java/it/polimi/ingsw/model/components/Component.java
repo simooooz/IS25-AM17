@@ -28,18 +28,12 @@ import java.util.stream.Collectors;
  * - Ship integrity: Component destruction can fragment ships requiring player decisions
  * <p>
  * Component lifecycle flows through several states:
- * 1. Hidden/Available: Component exists but not yet acquired by players
+ * 1. Hidden: Component exists but not yet acquired by players
  * 2. Picked: Component is in a player's hand for immediate use
  * 3. Reserved: Component is stored for later use (limited capacity)
  * 4. Inserted: Component is placed on the ship but can still be moved/rotated
  * 5. Welded: Component is permanently fixed to the ship
  * 6. Destroyed: Component is removed from the ship (may cause fragmentation)
- * <p>
- * The connector system ensures structural integrity and functional connections
- * between components, while the validation system prevents invalid configurations.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public sealed class Component permits
         BatteryComponent, CabinComponent, CannonComponent,
@@ -93,15 +87,6 @@ public sealed class Component permits
         this.rotationsCounter = 0;
     }
 
-    /**
-     * Retrieves the connector types for this component.
-     * <p>
-     * The connector array defines how this component can connect to adjacent
-     * components in the four cardinal directions (North, East, South, West).
-     * Connector compatibility determines valid ship configurations.
-     *
-     * @return array of connector types for the four cardinal directions
-     */
     public ConnectorType[] getConnectors() {
         return connectors;
     }
@@ -110,8 +95,8 @@ public sealed class Component permits
      * Checks if this component is adjacent to another component.
      * <p>
      * Two components are considered adjacent if they are exactly one grid
-     * position apart (Manhattan distance of 1). This is used for proximity
-     * checks in various game mechanics like epidemic spread.
+     * position apart. This is used for proximity checks in various game
+     * mechanics like epidemic spread.
      *
      * @param c the other component to check adjacency with
      * @return true if the components are adjacent, false otherwise
@@ -130,8 +115,6 @@ public sealed class Component permits
      * 2. Have compatible connectors that form functional connections
      * 3. Both connectors are non-empty (actual connections, not just compatibility)
      * <p>
-     * This method is crucial for ship connectivity validation and component
-     * interaction systems throughout the game.
      *
      * @param ship the ship containing this component and its potential neighbors
      * @return list of components that are functionally linked to this component
@@ -165,7 +148,6 @@ public sealed class Component permits
      * - Universal connectors are compatible with any non-empty connector
      * - Empty connectors are only compatible with other empty connectors
      * <p>
-     * This allows flexible ship design while maintaining structural logic.
      *
      * @param conn1 the first connector type
      * @param conn2 the second connector type
@@ -296,7 +278,7 @@ public sealed class Component permits
     }
 
     /**
-     * Moves this component to the player's reserve storage.
+     * Moves this component to the player's reserves.
      * <p>
      * The reservation process:
      * 1. Validates reserve capacity (maximum 2 components)
@@ -433,8 +415,7 @@ public sealed class Component permits
      * 2. Rotates the connector array clockwise by the specified amount
      * 3. Emits rotation events for game state updates
      * <p>
-     * Rotation affects connector positioning, which impacts how the component
-     * connects to adjacent components. Subclasses may override this to handle
+     * Subclasses may override this to handle
      * additional rotation effects (like cannon direction updates).
      *
      * @param player    the player rotating this component
@@ -498,10 +479,6 @@ public sealed class Component permits
      * 2. Calculates remaining ship connectivity after component removal
      * 3. If the ship fragments into multiple parts, prompts the player to choose which part to keep
      * 4. Emits ship fragmentation events if necessary
-     * <p>
-     * Ship fragmentation occurs when component destruction breaks the ship into
-     * disconnected sections, requiring players to make strategic decisions about
-     * which parts of their ship to preserve.
      *
      * @param player the player owning the ship where this component is being destroyed
      * @return PlayerState.DONE if the ship remains intact, PlayerState.WAIT_SHIP_PART if fragmentation occurred
@@ -519,47 +496,27 @@ public sealed class Component permits
         return PlayerState.DONE;
     }
 
-    /**
-     * Retrieves the x-coordinate (column) of this component.
-     *
-     * @return the column position on the ship dashboard
-     */
+
     public int getX() {
         return x;
     }
 
-    /**
-     * Retrieves the y-coordinate (row) of this component.
-     *
-     * @return the row position on the ship dashboard
-     */
+
     public int getY() {
         return y;
     }
 
-    /**
-     * Retrieves the unique identifier of this component.
-     *
-     * @return the component's unique ID
-     */
+
     public int getId() {
         return id;
     }
 
-    /**
-     * Checks if this component has been welded to the ship.
-     *
-     * @return true if the component is permanently attached, false otherwise
-     */
+
     public boolean isInserted() {
         return inserted;
     }
 
-    /**
-     * Checks if this component has been revealed to players.
-     *
-     * @return true if the component is visible and interactive, false otherwise
-     */
+
     public boolean isShown() {
         return shown;
     }
@@ -570,11 +527,6 @@ public sealed class Component permits
 
     /**
      * Checks if this component matches the specified type.
-     * <p>
-     * This method supports the type-safe component identification system
-     * used throughout the game for component filtering and selection.
-     * The base implementation handles general Component class checks and
-     * assignability relationships.
      *
      * @param type the class type to check against
      * @param <T>  the generic type parameter
@@ -589,10 +541,6 @@ public sealed class Component permits
 
     /**
      * Safely casts this component to the specified type.
-     * <p>
-     * This method provides type-safe casting for component operations
-     * that need to work with specific component types. The base implementation
-     * handles casting to Component class and assignable types.
      *
      * @param type the class type to cast to
      * @param <T>  the generic type parameter
@@ -609,10 +557,6 @@ public sealed class Component permits
 
     /**
      * Creates a data transfer object representation of this component.
-     * <p>
-     * The DTO includes basic component information including ID, connectors,
-     * position, and state flags. Subclasses typically override this method
-     * to include component-specific information in their DTOs.
      *
      * @return a ComponentDTO containing this component's current state
      */

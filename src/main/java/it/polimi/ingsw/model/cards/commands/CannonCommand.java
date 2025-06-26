@@ -22,9 +22,6 @@ import java.util.stream.Collectors;
  * <p>
  * The command validates that the specified batteries and cannons are valid components
  * on the player's ship and that there are sufficient battery charges to power the cannons.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class CannonCommand implements Command {
 

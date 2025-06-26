@@ -9,18 +9,8 @@ import it.polimi.ingsw.model.player.Ship;
  * This card creates an environmental hazard that affects all players based
  * on their ship's structural integrity and exposed connection points.
  * <p>
- * The stardust field represents a region of space filled with cosmic particles
- * that can interfere with ship systems and slow down travel. Ships with more
- * exposed connectors (representing incomplete hull protection or damaged
- * sections) are more vulnerable to the stardust interference and experience
- * greater propulsion impedance.
- * <p>
  * This card provides an immediate effect that executes automatically without
- * requiring player interaction, representing the unavoidable nature of
- * environmental space hazards.
- *
- * @author Generated Javadoc
- * @version 1.0
+ * requiring player interaction.
  */
 public class StardustCard extends Card {
 
@@ -39,19 +29,11 @@ public class StardustCard extends Card {
      * Executes the stardust field encounter by applying movement penalties
      * based on each ship's exposed connector count.
      * <p>
-     * The stardust field affects all players simultaneously, with the impact
-     * proportional to their ship's structural vulnerabilities:
-     * - Ships with more exposed connectors suffer greater movement penalties
-     * - Ships with better hull integrity (fewer exposed connectors) are less affected
-     * - Movement penalty equals the negative value of exposed connectors count
+     * The stardust field affects all players simultaneously, and the movement penalty
+     * equals the negative value of exposed connectors count
      * <p>
-     * Players are processed in reverse order to maintain proper positioning
-     * relationships on the flight path, ensuring that relative positions are
-     * preserved correctly after the environmental effect is applied.
-     * <p>
-     * The negative movement represents being slowed down or pushed backward
-     * by the cosmic particle interference, simulating the realistic effects
-     * of navigating through a hazardous stardust field.
+     * Players are processed in reverse order ensuring that relative positions are
+     * preserved correctly after the effect is applied.
      *
      * @param model the model facade providing access to game state
      * @param board the game board containing all players and their ships

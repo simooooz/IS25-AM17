@@ -251,11 +251,9 @@ public class MeteorSwarmCard extends Card {
     }
 
     /**
-     * Processes ship part replacement command effects following component destruction.
+     * Processes the effects of the command to choose the part of the ship to be retained
+     * following the destruction of components and the separation of the ship into two or more parts
      * <p>
-     * Handles the completion of ship part replacement after a component was destroyed
-     * by meteor impact. Marks the player as done and continues the meteor sequence.
-     *
      * @param commandType the type of command being executed (must be WAIT_SHIP_PART)
      * @param model       the model facade providing access to game state
      * @param board       the game board containing all players and entities

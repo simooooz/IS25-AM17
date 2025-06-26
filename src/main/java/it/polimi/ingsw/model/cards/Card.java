@@ -39,9 +39,6 @@ import java.util.Map;
  * The validation system ensures players can only perform actions allowed by their
  * current game state and the specific card's requirements, preventing exploitation
  * and maintaining game balance.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

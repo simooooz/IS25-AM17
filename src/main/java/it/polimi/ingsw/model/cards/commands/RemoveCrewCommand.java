@@ -18,12 +18,8 @@ import java.util.stream.Collectors;
  * This command handles the removal of both human crew members and alien crew members
  * from specified cabin components on the player's ship.
  * <p>
- * The command follows a priority system where aliens are removed before humans when
- * both are present in the same cabin. It validates that the specified cabins exist
+ * It validates that the specified cabins exist
  * on the ship and contain sufficient crew members to be removed.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class RemoveCrewCommand implements Command {
 
@@ -69,9 +65,7 @@ public class RemoveCrewCommand implements Command {
      * The method performs the following operations:
      * 1. Validates that all specified cabin components are valid and exist on the ship
      * 2. Performs card-specific validation for the crew removal state
-     * 3. Removes crew members from each cabin using a priority system:
-     * - If an alien is present in the cabin, removes the alien first
-     * - If no alien is present, removes one human crew member
+     * 3. Removes crew members from each cabin
      * 4. Applies the card's command effects for the crew removal operation
      *
      * @param card the card being executed that triggered this command

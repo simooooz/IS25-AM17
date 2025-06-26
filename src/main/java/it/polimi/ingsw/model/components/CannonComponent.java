@@ -12,21 +12,6 @@ import it.polimi.ingsw.common.model.enums.DirectionType;
  * Cannon components provide offensive capabilities for combat encounters and defensive
  * actions against threats like meteors and enemy attacks.
  * <p>
- * Cannons have several important characteristics that affect their effectiveness:
- * - Direction: Cannons fire in a specific direction and must be oriented properly for targeting
- * - Power type: Single cannons fire automatically, double cannons require battery power but provide more firepower
- * - Firing arc: North-facing cannons are more effective than side-firing cannons due to better positioning
- * <p>
- * The cannon system requires strategic placement and orientation planning:
- * - Cannons need clear firing lines (no components blocking their direction)
- * - Double cannons offer more firepower but consume limited battery resources
- * - Directional placement affects both defensive coverage and offensive capability
- * <p>
- * Cannon effectiveness is influenced by alien crew bonuses, with cannon aliens
- * providing additional firepower when any cannons are active on the ship.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public final class CannonComponent extends Component {
 
@@ -57,12 +42,6 @@ public final class CannonComponent extends Component {
     /**
      * Retrieves the direction this cannon is oriented to fire toward.
      * <p>
-     * The cannon's direction determines:
-     * - Which targets it can engage in combat
-     * - Its effectiveness against directional threats like meteors
-     * - Its power calculation (north-facing cannons are more effective)
-     * - Placement validation requirements (firing line must be clear)
-     *
      * @return the DirectionType indicating where this cannon is aimed
      */
     public DirectionType getDirection() {
@@ -72,12 +51,6 @@ public final class CannonComponent extends Component {
     /**
      * Retrieves whether this is a double cannon with enhanced capabilities.
      * <p>
-     * Double cannons differ from single cannons in several ways:
-     * - They provide twice the base firepower of single cannons
-     * - They require battery power to activate (unlike single cannons which fire automatically)
-     * - They allow strategic choice in combat situations
-     * - They are more effective for players with sufficient power resources
-     *
      * @return true if this is a double cannon, false if it's a single cannon
      */
     public boolean getIsDouble() {
@@ -91,9 +64,6 @@ public final class CannonComponent extends Component {
      * 1. Cannon type: Double cannons provide 2.0 base power, single cannons provide 1.0
      * 2. Direction effectiveness: North-facing cannons maintain full power,
      * while cannons facing other directions have their power halved due to less optimal positioning
-     * <p>
-     * This power value is used in combat calculations, defensive actions against meteors,
-     * and other situations where cannon effectiveness matters.
      *
      * @return the calculated firepower of this cannon (0.5 to 2.0 range)
      */
@@ -106,9 +76,7 @@ public final class CannonComponent extends Component {
      * Handles cannon rotation by updating both the component orientation and firing direction.
      * <p>
      * When a cannon is rotated, its firing direction must be updated to match the new
-     * orientation. This ensures that the cannon fires in the correct direction relative
-     * to its physical placement on the ship. The direction is rotated by the same number
-     * of steps as the component itself.
+     * orientation.
      *
      * @param player    the player performing the rotation
      * @param rotations the number of 90-degree clockwise rotations to apply
@@ -125,11 +93,7 @@ public final class CannonComponent extends Component {
      * <p>
      * Cannon placement requires not only the standard component validation but also
      * verification that the firing line is clear. The cannon must have an empty space
-     * in the direction it's oriented to fire, ensuring it can engage targets effectively
-     * without obstruction from other ship components.
-     * <p>
-     * This validation prevents players from placing cannons in positions where they
-     * would be blocked by their own ship structure, maintaining realistic firing constraints.
+     * in the direction it's oriented to fire.
      *
      * @param ship the ship where this cannon is being validated for placement
      * @return true if the cannon can be placed with clear firing line, false otherwise
@@ -145,10 +109,6 @@ public final class CannonComponent extends Component {
 
     /**
      * Checks if this component matches the specified type.
-     * <p>
-     * This method supports the type-safe component identification system
-     * used throughout the game for component filtering and selection.
-     * Only returns true for CannonComponent class checks.
      *
      * @param type the class type to check against
      * @param <T>  the generic type parameter
@@ -161,10 +121,6 @@ public final class CannonComponent extends Component {
 
     /**
      * Safely casts this component to the specified type.
-     * <p>
-     * This method provides type-safe casting for component operations
-     * that need to work with specific component types. Only supports
-     * casting to CannonComponent class.
      *
      * @param type the class type to cast to
      * @param <T>  the generic type parameter
@@ -182,11 +138,6 @@ public final class CannonComponent extends Component {
 
     /**
      * Creates a data transfer object representation of this cannon component.
-     * <p>
-     * The DTO includes all relevant information about the cannon's current
-     * state, including its firing direction, power type, position, and
-     * connection information. This is used for client-server communication
-     * and UI display purposes.
      *
      * @return a CannonComponentDTO containing this component's current state
      */

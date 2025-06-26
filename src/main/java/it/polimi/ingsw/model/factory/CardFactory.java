@@ -30,30 +30,10 @@ import java.util.*;
  * This factory implements the Factory Method pattern to provide a flexible system for card creation
  * and serialization, supporting various card types with complex nested structures.
  * <p>
- * The CardFactory serves multiple critical functions:
- * - JSON-based card creation from configuration files
- * - Polymorphic card instantiation supporting all card types in the game
- * - Card serialization for network transmission and persistence
- * - Centralized card management and type safety
- * <p>
- * The factory supports a comprehensive set of card types including:
- * - Enemy encounters (Slavers, Pirates, Smugglers)
- * - Environmental hazards (Stardust, Epidemic, Meteor Swarms)
- * - Exploration opportunities (Abandoned Ships/Stations, Planets)
- * - Strategic challenges (Combat Zones, Open Space)
- * <p>
- * Card creation involves parsing complex JSON structures that may include:
- * - Nested utility objects (WarLines, Meteors, CannonFires, Planets)
- * - Enumerated values (ColorTypes, DirectionTypes, CriteriaTypes)
- * - Collections of complex objects
- * - Conditional logic based on card-specific properties
- * <p>
  * The serialization system provides network-ready JSON representations of cards
  * for client-server communication and game state persistence.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
+
 public abstract class CardFactory {
 
     /**
@@ -77,10 +57,6 @@ public abstract class CardFactory {
 
     /**
      * Retrieves the collection of cards managed by this factory.
-     * <p>
-     * This method provides access to all cards that have been created
-     * and registered with this factory instance. The returned list
-     * reflects the current state of the factory's card collection.
      *
      * @return the list of cards managed by this factory
      */
@@ -90,10 +66,6 @@ public abstract class CardFactory {
 
     /**
      * Creates and configures a static ObjectMapper for card serialization operations.
-     * <p>
-     * The ObjectMapper is configured with JDK8 module support when available,
-     * enabling proper serialization of Optional types and other JDK8 features
-     * commonly used in card implementations.
      *
      * @return a configured ObjectMapper instance for serialization operations
      */
@@ -111,11 +83,6 @@ public abstract class CardFactory {
 
     /**
      * Loads and parses the JSON configuration file containing card definitions.
-     * <p>
-     * This method reads the 'factory.json' resource file and parses it into
-     * a JsonNode structure that can be used for card creation. The configuration
-     * file contains the complete specifications for all card types and their
-     * associated properties.
      *
      * @return the root JsonNode containing all card configuration data
      * @throws RuntimeException if the configuration file cannot be found or parsed
@@ -139,10 +106,6 @@ public abstract class CardFactory {
 
     /**
      * Creates a new ObjectMapper instance with JDK8 module support.
-     * <p>
-     * This method provides a fresh ObjectMapper configured similarly to the
-     * static instance but for use in specific operations that require a
-     * separate mapper instance.
      *
      * @return a new configured ObjectMapper instance
      */
@@ -161,29 +124,6 @@ public abstract class CardFactory {
     /**
      * Creates a specific card instance from JSON configuration data.
      * <p>
-     * This method implements the core card creation logic, parsing JSON data
-     * and instantiating the appropriate card type based on the configuration.
-     * The method handles complex card creation including:
-     * <p>
-     * - Basic card properties (id, level, learner mode)
-     * - Card-specific parameters (crew requirements, credits, days)
-     * - Complex nested structures (war lines, meteors, cannon fires)
-     * - Collections of utility objects (planets, penalties)
-     * - Enumerated value parsing (colors, directions, criteria types)
-     * <p>
-     * Supported card types include:
-     * - SlaversCard: Enemy encounter requiring crew sacrifice
-     * - SmugglersCard: Enemy encounter with goods-based penalties and rewards
-     * - PiratesCard: Enemy encounter with cannon fire retaliation
-     * - StardustCard: Environmental hazard affecting ship movement
-     * - OpenSpaceCard: Navigation challenge using engine power
-     * - EpidemicCard: Crew-affecting environmental hazard
-     * - MeteorSwarmCard: Defensive challenge against meteor impacts
-     * - AbandonedShipCard: Opportunity encounter requiring crew investment
-     * - AbandonedStationCard: Opportunity encounter offering goods rewards
-     * - PlanetCard: Trading encounter with multiple planet options
-     * - CombatZoneCard: Complex multi-criteria competitive encounter
-     *
      * @param cardJson the JsonNode containing the card's configuration data
      * @return a fully configured Card instance of the appropriate type
      * @throws IllegalArgumentException if the card type is unknown or configuration is invalid
@@ -331,11 +271,6 @@ public abstract class CardFactory {
     /**
      * Serializes a single card instance to JSON string format.
      * <p>
-     * This method converts a Card object into a JSON string representation
-     * suitable for network transmission, persistence, or client-server
-     * communication. The serialization preserves all card state including
-     * dynamic properties and current conditions.
-     *
      * @param card the card instance to serialize
      * @return JSON string representation of the card
      * @throws RuntimeException if serialization fails due to JSON processing errors
@@ -353,11 +288,6 @@ public abstract class CardFactory {
     /**
      * Serializes a list of card instances to JSON string format.
      * <p>
-     * This method converts a collection of Card objects into a JSON array
-     * string representation suitable for bulk operations, event transmission,
-     * or batch card data transfer. Each card in the list is fully serialized
-     * with its complete state information.
-     *
      * @param cards the list of card instances to serialize
      * @return JSON array string representation of the card list
      * @throws RuntimeException if serialization fails due to JSON processing errors

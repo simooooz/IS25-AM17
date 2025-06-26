@@ -18,16 +18,9 @@ import java.util.Map;
  * <p>
  * The smuggler encounter follows the standard enemy combat pattern where players
  * attempt to defeat the smugglers using cannon firepower. Players who successfully
- * defeat the smugglers are offered rewards in the form of specific goods and
- * movement benefits, while players who fail face the penalty of having goods
+ * defeat the smugglers are offered rewards in the form of specific goods,
+ * while players who fail face the penalty of having goods
  * confiscated by the smugglers.
- * <p>
- * The smugglers operate in the black market trade, making them interested in
- * seizing valuable cargo rather than crew or ship components. This creates
- * goods-focused consequences that align with their criminal enterprise nature.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class SmugglersCard extends EnemiesCard {
 
@@ -64,11 +57,6 @@ public class SmugglersCard extends EnemiesCard {
      * Applies the specific penalty for players defeated by the smugglers by initiating
      * goods confiscation proceedings.
      * <p>
-     * When a player fails to defeat the smugglers, they must surrender goods
-     * to represent the smugglers' primary objective of seizing valuable cargo
-     * for their black market operations. This penalty directly targets the
-     * player's goods inventory rather than crew or ship components.
-     *
      * @param model  the model facade providing access to game state
      * @param player the player data for the defeated player
      * @return true as goods removal requires player interaction to select which goods to surrender
@@ -83,13 +71,9 @@ public class SmugglersCard extends EnemiesCard {
      * Processes reward choice command effects for players who successfully defeated the smugglers.
      * <p>
      * Handles the player's decision on whether to claim the victory rewards:
-     * - If rewards accepted: player receives movement benefits and proceeds to goods acquisition
+     * - If rewards accepted: player loses flight days and proceeds to goods acquisition
      * - If rewards declined: player receives no benefits and encounter ends for them
      * <p>
-     * The reward system is two-phased: first the movement benefit is applied,
-     * then the player can acquire the specific goods offered by the smugglers.
-     * This represents both territorial advancement and access to smuggled goods.
-     *
      * @param commandType the type of command being executed (must be WAIT_BOOLEAN)
      * @param value       the boolean value indicating whether the player accepts the rewards
      * @param model       the model facade providing access to game state
@@ -121,9 +105,6 @@ public class SmugglersCard extends EnemiesCard {
      * Handles the completion of goods transactions for players in two scenarios:
      * - WAIT_GOODS: Player completing acquisition of reward goods after accepting victory rewards
      * - WAIT_REMOVE_GOODS: Player completing surrender of goods after being defeated
-     * <p>
-     * Both scenarios result in the player being marked as done and the encounter
-     * progressing to the next player or completion phase.
      *
      * @param commandType the type of command being executed (WAIT_GOODS or WAIT_REMOVE_GOODS)
      * @param model       the model facade providing access to game state

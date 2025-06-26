@@ -13,9 +13,6 @@ import it.polimi.ingsw.model.game.Board;
  * The dice roll is performed during command construction, generating a random
  * value between 2 and 12 (inclusive) that represents the sum of two dice.
  * This value is then used when executing the card's command effects.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class RollDicesCommand implements Command {
 

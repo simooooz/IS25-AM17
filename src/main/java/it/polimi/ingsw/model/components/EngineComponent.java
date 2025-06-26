@@ -11,22 +11,6 @@ import it.polimi.ingsw.common.model.enums.DirectionType;
  * Component implementation representing a propulsion engine on a player's ship.
  * Engine components provide movement capabilities for navigation through space
  * and advancement along the flight path during various encounters.
- * <p>
- * Engines have several important characteristics that affect their functionality:
- * - Power type: Single engines provide automatic propulsion, double engines provide enhanced power but require battery activation
- * - Direction: Engines have orientation but unlike cannons, their effectiveness is not direction-dependent
- * - Exhaust clearance: Engines require clear space behind them (south direction) for proper operation
- * <p>
- * The engine system supports strategic power management decisions:
- * - Single engines contribute automatically to ship movement capabilities
- * - Double engines offer more power but consume limited battery resources
- * - Engine aliens provide additional propulsion bonuses when any engines are active
- * <p>
- * Engine placement requires careful consideration of exhaust clearance, ensuring
- * that the propulsion systems can operate without obstruction from other ship components.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public final class EngineComponent extends Component {
 
@@ -57,12 +41,6 @@ public final class EngineComponent extends Component {
     /**
      * Retrieves whether this is a double engine with enhanced capabilities.
      * <p>
-     * Double engines differ from single engines in several ways:
-     * - They provide twice the propulsion power of single engines
-     * - They require battery power to activate (unlike single engines which operate automatically)
-     * - They allow strategic choice in movement situations
-     * - They are more effective for players with sufficient power resources
-     *
      * @return true if this is a double engine, false if it's a single engine
      */
     public boolean getIsDouble() {
@@ -72,14 +50,6 @@ public final class EngineComponent extends Component {
     /**
      * Calculates the propulsion power of this engine.
      * <p>
-     * Unlike cannons, engine power calculation is straightforward:
-     * - Double engines provide 2 units of propulsion power
-     * - Single engines provide 1 unit of propulsion power
-     * - Direction does not affect engine power (all orientations are equally effective)
-     * <p>
-     * This power value is used in movement calculations, open space navigation,
-     * and other situations where propulsion capability matters.
-     *
      * @return the propulsion power of this engine (1 for single, 2 for double)
      */
     public int calcPower() {
@@ -90,8 +60,7 @@ public final class EngineComponent extends Component {
      * Handles engine rotation by updating both the component orientation and direction tracking.
      * <p>
      * When an engine is rotated, its direction property is updated to match the new
-     * orientation. While direction doesn't affect engine power, it's important for
-     * proper exhaust clearance validation and visual representation.
+     * orientation.
      *
      * @param player    the player performing the rotation
      * @param rotations the number of 90-degree clockwise rotations to apply
@@ -110,10 +79,6 @@ public final class EngineComponent extends Component {
      * verification that the exhaust path is clear. Engines must have an empty space
      * to the south (behind them) to ensure proper exhaust flow and prevent obstruction
      * from other ship components.
-     * <p>
-     * This validation ensures realistic engine operation constraints and prevents
-     * players from placing engines in positions where they would be blocked by
-     * their own ship structure.
      *
      * @param ship the ship where this engine is being validated for placement
      * @return true if the engine can be placed with clear exhaust path, false otherwise
@@ -126,10 +91,6 @@ public final class EngineComponent extends Component {
     /**
      * Checks if this component matches the specified type.
      * <p>
-     * This method supports the type-safe component identification system
-     * used throughout the game for component filtering and selection.
-     * Only returns true for EngineComponent class checks.
-     *
      * @param type the class type to check against
      * @param <T>  the generic type parameter
      * @return true if the type matches EngineComponent, false otherwise
@@ -142,10 +103,6 @@ public final class EngineComponent extends Component {
     /**
      * Safely casts this component to the specified type.
      * <p>
-     * This method provides type-safe casting for component operations
-     * that need to work with specific component types. Only supports
-     * casting to EngineComponent class.
-     *
      * @param type the class type to cast to
      * @param <T>  the generic type parameter
      * @return this component cast to the specified type
@@ -163,11 +120,6 @@ public final class EngineComponent extends Component {
     /**
      * Creates a data transfer object representation of this engine component.
      * <p>
-     * The DTO includes all relevant information about the engine's current
-     * state, including its orientation, power type, position, and connection
-     * information. This is used for client-server communication and UI
-     * display purposes.
-     *
      * @return an EngineComponentDTO containing this component's current state
      */
     @Override
