@@ -64,11 +64,13 @@ public class FlightPhaseController implements MessageHandler {
     @FXML private Button mainButton;
     @FXML private Button endFlightButton;
 
-    @FXML private Label statusLabel;
+    @FXML private Label logLabel;
     @FXML private ScrollPane statusScrollPane;
 
-    @FXML private Label instructionLabel;
     @FXML private Label mainStatusLabel;
+    @FXML private Label instructionLabel;
+
+    @FXML private Label errorLabel;
 
     private Client client;
     private ClientGameModel model;
@@ -184,7 +186,6 @@ public class FlightPhaseController implements MessageHandler {
                     destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is allowed component
                     destComponent instanceof ClientCargoHoldsComponent && objectsMap.get(destComponentId).size() < ((ClientCargoHoldsComponent) destComponent).getNumber()
                 ) {
-                    System.out.println("Mi muovo");
                     moveComponentObject(objectImageView, destId);
                     event.setDropCompleted(true);
                 }
@@ -1131,20 +1132,15 @@ public class FlightPhaseController implements MessageHandler {
     }
 
     private void showCardInfo(ClientCard card) {
-        // Ottieni direttamente la stringa dalle informazioni della carta
         String cardInfo = card.printCardInfo(client.getGameController().getModel(), client.getGameController().getModel().getBoard());
 
-        // Aggiorna il label nella sezione status
-        statusLabel.setText(cardInfo);
+        logLabel.setText(cardInfo);
 
-        // Scrolla automaticamente all'inizio
         statusScrollPane.setVvalue(0.0);
     }
 
-// Aggiungi anche questo metodo per inizializzare la sezione status vuota:
-
     private void initializeStatus() {
-        statusLabel.setText("Waiting for game events...");
+        logLabel.setText("Waiting for game events...");
         statusScrollPane.setVvalue(0.0);
     }
 
@@ -1272,7 +1268,9 @@ public class FlightPhaseController implements MessageHandler {
                     endFlightButton.setVisible(false);
                 updateBoard();
             }
-            case GameErrorEvent e -> {}
+            case GameErrorEvent e -> {
+                errorLabel.setText(e.message());
+            }
             default -> {}
         }
     }
