@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.App;
 import it.polimi.ingsw.view.GUI.MessageDispatcher;
+import it.polimi.ingsw.view.GUI.MessageHandler;
 import it.polimi.ingsw.view.GUI.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

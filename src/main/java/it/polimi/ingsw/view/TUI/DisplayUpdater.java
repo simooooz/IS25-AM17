@@ -13,7 +13,7 @@ import java.util.List;
 
 public class DisplayUpdater {
 
-    private List<ClientCard> lookedCards;
+    private final List<ClientCard> lookedCards;
 
     public DisplayUpdater() {
         lookedCards = new ArrayList<>();

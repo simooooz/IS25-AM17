@@ -4,7 +4,7 @@ import it.polimi.ingsw.common.model.events.game.*;
 import it.polimi.ingsw.model.events.CardPileLookedEvent;
 import it.polimi.ingsw.model.events.CardRevealedEvent;
 import it.polimi.ingsw.model.events.CardUpdatedEvent;
-import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.SetLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
@@ -18,7 +18,7 @@ public sealed interface Event permits
         ComponentReleasedEvent, ComponentReservedEvent, ComponentRotatedEvent, ComponentDestroyedEvent,
         HourglassMovedEvent, CardPileLookedEvent, CardPileReleasedEvent, CardRevealedEvent, CardUpdatedEvent,
         it.polimi.ingsw.client.model.events.CardPileLookedEvent, it.polimi.ingsw.client.model.events.CardRevealedEvent, it.polimi.ingsw.client.model.events.CardUpdatedEvent,
-        FlightEndedEvent, CreatedLobbyEvent, JoinedLobbyEvent, LeftLobbyEvent, UsernameOkEvent
+        FlightEndedEvent, SetLobbyEvent, JoinedLobbyEvent, LeftLobbyEvent, UsernameOkEvent
 {
 
     MessageType eventType();

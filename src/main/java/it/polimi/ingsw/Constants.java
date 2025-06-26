@@ -38,24 +38,17 @@ public abstract class Constants {
     }
 
     public static String inTheMiddle(String text, int width) {
-        // Rimuovi eventuali caratteri di controllo ANSI o altri caratteri speciali per il calcolo della lunghezza visiva
         String visibleText = text.replaceAll("\\u001B\\[[;\\d]*m", "");
         int visibleLength = visibleText.length();
 
-        if (visibleLength >= width) {
-            return text; // Restituisci il testo originale completo (con i codici di colore)
-        }
+        if (visibleLength >= width)
+            return text;
 
         int leftPadding = (width - visibleLength) / 2;
         int rightPadding = width - visibleLength - leftPadding;
 
-        // Crea la stringa centrata
-        StringBuilder centeredText = new StringBuilder();
-        centeredText.append(" ".repeat(leftPadding));
-        centeredText.append(text); // Aggiungi il testo originale con eventuali codici di colore
-        centeredText.append(" ".repeat(rightPadding));
-
-        return centeredText.toString();
+        return " ".repeat(leftPadding) +
+                text + " ".repeat(rightPadding);
     }
 
     public static String displayComponents(List<ClientComponent> components, int componentsPerRow) {
@@ -134,8 +127,6 @@ public abstract class Constants {
         return output.toString();
     }
 
-
-    // Socket only
     public static Message createMessage(MessageType gameEvent, Object... args) {
         Message message;
         switch (args.length) {

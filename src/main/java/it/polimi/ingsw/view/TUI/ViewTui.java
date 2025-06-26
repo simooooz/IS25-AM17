@@ -12,7 +12,7 @@ import it.polimi.ingsw.common.model.enums.AlienType;
 import it.polimi.ingsw.common.model.enums.ColorType;
 import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.common.model.events.game.*;
-import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.SetLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
@@ -50,7 +50,7 @@ public class ViewTui implements UserInterface {
             if (toUpdate) break;
             switch (event) {
                 case ComponentPickedEvent _, ComponentReleasedEvent _, SyncAllEvent _, MatchStartedEvent _, HourglassMovedEvent _, CardRevealedEvent _,
-                     CardUpdatedEvent _, FlightEndedEvent _, CreatedLobbyEvent _, JoinedLobbyEvent _, LeftLobbyEvent _,
+                     CardUpdatedEvent _, FlightEndedEvent _, SetLobbyEvent _, JoinedLobbyEvent _, LeftLobbyEvent _,
                      UsernameOkEvent _, ErrorEvent _, PlayersStateUpdatedEvent _, PlayersPositionUpdatedEvent _, CreditsUpdatedEvent _ -> toUpdate = true;
                 case ComponentRotatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());
                 case BatteriesUpdatedEvent e -> toUpdate = isToUpdateByComponentId(e.id());

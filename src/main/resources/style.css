@@ -351,7 +351,6 @@
     -fx-opacity: 0;
 }
 
-/* Rimuove corner e sfondo */
 .scroll-pane .corner {
     -fx-background-color: transparent;
 }

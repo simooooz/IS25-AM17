@@ -5,7 +5,7 @@ import it.polimi.ingsw.common.model.events.game.SyncAllEvent;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.controller.exceptions.PlayerAlreadyInException;
 import it.polimi.ingsw.common.model.events.EventContext;
-import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.SetLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.JoinedLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 
@@ -183,7 +183,7 @@ public class Lobby {
 
         players.add(username);
         EventContext.emit(new JoinedLobbyEvent(username));
-        EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
+        EventContext.emit(new SetLobbyEvent(id, players, learnerMode, maxPlayers));
 
         if (players.size() == maxPlayers && state == LobbyState.WAITING)
             this.initGame();
@@ -244,7 +244,7 @@ public class Lobby {
         players.add(username);
 
         EventContext.emit(new JoinedLobbyEvent(username));
-        EventContext.emit(new CreatedLobbyEvent(id, players, learnerMode, maxPlayers));
+        EventContext.emit(new SetLobbyEvent(id, players, learnerMode, maxPlayers));
 
         if (this.game != null) {
             this.game.rejoinGame(username);

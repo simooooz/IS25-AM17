@@ -30,7 +30,6 @@ public class InputUtility {
             } catch (Exception e) {
                 Chroma.println(errorMessage, Chroma.RED);
                 System.out.print("> ");
-                result = null;
             }
         } while (true);
     }
@@ -41,18 +40,6 @@ public class InputUtility {
                 s -> {
                     if (s.equals("q") && acceptQ) return null;
                     return Integer.parseInt(s);
-                },
-                x -> x >= min && x <= max,
-                "Insert a number between " + min + " and " + max + "."
-        );
-    }
-
-    public static Double requestDouble(String message, boolean acceptQ, double min, double max) {
-        return requestInput(
-                message,
-                s -> {
-                    if (s.equals("q") && acceptQ) return null;
-                    return Double.parseDouble(s);
                 },
                 x -> x >= min && x <= max,
                 "Insert a number between " + min + " and " + max + "."
@@ -86,7 +73,7 @@ public class InputUtility {
                         throw new IllegalArgumentException();
                     }
                 },
-                x -> true, // Sempre valido una volta convertito
+                _ -> true,
                 "Insert yes/no, true/false"
         );
     }

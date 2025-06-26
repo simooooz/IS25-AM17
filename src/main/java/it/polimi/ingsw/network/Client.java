@@ -3,7 +3,7 @@ package it.polimi.ingsw.network;
 import it.polimi.ingsw.client.controller.ClientGameController;
 import it.polimi.ingsw.client.model.ClientEventBus;
 import it.polimi.ingsw.client.model.game.ClientLobby;
-import it.polimi.ingsw.common.model.events.lobby.CreatedLobbyEvent;
+import it.polimi.ingsw.common.model.events.lobby.SetLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.common.model.events.lobby.UsernameOkEvent;
 import it.polimi.ingsw.network.messages.MessageType;
@@ -33,7 +33,7 @@ public abstract class Client {
 
     public void setLobby(ClientLobby lobby) {
         this.lobby = lobby;
-        ClientEventBus.getInstance().publish(lobby == null ? new LeftLobbyEvent(username, null) : new CreatedLobbyEvent(lobby.getGameID(), lobby.getPlayers(), lobby.isLearnerMode(), lobby.getMaxPlayers()));
+        ClientEventBus.getInstance().publish(lobby == null ? new LeftLobbyEvent(username, null) : new SetLobbyEvent(lobby.getGameID(), lobby.getPlayers(), lobby.isLearnerMode(), lobby.getMaxPlayers()));
     }
 
     public UserState getState() {
