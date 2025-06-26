@@ -9,6 +9,7 @@ import it.polimi.ingsw.network.socket.client.ClientSocket;
 import it.polimi.ingsw.view.UserInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -36,9 +37,14 @@ public class App extends Application implements UserInterface {
     }
 
     @Override
-    public void start(Stage stage) { SceneManager.init(stage); }
+    public void start(Stage stage) {
+        Font.loadFont(getClass().getResource("/fonts/Audiowide-Regular.ttf").toExternalForm(), 14);
+        SceneManager.init(stage);
+    }
 
-    public static Client getClientInstance() { return client; }
+    public static Client getClientInstance() {
+        return client;
+    }
 
     @Override
     public void onEvent(List<Event> events) {
