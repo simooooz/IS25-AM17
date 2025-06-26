@@ -23,11 +23,7 @@ import java.util.List;
  * <p>
  * Once a player successfully claims the abandoned ship, all subsequent players
  * are excluded from the opportunity, representing the fact that the ship has
- * already been secured. This creates strategic timing decisions about when
- * to attempt claiming valuable but risky opportunities.
- *
- * @author Generated Javadoc
- * @version 1.0
+ * already been secured.
  */
 public class AbandonedShipCard extends Card {
 
@@ -44,7 +40,7 @@ public class AbandonedShipCard extends Card {
     private final int credits;
 
     /**
-     * The number of flight days advanced for successfully claiming the abandoned ship
+     * The number of flight days lost for successfully claiming the abandoned ship
      */
     @JsonProperty
     private final int days;
@@ -112,10 +108,6 @@ public class AbandonedShipCard extends Card {
      * 1. If the ship is already claimed: all remaining players are marked as done
      * 2. If a player lacks sufficient crew: they cannot attempt boarding and are marked as done
      * 3. If a player has sufficient crew: they are offered the choice to attempt boarding
-     * <p>
-     * Players are evaluated in turn order, creating a first-come-first-served system
-     * where earlier players have priority access to the abandoned ship opportunity.
-     * The encounter completes when all players have been evaluated or made their decisions.
      *
      * @param model the model facade providing access to game state
      * @return true if all players have been evaluated and the encounter is complete, false if waiting for player decisions
@@ -149,10 +141,6 @@ public class AbandonedShipCard extends Card {
      * Handles player choices about attempting to board the abandoned ship:
      * - If player accepts the challenge: initiates crew sacrifice process and marks ship as claimed
      * - If player declines the challenge: marks them as done and continues to next player
-     * <p>
-     * The first player to accept the boarding challenge claims the ship, preventing
-     * all subsequent players from accessing the opportunity. This creates strategic
-     * risk/reward decisions about timing and resource allocation.
      *
      * @param commandType the type of command being executed (must be WAIT_BOOLEAN)
      * @param value       the boolean value indicating whether the player accepts the boarding challenge

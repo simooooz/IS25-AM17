@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Card implementation representing an abandoned space station encounter in the game.
+ * Card implementation representing an abandoned station encounter in the game.
  * This card presents players with an opportunity to claim valuable goods from
  * a derelict space station, but requires sufficient crew to safely dock and
  * secure the facility.
@@ -24,13 +24,7 @@ import java.util.Map;
  * action, and successful claimants can acquire specific goods from the station's stores.
  * <p>
  * Unlike abandoned ships that require crew sacrifice, abandoned stations allow
- * players to claim goods without losing crew members, representing the safer
- * nature of securing an unmanned facility compared to boarding a potentially
- * dangerous derelict vessel. This creates different risk/reward calculations
- * for players considering the opportunity.
- *
- * @author Generated Javadoc
- * @version 1.0
+ * players to claim goods without losing crew members.
  */
 public class AbandonedStationCard extends Card {
 
@@ -41,7 +35,7 @@ public class AbandonedStationCard extends Card {
     private final int crew;
 
     /**
-     * The number of flight days advanced for successfully claiming the abandoned station
+     * The number of flight days lost for successfully claiming the abandoned station
      */
     @JsonProperty
     private final int days;
@@ -153,8 +147,7 @@ public class AbandonedStationCard extends Card {
      * - If player declines the challenge: marks them as done and continues to next player
      * <p>
      * The first player to accept the docking challenge claims the station, preventing
-     * all subsequent players from accessing the opportunity. This creates strategic
-     * timing decisions about when to claim valuable but limited opportunities.
+     * all subsequent players from accessing the opportunity.
      *
      * @param commandType the type of command being executed (must be WAIT_BOOLEAN)
      * @param value       the boolean value indicating whether the player accepts the docking challenge
@@ -182,13 +175,7 @@ public class AbandonedStationCard extends Card {
      * Processes goods acquisition completion and awards the abandoned station's movement benefits.
      * <p>
      * Handles the completion of goods acquisition after a player has successfully
-     * docked with the abandoned station. Awards the player with movement benefits
-     * as compensation for claiming the derelict facility and securing its resources.
-     * <p>
-     * Unlike abandoned ships, stations do not require crew sacrifice, making them
-     * safer but potentially less rewarding opportunities. The movement benefit
-     * represents advancing further along the flight path due to resources or
-     * intelligence gained from the abandoned station.
+     * docked with the abandoned station.
      *
      * @param commandType the type of command being executed (must be WAIT_GOODS)
      * @param model       the model facade providing access to game state

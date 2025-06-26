@@ -19,12 +19,6 @@ import java.util.List;
  * every cabin that is both occupied (contains crew) and adjacent to another
  * occupied cabin loses one crew member, representing the spread of disease
  * through close proximity.
- * <p>
- * The crew removal follows a priority system: human crew members are removed
- * before alien crew members when both are present in the same cabin.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class EpidemicCard extends Card {
 
@@ -46,14 +40,12 @@ public class EpidemicCard extends Card {
      * 1. Identifies all cabin components on the player's ship
      * 2. Checks each pair of cabins to determine adjacency and occupancy
      * 3. Marks cabins for crew reduction if they are both occupied and adjacent to other occupied cabins
-     * 4. Removes one crew member from each marked cabin using the priority system
+     * 4. Removes one crew member from each marked cabin
      * 5. Repeats the process for all players on the board
      * <p>
      * The epidemic affects cabins that meet both criteria:
      * - The cabin contains at least one crew member (human or alien)
      * - The cabin is physically adjacent to at least one other occupied cabin
-     * <p>
-     * This represents the realistic spread of contagious disease through close quarters.
      *
      * @param model the model facade providing access to game state
      * @param board the game board containing all players and their ships
@@ -94,16 +86,10 @@ public class EpidemicCard extends Card {
     }
 
     /**
-     * Removes one crew member from the specified cabin component following priority rules.
-     * <p>
-     * The crew removal follows a hierarchical priority system to simulate realistic
-     * epidemic casualties:
+     * Removes one crew member from the specified cabin component:
      * - If the cabin contains human crew members, removes one human
      * - If the cabin contains no humans but has an alien, removes the alien
      * - If the cabin is empty, no action is taken
-     * <p>
-     * This priority system reflects the assumption that human crew members are
-     * more susceptible to epidemic diseases than alien crew members.
      *
      * @param cabin the cabin component from which to remove crew
      * @param ship  the ship containing the cabin, used for state updates

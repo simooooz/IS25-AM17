@@ -16,16 +16,8 @@ import java.util.List;
  * <p>
  * The slaver encounter follows the standard enemy combat pattern where players
  * attempt to defeat the slavers using cannon firepower. Players who successfully
- * defeat the slavers are offered rewards (credits and movement benefits), while
+ * defeat the slavers are offered rewards (credits), while
  * players who fail face the specific penalty of losing crew members to the slavers.
- * <p>
- * The slavers specifically target crew members, representing their primary
- * interest in capturing living beings for their slave trade operations.
- * Defeated players must surrender a specified number of crew members from
- * their cabin components.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class SlaversCard extends EnemiesCard {
 
@@ -61,11 +53,6 @@ public class SlaversCard extends EnemiesCard {
     /**
      * Applies the specific penalty for players defeated by the slavers by initiating
      * crew removal proceedings.
-     * <p>
-     * When a player fails to defeat the slavers, they must surrender crew members
-     * to represent the slavers' primary objective of capturing people for their
-     * slave trade operations. This penalty directly targets the player's crew
-     * resources rather than causing ship damage or other penalties.
      *
      * @param model  the model facade providing access to game state
      * @param player the player data for the defeated player
@@ -81,11 +68,8 @@ public class SlaversCard extends EnemiesCard {
      * Processes reward choice command effects for players who successfully defeated the slavers.
      * <p>
      * Handles the player's decision on whether to claim the victory rewards:
-     * - If rewards accepted: player receives credits and movement benefits
-     * - If rewards declined: player receives no benefits but avoids potential risks
-     * <p>
-     * The movement benefit represents advancing further along the flight path
-     * due to successful navigation through slaver-controlled space.
+     * - If rewards accepted: player receives credits and loses flight days
+     * - If rewards declined: player receives no benefits
      *
      * @param commandType the type of command being executed (must be WAIT_BOOLEAN)
      * @param value       the boolean value indicating whether the player accepts the rewards

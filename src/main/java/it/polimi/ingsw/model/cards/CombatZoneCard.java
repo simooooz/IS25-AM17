@@ -26,12 +26,6 @@ import java.util.Optional;
  * specific criteria (engines, cannons, etc.) and associated penalties. Players
  * are evaluated based on their performance, and the player with the lowest score
  * on each war line must face the penalty consequences.
- * <p>
- * The card supports various command types including engine power, cannon power,
- * shield activation, dice rolling, crew removal, goods removal, and ship part penalties.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class CombatZoneCard extends Card {
 

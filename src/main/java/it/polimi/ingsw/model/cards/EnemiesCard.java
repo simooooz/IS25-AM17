@@ -24,14 +24,12 @@ import java.util.List;
  * Once any player defeats the enemies, all subsequent players automatically
  * succeed. Players who cannot defeat the enemies face penalties defined by
  * concrete subclasses through the abstract defeatedMalus method.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public abstract class EnemiesCard extends Card {
 
     /**
-     * The number of flight days this enemy encounter represents
+     * The number of flight days that a player loses if he defeats enemies
+     * and decides to take the reward
      */
     @JsonProperty
     protected final int days;
