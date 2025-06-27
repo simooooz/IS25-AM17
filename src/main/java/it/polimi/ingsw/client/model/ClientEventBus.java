@@ -6,6 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * The ClientEventBus is a singleton class responsible for managing the
+ * dispatch and subscription of client-side events. It supports event batching
+ * to optimize event handling and allows observers to subscribe to receive
+ * notifications of published events.
+ * <p>
+ * The class maintains a list of subscribed observers and manages events
+ * through batching or immediate publication.
+ */
 public class ClientEventBus {
 
     private boolean inBatch = false;

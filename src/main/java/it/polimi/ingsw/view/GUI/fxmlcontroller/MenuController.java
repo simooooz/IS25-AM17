@@ -120,10 +120,10 @@ public class MenuController implements MessageHandler {
         Button createBtn = createCreateLobbyButton(nameField, playersField, selectedMode);
 
         sidePanelContent.getChildren().addAll(
-            nameLabel, nameField,
-            playersLabel, playersField,
-            modeLabel, modeButtonsBox,
-            createBtn
+                nameLabel, nameField,
+                playersLabel, playersField,
+                modeLabel, modeButtonsBox,
+                createBtn
         );
 
         sidePanel.setVisible(true);
