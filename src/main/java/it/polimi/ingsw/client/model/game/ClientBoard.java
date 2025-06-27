@@ -18,6 +18,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Represents an abstract game board on the client side.
+ * This class provides common functionality for managing components, players, and cards, as well as
+ * supporting game-specific behaviors through abstract methods.
+ */
 public abstract class ClientBoard {
 
     protected Map<Integer, ClientComponent> mapIdComponents;
