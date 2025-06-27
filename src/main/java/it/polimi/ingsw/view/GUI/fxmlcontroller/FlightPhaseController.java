@@ -830,7 +830,6 @@ public class FlightPhaseController implements MessageHandler {
             sb.append("none");
         playersStartingDeckLabel.setText(sb.toString());
         playersStartingDeckLabel.setStyle("-fx-fill: white !important;");
-        updateCardCounter();
     }
 
     private void paneRemoveAllListeners(Pane p) {
@@ -1114,6 +1113,7 @@ public class FlightPhaseController implements MessageHandler {
                     }
                     indexBooleanButtonsContainer.getChildren().addAll(planetsButtons);
                     indexBooleanButtonsContainer.setVisible(true);
+                    indexBooleanButtonsContainer.setSpacing(10);
                 }
 
                 mainButton.setOnAction(_ -> client.send(MessageType.GET_INDEX, index));
@@ -1128,6 +1128,8 @@ public class FlightPhaseController implements MessageHandler {
                 acceptBtn.getStyleClass().add("toggle-button");
                 declineBtn.getStyleClass().clear();
                 declineBtn.getStyleClass().add("toggle-button-selected");
+                Region spacer = new Region();
+                spacer.setPrefWidth(10);
 
                 acceptBtn.setOnAction(_ -> {
                     if (!decision) {
@@ -1147,8 +1149,9 @@ public class FlightPhaseController implements MessageHandler {
                         acceptBtn.getStyleClass().add("toggle-button");
                     }
                 });
-                indexBooleanButtonsContainer.getChildren().addAll(acceptBtn, declineBtn);
+                indexBooleanButtonsContainer.getChildren().addAll(acceptBtn, spacer, declineBtn);
                 indexBooleanButtonsContainer.setVisible(true);
+                indexBooleanButtonsContainer.setSpacing(10);
 
                 mainButton.setOnAction(_ -> client.send(MessageType.GET_BOOLEAN, decision));
             }
@@ -1304,6 +1307,7 @@ public class FlightPhaseController implements MessageHandler {
                 if (instructionManager != null) {
                     instructionManager.showSuccessMessage("New card revealed: " + e.card().getId());
                 }
+                updateCardCounter();
             }
             case CardUpdatedEvent e -> showCardInfo(e.card());
             case FlightEndedEvent e -> {
