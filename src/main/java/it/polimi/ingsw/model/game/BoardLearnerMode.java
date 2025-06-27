@@ -16,35 +16,11 @@ import java.util.function.Consumer;
 /**
  * Learner mode implementation of the game board that extends the base Board class.
  * This simplified version is designed for new players to learn the game mechanics
- * without the complexity of advanced features like time management and card pile watching.
- *
- * <p>The BoardLearnerMode provides a streamlined gameplay experience:
- * <ul>
- * <li>Simplified card shuffling without level restrictions</li>
- * <li>No time-based mechanics or hourglass functionality</li>
- * <li>No card pile watching system</li>
- * <li>Reduced scoring values for a more forgiving learning environment</li>
- * <li>Specialized learner mode ships with simplified mechanics</li>
- * </ul>
- *
- * <p>This mode is ideal for:
- * <ul>
- * <li>New players learning the basic game mechanics</li>
- * <li>Tutorial or training sessions</li>
- * <li>Players who prefer a more relaxed gaming experience</li>
- * </ul>
- *
- * @author Generated Javadoc
- * @version 1.0
- * @since 1.0
+ * without the complexity of advanced features like time management, card pile watching and aliens.
  */
 public class BoardLearnerMode extends Board {
 
     /**
-     * Constructs a new BoardLearnerMode with the specified player usernames.
-     * Initializes all learner mode components including simplified ships
-     * and learner-specific card factory.
-     *
      * @param usernames the list of player usernames to initialize the game with
      * @throws IllegalArgumentException if usernames list is null or empty
      */
@@ -93,23 +69,11 @@ public class BoardLearnerMode extends Board {
         // Do nothing, there aren't specific things to do in learner mode
     }
 
-    /**
-     * Card pile watching is not supported in learner mode.
-     *
-     * @return this method does not return normally
-     * @throws RuntimeException always thrown as card piles watching is not available
-     *                          in learner mode
-     */
     @Override
     public Map<String, Integer> getCardPilesWatchMap() {
         throw new RuntimeException("Card piles aren't in learner mode flight");
     }
 
-    /**
-     * Returns the board order positions for learner mode gameplay.
-     *
-     * @return an array of integers representing the board order positions [4, 2, 1, 0]
-     */
     @Override
     public int[] getBoardOrderPos() {
         return new int[]{4, 2, 1, 0};
@@ -129,23 +93,11 @@ public class BoardLearnerMode extends Board {
         throw new RuntimeException("Hourglass is not in learner mode flight");
     }
 
-    /**
-     * Returns the reduced credit values awarded for different ranking positions
-     * in learner mode.
-     *
-     * @return an array of credit values for ranking positions [4, 3, 2, 1]
-     */
     @Override
     protected int[] getRankingCreditsValues() {
         return new int[]{4, 3, 2, 1};
     }
 
-    /**
-     * Returns the reduced reward value for having the most beautiful ship
-     * in learner mode.
-     *
-     * @return the credit reward value (2) for the most beautiful ship in learner mode
-     */
     @Override
     protected int getRankingMostBeautifulShipReward() {
         return 2;
