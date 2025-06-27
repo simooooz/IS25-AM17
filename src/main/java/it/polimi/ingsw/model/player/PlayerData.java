@@ -9,31 +9,9 @@ import it.polimi.ingsw.model.game.Board;
  * Represents the data and state of a player in the game.
  * This class encapsulates all player-specific information including
  * their ship, credits, game status, and flight progress.
- *
- * <p>The PlayerData class manages:
- * <ul>
- * <li>Player identification through username</li>
- * <li>Ship ownership and management</li>
- * <li>Credit system and scoring</li>
- * <li>Flight completion status</li>
- * <li>Game connection status</li>
- * <li>Event emission for state changes</li>
- * </ul>
- *
- * <p>Key features:
- * <ul>
- * <li>Automatic event emission when credits are updated</li>
- * <li>Flight completion tracking for early endings</li>
- * <li>Connection status tracking for player disconnections</li>
- * <li>Integration with the board system for game state transitions</li>
- * </ul>
- *
+
  * <p>Player equality is determined solely by username, allowing for
  * easy identification and comparison of players throughout the game.
- *
- * @author Generated Javadoc
- * @version 1.0
- * @since 1.0
  */
 public class PlayerData {
 
@@ -51,7 +29,6 @@ public class PlayerData {
 
     /**
      * The current credit count for this player.
-     * Credits are used for scoring and purchasing game elements.
      */
     private int credits;
 
@@ -85,11 +62,7 @@ public class PlayerData {
 
     /**
      * Compares this PlayerData with another object for equality.
-     * Two PlayerData objects are considered equal if they have the same username,
-     * regardless of other field values.
-     *
-     * <p>This implementation allows for easy player identification and
-     * collection operations based solely on username.
+     * Two PlayerData objects are considered equal if they have the same username.
      *
      * @param o the object to compare with this PlayerData
      * @return true if the object is a PlayerData with the same username, false otherwise
@@ -122,7 +95,7 @@ public class PlayerData {
     /**
      * Sets the ship for this player.
      * This method is typically called during game initialization
-     * when assigning specific ship types (standard, learner, or advanced mode).
+     * when assigning specific ship types (learner, or advanced mode).
      *
      * @param ship the Ship instance to assign to this player
      */
@@ -144,9 +117,6 @@ public class PlayerData {
      * This method automatically notifies the game system of the credit change
      * by emitting a CreditsUpdatedEvent.
      *
-     * <p>The event emission allows other parts of the system to react to
-     * credit changes, such as updating UI displays or triggering game logic.
-     *
      * @param credits the new credit amount to set
      */
     public void setCredits(int credits) {
@@ -158,16 +128,6 @@ public class PlayerData {
      * Marks the player as having ended their flight early and emits an event.
      * This method is called when a player chooses to finish their game
      * before the normal end conditions are met.
-     *
-     * <p>Ending early may have strategic implications, such as:
-     * <ul>
-     * <li>Securing position on the leaderboard</li>
-     * <li>Avoiding potential penalties</li>
-     * <li>Influencing other players' remaining time</li>
-     * </ul>
-     *
-     * <p>The FlightEndedEvent is emitted to notify the game system
-     * and other players of this action.
      */
     public void endFlight() {
         endedInAdvance = true;
@@ -197,9 +157,6 @@ public class PlayerData {
      * Sets the left game status for this player.
      * This method is used to track when players disconnect from or reconnect to the game.
      *
-     * <p>Setting this to true indicates the player has disconnected,
-     * while setting it to false indicates they have reconnected or are active.
-     *
      * @param leftGame true if the player has left the game, false otherwise
      */
     public void setLeftGame(boolean leftGame) {
@@ -211,18 +168,6 @@ public class PlayerData {
      * This method handles the final preparation steps when a player
      * is ready to begin active gameplay.
      *
-     * <p>The method performs the following actions:
-     * <ul>
-     * <li>Releases any component currently in the player's hand</li>
-     * <li>Moves the player to the game board</li>
-     * </ul>
-     *
-     * <p>This transition typically occurs when:
-     * <ul>
-     * <li>Initial game setup is complete</li>
-     * <li>The player has finished their preparation phase</li>
-     * <li>All players are ready to begin the main game</li>
-     * </ul>
      *
      * @param board the game board to move the player to
      */

@@ -13,29 +13,12 @@ import java.util.Optional;
  * Enumeration defining different criteria types used for evaluating player performance
  * in combat zone encounters and determining the worst-performing player for penalty application.
  * <p>
- * Each criteria type represents a different aspect of ship capability or player resources
- * that can be measured and compared across players to identify weaknesses. The criteria
- * evaluation system tracks the worst performer in each category and determines whether
- * players need to take additional actions to improve their standing.
- * <p>
- * The evaluation process considers both passive capabilities (automatically available)
- * and active capabilities (requiring player decisions and battery power) to provide
- * strategic choices during combat evaluations.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public enum CriteriaType {
 
     /**
      * Crew criteria evaluates players based on their total crew count.
-     * This represents the human resources available for ship operations,
-     * with players having fewer crew members being more vulnerable.
-     * <p>
-     * Crew evaluation is straightforward and immediate, as crew count
-     * is a fixed resource that doesn't require player decisions or actions.
-     * The player with the lowest crew count becomes the worst performer.
-     */
+    */
     CREW {
         /**
          * Evaluates a player's crew count against the current worst performer.
@@ -60,23 +43,10 @@ public enum CriteriaType {
 
     /**
      * Cannon criteria evaluates players based on their available firepower.
-     * This represents the combat capability for offensive actions,
-     * considering both single cannons (always available) and double cannons
-     * (requiring battery power to activate).
-     * <p>
-     * Cannon evaluation uses a sophisticated system that calculates free
-     * cannon power and potential double cannon power, giving players
-     * strategic choices about battery usage if they have double cannons available.
      */
     CANNON {
         /**
          * Evaluates a player's cannon firepower against the current worst performer.
-         * <p>
-         * The evaluation process:
-         * 1. Calculates free cannon power from single cannons (plus alien bonus if applicable)
-         * 2. Calculates potential double cannon power (limited by available batteries)
-         * 3. Determines if the player can improve their standing with double cannon activation
-         * 4. Either marks them as done or prompts for cannon selection based on capabilities
          * <p>
          * Players with sufficient free cannon power compared to the current worst are
          * automatically marked as done. Players with potential double cannon improvements
@@ -178,11 +148,6 @@ public enum CriteriaType {
      * Abstract method that must be implemented by each criteria type to define
      * how player evaluation should be performed for that specific criterion.
      * <p>
-     * Each implementation should:
-     * 1. Calculate the player's capability in the relevant area
-     * 2. Compare against the current worst performer
-     * 3. Update the worst performer if this player ranks lower
-     * 4. Determine the appropriate player state based on available options
      *
      * @param player the player data to evaluate against the criterion
      * @param worst  the pair tracking the current worst performer and their score
