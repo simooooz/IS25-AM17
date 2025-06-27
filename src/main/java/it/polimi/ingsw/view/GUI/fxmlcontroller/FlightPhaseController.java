@@ -476,7 +476,7 @@ public class FlightPhaseController implements MessageHandler {
             points = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/StandardModePoints.png")));
         } else {
             playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg")));
-            points = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/PunteggiLearnermode.png")));
+            points = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/LearnerModePoints.png")));
         }
 
         playerShipImage.setImage(playerShipImg);
