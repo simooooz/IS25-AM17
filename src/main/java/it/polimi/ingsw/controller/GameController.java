@@ -830,6 +830,273 @@ public class GameController {
                 model.insertComponent(usernames.get(2), 87, 4, 6, 0, true);
             }
             case 2 -> {
+                model.pickComponent(usernames.getFirst(), 130);
+                model.rotateComponent(usernames.getFirst(), 130, 3);
+                model.insertComponent(usernames.getFirst(), 130, 0, 3, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 68);
+                model.rotateComponent(usernames.getFirst(), 68, 2);
+                model.insertComponent(usernames.getFirst(), 68, 1, 4, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 14);
+                model.rotateComponent(usernames.getFirst(), 14, 1);
+                model.insertComponent(usernames.getFirst(), 14, 1, 2, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 58);
+                model.rotateComponent(usernames.getFirst(), 58, 1);
+                model.insertComponent(usernames.getFirst(), 58, 1, 3, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 25);
+                model.rotateComponent(usernames.getFirst(), 25, 2);
+                model.insertComponent(usernames.getFirst(), 25, 2, 1, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 44);
+                model.rotateComponent(usernames.getFirst(), 44, 3);
+                model.insertComponent(usernames.getFirst(), 44, 2, 2, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 115);
+                model.rotateComponent(usernames.getFirst(), 115, 1);
+                model.insertComponent(usernames.getFirst(), 115, 2, 5, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 29);
+                model.rotateComponent(usernames.getFirst(), 29, 1);
+                model.insertComponent(usernames.getFirst(), 29, 2, 4, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 96);
+                model.rotateComponent(usernames.getFirst(), 96, 0);
+                model.insertComponent(usernames.getFirst(), 96, 3, 1, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 31);
+                model.rotateComponent(usernames.getFirst(), 31, 0);
+                model.insertComponent(usernames.getFirst(), 31, 3, 2, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 51);
+                model.rotateComponent(usernames.getFirst(), 51, 1);
+                model.insertComponent(usernames.getFirst(), 51, 4, 2, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 77);
+                model.rotateComponent(usernames.getFirst(), 77, 0);
+                model.insertComponent(usernames.getFirst(), 77, 3, 3, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 5);
+                model.rotateComponent(usernames.getFirst(), 5, 3);
+                model.insertComponent(usernames.getFirst(), 5, 3, 4, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 147);
+                model.rotateComponent(usernames.getFirst(), 147, 1);
+                model.insertComponent(usernames.getFirst(), 147, 4, 4, 0, true);
+
+                model.pickComponent(usernames.getFirst(), 89);
+                model.rotateComponent(usernames.getFirst(), 89, 0);
+                model.insertComponent(usernames.getFirst(), 89, 4, 5, 0, true);
+
+
+                model.pickComponent(usernames.get(1), 118);
+                model.rotateComponent(usernames.get(1), 118, 3);
+                model.insertComponent(usernames.get(1), 118, 0, 3, 0, true);
+
+                model.pickComponent(usernames.get(1), 13);
+                model.rotateComponent(usernames.get(1), 13, 1);
+                model.insertComponent(usernames.get(1), 13, 1, 2, 0, true);
+
+                model.pickComponent(usernames.get(1), 150);
+                model.rotateComponent(usernames.get(1), 150, 1);
+                model.insertComponent(usernames.get(1), 150, 1, 3, 0, true);
+
+                model.pickComponent(usernames.get(1), 116);
+                model.rotateComponent(usernames.get(1), 116, 1);
+                model.insertComponent(usernames.get(1), 116, 1, 4, 0, true);
+
+                model.pickComponent(usernames.get(1), 125);
+                model.rotateComponent(usernames.get(1), 125, 0);
+                model.insertComponent(usernames.get(1), 125, 2, 1, 0, true);
+
+                model.pickComponent(usernames.get(1), 149);
+                model.rotateComponent(usernames.get(1), 149, 3);
+                model.insertComponent(usernames.get(1), 149, 2, 2, 0, true);
+
+                model.pickComponent(usernames.get(1), 63);
+                model.rotateComponent(usernames.get(1), 63, 3);
+                model.insertComponent(usernames.get(1), 63, 2, 4, 0, true);
+
+                model.pickComponent(usernames.get(1), 62);
+                model.rotateComponent(usernames.get(1), 62, 2);
+                model.insertComponent(usernames.get(1), 62, 2, 5, 0, true);
+
+                model.pickComponent(usernames.get(1), 30);
+                model.rotateComponent(usernames.get(1), 30, 2);
+                model.insertComponent(usernames.get(1), 30, 3, 1, 0, true);
+
+                model.pickComponent(usernames.get(1), 56);
+                model.rotateComponent(usernames.get(1), 56, 3);
+                model.insertComponent(usernames.get(1), 56, 3, 2, 0, true);
+
+                model.pickComponent(usernames.get(1), 18);
+                model.rotateComponent(usernames.get(1), 18, 1);
+                model.insertComponent(usernames.get(1), 18, 3, 3, 0, true);
+
+                model.pickComponent(usernames.get(1), 60);
+                model.rotateComponent(usernames.get(1), 60, 2);
+                model.insertComponent(usernames.get(1), 60, 3, 4, 0, true);
+
+                model.pickComponent(usernames.get(1), 124);
+                model.rotateComponent(usernames.get(1), 124, 1);
+                model.insertComponent(usernames.get(1), 124, 3, 5, 0, true);
+
+                model.pickComponent(usernames.get(1), 84);
+                model.rotateComponent(usernames.get(1), 84, 0);
+                model.insertComponent(usernames.get(1), 84, 4, 1, 0, true);
+
+                model.pickComponent(usernames.get(1), 99);
+                model.rotateComponent(usernames.get(1), 99, 0);
+                model.insertComponent(usernames.get(1), 99, 4, 2, 0, true);
+
+                model.pickComponent(usernames.get(1), 94);
+                model.rotateComponent(usernames.get(1), 94, 0);
+                model.insertComponent(usernames.get(1), 94, 4, 4, 0, true);
+
+                model.pickComponent(usernames.get(1), 16);
+                model.rotateComponent(usernames.get(1), 16, 0);
+                model.insertComponent(usernames.get(1), 16, 4, 5, 0, true);
+
+
+                model.pickComponent(usernames.get(2), 103);
+                model.rotateComponent(usernames.get(2), 103, 0);
+                model.insertComponent(usernames.get(2), 103, 0, 3, 0, true);
+
+                model.pickComponent(usernames.get(2), 152);
+                model.rotateComponent(usernames.get(2), 152, 3);
+                model.insertComponent(usernames.get(2), 152, 1, 2, 0, true);
+
+                model.pickComponent(usernames.get(2), 4);
+                model.rotateComponent(usernames.get(2), 4, 2);
+                model.insertComponent(usernames.get(2), 4, 1, 3, 0, true);
+
+                model.pickComponent(usernames.get(2), 129);
+                model.rotateComponent(usernames.get(2), 129, 0);
+                model.insertComponent(usernames.get(2), 129, 1, 4, 0, true);
+
+                model.pickComponent(usernames.get(2), 12);
+                model.rotateComponent(usernames.get(2), 12, 0);
+                model.insertComponent(usernames.get(2), 12, 2, 1, 0, true);
+
+                model.pickComponent(usernames.get(2), 65);
+                model.rotateComponent(usernames.get(2), 65, 0);
+                model.insertComponent(usernames.get(2), 65, 2, 2, 0, true);
+
+                model.pickComponent(usernames.get(2), 24);
+                model.rotateComponent(usernames.get(2), 24, 2);
+                model.insertComponent(usernames.get(2), 24, 2, 4, 0, true);
+
+                model.pickComponent(usernames.get(2), 153);
+                model.rotateComponent(usernames.get(2), 153, 1);
+                model.insertComponent(usernames.get(2), 153, 2, 5, 0, true);
+
+                model.pickComponent(usernames.get(2), 1);
+                model.rotateComponent(usernames.get(2), 1, 0);
+                model.insertComponent(usernames.get(2), 1, 3, 1, 0, true);
+
+                model.pickComponent(usernames.get(2), 55);
+                model.rotateComponent(usernames.get(2), 55, 1);
+                model.insertComponent(usernames.get(2), 55, 3, 2, 0, true);
+
+                model.pickComponent(usernames.get(2), 146);
+                model.rotateComponent(usernames.get(2), 146, 2);
+                model.insertComponent(usernames.get(2), 146, 3, 3, 0, true);
+
+                model.pickComponent(usernames.get(2), 6);
+                model.rotateComponent(usernames.get(2), 6, 0);
+                model.insertComponent(usernames.get(2), 6, 3, 4, 0, true);
+
+                model.pickComponent(usernames.get(2), 47);
+                model.rotateComponent(usernames.get(2), 47, 1);
+                model.insertComponent(usernames.get(2), 47, 3, 5, 0, true);
+
+                model.pickComponent(usernames.get(2), 66);
+                model.rotateComponent(usernames.get(2), 66, 1);
+                model.insertComponent(usernames.get(2), 66, 4, 1, 0, true);
+
+                model.pickComponent(usernames.get(2), 95);
+                model.rotateComponent(usernames.get(2), 95, 0);
+                model.insertComponent(usernames.get(2), 95, 4, 2, 0, true);
+
+                model.pickComponent(usernames.get(2), 61);
+                model.rotateComponent(usernames.get(2), 61, 2);
+                model.insertComponent(usernames.get(2), 61, 4, 4, 0, true);
+
+                model.pickComponent(usernames.get(2), 97);
+                model.rotateComponent(usernames.get(2), 97, 0);
+                model.insertComponent(usernames.get(2), 97, 4, 5, 0, true);
+
+
+                model.pickComponent(usernames.get(3), 102);
+                model.rotateComponent(usernames.get(3), 102, 0);
+                model.insertComponent(usernames.get(3), 102, 0, 3, 0, true);
+
+                model.pickComponent(usernames.get(3), 132);
+                model.rotateComponent(usernames.get(3), 132, 3);
+                model.insertComponent(usernames.get(3), 132, 1, 2, 0, true);
+
+                model.pickComponent(usernames.get(3), 38);
+                model.rotateComponent(usernames.get(3), 38, 3);
+                model.insertComponent(usernames.get(3), 38, 1, 3, 0, true);
+
+                model.pickComponent(usernames.get(3), 109);
+                model.rotateComponent(usernames.get(3), 109, 1);
+                model.insertComponent(usernames.get(3), 109, 1, 4, 0, true);
+
+                model.pickComponent(usernames.get(3), 151);
+                model.rotateComponent(usernames.get(3), 151, 2);
+                model.insertComponent(usernames.get(3), 151, 2, 1, 0, true);
+
+                model.pickComponent(usernames.get(3), 15);
+                model.rotateComponent(usernames.get(3), 15, 3);
+                model.insertComponent(usernames.get(3), 15, 2, 2, 0, true);
+
+                model.pickComponent(usernames.get(3), 148);
+                model.rotateComponent(usernames.get(3), 148, 0);
+                model.insertComponent(usernames.get(3), 148, 2, 4, 0, true);
+
+                model.pickComponent(usernames.get(3), 17);
+                model.rotateComponent(usernames.get(3), 17, 2);
+                model.insertComponent(usernames.get(3), 17, 2, 5, 0, true);
+
+                model.pickComponent(usernames.get(3), 144);
+                model.rotateComponent(usernames.get(3), 144, 3);
+                model.insertComponent(usernames.get(3), 144, 3, 1, 0, true);
+
+                model.pickComponent(usernames.get(3), 67);
+                model.rotateComponent(usernames.get(3), 67, 3);
+                model.insertComponent(usernames.get(3), 67, 3, 2, 0, true);
+
+                model.pickComponent(usernames.get(3), 92);
+                model.rotateComponent(usernames.get(3), 92, 0);
+                model.insertComponent(usernames.get(3), 92, 3, 3, 0, true);
+
+                model.pickComponent(usernames.get(3), 136);
+                model.rotateComponent(usernames.get(3), 136, 0);
+                model.insertComponent(usernames.get(3), 136, 3, 4, 0, true);
+
+                model.pickComponent(usernames.get(3), 41);
+                model.rotateComponent(usernames.get(3), 41, 0);
+                model.insertComponent(usernames.get(3), 41, 3, 5, 0, true);
+
+                model.pickComponent(usernames.get(3), 37);
+                model.rotateComponent(usernames.get(3), 37, 2);
+                model.insertComponent(usernames.get(3), 37, 4, 1, 0, true);
+
+                model.pickComponent(usernames.get(3), 82);
+                model.rotateComponent(usernames.get(3), 82, 0);
+                model.insertComponent(usernames.get(3), 82, 4, 2, 0, true);
+
+                model.pickComponent(usernames.get(3), 3);
+                model.rotateComponent(usernames.get(3), 3, 3);
+                model.insertComponent(usernames.get(3), 3, 4, 4, 0, true);
+
+                model.pickComponent(usernames.get(3), 19);
+                model.rotateComponent(usernames.get(3), 19, 0);
+                model.insertComponent(usernames.get(3), 19, 4, 5, 0, true);
+
             }
             default -> throw new IllegalArgumentException("Unsupported test number: " + testNumber);
         }

@@ -31,7 +31,6 @@ public class LearnerModeGameSimulationTest {
 
         // Building Ships
         controller.pickComponent("Tommaso", 130);
-        controller.reserveComponent("Tommaso", 130);
         controller.rotateComponent("Tommaso", 130, 3);
         controller.insertComponent("Tommaso", 130, 0, 3, 0, true);
 
