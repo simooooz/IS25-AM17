@@ -9,41 +9,19 @@ import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A read-only representation of a lobby on the client side.
+ */
 public class ClientLobby {
 
-    /**
-     * {@link ClientGameController} reference, null if game not started
-     */
     private ClientGameController game = null;
-    /**
-     * unique id for the lobby
-     */
     private final String id;
-    /**
-     * {@link LobbyState}
-     */
     private LobbyState state;
-    /**
-     * learner flag
-     */
     private final boolean learnerMode;
 
-    /**
-     * max num of players master wants to be accepted
-     */
     private final int maxPlayers;
-    /**
-     * players in the lobby
-     */
     private final List<String> players;
 
-    /**
-     * Constructor
-     *
-     * @param name        lobby's id
-     * @param learnerMode true if is a test flight
-     * @param maxPlayers  max players allowed in a lobby
-     */
     public ClientLobby(String name, List<String> players, boolean learnerMode, int maxPlayers) {
         this.state = LobbyState.WAITING;
         this.id = name;
@@ -99,9 +77,6 @@ public class ClientLobby {
         ClientEventBus.getInstance().publish(new LeftLobbyEvent(username, null));
     }
 
-    /**
-     * Init the {@link ClientGameController} associated with the lobby
-     */
     public void initGame() {
         this.game = new ClientGameController(players, learnerMode);
         this.state = LobbyState.IN_GAME;

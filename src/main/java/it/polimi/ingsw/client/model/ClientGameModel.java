@@ -24,13 +24,6 @@ import java.util.AbstractMap.SimpleEntry;
  * Main class for the client-side model.
  * It holds a read-only representation of the game state and notifies the View of any changes.
  * This class is the single point of access for the UI to the game data.
- * DIFFERENCES FROM SERVER MODEL:
- * - No business logic: It doesn't enforce game rules.
- * - Observable: It notifies observers (the View) when its state changes.
- * - Update methods: State is modified only through `update...` methods,
- *   which are called in response to server events.
- * - Read-only query methods: Provides getters for the UI.
- * - Lightweight: Uses simplified data classes (ClientPlayer, ClientShip, etc.).
  */
 public abstract class ClientGameModel {
 
