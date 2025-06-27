@@ -102,11 +102,11 @@ public class DisplayUpdater {
                 Chroma.println(
                         "[ship <username>]            - view <username>'s ship\n" +
                                 "[pick <id>]                  - pick a component\n" +
-                                "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
+                                "[insert <id> <row> <col>]    - inserts the component into position [row, col]\n" +
                                 "[release <id>]               - release the picked component\n" +
                                 (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
                                 (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[rotate-hourglass]           - rotate the hourglass\n") +
-                                "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
+                                "[move <id> <row> <col>]      - moves the component <id> into the position [row, col] of the ship\n" +
                                 "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
                                 "[look-cards <id>]            - view specific card pile (0, 1 or 2)\n" +
                                 "[ready]                      - end building phase\n" +
