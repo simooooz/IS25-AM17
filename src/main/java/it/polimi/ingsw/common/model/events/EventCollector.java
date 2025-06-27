@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Collector responsible for gathering and managing system events.
+ * Provides functionality for aggregating and distributing events
+ * to their respective recipients.
+ */
 public class EventCollector {
 
     private final List<Event> regularEvents = new ArrayList<>();

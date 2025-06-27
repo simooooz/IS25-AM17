@@ -12,6 +12,9 @@ import it.polimi.ingsw.network.messages.MessageType;
 
 import java.util.List;
 
+/**
+ * Core interface representing an event in the system.
+ */
 public sealed interface Event permits
         UniqueEvent, BatchStartedEvent, BatchEndedEvent, SyncAllEvent,
         MatchStartedEvent, ComponentInsertedEvent, ComponentMovedEvent, ComponentPickedEvent, ShipBrokenEvent,
@@ -21,8 +24,17 @@ public sealed interface Event permits
         FlightEndedEvent, SetLobbyEvent, JoinedLobbyEvent, LeftLobbyEvent, UsernameOkEvent
 {
 
+    /**
+     * @return the message type associated with this event
+     */
     MessageType eventType();
+    /**
+     * @return the visibility level of the event determining which players can receive it
+     */
     EventVisibility getVisibility();
+    /**
+     * @return array of arguments associated with this event
+     */
     Object[] getArgs();
 
     default List<String> getTargetPlayers() { return List.of(); } // Only for SPECIFIC_PLAYERS visibility
