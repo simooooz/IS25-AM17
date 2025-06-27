@@ -15,22 +15,6 @@ import java.util.Optional;
  * Penalty implementation for combat zone encounters that subjects players to
  * a sequence of cannon fire attacks as punishment for poor performance.
  * <p>
- * This penalty type represents sustained enemy bombardment against players who
- * performed worst in combat evaluations. The penalty consists of multiple cannon
- * fire attacks that must be resolved sequentially, with each attack requiring
- * dice rolls to determine impact coordinates and potential defensive responses.
- * <p>
- * The cannon fire sequence operates similarly to meteor swarms but represents
- * deliberate enemy attacks rather than environmental hazards. Players face
- * multiple projectiles that can destroy ship components unless successfully
- * defended against using shields or avoided through favorable dice rolls.
- * <p>
- * Each cannon fire in the sequence must be resolved completely (including any
- * ship part replacements) before proceeding to the next attack, ensuring that
- * the full penalty is applied systematically.
- *
- * @author Generated Javadoc
- * @version 1.0
  */
 public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
@@ -65,9 +49,6 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
     /**
      * Initiates the cannon fire penalty sequence by prompting for the first dice roll.
-     * <p>
-     * The penalty begins with a dices roll to determine the impact coordinates
-     * for the first cannon fire attack in the sequence.
      *
      * @param model    the model facade providing access to game state
      * @param board    the game board containing the penalized player
@@ -82,15 +63,6 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     /**
      * Processes dice roll command effects to determine cannon fire impact coordinates
      * and execute attack resolution.
-     * <p>
-     * When a dices roll is completed:
-     * 1. Records the rolled coordinates for the current cannon fire
-     * 2. Executes the cannon fire attack using the rolled coordinates
-     * 3. Determines the appropriate next state based on attack outcome
-     * 4. Advances to the next cannon fire if the current one is resolved and more remain
-     * <p>
-     * The method ensures that players cannot prematurely complete the penalty
-     * if more cannon fires remain in the sequence, maintaining the full punishment.
      *
      * @param commandType the type of command being executed (must be WAIT_ROLL_DICES)
      * @param value       the integer result of the dice roll determining impact coordinates
@@ -118,14 +90,6 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
 
     /**
      * Processes shield activation command effects for defensive responses to cannon fire.
-     * <p>
-     * Handles player shield defense attempts against cannon fire attacks:
-     * - If shield not activated: destroys the target component and may trigger ship part replacement
-     * - If shield activated: deflects the attack without damage
-     * - Manages progression to the next cannon fire or completion of the penalty sequence
-     * <p>
-     * The method carefully handles the timing of cannon fire progression, ensuring that
-     * ship part replacements are completed before advancing to the next attack.
      *
      * @param commandType the type of command being executed (must be WAIT_SHIELD)
      * @param value       the boolean value indicating whether shield was activated
@@ -160,12 +124,8 @@ public class CannonFirePenaltyCombatZone extends PenaltyCombatZone {
     }
 
     /**
-     * Processes ship part replacement command effects following component destruction
-     * and manages continuation of the cannon fire penalty sequence.
-     * <p>
-     * Handles the completion of ship part replacement after a component was destroyed
-     * by cannon fire, then determines whether to continue with the next cannon fire
-     * or complete the penalty sequence if all attacks have been resolved.
+     * Processes ship part choice command effects following component destruction
+     * and ship fragmentation and manages continuation of the cannon fire penalty sequence.
      *
      * @param commandType the type of command being executed (must be WAIT_SHIP_PART)
      * @param model       the model facade providing access to game state
