@@ -19,6 +19,7 @@ import it.polimi.ingsw.common.model.events.lobby.LeftLobbyEvent;
 import it.polimi.ingsw.network.Client;
 import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.*;
+import it.polimi.ingsw.view.GUI.MessageHandler;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -484,7 +485,7 @@ public class FlightPhaseController implements MessageHandler {
         // Setup ship and points image
         if (!client.getLobby().isLearnerMode()) {
             playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1b.jpg")));
-            points = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/Punteggistandardmode.png")));
+            points = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/StandardModePoints.png")));
         }
         else {
             playerShipImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cardboard/cardboard-1.jpg")));

@@ -145,7 +145,7 @@
         <!-- your ship and board info -->
         <VBox prefWidth="500.0" spacing="10.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10;">
             <!-- board info -->
-            <VBox alignment="CENTER" spacing="5.0">
+            <VBox alignment="CENTER" spacing="5.0" style="-fx-label-padding: 16">
                 <Label style="-fx-text-fill: yellow; -fx-font-size: 25px;" text="Board Info">
                     <padding>
                         <Insets bottom="15.0" />
