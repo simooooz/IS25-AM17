@@ -8,7 +8,6 @@ import java.util.List;
 public class ClientCannonFirePenaltyCombatZone extends ClientPenaltyCombatZone {
 
     @JsonProperty private List<ClientCannonFire> cannonFires;
-    // TODO stampare coords e cannon index
     @JsonProperty private List<Integer> coords;
     @JsonProperty private int cannonIndex;
 
