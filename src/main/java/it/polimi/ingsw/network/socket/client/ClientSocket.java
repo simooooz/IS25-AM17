@@ -19,21 +19,37 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Manages (client point of view) the connection between a client and the server via socket.
- * It encapsulates two-way communication of serialized objects,
- * connection monitoring via heartbeat, and asynchronous listening for incoming messages from the client.
+ * Client-side socket connection.
+ * Manages bidirectional communication with socket clients and message processing.
  */
 public class ClientSocket extends Client {
 
+    /**
+     * TCP socket connection to the client
+     */
     private Socket socket;
+
+    /**
+     * Output stream for sending serialized objects to the server
+     */
     private ObjectOutputStream output;
+
+    /**
+     * Input stream for receiving serialized objects from the server
+     */
     private ObjectInputStream input;
 
+    /** Thread for listening to server messages */
     private ListenLoopOfClient listenLoop;
 
+    /** Scheduler for periodic heartbeat messages */
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-
+    /**
+     * Creates client with automatic server discovery.
+     *
+     * @param ui user interface
+     */
     public ClientSocket(UserInterface ui) {
         super(ui);
         this.connect();
@@ -44,6 +60,12 @@ public class ClientSocket extends Client {
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Creates client with specific IP address.
+     *
+     * @param ui user interface
+     * @param ip server IP address
+     */
     public ClientSocket(UserInterface ui, String ip) {
         super(ui);
         this.connect(ip);
@@ -54,6 +76,9 @@ public class ClientSocket extends Client {
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Connects using server discovery with retry logic.
+     */
     private void connect() {
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
@@ -76,6 +101,11 @@ public class ClientSocket extends Client {
         }
     }
 
+    /**
+     * Connects to specific IP address with retry logic.
+     *
+     * @param ip server IP address
+     */
     private void connect(String ip) {
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
@@ -95,6 +125,11 @@ public class ClientSocket extends Client {
         }
     }
 
+    /**
+     * Handles exponential backoff between connection attempts.
+     *
+     * @param attempt current attempt number
+     */
     @SuppressWarnings("Duplicates")
     private void backoff(int attempt) {
         if (attempt == Constants.MAX_RETRIES) {
@@ -111,6 +146,9 @@ public class ClientSocket extends Client {
         }
     }
 
+    /**
+     * Sends heartbeat message to server.
+     */
     private void sendPing() {
         try {
             sendObject(new Heartbeat());
@@ -120,6 +158,9 @@ public class ClientSocket extends Client {
         }
     }
 
+    /**
+     * Closes connection and shuts down scheduler.
+     */
     @SuppressWarnings("Duplicates")
     @Override
     public void closeConnection() {
@@ -160,6 +201,12 @@ public class ClientSocket extends Client {
         System.out.println("[CLIENT SOCKET] Closing connection...");
     }
 
+    /**
+     * Reads serialized object from server.
+     *
+     * @return deserialized object
+     * @throws ClientException if reading fails
+     */
     public Object readObject() throws ClientException {
         try {
             Object obj = this.input.readObject();
@@ -172,6 +219,12 @@ public class ClientSocket extends Client {
         }
     }
 
+    /**
+     * Sends serialized object to server.
+     *
+     * @param data object to send
+     * @throws ClientException if sending fails
+     */
     public void sendObject(Object data) throws ClientException {
         try {
             this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
@@ -183,6 +236,12 @@ public class ClientSocket extends Client {
         }
     }
 
+    /**
+     * Sends message to server.
+     *
+     * @param messageType message type
+     * @param args message arguments
+     */
     @Override
     public void send(MessageType messageType, Object... args) {
         try {
@@ -194,6 +253,11 @@ public class ClientSocket extends Client {
         }
     }
 
+    /**
+     * Processes received message from server.
+     *
+     * @param message received message
+     */
     public void receive(Message message) {
         try {
             message.execute(this);

@@ -22,13 +22,40 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * RMI client implementation that handles communication with the RMI server.
+ * This class extends the base Client class and provides RMI-specific
+ * functionality for connecting to and communicating with the game server.
+ * <p>
+ * The client manages its own session, handles server discovery or direct connection,
+ * implements connection retry logic with exponential backoff, and maintains
+ * connection health through periodic ping messages.
+ */
 public class RMIClient extends Client {
 
+    /**
+     * Unique session identifier for this client instance
+     */
     private final String sessionCode;
+
+    /**
+     * Reference to the remote server interface
+     */
     private RMIServerInterface server;
+
+    /**
+     * Callback object for receiving messages from the server
+     */
     private ClientCallback clientCallback;
+
+    /**
+     * Scheduled executor service for sending periodic ping messages
+     */
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+    /**
+     * @param ui the user interface for displaying messages and errors
+     */
     public RMIClient(UserInterface ui) {
         super(ui);
 
@@ -42,6 +69,10 @@ public class RMIClient extends Client {
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * @param ui the user interface for displaying messages and errors
+     * @param ip the IP address of the server to connect to
+     */
     public RMIClient(UserInterface ui, String ip) {
         super(ui);
 
@@ -55,6 +86,10 @@ public class RMIClient extends Client {
         scheduler.scheduleAtFixedRate(this::sendPing, Constants.HEARTBEAT_INTERVAL, Constants.HEARTBEAT_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Establishes connection to the server using automatic discovery.
+     * Uses retry logic with exponential backoff on connection failures.
+     */
     private void connect() {
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
@@ -76,6 +111,11 @@ public class RMIClient extends Client {
         }
     }
 
+    /**
+     * Establishes connection to a specific server IP address.
+     *
+     * @param ip the IP address of the server to connect to
+     */
     private void connect(String ip) {
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
 
@@ -94,6 +134,11 @@ public class RMIClient extends Client {
         }
     }
 
+    /**
+     * Implements exponential backoff strategy for connection retries.
+     *
+     * @param attempt the current attempt number (1-based)
+     */
     @SuppressWarnings("Duplicates")
     private void backoff(int attempt) {
         if (attempt == Constants.MAX_RETRIES) {
@@ -110,6 +155,12 @@ public class RMIClient extends Client {
         }
     }
 
+    /**
+     * Sends a ping message to the server to maintain connection health.
+     * This method is called periodically by the scheduler to verify
+     * that the connection is still active. If the ping fails, the
+     * server will eventually close the session.
+     */
     private void sendPing() {
         try {
             server.ping(sessionCode);
@@ -119,6 +170,11 @@ public class RMIClient extends Client {
         }
     }
 
+    /**
+     * Closes the connection to the server and cleans up resources.
+     * Shuts down the ping scheduler, unregisters the client from the server,
+     * and unexports the callback object to prevent memory leaks.
+     */
     @Override
     public void closeConnection() {
         scheduler.shutdownNow();
@@ -133,22 +189,35 @@ public class RMIClient extends Client {
 
     }
 
+    /**
+     * Sends a message to the server based on the message type and arguments.
+     * This method acts as a dispatcher, converting the generic message format
+     * into specific RMI method calls on the server interface.
+     *
+     * @param messageType the type of message to send
+     * @param args        the arguments for the message, which are cast to appropriate types
+     *                    based on the message type
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void send(MessageType messageType, Object... args) {
         try {
             switch (messageType) {
                 case SET_USERNAME -> server.setUsernameHandler(sessionCode, (String) args[0]);
-                case CREATE_LOBBY -> server.createLobbyHandler(sessionCode, (String) args[0], (Integer) args[1], (Boolean) args[2]);
+                case CREATE_LOBBY ->
+                        server.createLobbyHandler(sessionCode, (String) args[0], (Integer) args[1], (Boolean) args[2]);
                 case JOIN_LOBBY -> server.joinLobbyHandler(sessionCode, (String) args[0]);
                 case JOIN_RANDOM_LOBBY -> server.joinRandomLobbyHandler(sessionCode, (Boolean) args[0]);
                 case LEAVE_GAME -> server.leaveGameHandler(sessionCode);
                 case PICK_COMPONENT -> server.pickComponentHandler(sessionCode, (Integer) args[0]);
                 case RELEASE_COMPONENT -> server.releaseComponentHandler(sessionCode, (Integer) args[0]);
                 case RESERVE_COMPONENT -> server.reserveComponentHandler(sessionCode, (Integer) args[0]);
-                case INSERT_COMPONENT -> server.insertComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
-                case MOVE_COMPONENT -> server.moveComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
-                case ROTATE_COMPONENT -> server.rotateComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1]);
+                case INSERT_COMPONENT ->
+                        server.insertComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+                case MOVE_COMPONENT ->
+                        server.moveComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1], (Integer) args[2], (Integer) args[3]);
+                case ROTATE_COMPONENT ->
+                        server.rotateComponentHandler(sessionCode, (Integer) args[0], (Integer) args[1]);
                 case LOOK_CARD_PILE -> server.lookCardPileHandler(sessionCode, (Integer) args[0]);
                 case RELEASE_CARD_PILE -> server.releaseCardPileHandler(sessionCode);
                 case MOVE_HOURGLASS -> server.moveHourglassHandler(sessionCode);
@@ -157,10 +226,13 @@ public class RMIClient extends Client {
                 case CHOOSE_ALIEN -> server.chooseAlienHandler(sessionCode, (Map<Integer, AlienType>) args[0]);
                 case CHOOSE_SHIP_PART -> server.chooseShipPartHandler(sessionCode, (Integer) args[0]);
                 case DRAW_CARD -> server.drawCardHandler(sessionCode);
-                case ACTIVATE_CANNONS -> server.activateCannonsHandler(sessionCode, (List<Integer>) args[0], (List<Integer>) args[1]);
-                case ACTIVATE_ENGINES -> server.activateEnginesHandler(sessionCode, (List<Integer>) args[0], (List<Integer>) args[1]);
+                case ACTIVATE_CANNONS ->
+                        server.activateCannonsHandler(sessionCode, (List<Integer>) args[0], (List<Integer>) args[1]);
+                case ACTIVATE_ENGINES ->
+                        server.activateEnginesHandler(sessionCode, (List<Integer>) args[0], (List<Integer>) args[1]);
                 case ACTIVATE_SHIELD -> server.activateShieldHandler(sessionCode, (Integer) args[0]);
-                case UPDATE_GOODS -> server.updateGoodsHandler(sessionCode, (Map<Integer, List<ColorType>>) args[0], (List<Integer>) args[1]);
+                case UPDATE_GOODS ->
+                        server.updateGoodsHandler(sessionCode, (Map<Integer, List<ColorType>>) args[0], (List<Integer>) args[1]);
                 case REMOVE_CREW -> server.removeCrewHandler(sessionCode, (List<Integer>) args[0]);
                 case ROLL_DICES -> server.rollDicesHandler(sessionCode);
                 case GET_BOOLEAN -> server.getBooleanHandler(sessionCode, (Boolean) args[0]);

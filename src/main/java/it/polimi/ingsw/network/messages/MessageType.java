@@ -20,10 +20,17 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Enumeration of all message types used in client-server communication.
+ * Each enum constant implements the Command pattern by providing specific
+ * execution logic for both client and server sides.
+ */
 @SuppressWarnings("unchecked")
 public enum MessageType {
 
+    /**
+     * Error message display
+     */
     ERROR {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -32,6 +39,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Start event batching
+     */
     BATCH_START {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -39,6 +49,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * End event batching
+     */
     BATCH_END {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -46,6 +59,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Set username request
+     */
     SET_USERNAME {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -54,6 +70,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Username set confirmation
+     */
     USERNAME_OK_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -63,6 +82,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Create lobby request
+     */
     CREATE_LOBBY {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -71,6 +93,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Lobby created event
+     */
     CREATED_LOBBY_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -80,6 +105,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Join random lobby request
+     */
     JOIN_RANDOM_LOBBY {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -88,6 +116,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Join specific lobby request
+     */
     JOIN_LOBBY {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -96,6 +127,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Player joined lobby event
+     */
     JOINED_LOBBY_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -104,6 +138,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Leave game request
+     */
     LEAVE_GAME {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -111,6 +148,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Player left lobby event
+     */
     LEFT_LOBBY_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -124,6 +164,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Synchronize all game state
+     */
     SYNC_ALL_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -138,6 +181,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Match started event
+     */
     MATCH_STARTED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -146,6 +192,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Players state updated
+     */
     PLAYERS_STATE_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -154,6 +203,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Pick component request
+     */
     PICK_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -162,6 +214,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Component picked event
+     */
     COMPONENT_PICKED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -170,6 +225,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Release component request
+     */
     RELEASE_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -178,6 +236,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Component released event
+     */
     COMPONENT_RELEASED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -186,6 +247,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Reserve component request
+     */
     RESERVE_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -194,6 +258,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Component reserved event
+     */
     COMPONENT_RESERVED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -202,6 +269,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Insert component request
+     */
     INSERT_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -210,6 +280,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Component inserted event
+     */
     COMPONENT_INSERTED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -218,6 +291,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Move component request
+     */
     MOVE_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -226,6 +302,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Component moved event
+     */
     COMPONENT_MOVED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -234,6 +313,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Rotate component request
+     */
     ROTATE_COMPONENT {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -242,6 +324,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Component rotated event
+     */
     COMPONENT_ROTATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -250,6 +335,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Component destroyed event
+     */
     COMPONENT_DESTROYED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -258,6 +346,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Look at card pile request
+     */
     LOOK_CARD_PILE {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -266,6 +357,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Release card pile request
+     */
     RELEASE_CARD_PILE {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -273,6 +367,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Card pile looked event
+     */
     CARD_PILE_LOOKED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -282,6 +379,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Card pile released event
+     */
     CARD_PILE_RELEASED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -290,6 +390,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Move hourglass request
+     */
     MOVE_HOURGLASS {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -297,6 +400,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Hourglass moved event
+     */
     HOURGLASS_MOVED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -304,6 +410,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Set ready request
+     */
     SET_READY {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -311,6 +420,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Check ship request
+     */
     CHECK_SHIP {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -319,6 +431,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Choose alien request
+     */
     CHOOSE_ALIEN {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -327,6 +442,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Choose ship part request
+     */
     CHOOSE_SHIP_PART {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -335,6 +453,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Ship broken event
+     */
     SHIP_BROKEN_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -343,6 +464,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Players position updated
+     */
     PLAYERS_POSITION_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -351,6 +475,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Draw card request
+     */
     DRAW_CARD {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -358,6 +485,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Card revealed event
+     */
     CARD_REVEALED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -367,6 +497,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Card updated event
+     */
     CARD_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -376,6 +509,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Activate cannons request
+     */
     ACTIVATE_CANNONS {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -384,6 +520,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Activate engines request
+     */
     ACTIVATE_ENGINES {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -392,6 +531,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Activate shield request
+     */
     ACTIVATE_SHIELD {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -400,6 +542,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Batteries updated event
+     */
     BATTERIES_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -408,6 +553,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Update goods request
+     */
     UPDATE_GOODS {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -416,6 +564,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Goods updated event
+     */
     GOODS_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -424,6 +575,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Remove crew request
+     */
     REMOVE_CREW {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -432,6 +586,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Crew updated event
+     */
     CREW_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -440,6 +597,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Credits updated event
+     */
     CREDITS_UPDATED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -448,6 +608,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Roll dices request
+     */
     ROLL_DICES {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -455,6 +618,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Get boolean request
+     */
     GET_BOOLEAN {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -463,6 +629,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Get index request
+     */
     GET_INDEX {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -471,6 +640,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * End flight request
+     */
     END_FLIGHT {
         @Override
         public void execute(ClientHandler user, Message message) {
@@ -478,6 +650,9 @@ public enum MessageType {
         }
     },
 
+    /**
+     * Flight ended event
+     */
     FLIGHT_ENDED_EVENT {
         @Override
         public void execute(ClientSocket client, Message message) {
@@ -486,11 +661,25 @@ public enum MessageType {
         }
     };
 
+    /**
+     * Default server-side execution method.
+     * Override in specific enum constants to provide implementation.
+     *
+     * @param user    the client handler
+     * @param message the message to execute
+     */
     public void execute(ClientHandler user, Message message) {
         // This code should not be executed
         // Otherwise, do nothing
     }
 
+    /**
+     * Default client-side execution method.
+     * Override in specific enum constants to provide implementation.
+     *
+     * @param client  the client socket
+     * @param message the message to execute
+     */
     public void execute(ClientSocket client, Message message) {
         // This code should not be executed
         // Otherwise, do nothing

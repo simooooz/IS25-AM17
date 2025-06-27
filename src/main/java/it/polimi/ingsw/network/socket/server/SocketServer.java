@@ -15,6 +15,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A server implementation utilizing sockets to handle client connections.
+ * This class extends {@code ServerBasis} and implements {@code Runnable}.
+ * It manages client connections and operations such as accepting and closing connections,
+ * and periodically checks for inactive clients.
+ */
 public class SocketServer extends ServerBasis implements Runnable {
 
     private static SocketServer instance;
@@ -25,8 +31,6 @@ public class SocketServer extends ServerBasis implements Runnable {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     /**
-     * Constructor
-     *
      * @param port on which the server will listen
      * @throws ServerException if the port is invalid or the server cannot be started
      */
@@ -48,7 +52,7 @@ public class SocketServer extends ServerBasis implements Runnable {
     }
 
     /**
-     * singleton instance of the server
+     * Singleton instance of the server
      *
      * @return server instance
      * @throws ServerException if the server is not instantiated
@@ -60,13 +64,6 @@ public class SocketServer extends ServerBasis implements Runnable {
         throw new ServerException("[SOCKET SERVER] Server is not instantiated");
     }
 
-    /**
-     * Get or create the singleton instance of the server
-     *
-     * @param port the port on which the server will listen
-     * @return the server instance
-     * @throws ServerException if the server cannot be instantiated
-     */
     public static SocketServer getInstance(int port) throws ServerException {
         if (instance == null) {
             instance = new SocketServer(port);
@@ -134,6 +131,10 @@ public class SocketServer extends ServerBasis implements Runnable {
 
     }
 
+
+    /**
+     * Stops the server and releases all resources.
+     */
     public void stop() {
         scheduler.shutdownNow();
         Thread.currentThread().interrupt();
@@ -155,6 +156,10 @@ public class SocketServer extends ServerBasis implements Runnable {
         }
     }
 
+    /**
+     * Continuously runs the main server loop, accepting incoming client connections
+     * until the thread is interrupted.
+     */
     @Override
     public void run() {
         while (!Thread.interrupted()) {

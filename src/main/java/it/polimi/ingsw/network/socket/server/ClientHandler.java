@@ -13,24 +13,33 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
- * Manages (server point of view) the connection between a client and the server via socket.
- * It encapsulates two-way communication of serialized objects,
- * connection monitoring via heartbeat, and asynchronous listening for incoming messages from the client.
+ * Server-side socket connection handler.
+ * Manages bidirectional communication with socket clients and message processing.
  */
 public class ClientHandler extends User {
 
+    /**
+     * TCP socket connection to the client
+     */
     private Socket socket;
+
+    /**
+     * Output stream for sending serialized objects to the client
+     */
     private ObjectOutputStream output;
+
+    /**
+     * Input stream for receiving serialized objects from the client
+     */
     private ObjectInputStream input;
 
+    /** Thread for listening to client messages */
     private ListenLoop listenLoop;
 
     /**
-     * Constructor
-     *
-     * @param connectionCode the unique identifier for this connection
-     * @param socket         the socket for this connection
-     * @throws IOException if there's an error setting up the connection
+     * @param connectionCode unique connection identifier
+     * @param socket client socket connection
+     * @throws IOException if connection setup fails
      */
     public ClientHandler(String connectionCode, Socket socket) throws IOException {
         super(connectionCode, null);
@@ -40,6 +49,12 @@ public class ClientHandler extends User {
         this.listenLoop = new ListenLoop(this);
     }
 
+    /**
+     * Sends a serialized object to a client with connection cleanup on error.
+     *
+     * @param data object to send
+     * @throws ServerException if sending fails
+     */
     public void sendObject(Object data) throws ServerException {
         try {
             this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
@@ -50,6 +65,12 @@ public class ClientHandler extends User {
         }
     }
 
+    /**
+     * Reads a serialized object from a client with connection cleanup on error.
+     *
+     * @return received object
+     * @throws ServerException if reading fails or object is null
+     */
     public Object readObject() throws ServerException {
         try {
             return input.readObject();
@@ -59,6 +80,11 @@ public class ClientHandler extends User {
         }
     }
 
+    /**
+     * Sends game event to a client as a message.
+     *
+     * @param event game event to send
+     */
     @Override
     public void sendEvent(Event event) {
         Message message = Constants.createMessage(event.eventType(), event.getArgs());
@@ -70,6 +96,11 @@ public class ClientHandler extends User {
         }
     }
 
+    /**
+     * Processes received a message with error handling.
+     *
+     * @param message received message to process
+     */
     public void receive(Message message) {
         try {
             message.execute(this);
@@ -84,6 +115,9 @@ public class ClientHandler extends User {
         }
     }
 
+    /**
+     * Closes connection and cleans up all resources.
+     */
     @SuppressWarnings("Duplicates")
     public void close() {
         if (this.socket == null) return; // Already closed

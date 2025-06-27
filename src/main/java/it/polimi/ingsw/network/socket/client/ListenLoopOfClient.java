@@ -4,15 +4,29 @@ import it.polimi.ingsw.network.exceptions.ClientException;
 import it.polimi.ingsw.network.messages.Message;
 import it.polimi.ingsw.network.socket.Sense;
 
+/**
+ * Thread that continuously listens for incoming messages from the server.
+ * Filters out Sense objects and processes Message objects through the client.
+ */
 public class ListenLoopOfClient extends Thread {
 
+    /** Client socket to listen on */
     private final ClientSocket clientSocket;
 
+    /**
+     * Creates and starts the listening thread.
+     *
+     * @param clientSocket the client socket to monitor for incoming messages
+     */
     public ListenLoopOfClient(ClientSocket clientSocket) {
         this.clientSocket = clientSocket;
         this.start();
     }
 
+    /**
+     * Continuously reads and processes messages from the server.
+     * Ignores Sense objects and forwards Message objects to the client for processing.
+     */
     @Override
     public void run() {
         while (!Thread.interrupted()) {

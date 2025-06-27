@@ -21,14 +21,31 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * RMI callback implementation for handling server-to-client notifications.
+ * Processes various game events and updates the client state accordingly.
+ */
 public class ClientCallback extends UnicastRemoteObject implements ClientCallbackInterface {
 
+    /** Reference to the client that owns this callback */
     private final Client client;
 
+    /**
+     * @param client the client instance
+     * @throws RemoteException if RMI export fails
+     */
     public ClientCallback(Client client) throws RemoteException {
         this.client = client;
     }
 
+    /**
+     * Handles game events from the server and updates client state.
+     * Dispatches events to appropriate handlers based on message type.
+     *
+     * @param eventType the type of event
+     * @param args event parameters
+     * @throws RemoteException if RMI communication fails
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void notifyGameEvent(MessageType eventType, Object... args) throws RemoteException {

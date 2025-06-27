@@ -8,7 +8,6 @@ import it.polimi.ingsw.network.exceptions.ServerException;
 import it.polimi.ingsw.network.exceptions.UserNotFoundException;
 import it.polimi.ingsw.network.User;
 
-import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,13 +21,26 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
+/**
+ * RMI server implementation that handles remote method invocations for the game server.
+ * This class extends ServerBasis and implements RMIServerInterface to provide
+ * RMI-based communication between clients and the game server.
+ * <p>
+ * The server manages client sessions, handles connection timeouts, and delegates
+ * game logic operations to the parent ServerBasis class.
+ */
 public class RMIServer extends ServerBasis implements RMIServerInterface {
 
+    /** Singleton instance of the RMI server */
     private static RMIServer instance;
+
+    /** RMI registry for binding remote objects */
     private final Registry registry;
+
+    /** Map storing active client sessions with their session codes */
     private final Map<String, User> sessions;
 
+    /** Scheduled executor service for periodic client connection checks */
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public RMIServer(int port) throws ServerException {
@@ -65,6 +77,11 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
         return instance;
     }
 
+    /**
+     * Stops the RMI server and cleans up all resources.
+     * Shuts down the scheduler, unregisters all clients, unbinds the registry,
+     * and unexports all remote objects.
+     */
     public void stop() {
         scheduler.shutdownNow();
 
@@ -97,6 +114,11 @@ public class RMIServer extends ServerBasis implements RMIServerInterface {
         return user;
     }
 
+    /**
+     * Periodically checks all active clients and removes those that have timed out.
+     * This method is called by the scheduled executor service to maintain
+     * connection integrity and clean up inactive sessions.
+     */
     private void checkActiveClients() {
         long now = System.currentTimeMillis();
         Map<String, User> sessionsCopy;

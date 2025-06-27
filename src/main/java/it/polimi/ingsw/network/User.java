@@ -16,21 +16,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Server's point of view of the client. This class handles connected users
+ * Server-side user representation supporting both RMI and Socket connections.
+ * Manages connected users, event notifications, and connection monitoring.
  */
 public class User {
 
+    /** Thread-safe list of active users */
     private final static List<User> activeUsers = new ArrayList<>();
+
+    /** Thread-safe list of inactive users with ongoing games */
     private final static List<User> inactiveUsers = new ArrayList<>();
 
+    /** Last ping timestamp for connection monitoring */
     private long lastPing;
+
+    /** Unique connection identifier */
     protected final String connectionCode;
+
+    /** User's username */
     protected String username;
+
+    /** Current user state */
     private UserState state;
+
+    /** User's current lobby */
     private Lobby lobby;
 
+    /** RMI callback interface for client communication */
     private final ClientCallbackInterface callback;
 
+    /**
+     * @param connectionCode unique connection identifier
+     * @param callback RMI callback interface for client communication, null for Socket
+     */
     public User(String connectionCode, ClientCallbackInterface callback) {
         this.connectionCode = connectionCode;
         this.username = null;
@@ -45,6 +63,11 @@ public class User {
         }
     }
 
+    /**
+     * Notifies multiple events, wrapping in batch markers if needed.
+     *
+     * @param events list of events to notify
+     */
     public void notifyEvents(List<Event> events) {
         if (events.size() == 1) notifyEvent(events.getFirst());
         else {
@@ -55,6 +78,11 @@ public class User {
         }
     }
 
+    /**
+     * Notifies event to appropriate players based on visibility.
+     *
+     * @param event event to notify
+     */
     public void notifyEvent(Event event) {
         List<String> playersToNotify = new ArrayList<>();
         if ((event.getVisibility() == EventVisibility.ALL_PLAYERS || event.getVisibility() == EventVisibility.OTHER_PLAYERS) && lobby != null)
@@ -73,6 +101,11 @@ public class User {
         }
     }
 
+    /**
+     * Sends event to this user's client.
+     *
+     * @param event event to send
+     */
     public void sendEvent(Event event) {
         try {
             this.getCallback().notifyGameEvent(event.eventType(), event.getArgs());
@@ -125,10 +158,22 @@ public class User {
         return lastPing;
     }
 
+    /**
+     * Updates last ping timestamp.
+     *
+     * @param lastPing new ping timestamp
+     */
     public void setLastPing(long lastPing) {
         this.lastPing = lastPing;
     }
 
+    /**
+     * Finds active user by username.
+     *
+     * @param username username to find
+     * @return user with matching username
+     * @throws UserNotFoundException if user not found
+     */
     public static User getUser(String username) {
         List<User> temp;
         synchronized (activeUsers) {
@@ -140,6 +185,12 @@ public class User {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    /**
+     * Removes and returns inactive user by username.
+     *
+     * @param username username to find
+     * @return inactive user or null if not found
+     */
     public static User popInactiveUser(String username) {
         synchronized (inactiveUsers) {
             for (User user : inactiveUsers) {
@@ -152,6 +203,11 @@ public class User {
         return null;
     }
 
+    /**
+     * Removes user from system, handling lobby cleanup and game state.
+     *
+     * @param user user to remove
+     */
     public static void removeUser(User user) {
         synchronized (activeUsers) {
             if (!activeUsers.contains(user)) return;
