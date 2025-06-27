@@ -57,16 +57,16 @@ The project includes all base gameplay mechanics plus **3 out of 4 advanced modu
 ## 📚 Documentation
 
 ### 📁 Structure
-All documentation is organized in the `/deliverables` folder.
+All documentation is organized in the `/deliveries` folder.
 
 ### 🎨 UML Diagrams
-**Location:** `/deliverables/final/uml`
+**Location:** `/deliveries/UML`
 
-- **📊 Class Diagram**: Main classes architecture (*Model* and *Controller*)
-- **🔄 Sequence Diagrams**: Core interactions (lobby joining, component picking, etc.)
+### 📊 Sequence Diagrams
+**Location:** `/deliveries/sequenceDiagram`
 
 ### 📖 JavaDoc
-**Location:** `/images/javadoc`
+**Location:** `/deliveries/javadoc`
 
 Comprehensive documentation covering the most significant classes and methods.
 
@@ -138,12 +138,12 @@ java -jar IS25-AM17-Windows.jar client
 
 #### 🖲️ Server Launch
 ```bash
-java -jar IS25-AM17-Mac.jar server
+java -jar IS25-AM17-MacSilicon.jar server
 ```
 
 #### 👤 Client Launch
 ```bash
-java -jar IS25-AM17-Mac.jar client
+java -jar IS25-AM17-MacSilicon.jar client
 ```
 
 ---
