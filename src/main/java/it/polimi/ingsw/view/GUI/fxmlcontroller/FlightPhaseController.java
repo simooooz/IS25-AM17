@@ -457,18 +457,32 @@ public class FlightPhaseController implements MessageHandler {
         Image points;
 
         // Setup card image
-        if (!model.getBoard().getCardPile().isEmpty()) {
-            if (model.getBoard().getCardPile().size() > 1) {
-                previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().get(model.getBoard().getCardPile().size() - 2).getId() + ".jpg")))));
+        if (model.getPlayersState().containsValue(PlayerState.DRAW_CARD)) {
+            if (!model.getBoard().getCardPile().isEmpty()) {
+                previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")))));
                 previousCardImage.setVisible(true);
+            } else {
+                previousCardImage.setVisible(false);
             }
-            cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")));
-        } else {
-            previousCardImage.setVisible(false);
             if (!client.getLobby().isLearnerMode())
                 cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
             else
                 cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
+        }
+        else {
+            if (!model.getBoard().getCardPile().isEmpty()) {
+                if (model.getBoard().getCardPile().size() > 1) {
+                    previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().get(model.getBoard().getCardPile().size() - 2).getId() + ".jpg")))));
+                    previousCardImage.setVisible(true);
+                }
+                cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")));
+            } else {
+                previousCardImage.setVisible(false);
+                if (!client.getLobby().isLearnerMode())
+                    cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+                else
+                    cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
+            }
         }
 
         // Setup ship and points image

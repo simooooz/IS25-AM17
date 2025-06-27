@@ -39,7 +39,11 @@ public abstract class ClientGameModel {
     public PlayerState getPlayerState(String username) {
         return playersState.get(username);
     }
-    
+
+    public Map<String, PlayerState> getPlayersState() {
+        return playersState;
+    }
+
     // --- UPDATE METHODS (called by the Network layer) ---
 
     public void matchStarted() {
