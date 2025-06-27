@@ -190,14 +190,16 @@ public class FlightPhaseController implements MessageHandler {
             }
         }
         else if ((state == PlayerState.WAIT_REMOVE_GOODS || state == PlayerState.WAIT_GOODS) && object.contains("good")) { // Good in WAIT_REMOVE_GOODS or WAIT_GOODS
-            List<Class<?>> allowedClasses = List.of(ClientCargoHoldsComponent.class);
+            List<Class<?>> allowedClasses = List.of(ClientCargoHoldsComponent.class, ClientSpecialCargoHoldsComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
                 if (
                     destId.contains("component") && allowedClasses.contains(destComponent.getClass()) && // Dest is allowed component
-                    destComponent instanceof ClientCargoHoldsComponent && objectsMap.get(destComponentId).size() < ((ClientCargoHoldsComponent) destComponent).getNumber()
+                    destComponent instanceof ClientSpecialCargoHoldsComponent && objectsMap.get(destComponentId).size() < ((ClientSpecialCargoHoldsComponent) destComponent).getNumber()
                 ) {
-                    moveComponentObject(objectImageView, destId);
-                    event.setDropCompleted(true);
+                    if (!(destComponent instanceof ClientCargoHoldsComponent) || !object.contains("red")) {
+                        moveComponentObject(objectImageView, destId);
+                        event.setDropCompleted(true);
+                    }
                 }
             }
         }
@@ -262,7 +264,7 @@ public class FlightPhaseController implements MessageHandler {
             }
         }
         else if ((state == PlayerState.WAIT_REMOVE_GOODS || state == PlayerState.WAIT_GOODS) && object.contains("good")) { // Good in WAIT_REMOVE_GOODS or WAIT_GOODS
-            List<Class<?>> allowedClasses = List.of(ClientCargoHoldsComponent.class);
+            List<Class<?>> allowedClasses = List.of(ClientCargoHoldsComponent.class, ClientSpecialCargoHoldsComponent.class);
             if (sourceId.equals(flowPane.getId()) || (sourceId.contains("component") && allowedClasses.contains(Objects.requireNonNull(sourceComponent).getClass()))) { // Source is flow pane or allowed component
                 moveComponentObject(objectImageView, destId);
                 event.setDropCompleted(true);
@@ -619,6 +621,7 @@ public class FlightPhaseController implements MessageHandler {
                         }
                         case ClientBatteryComponent c -> changeComponentObjects(c, c.getBatteries(), List.of("/images/objects/battery.png"));
                         case ClientCargoHoldsComponent c -> changeComponentObjects(c, c.getGoods().size(), c.getGoods().stream().map(good -> "/images/objects/good-"+good.name().toLowerCase()+".png").toList());
+                        case ClientSpecialCargoHoldsComponent c -> changeComponentObjects(c, c.getGoods().size(), c.getGoods().stream().map(good -> "/images/objects/good-"+good.name().toLowerCase()+".png").toList());
                         case ClientCannonComponent _, ClientEngineComponent _, ClientShieldComponent _ -> objectsMap.put(component.get().getId(), new ArrayList<>());
                         default -> {}
                     }
@@ -1007,8 +1010,10 @@ public class FlightPhaseController implements MessageHandler {
                             }
                         }
                     });
-                    if (list2.size() > 1) {} // TODO set error troppi shield attivati
-                    client.send(MessageType.ACTIVATE_SHIELD, list2.isEmpty() ? null : list2.getFirst());
+                    if (list2.size() > 1)
+                        showError("Choose only one shield");
+                    else
+                        client.send(MessageType.ACTIVATE_SHIELD, list2.isEmpty() ? null : list2.getFirst());
                 });
             }
             case WAIT_SHIP_PART -> {
@@ -1064,7 +1069,7 @@ public class FlightPhaseController implements MessageHandler {
                         if (shipGrid.lookup("#component_"+id) != null) { // Count only objects in my components
                             ClientComponent component = model.getBoard().getMapIdComponents().get(id);
                             switch (component) {
-                                case ClientCargoHoldsComponent _ -> {
+                                case ClientCargoHoldsComponent _, ClientSpecialCargoHoldsComponent _ -> {
                                     List<ColorType> goods = objects.stream()
                                         .map(iv -> ColorType.valueOf(((String) iv.getUserData()).split("-")[1].toUpperCase()))
                                         .toList();
@@ -1176,6 +1181,13 @@ public class FlightPhaseController implements MessageHandler {
     private void initializeStatus() {
         logLabel.setText("Waiting for game events...");
         statusScrollPane.setVvalue(0.0);
+    }
+
+    private void showError(String messame) {
+        errorLabel.setText(messame);
+        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+        pause.setOnFinished(_ -> errorLabel.setText(""));
+        pause.play();
     }
 
     /**
@@ -1316,12 +1328,7 @@ public class FlightPhaseController implements MessageHandler {
                     endFlightButton.setVisible(false);
                 updateBoard();
             }
-            case ErrorEvent e -> {
-                errorLabel.setText(e.message());
-                PauseTransition pause = new PauseTransition(Duration.seconds(2));
-                pause.setOnFinished(_ -> errorLabel.setText(""));
-                pause.play();
-            }
+            case ErrorEvent e -> showError(e.message());
             default -> {}
         }
     }
