@@ -31,7 +31,7 @@ public class GameStateDTOFactory {
     public static ModelDTO createFromModel(ModelFacade serverModel) {
         ModelDTO dto = new ModelDTO();
         dto.playersState = serverModel.getPlayersState();
-        dto.board = serverModel.getBoard().toDto();
+        dto.board = serverModel.getBoard().toDto(serverModel);
         return dto;
     }
 

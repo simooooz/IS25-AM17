@@ -332,7 +332,7 @@ public abstract class Board {
      *
      * @return a BoardDTO containing the complete current board state
      */
-    public BoardDTO toDto() {
+    public BoardDTO toDto(ModelFacade model) {
         BoardDTO boardDTO = new BoardDTO();
 
         boardDTO.mapIdComponents = mapIdComponents.entrySet().stream()
@@ -343,8 +343,13 @@ public abstract class Board {
                 .map(GameStateDTOFactory::createPlayerPositionDTO).toList();
         boardDTO.startingDeck = startingDeck.stream()
                 .map(GameStateDTOFactory::createPlayerDTO).toList();
-        boardDTO.cardPile = CardFactory.serializeCardList(cardPile.stream()
-                .limit(cardPilePos+1).toList());
+
+        if (model.getPlayersState().containsValue(PlayerState.DRAW_CARD))
+            boardDTO.cardPile = CardFactory.serializeCardList(cardPile.stream()
+                .limit(Math.max(cardPilePos, 0)).toList());
+        else
+            boardDTO.cardPile = CardFactory.serializeCardList(cardPile.stream()
+                    .limit(cardPilePos+1).toList());
 
         return boardDTO;
     }

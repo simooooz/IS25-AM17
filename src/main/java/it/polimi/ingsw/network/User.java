@@ -221,6 +221,9 @@ public class User {
                 }
                 user.notifyEvents(events);
             }
+            else if (user.lobby.getState() == LobbyState.WAITING && !events.isEmpty()) {
+                user.notifyEvents(events);
+            }
         }
 
         synchronized (activeUsers) {

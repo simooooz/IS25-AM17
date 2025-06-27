@@ -35,7 +35,7 @@ public class ClientCannonFirePenaltyCombatZone extends ClientPenaltyCombatZone {
         str.append("\nDices for cannon fires: ");
         for (Integer coord : coords)
             str.append(coord).append(", ");
-        return str.toString();
+        return str.append("\n").toString();
     }
 
 }

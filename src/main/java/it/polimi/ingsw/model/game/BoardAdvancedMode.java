@@ -176,8 +176,8 @@ public class BoardAdvancedMode extends Board {
      * advanced mode specific timing information
      */
     @Override
-    public BoardDTO toDto() {
-        BoardDTO dto = super.toDto();
+    public BoardDTO toDto(ModelFacade model) {
+        BoardDTO dto = super.toDto(model);
         dto.timeLeft = timeManagement.getTimeLeft();
         dto.hourglassPos = timeManagement.getHourglassPos();
         return dto;

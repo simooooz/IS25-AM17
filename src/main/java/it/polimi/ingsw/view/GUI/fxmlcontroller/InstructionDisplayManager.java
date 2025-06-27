@@ -1,20 +1,17 @@
 package it.polimi.ingsw.view.GUI.fxmlcontroller;
 
 import it.polimi.ingsw.client.model.ClientGameModel;
-import it.polimi.ingsw.client.model.game.ClientBoard;
 import it.polimi.ingsw.client.model.player.ClientPlayer;
-import it.polimi.ingsw.client.model.player.ClientShip;
 import it.polimi.ingsw.common.model.enums.PlayerState;
 import it.polimi.ingsw.network.Client;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
 
 /**
  * Manages the display of instructions and status messages for the GUI,
  * providing dynamic guidance to players based on their current game state.
  *
- * <p>This class serves as the GUI equivalent of the TUI's DisplayUpdater,
+ * <p>This class serves as the GUI equivalent of the TUI DisplayUpdater,
  * automatically updating instruction labels and status messages to help
  * players understand what actions they can take in each phase of the game.</p>
  */
@@ -127,7 +124,6 @@ public class InstructionDisplayManager {
             case WAIT_INDEX -> getWaitIndexInstructions();
             case WAIT, DONE -> getWaitingInstructions();
             case END -> getEndGameInstructions();
-            default -> "Waiting for game to start...";
         };
     }
 
@@ -149,7 +145,6 @@ public class InstructionDisplayManager {
             case WAIT_INDEX -> "Planet Selection - Choose landing destination";
             case WAIT, DONE -> "Waiting Phase - Other players are taking actions";
             case END -> "Game Complete - Final results available";
-            default -> "Game in progress...";
         };
     }
 
@@ -189,18 +184,20 @@ public class InstructionDisplayManager {
     }
 
     private String getCheckPhaseInstructions() {
-        return "• Your ship configuration is invalid\n" +
-                "• Click on components you want to remove\n" +
-                "• Selected components will be highlighted in red\n" +
-                "• Click 'Done' when you've selected all components to remove";
+        return """
+                • Your ship configuration is invalid
+                • Click on components you want to remove
+                • Selected components will be highlighted in red
+                • Click 'Done' when you've selected all components to remove""";
     }
 
     private String getWaitAlienInstructions() {
-        return "• Drag aliens from the panel to cabin components\n" +
-                "• Engine aliens provide movement bonuses\n" +
-                "• Cannon aliens provide combat bonuses\n" +
-                "• Each cabin can hold one alien\n" +
-                "• Click 'Done' when finished placing aliens";
+        return """
+                • Drag aliens from the panel to cabin components
+                • Engine aliens provide movement bonuses
+                • Cannon aliens provide combat bonuses
+                • Each cabin can hold one alien
+                • Click 'Done' when finished placing aliens""";
     }
 
     private String getWaitShipPartInstructions() {
@@ -216,78 +213,88 @@ public class InstructionDisplayManager {
     }
 
     private String getDrawCardInstructions() {
-        return "• Click 'Draw Card' to reveal the next adventure card\n" +
-                "• The card will determine your next actions\n" +
-                "• Wait for the card to be revealed";
+        return """
+                • Click 'Draw Card' to reveal the next adventure card
+                • The card will determine your next actions
+                • Wait for the card to be revealed""";
     }
 
     private String getWaitCannonsInstructions() {
-        return "• Drag batteries to double cannons to activate them\n" +
-                "• Activated cannons provide combat advantages\n" +
-                "• Each double cannon needs one battery\n" +
-                "• You can choose which cannons to activate\n" +
-                "• Click 'Done' when finished";
+        return """
+                • Drag batteries to double cannons to activate them
+                • Activated cannons provide combat advantages
+                • Each double cannon needs one battery
+                • You can choose which cannons to activate
+                • Click 'Done' when finished""";
     }
 
     private String getWaitEnginesInstructions() {
-        return "• Drag batteries to double engines to activate them\n" +
-                "• Activated engines provide movement advantages\n" +
-                "• Each double engine needs one battery\n" +
-                "• You can choose which engines to activate\n" +
-                "• Click 'Done' when finished";
+        return """
+                • Drag batteries to double engines to activate them
+                • Activated engines provide movement advantages
+                • Each double engine needs one battery
+                • You can choose which engines to activate
+                • Click 'Done' when finished""";
     }
 
     private String getWaitGoodsInstructions() {
-        return "• Drag goods from the panel to cargo holds\n" +
-                "• Match goods to appropriate cargo hold types\n" +
-                "• Red, Blue, and Yellow goods available\n" +
-                "• Each cargo hold has limited capacity\n" +
-                "• Click 'Done' when finished arranging goods";
+        return """
+                • Drag goods from the panel to cargo holds
+                • Match goods to appropriate cargo hold types
+                • Red, Blue, and Yellow goods available
+                • Each cargo hold has limited capacity
+                • Click 'Done' when finished arranging goods""";
     }
 
     private String getWaitRemoveGoodsInstructions() {
-        return "• You have too many goods and must remove some\n" +
-                "• Drag goods from cargo holds back to the panel\n" +
-                "• Or use batteries to avoid removing goods\n" +
-                "• Drag batteries from battery components if needed\n" +
-                "• Click 'Done' when finished";
+        return """
+                • You have too many goods and must remove some
+                • Drag goods from cargo holds back to the panel
+                • Or use batteries to avoid removing goods
+                • Drag batteries from battery components if needed
+                • Click 'Done' when finished""";
     }
 
     private String getWaitRollDicesInstructions() {
-        return "• Click 'Roll Dices' to determine event outcomes\n" +
-                "• Dice results will affect your ship and crew\n" +
-                "• Results are random and cannot be changed";
+        return """
+                • Click 'Roll Dices' to determine event outcomes
+                • Dice results will affect your ship and crew
+                • Results are random and cannot be changed""";
     }
 
     private String getWaitRemoveCrewInstructions() {
-        return "• Remove crew members from cabins as required\n" +
-                "• Drag humans or aliens from cabins to the panel\n" +
-                "• Follow the card requirements for removal\n" +
-                "• Click 'Done' when finished removing crew";
+        return """
+                • Remove crew members from cabins as required
+                • Drag humans or aliens from cabins to the panel
+                • Follow the card requirements for removal
+                • Click 'Done' when finished removing crew""";
     }
 
     private String getWaitShieldInstructions() {
-        return "• Optionally activate shields for protection\n" +
-                "• Drag one battery to a shield component\n" +
-                "• Shields can prevent damage from events\n" +
-                "• You can choose not to activate shields\n" +
-                "• Click 'Done' to confirm your choice";
+        return """
+                • Optionally activate shields for protection
+                • Drag one battery to a shield component
+                • Shields can prevent damage from events
+                • You can choose not to activate shields
+                • Click 'Done' to confirm your choice""";
     }
 
     private String getWaitBooleanInstructions() {
-        return "• Choose whether to take the offered reward\n" +
-                "• Click 'Take Reward' to accept the bonus\n" +
-                "• Click 'Decline' to refuse the reward\n" +
-                "• Consider the risks and benefits carefully\n" +
-                "• Click 'Done' to confirm your decision";
+        return """
+                • Choose whether to take the offered reward
+                • Click 'Take Reward' to accept the bonus
+                • Click 'Decline' to refuse the reward
+                • Consider the risks and benefits carefully
+                • Click 'Done' to confirm your decision""";
     }
 
     private String getWaitIndexInstructions() {
-        return "• Choose which planet to land on\n" +
-                "• Click the numbered buttons to select a planet\n" +
-                "• Each planet offers different rewards and risks\n" +
-                "• Consider your ship's capabilities\n" +
-                "• Click 'Done' to confirm your choice";
+        return """
+                • Choose which planet to land on
+                • Click the numbered buttons to select a planet
+                • Each planet offers different rewards and risks
+                • Consider your ship's capabilities
+                • Click 'Done' to confirm your choice""";
     }
 
     private String getWaitingInstructions() {
@@ -306,11 +313,12 @@ public class InstructionDisplayManager {
     }
 
     private String getEndGameInstructions() {
-        return "• Game has finished!\n" +
-                "• Check final scores and rankings\n" +
-                "• View other players' final ship configurations\n" +
-                "• Click 'Leave Game' to return to main menu\n" +
-                "• Congratulations on completing your space adventure!";
+        return """
+                • Game has finished!
+                • Check final scores and rankings
+                • View other players' final ship configurations
+                • Click 'Leave Game' to return to main menu
+                • Congratulations on completing your space adventure!""";
     }
 
     private String getCurrentPhase() {
@@ -336,26 +344,6 @@ public class InstructionDisplayManager {
         }
     }
 
-    /**
-     * Displays a temporary error message that automatically reverts after 5 seconds.
-     * Error messages are shown in red color to indicate their importance.
-     *
-     * @param errorMessage The error message to display
-     */
-    public void showErrorMessage(String errorMessage) {
-        Platform.runLater(() -> {
-            setLabelText(statusMessageLabel, "ERROR: " + errorMessage, ERROR_COLOR);
-            // Restore normal message after 5 seconds
-            new Thread(() -> {
-                try {
-                    Thread.sleep(5000);
-                    updateInstructions();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }).start();
-        });
-    }
 
     /**
      * Displays a temporary success message that automatically reverts after 3 seconds.

@@ -93,7 +93,7 @@ public class ClientPlanetCard extends ClientCard {
             switch (state) {
                 case DONE -> sb.append("- ").append(player.getUsername()).append(" has done ").append(landInfo);
                 case WAIT -> sb.append("- ").append(player.getUsername()).append(" is waiting ").append(landInfo);
-                case WAIT_GOODS -> sb.append("- ").append(player.getUsername()).append(" is collecting the reward (updating goods)\n");
+                case WAIT_GOODS -> sb.append("- ").append(player.getUsername()).append(" is collecting the reward (updating goods) )").append(landInfo);
                 case WAIT_INDEX -> sb.append("- ").append(player.getUsername()).append(" is choosing the planet\n");
             }
         }

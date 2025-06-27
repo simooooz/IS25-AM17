@@ -25,7 +25,6 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -134,12 +133,14 @@ public class FlightPhaseController implements MessageHandler {
                     changeComponentObjects(destComponent, 0, List.of());
                     moveComponentObject(objectImageView, destId);
                     if (sourceId.contains("component")) {
+                        assert sourceComponent != null;
                         changeComponentObjects(sourceComponent, 2, List.of("/images/objects/human.png"));
                     }
                     event.setDropCompleted(true);
                 }
             }
         } else if (state == PlayerState.WAIT_CANNONS && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_CANNONS
+            assert sourceComponent != null;
             List<Class<?>> allowedClasses = Arrays.asList(ClientCannonComponent.class, ClientBatteryComponent.class);
             if (allowedClasses.containsAll(List.of(destComponent.getClass(), sourceComponent.getClass()))) {
                 if (
@@ -151,6 +152,7 @@ public class FlightPhaseController implements MessageHandler {
                 }
             }
         } else if (state == PlayerState.WAIT_ENGINES && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_ENGINES
+            assert sourceComponent != null;
             List<Class<?>> allowedClasses = Arrays.asList(ClientEngineComponent.class, ClientBatteryComponent.class);
             if (allowedClasses.containsAll(List.of(destComponent.getClass(), sourceComponent.getClass()))) {
                 if (
@@ -162,6 +164,7 @@ public class FlightPhaseController implements MessageHandler {
                 }
             }
         } else if (state == PlayerState.WAIT_SHIELD && object.equals("battery") && destId.contains("component") && sourceId.contains("component")) { // Battery in WAIT_SHIELD
+            assert sourceComponent != null;
             List<Class<?>> allowedClasses = Arrays.asList(ClientShieldComponent.class, ClientBatteryComponent.class);
             if (allowedClasses.containsAll(List.of(destComponent.getClass(), sourceComponent.getClass()))) {
                 if (
@@ -450,23 +453,22 @@ public class FlightPhaseController implements MessageHandler {
 
     private void loadImages() {
         Image playerShipImg;
-        Image cardBackImg;
+        Image cardImg;
         Image points;
 
         // Setup card image
-        System.out.println("CARD PULE SIZE " + model.getBoard().getCardPile().size());
         if (!model.getBoard().getCardPile().isEmpty()) {
             if (model.getBoard().getCardPile().size() > 1) {
                 previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().get(model.getBoard().getCardPile().size() - 2).getId() + ".jpg")))));
                 previousCardImage.setVisible(true);
             }
-            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")));
+            cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")));
         } else {
             previousCardImage.setVisible(false);
             if (!client.getLobby().isLearnerMode())
-                cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+                cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
             else
-                cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
+                cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
         }
 
         // Setup ship and points image
@@ -479,7 +481,7 @@ public class FlightPhaseController implements MessageHandler {
         }
 
         playerShipImage.setImage(playerShipImg);
-        currentCardImage.setImage(cardBackImg);
+        currentCardImage.setImage(cardImg);
         pointImage.setImage(points);
     }
 
@@ -795,7 +797,6 @@ public class FlightPhaseController implements MessageHandler {
     private void updateBoard() {
         StringBuilder sb = new StringBuilder();
         for (SimpleEntry<ClientPlayer, Integer> player : model.getBoard().getPlayers()) {
-            System.out.println("In game  " + player.getKey().toRawString());
             sb.append(player.getValue().toString()).append(" ").append(player.getKey().toRawString()).append(" | ").append(player.getKey().getCredits()).append(" credits\n");
         }
         if (sb.isEmpty())
@@ -1182,8 +1183,12 @@ public class FlightPhaseController implements MessageHandler {
 
                 // Check if card is covered
                 if (e.states().containsValue(PlayerState.DRAW_CARD)) {
-                    Image cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
-                    currentCardImage.setImage(cardBackImg);
+                    Image cardImg;
+                    if (!client.getLobby().isLearnerMode())
+                        cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_II_IT_0121.jpg")));
+                    else
+                        cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/GT-cards_I_IT_21.jpg")));
+                    currentCardImage.setImage(cardImg);
                     if (!model.getBoard().getCardPile().isEmpty()) {
                         previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")))));
                         previousCardImage.setVisible(true);
