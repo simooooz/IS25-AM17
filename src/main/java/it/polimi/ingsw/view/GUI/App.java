@@ -13,6 +13,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Main application class for the GUI client implementation.
@@ -73,7 +74,7 @@ public class App extends Application implements UserInterface {
      */
     @Override
     public void start(Stage stage) {
-        Font.loadFont(getClass().getResource("/fonts/Audiowide-Regular.ttf").toExternalForm(), 14);
+        Font.loadFont(Objects.requireNonNull(getClass().getResource("/fonts/Audiowide-Regular.ttf")).toExternalForm(), 14);
         SceneManager.init(stage);
     }
 

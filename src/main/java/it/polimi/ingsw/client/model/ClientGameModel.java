@@ -1,10 +1,7 @@
 package it.polimi.ingsw.client.model;
 
 import it.polimi.ingsw.client.model.cards.ClientCard;
-import it.polimi.ingsw.client.model.components.ClientBatteryComponent;
-import it.polimi.ingsw.client.model.components.ClientCabinComponent;
-import it.polimi.ingsw.client.model.components.ClientCargoHoldsComponent;
-import it.polimi.ingsw.client.model.components.ClientComponent;
+import it.polimi.ingsw.client.model.components.*;
 import it.polimi.ingsw.client.model.events.CardRevealedEvent;
 import it.polimi.ingsw.client.model.events.CardUpdatedEvent;
 import it.polimi.ingsw.client.model.game.ClientBoard;
@@ -175,7 +172,7 @@ public abstract class ClientGameModel {
     }
 
     public void goodsUpdated(int id, List<ColorType> goods) {
-        ClientCargoHoldsComponent component = (ClientCargoHoldsComponent) board.getMapIdComponents().get(id);
+        ClientSpecialCargoHoldsComponent component = (ClientSpecialCargoHoldsComponent) board.getMapIdComponents().get(id);
         component.getGoods().clear();
         component.getGoods().addAll(goods);
 

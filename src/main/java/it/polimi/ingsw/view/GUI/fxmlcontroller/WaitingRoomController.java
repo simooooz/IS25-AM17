@@ -198,7 +198,7 @@ public class WaitingRoomController implements MessageHandler {
         statusLabel.setText("Error: " + message);
         statusLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 16px; -fx-font-weight: bold;");
     }
-    
+
     private void skipBuildPhase() {
         Map<Integer, ImageView> componentMap = new HashMap<>();
         List<ClientComponent> components = client.getGameController().getModel().getBoard().getMapIdComponents().values().stream().toList();
@@ -221,7 +221,7 @@ public class WaitingRoomController implements MessageHandler {
         }
         System.out.println(componentMap.size());
         SceneManager.navigateToScene("/fxml/gameFlight.fxml", this, (FlightPhaseController controller) ->
-            controller.setImageMap(componentMap)
+                controller.setImageMap(componentMap)
         );
     }
 
