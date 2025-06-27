@@ -8,13 +8,30 @@ import it.polimi.ingsw.model.player.PlayerData;
 
 import java.util.List;
 
+/**
+ * Advanced mode implementation of the ModelFacade that provides enhanced gameplay mechanics
+ * and enables alien selection rules.
+ *
+ */
 public class ModelFacadeAdvancedMode extends ModelFacade {
 
+    /**
+     * Constructs a new ModelFacadeAdvancedMode with the specified list of player usernames.
+     * Initializes the advanced mode board with enhanced gameplay mechanics.
+     *
+     * @param usernames the list of player usernames participating in the advanced mode game
+     * @throws NullPointerException if usernames is null
+     * @throws IllegalArgumentException if usernames is empty or contains invalid usernames
+     */
     public ModelFacadeAdvancedMode(List<String> usernames) {
         super(usernames);
         this.board = new BoardAdvancedMode(usernames);
     }
 
+    /**
+     * Manages the alien selection phase in advanced mode.
+     *
+     */
     @Override
     protected void manageChooseAlienPhase(int playerIndex) {
         boolean phaseDone = true;

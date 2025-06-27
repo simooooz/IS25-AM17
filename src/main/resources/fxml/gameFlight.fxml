@@ -15,7 +15,7 @@
         <!-- others players' ship -->
         <VBox fx:id="otherPlayersContainer" prefWidth="300.0" spacing="10.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10;">
             <children>
-                <Label style="-fx-text-fill: yellow; -fx-font-size: 25px;" text="Other Players">
+                <Label style="-fx-text-fill: yellow; -fx-font-size: 16px;" text="Other Players">
                 </Label>
 
             </children>
@@ -90,11 +90,11 @@
             </VBox>
 
             <!-- Card counter centrato - Ridotto margine superiore -->
-            <HBox alignment="CENTER" prefHeight="84.0" prefWidth="530.0">
+            <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                 <VBox.margin>
-                    <Insets top="-5.0" />
+                    <Insets top="8.0" />
                 </VBox.margin>
-                <Label fx:id="cardCounterLabel" alignment="CENTER" prefHeight="65.0" prefWidth="239.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Cards resolved so far:" />
+                <Label fx:id="cardCounterLabel" alignment="CENTER" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Cards resolved so far:" />
             </HBox>
 
             <!-- Actual and previous card - spazio ridotto -->
@@ -182,7 +182,7 @@
             <VBox alignment="CENTER">
                 <Label style="-fx-text-fill: yellow; -fx-font-size: 16px;" text="Your Ship">
                     <padding>
-                        <Insets bottom="15.0" top="15.0" />
+                        <Insets bottom="8.0" top="16.0" />
                     </padding>
                 </Label>
 
