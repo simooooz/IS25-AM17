@@ -29,4 +29,13 @@ public class ClientCannonFirePenaltyCombatZone extends ClientPenaltyCombatZone {
         return fires.toString();
     }
 
+    @Override
+    public String printCardInfo() {
+        StringBuilder str = new StringBuilder();
+        str.append("\nDices for cannon fires: ");
+        for (Integer coord : coords)
+            str.append(coord).append(", ");
+        return str.toString();
+    }
+
 }

@@ -18,9 +18,9 @@ public abstract class Constants {
     public static final int DEFAULT_RMI_PORT = 1099;
     public static final int DISCOVERY_PORT = 4040;
 
-    public static final int HEARTBEAT_INTERVAL = 5000;
-    public static final int NETWORK_TIMEOUT = 15000;
-    public static final int SERVER_CHECK_INTERVAL = 7500;
+    public static final int HEARTBEAT_INTERVAL = 2000;
+    public static final int NETWORK_TIMEOUT = 6000;
+    public static final int SERVER_CHECK_INTERVAL = 3000;
     public static final int DISCOVERY_TIMEOUT = 3000;
 
     public static final String DISCOVERY_MESSAGE = "GALAXY_TRUCKER_SERVER_DISCOVERY";

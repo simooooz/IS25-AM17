@@ -54,7 +54,6 @@ public class FlightPhaseController implements MessageHandler {
     @FXML public Text playersInGameLabel;
     @FXML public Text playersStartingDeckLabel;
 
-    private OverlayManager overlayManager;
     @FXML public AnchorPane root;
 
     @FXML private VBox otherPlayersContainer;
@@ -433,7 +432,6 @@ public class FlightPhaseController implements MessageHandler {
         this.client = App.getClientInstance();
         this.model = client.getGameController().getModel();
 
-        this.overlayManager = new OverlayManager(root);
         initializeStatus();
         initializeInstructionManager();
 
@@ -456,12 +454,13 @@ public class FlightPhaseController implements MessageHandler {
         Image points;
 
         // Setup card image
+        System.out.println("CARD PULE SIZE " + model.getBoard().getCardPile().size());
         if (!model.getBoard().getCardPile().isEmpty()) {
             if (model.getBoard().getCardPile().size() > 1) {
                 previousCardImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(("/images/cards/" + model.getBoard().getCardPile().get(model.getBoard().getCardPile().size() - 2).getId() + ".jpg")))));
                 previousCardImage.setVisible(true);
             }
-            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/" + model.getBoard().getCardPile().getLast() + ".jpg")));
+            cardBackImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/" + model.getBoard().getCardPile().getLast().getId() + ".jpg")));
         } else {
             previousCardImage.setVisible(false);
             if (!client.getLobby().isLearnerMode())
@@ -822,38 +821,6 @@ public class FlightPhaseController implements MessageHandler {
         p.removeEventHandler(MouseEvent.MOUSE_ENTERED, checkShipPaneMouseEnteredHandler);
         p.removeEventHandler(MouseEvent.MOUSE_EXITED, checkShipPaneMouseExitedHandler);
         p.removeEventHandler(MouseEvent.MOUSE_CLICKED, checkShipPaneMouseClickedHandler);
-    }
-
-    @SuppressWarnings("Duplicates")
-    @FXML
-    private void viewPreviousCardsHandler() {
-
-        overlayManager.showOverlay(() -> {});
-
-        HBox centralBox = overlayManager.getCentralHBox();
-        centralBox.setAlignment(Pos.CENTER);
-        centralBox.setSpacing(10);
-
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.getStyleClass().add("scroll-pane");
-        scrollPane.maxWidth(1200);
-        scrollPane.minWidth(300);
-        scrollPane.setStyle("-fx-background: transparent; -fx-border-color: transparent;");
-        scrollPane.setContent(centralBox);
-
-        for (ClientCard card : model.getBoard().getCardPile()) {
-            ImageView iw = new ImageView();
-            iw.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/cards/" + card.getId() + ".jpg"))));
-            iw.setFitWidth(196.0);
-            iw.setFitHeight(296.0);
-            iw.setLayoutX(2.0);
-            iw.setLayoutY(2.0);
-            iw.setPickOnBounds(true);
-            iw.setPreserveRatio(true);
-            centralBox.getChildren().add(iw);
-        }
-
     }
 
     @FXML

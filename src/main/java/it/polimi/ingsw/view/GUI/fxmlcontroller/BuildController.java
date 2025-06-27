@@ -884,6 +884,8 @@ public class BuildController implements MessageHandler, Initializable {
 
                 boolean allReady = e.states().values().stream().noneMatch(s -> s == PlayerState.BUILD || s == PlayerState.LOOK_CARD_PILE);
                 if (allReady) {
+                    if (timeline != null)
+                        timeline.stop();
                     SceneManager.navigateToScene("/fxml/gameFlight.fxml", this, (FlightPhaseController controller) ->
                             controller.setImageMap(componentMap)
                     );

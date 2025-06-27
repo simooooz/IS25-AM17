@@ -14,4 +14,9 @@ public class ClientCountablePenaltyZone extends ClientPenaltyCombatZone {
         return penaltyNumber + " " + penaltyType.toString();
     }
 
+    @Override
+    public String printCardInfo() {
+        return super.printCardInfo();
+    }
+
 }

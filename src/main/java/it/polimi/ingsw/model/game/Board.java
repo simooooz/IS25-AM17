@@ -344,7 +344,7 @@ public abstract class Board {
         boardDTO.startingDeck = startingDeck.stream()
                 .map(GameStateDTOFactory::createPlayerDTO).toList();
         boardDTO.cardPile = CardFactory.serializeCardList(cardPile.stream()
-                .limit(Math.max(cardPilePos, 0)).toList());
+                .limit(cardPilePos+1).toList());
 
         return boardDTO;
     }

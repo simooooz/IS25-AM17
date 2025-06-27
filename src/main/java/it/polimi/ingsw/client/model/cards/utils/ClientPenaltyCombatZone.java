@@ -16,4 +16,8 @@ public abstract class ClientPenaltyCombatZone {
 
     public ClientPenaltyCombatZone() {}
 
+    public String printCardInfo() {
+        return "";
+    }
+
 }

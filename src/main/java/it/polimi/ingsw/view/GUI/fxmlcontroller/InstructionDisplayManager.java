@@ -86,11 +86,13 @@ public class InstructionDisplayManager {
      * the displayed information remains current and relevant.
      */
     public void updateInstructions() {
-        Platform.runLater(() -> {
-            PlayerState state = client.getGameController().getModel().getPlayerState(client.getUsername());
-            updateInstructionsForState(state);
-            updateStatusMessage(state);
-        });
+        if (client.getLobby() != null) { // Player has left
+            Platform.runLater(() -> {
+                PlayerState state = client.getGameController().getModel().getPlayerState(client.getUsername());
+                updateInstructionsForState(state);
+                updateStatusMessage(state);
+            });
+        }
     }
 
     private void updateInstructionsForState(PlayerState state) {

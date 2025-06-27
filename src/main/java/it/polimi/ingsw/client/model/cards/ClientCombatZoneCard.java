@@ -93,7 +93,10 @@ public class ClientCombatZoneCard extends ClientCard {
             }
         }
         str.append("Fighting at war line n.").append(warLineIndex + 1).append("\n");
+        if (warLineIndex < warLines.size())
+            str.append(warLines.get(warLineIndex).getPenalty().printCardInfo());
         worst.getKey().ifPresent(p -> str.append("Actually the worst player is ").append(p).append(" with a score of ").append(worst.getValue()));
+
         return str.toString();
     }
 
