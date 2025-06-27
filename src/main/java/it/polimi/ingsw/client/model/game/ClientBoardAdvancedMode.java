@@ -168,7 +168,7 @@ public class ClientBoardAdvancedMode extends ClientBoard {
                         sb.append("- ").append(player).append(" | ").append("$").append(player.getCredits()).append("\n");
                 }
 
-                sb.append("\n").append(ColorType.RED).append("  ").append(4).append("\t").append(ColorType.YELLOW).append("  ").append(3).append("\t").append(ColorType.GREEN).append("  ").append(2).append("\t").append(ColorType.BLUE).append("  ").append(1).append("\n");
+                sb.append("\n\n").append(ColorType.RED).append("  ").append(4).append("\t").append(ColorType.YELLOW).append("  ").append(3).append("\t").append(ColorType.GREEN).append("  ").append(2).append("\t").append(ColorType.BLUE).append("  ").append(1).append("\n\n");
             }
 
             case END -> {
