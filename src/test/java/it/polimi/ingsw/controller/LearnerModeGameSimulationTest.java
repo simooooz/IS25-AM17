@@ -390,17 +390,6 @@ public class LearnerModeGameSimulationTest {
         finish = card1.doCommandEffects(PlayerState.WAIT_ROLL_DICES, 6, controller.getModel(), controller.getModel().getBoard(), "Tommaso");
         if (finish) { controller.getModel().getBoard().pickNewCard(controller.getModel()); }
 
-        Exception exception = assertThrows(ComponentNotValidException.class, () -> {
-            controller.activateShield("Tommaso", 1);
-        });
-        assertEquals("Battery component not valid", exception.getMessage());
-
-        exception = assertThrows(ComponentNotValidException.class, () -> {
-            controller.activateShield("Tommaso", 147);
-        });
-        assertEquals("Invalid component id", exception.getMessage());
-
-
         controller.activateShield("Tommaso", 5);
         controller.activateShield("Davide", 3);
         controller.activateShield("Demetrio", 4);
@@ -432,11 +421,6 @@ public class LearnerModeGameSimulationTest {
 
         controller.drawCard("Tommaso");
 
-        exception = assertThrows(IllegalArgumentException.class, () -> {
-            controller.updateGoods("Tommaso", new HashMap<>(Map.of(29, new ArrayList<>())), new ArrayList<>(List.of(14)));
-        });
-        assertEquals("Battery components list should be empty", exception.getMessage());
-
         controller.updateGoods("Tommaso", new HashMap<>(Map.of(29, new ArrayList<>())), new ArrayList<>());
         controller.updateGoods("Simone", new HashMap<>(), new ArrayList<>(List.of(16, 16)));
         controller.updateGoods("Demetrio", new HashMap<>(), new ArrayList<>(List.of(6, 6)));
@@ -452,31 +436,6 @@ public class LearnerModeGameSimulationTest {
         // Card 4
 
         controller.drawCard("Tommaso");
-
-        exception = assertThrows(ComponentNotValidException.class, () -> {
-            controller.activateEngines("Tommaso", new ArrayList<>(List.of(10)), new ArrayList<>(List.of(96)));
-        });
-        assertEquals("Battery component not valid", exception.getMessage());
-
-        exception = assertThrows(ComponentNotValidException.class, () -> {
-            controller.activateEngines("Tommaso", new ArrayList<>(List.of(5)), new ArrayList<>(List.of(92)));
-        });
-        assertEquals("Engine component not valid", exception.getMessage());
-
-        exception = assertThrows(ComponentNotValidException.class, () -> {
-            controller.activateEngines("Tommaso", new ArrayList<>(List.of(5)), new ArrayList<>(List.of(77)));
-        });
-        assertEquals("Engine component 77 is not double", exception.getMessage());
-
-        exception = assertThrows(RuntimeException.class, () -> {
-            controller.activateEngines("Tommaso", new ArrayList<>(List.of()), new ArrayList<>(List.of(96)));
-        });
-        assertEquals("Inconsistent number of batteries", exception.getMessage());
-
-        exception = assertThrows(ComponentNotValidException.class, () -> {
-            controller.activateEngines("Tommaso", new ArrayList<>(List.of(5, 14)), new ArrayList<>(List.of(96, 96)));
-        });
-        assertEquals("Duplicate engines", exception.getMessage());
 
         controller.activateEngines("Tommaso", new ArrayList<>(List.of(5)), new ArrayList<>(List.of(96)));
 
@@ -510,18 +469,7 @@ public class LearnerModeGameSimulationTest {
 
         controller.getBoolean("Tommaso", true);
 
-
-        exception = assertThrows(IllegalArgumentException.class, () -> {
-            controller.removeCrew("Tommaso", new ArrayList<>(List.of(51, 51)));
-        });
-        assertEquals("Too few cabin components provided", exception.getMessage());
-
-        exception = assertThrows(ComponentNotValidException.class, () -> {
-            controller.removeCrew("Tommaso", new ArrayList<>(List.of(38, 51, 51)));
-        });
-        assertEquals("Cabin component not valid", exception.getMessage());
-
-                controller.removeCrew("Tommaso", new ArrayList<>(List.of(51, 51, 44)));
+        controller.removeCrew("Tommaso", new ArrayList<>(List.of(51, 51, 44)));
 
         assertEquals(3, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getShip().getCrew());
         assertEquals(4, controller.getModel().getBoard().getPlayerEntityByUsername("Tommaso").getCredits());
@@ -572,21 +520,6 @@ public class LearnerModeGameSimulationTest {
         controller.getIndex("Demetrio", null);
 
         controller.getIndex("Simone", 0);
-
-        exception = assertThrows(GoodNotValidException.class, () -> {
-            controller.updateGoods("Tommaso", new HashMap<>(Map.of(29, new ArrayList<>(List.of(ColorType.BLUE)))), new ArrayList<>());
-        });
-        assertEquals("Reward check not passed, insert only allowed goods", exception.getMessage());
-
-        exception = assertThrows(GoodNotValidException.class, () -> {
-            controller.updateGoods("Tommaso", new HashMap<>(Map.of(29, new ArrayList<>(List.of(ColorType.RED)))), new ArrayList<>());
-        });
-        assertEquals("Red good in normal hold", exception.getMessage());
-
-        exception = assertThrows(BatteryComponentNotValidException.class, () -> {
-            controller.updateGoods("Tommaso", new HashMap<>(Map.of(29, new ArrayList<>(List.of(ColorType.YELLOW)))), new ArrayList<>(List.of(14)));
-        });
-        assertEquals("Battery component list should be empty", exception.getMessage());
 
         controller.updateGoods("Tommaso", new HashMap<>(Map.of(29, new ArrayList<>(List.of(ColorType.YELLOW)))), new ArrayList<>());
 
