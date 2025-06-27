@@ -84,15 +84,6 @@ Comprehensive documentation covering the most significant classes and methods.
 
 ---
 
-## 🚀 Getting Started
-
-### 📋 Prerequisites
-- **Java 21** or higher
-- **Maven** with Shade plugin
-- **Trattatello** font installed
-
----
-
 ## 💻 Installation & Execution
 
 ### 🖥️ Windows Setup
