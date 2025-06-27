@@ -69,8 +69,10 @@ public class ClientMeteorSwarmCard extends ClientCard {
                 case WAIT_ROLL_DICES -> str.append("- ").append(player.getUsername()).append(" is rolling dices\n");
             }
         }
-        if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES))
+        if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES) && meteorIndex != meteors.size())
             str.append("Meteor n.").append(meteorIndex + 1).append(" is hitting at coord: ").append(coords.getLast());
+        else if (board.getPlayersByPos().stream().noneMatch(p -> model.getPlayerState(p.getUsername()) == PlayerState.WAIT_ROLL_DICES) && meteorIndex == meteors.size())
+            str.append("Previous meteor n.").append(meteorIndex - 1).append(" has come at coord: ").append(coords.getLast());
         else if (meteorIndex > 0)
             str.append("Previous meteor n.").append(meteorIndex).append(" has come at coord: ").append(coords.getLast());
         return str.toString();
