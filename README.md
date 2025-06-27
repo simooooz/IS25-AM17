@@ -1,78 +1,187 @@
 <div align="center">
   <img src="src/main/resources/images/logoReadMe.png" alt="Galaxy Truckers Logo" width="300"/>
+
+# 🚀 Galaxy Truckers
+
+**IS25-AM17 – Software Engineering Project**  
+*Politecnico di Milano (2024–2025)*
+  
+---
+
+**👥 Team**  
+Davide Cutrupi • Tommaso D'Alessio • Simone De Carlo • Davide Di Tanna
+
 </div>
 
-# IS25-AM17 – Galaxy Truckers
+---
 
-**Software Engineering Project – Politecnico di Milano (2024–2025)**  
-**Team:** Davide Cutrupi • Tommaso D'Alessio • Simone De Carlo • Davide Di Tanna
+## 📖 Project Overview
+
+This project is a **digital adaptation** of the acclaimed board game *Galaxy Trucker* by Cranio Creations.
+
+### 🎯 Key Highlights
+- **Single-server architecture** supporting multiple concurrent matches
+- **2-4 players** per game session
+- **Dual interface support**: Command-Line Interface (CLI) & Graphical User Interface (GUI)
+- Built following **software engineering best practices**
+- Extensive use of **design patterns**, particularly **MVC (Model-View-Controller)**
+
+> 📋 Detailed technical documentation covering networking, communication protocols, and system architecture is available in the project documentation.
 
 ---
 
-## 🚀 Project Overview
+## ✨ Features Implemented
 
-This project is a digital adaptation of the board game *Galaxy Trucker* by Cranio Creations.  
-The application is based on a **single-server architecture** capable of handling **multiple concurrent matches**, each supporting **2 to 4 players**.
+### 🎮 Core Gameplay
+The project includes all base gameplay mechanics plus **3 out of 4 advanced modules**.
 
-Players can access the game through either a **Command-Line Interface (CLI)** or a **Graphical User Interface (GUI)**.
+### 📊 Development Status
 
-The project adheres to **software engineering best practices** and makes extensive use of **design patterns**, with a particular emphasis on the **MVC (Model-View-Controller)** paradigm.
+| Feature | Status | Description |
+|---------|--------|-------------|
+| **Base game rules** | ✅ | Complete core gameplay implementation |
+| **Full ruleset** | ✅ | All official rules integrated |
+| **Socket networking** | ✅ | TCP/IP socket-based communication |
+| **RMI networking** | ✅ | Java RMI remote method invocation |
+| **CLI Interface** | ✅ | Text-based user interface |
+| **GUI Interface** | ✅ | JavaFX graphical interface |
+| **Multiple games*** | ✅ | Concurrent game sessions support |
+| **Learning flight*** | ✅ | Tutorial/practice mode |
+| **Resilience & recovery*** | ✅ | Connection recovery mechanisms |
+| **Persistence*** | ❌ | Save/load game state |
 
-Technical details regarding networking, communication protocols, and system architecture can be found in the project documentation.
-
----
-
-## ✅ Features Implemented
-
-Alongside the core gameplay mechanics, the project also integrates several of the game’s advanced modules. Out of the four optional modules, **three have been successfully implemented**.
-
----
-
-## 📌 Development Progress
-
-| Feature                     | Status |
-|-----------------------------|-------|
-| Base game rules             | ✅     |
-| Full ruleset                | ✅     |
-| Socket-based networking     | ✅     |
-| RMI networking              | ✅     |
-| CLI                         | ✅     |
-| GUI                         | ✅     |
-| Support for multiple games  | ✅     |
-| Learning flight             | ✅      |
-| Resilience & recovery       | ✅     |
-
-> (*) Advanced Function
+> ***Advanced Functions**
 
 ---
 
 ## 📚 Documentation
 
-All documentation is located in the `/deliverables` folder within this repository.
+### 📁 Structure
+All documentation is organized in the `/deliverables` folder.
 
-### UML Diagrams
+### 🎨 UML Diagrams
+**Location:** `/deliverables/final/uml`
 
-The folder `/deliverables/final/uml` contains both the **UML Class Diagram** and key **UML Sequence Diagrams**.
+- **📊 Class Diagram**: Main classes architecture (*Model* and *Controller*)
+- **🔄 Sequence Diagrams**: Core interactions (lobby joining, component picking, etc.)
 
-- The **Class Diagram** outlines the main classes within the *Model* and relevant parts of the *Controller*.
-- The **Sequence Diagrams** illustrate core interactions, such as joining a game and drawing cards.
+### 📖 JavaDoc
+**Location:** `/images/javadoc`
 
-### JavaDoc
-
-The JavaDoc documentation can be found under `/images/javadoc`, and covers the most significant classes and methods.
-
----
-
-## 🛠️ Technologies Used
-
-| Tool/Library | Role                                |
-|--------------|-------------------------------------|
-| **Maven**    | Dependency management & build tool  |
-| **JavaFX**   | GUI development                     |
-| **JUnit**    | Unit testing                        |
+Comprehensive documentation covering the most significant classes and methods.
 
 ---
 
-### How to use
+## 🛠️ Technology Stack
+
+| Technology | Purpose | Role |
+|------------|---------|------|
+| **☕ Java 21+** | Core Language | Application development |
+| **📦 Maven** | Build Tool | Dependency management & compilation |
+| **🎨 JavaFX** | GUI Framework | Graphical user interface |
+| **🧪 JUnit** | Testing | Unit testing framework |
+| **🎭 Shade Plugin** | Packaging | JAR file creation |
 
 ---
+
+## 🚀 Getting Started
+
+### 📋 Prerequisites
+- **Java 21** or higher
+- **Maven** with Shade plugin
+- **Trattatello** font installed
+
+---
+
+## 💻 Installation & Execution
+
+### 🖥️ Windows Setup
+
+#### 🖲️ Server Launch
+```bash
+java -jar IS25-AM17-Windows.jar server
+```
+
+#### 👤 Client Setup & Launch
+
+**Option 1: PowerShell**
+```powershell
+# Set UTF-8 encoding
+chcp 65001 | Out-Null
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$env:JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
+
+# Launch client
+java -jar IS25-AM17-Windows.jar client
+```
+
+**Option 2: Command Prompt**
+```cmd
+# Set UTF-8 encoding
+chcp 65001 >nul 
+set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+
+# Launch client
+java -jar IS25-AM17-Windows.jar client
+```
+
+**Option 3: Automated Batch File**
+```bash
+.\launch
+```
+
+> 💡 **Note**: UTF-8 encoding setup ensures proper TUI interface display.
+
+---
+
+### 🍎 macOS Setup
+
+#### 🖲️ Server Launch
+```bash
+java -jar IS25-AM17-Mac.jar server
+```
+
+#### 👤 Client Launch
+```bash
+java -jar IS25-AM17-Mac.jar client
+```
+
+---
+
+### Every OS:
+To compile the project move into the root project folder use the command:
+```
+mvn clean package 
+```
+then you should be able to run the package IS25-AM17.  
+if you want to run the server you should run:
+```
+java -jar target/IS25-AM17-1.0-SNAPSHOT-fat.jar server
+```
+for the client:
+```
+java -jar target/IS25-AM17-1.0-SNAPSHOT-fat.jar server
+```
+
+---
+
+## 🎮 How to Play
+
+1. **Start the server** using the appropriate command for your OS
+2. **Launch one or more clients** to join the game
+3. **Choose your interface**: CLI for terminal enthusiasts or GUI for visual experience
+4. **Create or join a lobby** with 2-4 players
+5. **Build your spaceship** and embark on your galactic trucking adventure!
+
+---
+
+<div align="center">
+
+### 🌟 Ready to explore the galaxy?
+**Start your trucking adventure today!**
+  
+---
+
+*Made with ❤️ by the IS25-AM17 team*
+
+</div>
