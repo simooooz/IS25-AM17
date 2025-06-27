@@ -143,55 +143,46 @@
         </VBox>
 
         <!-- your ship and board info -->
-        <VBox prefWidth="500.0" spacing="10.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10;">
+        <VBox prefWidth="500.0" spacing="5.0" style="-fx-background-color: #2a1a4a; -fx-background-radius: 10;">
             <!-- board info -->
-            <VBox alignment="CENTER" spacing="5.0" style="-fx-label-padding: 16">
-                <Label style="-fx-text-fill: yellow; -fx-font-size: 25px;" text="Board Info">
+            <VBox alignment="CENTER">
+                <Label style="-fx-text-fill: yellow; -fx-font-size: 16px;" text="Board info">
                     <padding>
-                        <Insets bottom="15.0" />
+                        <Insets bottom="8.0" top="8.0" />
                     </padding>
                 </Label>
 
                 <HBox spacing="10.0">
                     <!-- Parte sinistra: Immagine -->
-                    <VBox alignment="CENTER" prefWidth="271.0" spacing="5.0">
-                        <children>
-                            <!-- Container per l'immagine -->
-                            <Pane maxHeight="200.0" maxWidth="220.0" minHeight="200.0" minWidth="220.0" style="-fx-background-color: #1a0d2e; -fx-background-radius: 5;">
-                                <children>
-                                    <ImageView fx:id="pointImage" fitHeight="190.0" fitWidth="210.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
-                                </children>
-                            </Pane>
-                        </children>
+                    <VBox alignment="CENTER" prefWidth="271.0">
+                        <!-- Container per l'immagine -->
+                        <Pane maxHeight="200.0" maxWidth="220.0" minHeight="200.0" minWidth="220.0"
+                              style="-fx-background-color: #1a0d2e; -fx-background-radius: 5;">
+                            <ImageView fx:id="pointImage" fitHeight="190.0" fitWidth="210.0" layoutX="5.0"
+                                       layoutY="5.0" pickOnBounds="true" preserveRatio="true"/>
+                        </Pane>
                     </VBox>
 
                     <VBox alignment="CENTER" prefWidth="240.0" spacing="5.0">
-                        <children>
-                            <Label style="-fx-text-fill: yellow; -fx-font-size: 18px;" text="Players in game:">
-                                <padding>
-                                    <Insets bottom="5.0" top="10.0" />
-                                </padding>
-                            </Label>
+                        <Label style="-fx-text-fill: yellow; -fx-font-size: 18px;" text="Players in game:">
+                        </Label>
 
-                            <Text fx:id="playersInGameLabel" styleClass="label" textAlignment="CENTER" wrappingWidth="220" />
+                        <Text fx:id="playersInGameLabel" styleClass="label" textAlignment="CENTER" wrappingWidth="220"/>
 
-                            <Label style="-fx-text-fill: yellow; -fx-font-size: 18px;" text="Starting deck:">
-                                <padding>
-                                    <Insets bottom="5.0" top="10.0" />
-                                </padding>
-                            </Label>
+                        <Label style="-fx-text-fill: yellow; -fx-font-size: 18px;" text="Starting deck:">
+                        </Label>
 
-                            <Text fx:id="playersStartingDeckLabel" styleClass="label" textAlignment="CENTER" wrappingWidth="220" />
-                        </children>
+                        <Text fx:id="playersStartingDeckLabel" styleClass="label" textAlignment="CENTER"
+                              wrappingWidth="220"/>
                     </VBox>
                 </HBox>
             </VBox>
 
             <!-- your ship -->
             <VBox alignment="CENTER">
-                <Label style="-fx-text-fill: yellow; -fx-font-size: 25px;" text="Your Ship">
+                <Label style="-fx-text-fill: yellow; -fx-font-size: 16px;" text="Your Ship">
                     <padding>
-                        <Insets bottom="15.0" top="20.0" />
+                        <Insets bottom="15.0" top="15.0" />
                     </padding>
                 </Label>
 
