@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="src/main/resources/images/logoReadMe.png" alt="Galaxy Truckers Logo" width="300"/>
+</div>
+
 # IS25-AM17 – Galaxy Truckers
 
 **Software Engineering Project – Politecnico di Milano (2024–2025)**  
@@ -32,11 +36,11 @@ Alongside the core gameplay mechanics, the project also integrates several of th
 | Full ruleset                | ✅     |
 | Socket-based networking     | ✅     |
 | RMI networking              | ✅     |
-| CLI                         | 🟠     |
-| GUI                         | 🟠     |
+| CLI                         | ✅     |
+| GUI                         | ✅     |
 | Support for multiple games  | ✅     |
 | Learning flight             | ✅      |
-| Resilience & recovery       | 🟠     |
+| Resilience & recovery       | ✅     |
 
 > (*) Advanced Function
 
@@ -66,5 +70,9 @@ The JavaDoc documentation can be found under `/images/javadoc`, and covers the m
 | **Maven**    | Dependency management & build tool  |
 | **JavaFX**   | GUI development                     |
 | **JUnit**    | Unit testing                        |
+
+---
+
+### How to use
 
 ---
