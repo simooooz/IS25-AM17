@@ -10,8 +10,24 @@ import it.polimi.ingsw.view.TUI.ViewTui;
 
 import java.net.SocketException;
 
+/**
+ * Main class for the Galaxy Trucker application.
+ * This class serves as the entry point for both client and server modes of the application.
+ *
+ * <p>The application can be launched in two modes:
+ * <ul>
+ * <li><strong>Client mode:</strong> Provides options to run either a Text User Interface (TUI)
+ *     or Graphical User Interface (GUI) client</li>
+ * <li><strong>Server mode:</strong> Starts all server components including Socket server,
+ *     RMI server, and Discovery server</li>
+ * </ul>
+ */
 public class Main {
 
+    /**
+     * Main entry point of the application.
+     *
+     */
     public static void main(String[] args) {
         if (args[0].equals("client")) {
 

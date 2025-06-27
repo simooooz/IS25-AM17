@@ -29,20 +29,55 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.IntStream;
 
+/**
+ * Text User Interface (TUI) implementation for the Galaxy Trucker game.
+ *
+ * This class provides a command-line based interface for users to interact with the game.
+ * It handles user input processing, display updates, and event management throughout
+ * different game states including lobby selection, lobby waiting, and in-game actions.
+ */
 public class ViewTui implements UserInterface {
 
+    /**
+     * The client instance used for network communication.
+     */
     private static Client client;
+
+    /**
+     * BufferedReader for reading user input from the console.
+     */
     private final BufferedReader reader;
 
+    /**
+     * Display updater responsible for refreshing the game display.
+     */
     private final DisplayUpdater displayUpdater;
+
+    /**
+     * Stores the current local command being processed.
+     * Used for handling multi-step operations like component placement.
+     */
     private String localCommand = "";
 
+    /**
+     * Constructs a new ViewTui instance.
+     */
     public ViewTui() {
         ClientEventBus.getInstance().subscribe(this);
         this.reader = new BufferedReader(new InputStreamReader(System.in));
         this.displayUpdater = new DisplayUpdater();
     }
 
+    /**
+     * Handles incoming game events and updates the display accordingly.
+     *
+     * This method processes a list of game events and determines whether the display
+     * needs to be updated based on the event types and their relevance to the current
+     * player. It handles various event types including component events, lobby events,
+     * and game state changes.
+     *
+     * @param events the list of game events to process
+     */
     @Override
     public void onEvent(List<Event> events) {
         boolean toUpdate = false;
@@ -138,9 +173,6 @@ public class ViewTui implements UserInterface {
         }
     }
 
-    /**
-     * Handles the lobby creation process.
-     */
     private void handleCreateLobby() {
         clear();
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
@@ -164,9 +196,6 @@ public class ViewTui implements UserInterface {
         client.send(MessageType.CREATE_LOBBY, lobbyName, maxPlayers, learnerFlight);
     }
 
-    /**
-     * Handles the process of joining a specified existing lobby.
-     */
     private void handleJoinLobby() {
         clear();
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
@@ -180,9 +209,6 @@ public class ViewTui implements UserInterface {
         client.send(MessageType.JOIN_LOBBY, lobbyName);
     }
 
-    /**
-     * Handles the process of joining a random lobby.
-     */
     private void handleJoinRandomLobby() {
         clear();
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
@@ -196,12 +222,6 @@ public class ViewTui implements UserInterface {
         client.send(MessageType.JOIN_RANDOM_LOBBY, learnerFlight);
     }
 
-    /**
-     * Handles user interactions while in the lobby.
-     *
-     * @param input the user-provided input to be processed. If the input is "q",
-     *              the user is prompted for confirmation to leave the lobby.
-     */
     private void handleInLobby(String input) {
         Chroma.println("press 'q' to go back to the menu", Chroma.GREY_BOLD);
         if (input.equals("q")) {
@@ -211,11 +231,6 @@ public class ViewTui implements UserInterface {
         }
     }
 
-    /**
-     * Handles various in-game actions based on the player's current state.
-     *
-     * @param input provided by the user to influence the game logic
-     */
     @SuppressWarnings("Duplicates")
     private void handleInGame(String input) {
         PlayerState state = client.getGameController().getModel().getPlayerState(client.getUsername());
@@ -493,6 +508,9 @@ public class ViewTui implements UserInterface {
         }
     }
 
+    /**
+     * Clears the console screen.
+     */
     public void clear() {
         try {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -502,6 +520,11 @@ public class ViewTui implements UserInterface {
         }
     }
 
+    /**
+     * Displays an error message to the user.
+     *
+     * @param message the error message to display
+     */
     @Override
     public void displayError(String message) {
         Chroma.println(message, Chroma.RED);
@@ -509,6 +532,12 @@ public class ViewTui implements UserInterface {
         System.out.flush();
     }
 
+    /**
+     * Initializes and starts the Terminal User Interface (TUI) client application.
+     *
+     * This method serves as the main entry point for the TUI implementation of the Galaxy Trucker
+     * client.
+     */
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void start(int networkType, String ip) {
@@ -550,6 +579,13 @@ public class ViewTui implements UserInterface {
 
     }
 
+    /**
+     * Handles the disconnection process and cleanup.
+     *
+     * This method is responsible for gracefully shutting down the TUI application.
+     * It displays a farewell message, closes the input reader, closes the client
+     * connection, and exits the application.
+     */
     public void handleDisconnect() {
         Chroma.println("Bye!", Chroma.YELLOW_BOLD);
 
@@ -564,6 +600,14 @@ public class ViewTui implements UserInterface {
         System.exit(0);
     }
 
+    /**
+     * Returns the static client instance.
+     *
+     * This method provides access to the client instance for other classes
+     * that need to interact with the network client.
+     *
+     * @return the current Client instance
+     */
     public static Client getClientInstance() {
         return client;
     }

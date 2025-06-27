@@ -40,7 +40,7 @@
 
                 <Separator style="-fx-background-color: rgba(255, 255, 255, 0.3);" />
 
-                <ScrollPane fx:id="statusScrollPane" hbarPolicy="NEVER" maxHeight="243.0" minHeight="80" prefHeight="80" prefWidth="507.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
+                <ScrollPane fx:id="statusScrollPane" hbarPolicy="NEVER" maxHeight="243.0" minHeight="80" prefHeight="119.0" prefWidth="507.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" vbarPolicy="AS_NEEDED">
                     <Label fx:id="logLabel" maxWidth="480.0" style="-fx-background-color: transparent; -fx-padding: 5; -fx-line-spacing: 2;" textFill="#CCCCCC" wrapText="true">
                     </Label>
                 </ScrollPane>
@@ -94,7 +94,7 @@
                 <VBox.margin>
                     <Insets top="-5.0" />
                 </VBox.margin>
-                <Label alignment="CENTER" fx:id="cardCounterLabel" prefHeight="65.0" prefWidth="239.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Card Played: 0 / 10" />
+                <Label fx:id="cardCounterLabel" alignment="CENTER" prefHeight="65.0" prefWidth="239.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Cards resolved so far:" />
             </HBox>
 
             <!-- Actual and previous card - spazio ridotto -->

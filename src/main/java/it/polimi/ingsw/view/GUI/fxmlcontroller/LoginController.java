@@ -17,26 +17,57 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
+/**
+ * Controller for the login interface that handles username input and validation.
+ *
+ * <p>This controller manages the initial login screen where users enter their username
+ * to join the game. It provides real-time validation feedback, handles user input,
+ * and manages the authentication process with the server. The controller implements
+ * the {@link MessageHandler} interface to receive and process authentication-related
+ * network events.</p>
+ */
 public class LoginController implements MessageHandler {
 
     /**
-     * Container for the username input field
+     * Container for the dynamically created username input field.
+     *
+     * <p>This VBox serves as the parent container where the username TextField
+     * will be added during initialization. The container is configured via FXML
+     * and provides layout management for the input field.</p>
      */
-    @FXML private VBox username;
+    @FXML
+    private VBox username;
 
     /**
-     * Label for displaying status messages and errors
+     * Label for displaying status messages, validation errors, and connection feedback.
+     *
+     * <p>This label serves multiple purposes:</p>
+     * <ul>
+     *   <li>Showing validation errors (too short, too long)</li>
+     *   <li>Displaying connection status ("Connecting...")</li>
+     *   <li>Showing error messages for failed connections</li>
+     * </ul>
+     *
+     * <p>The label's styling is dynamically updated based on the message type
+     * using CSS classes like "error-text" and "status-text".</p>
      */
-    @FXML private Label status;
+    @FXML
+    private Label status;
 
     /**
-     * Label for displaying input hints to the user
+     * Label for displaying input hints to guide the user.
+     *
+     * <p>This label provides helpful hints to the user about the input requirements
+     * or submission process. It is shown when the username is valid and hidden
+     * during error states or when the input is empty.</p>
      */
-    @FXML private Label hintLabel;
+    @FXML
+    private Label hintLabel;
 
     /**
-     * Sets up the username input field, validation listeners,
-     * and keyboard event handlers.
+     * Initializes the login controller and sets up the user interface components.
+     * <p>The method uses Platform.runLater() to ensure proper focus management
+     * after the scene is fully rendered.</p>
      */
     @FXML
     public void initialize() {
@@ -75,22 +106,10 @@ public class LoginController implements MessageHandler {
         hideHint();
     }
 
-    /**
-     * Validates if the provided username meets the requirements.
-     *
-     * @param username the username string to validate
-     * @return true if username is between 3 and 18 characters, false otherwise
-     */
     private boolean isValidUsername(String username) {
         return username.length() >= 3 && username.length() <= 18;
     }
 
-    /**
-     * Performs real-time validation of the username input and updates the UI accordingly.
-     * Shows appropriate error messages or hints based on the current input state.
-     *
-     * @param username the current username input to validate
-     */
     private void validateUsername(String username) {
         if (username.isEmpty()) {
             clearMessages();
@@ -108,11 +127,6 @@ public class LoginController implements MessageHandler {
         }
     }
 
-    /**
-     * Displays an error message in the status label with error styling.
-     *
-     * @param message the error message to display
-     */
     private void showError(String message) {
         if (status != null) {
             status.getStyleClass().clear();
@@ -122,26 +136,26 @@ public class LoginController implements MessageHandler {
         }
     }
 
-    /**
-     * Clears all messages from the status label and hides it.
-     */
     private void clearMessages() {
         status.setText("");
         status.setVisible(false);
     }
 
-    /**
-     * Hides the hint label from the user interface.
-     */
     private void hideHint() {
         if (hintLabel != null)
             hintLabel.setVisible(false);
     }
 
     /**
-     * Handles incoming network messages related to the login process.
+     * Handles incoming network messages related to the login and authentication process.
      *
-     * @param event the game event received from the network layer
+     * <p>This method processes authentication-related events received from the server
+     * and updates the UI accordingly. It uses pattern matching with switch expressions
+     * to handle different event types efficiently.</p>
+     *
+     * <p>Upon successful username acceptance, the method navigates to the main menu
+     * scene. For authentication errors, it displays a generic connection failure
+     * message and hides any visible hints.</p>
      */
     @Override
     public void handleMessage(Event event) {
@@ -158,8 +172,12 @@ public class LoginController implements MessageHandler {
     /**
      * Determines if this controller can handle the specified message type.
      *
-     * @param messageType the type of message to check
-     * @return true if this controller can handle the message type, false otherwise
+     * @param messageType the type of message to check for compatibility,
+     *                    must not be {@code null}
+     * @return {@code true} if this controller can process the given message type,
+     *         {@code false} otherwise
+     *
+     * @see MessageHandler#canHandle(MessageType)
      */
     @Override
     public boolean canHandle(MessageType messageType) {
@@ -168,5 +186,4 @@ public class LoginController implements MessageHandler {
                 MessageType.ERROR
         ).contains(messageType);
     }
-
 }

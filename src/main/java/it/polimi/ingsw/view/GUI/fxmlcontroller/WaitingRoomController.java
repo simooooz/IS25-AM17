@@ -26,23 +26,85 @@ import javafx.scene.layout.VBox;
 import java.util.*;
 
 /**
- * Controller for the waiting room interface.
- * Handles lobby state updates and player management.
+ * Controller for the waiting room interface in the game lobby system.
+ *
+ * <p>This controller manages the waiting room UI where players wait for a game to start.
+ * It handles real-time updates of lobby state, player management, and provides visual
+ * feedback about the current status of the lobby. The controller implements the
+ * {@link MessageHandler} interface to receive and process game events related to
+ * lobby operations.</p>
+ **
+ * <p>The UI components are bound via FXML injection and updated through JavaFX
+ * Platform.runLater() to ensure thread safety when processing network events.</p>
+ *
  */
 public class WaitingRoomController implements MessageHandler {
 
     private Client client;
 
-    @FXML private Label lobbyNameLabel;
-    @FXML private Label gameModeLabel;
-    @FXML private Label maxPlayersLabel;
-    @FXML private Label playerCountLabel;
-    @FXML private Label statusLabel;
-    @FXML private VBox playersContainer;
-    @FXML private HBox loadingIndicator;
+    /**
+     * Label displaying the current lobby name.
+     */
+    @FXML
+    private Label lobbyNameLabel;
 
+    /**
+     * Label showing the current game mode (Learner or Standard).
+     */
+    @FXML
+    private Label gameModeLabel;
+
+    /**
+     * Label displaying the maximum number of players allowed in the lobby.
+     */
+    @FXML
+    private Label maxPlayersLabel;
+
+    /**
+     * Label showing the current player count in "current/max" format.
+     */
+    @FXML
+    private Label playerCountLabel;
+
+    /**
+     * Label displaying the current lobby status and waiting messages.
+     */
+    @FXML
+    private Label statusLabel;
+
+    /**
+     * Container for the dynamic list of player labels.
+     */
+    @FXML
+    private VBox playersContainer;
+
+    /**
+     * Loading indicator shown while waiting for players to join.
+     */
+    @FXML
+    private HBox loadingIndicator;
+
+    /**
+     * List maintaining the current players in the lobby.
+     * Used to track player additions and removals for UI updates.
+     */
     private List<String> currentPlayers;
 
+    /**
+     * Initializes the controller after FXML loading.
+     *
+     * <p>This method is automatically called by JavaFX after the FXML file has been
+     * loaded. It performs the following initialization tasks:</p>
+     * <ul>
+     *   <li>Initializes the current players list</li>
+     *   <li>Registers this controller as a message handler</li>
+     *   <li>Retrieves and displays current lobby information if available</li>
+     *   <li>Updates the initial player list display</li>
+     * </ul>
+     *
+     * <p>If a lobby is already available from the client instance, the method
+     * will populate the UI with the current lobby state.</p>
+     */
     @FXML
     public void initialize() {
         MessageDispatcher.getInstance().registerHandler(this);
@@ -60,7 +122,18 @@ public class WaitingRoomController implements MessageHandler {
     }
 
     /**
-     * Sets the lobby information and updates the UI.
+     * Sets the lobby information and updates the corresponding UI elements.
+     *
+     * <p>This method updates the lobby information display with the provided
+     * parameters. All UI updates are performed on the JavaFX Application Thread
+     * to ensure thread safety when called from network event handlers.</p>
+     *
+     * @param lobbyName the name/ID of the lobby to display
+     * @param maxPlayers the maximum number of players allowed in this lobby
+     * @param isLearnerMode {@code true} if the lobby is in learner mode,
+     *                      {@code false} for standard mode
+     *
+     * @see #updateStatus(int)
      */
     public void setLobbyInfo(String lobbyName, int maxPlayers, boolean isLearnerMode) {
         Platform.runLater(() -> {
@@ -74,9 +147,6 @@ public class WaitingRoomController implements MessageHandler {
         });
     }
 
-    /**
-     * Updates the status message based on current player count.
-     */
     private void updateStatus(int maxPlayers) {
         if (statusLabel == null || loadingIndicator == null) return;
 
@@ -91,15 +161,9 @@ public class WaitingRoomController implements MessageHandler {
         }
     }
 
-    /**
-     * Handles the leave lobby button action.
-     */
     @FXML
     private void handleLeaveLobby() { client.send(MessageType.LEAVE_GAME); }
 
-    /**
-     * Updates the players list display.
-     */
     private void updatePlayersList() {
         ClientLobby lobby = client.getLobby();
         if (lobby == null) return;
@@ -161,6 +225,17 @@ public class WaitingRoomController implements MessageHandler {
         );
     }
 
+    /**
+     * Handles incoming game events related to lobby operations.
+     *
+     * <p>The method uses pattern matching with switch expressions (Java 17+ feature)
+     * to handle different event types efficiently.</p>
+     *
+     * @param event the game event to process, must not be {@code null}
+
+     * @see #updatePlayersList()
+     * @see #showError(String)
+     */
     @Override
     public void handleMessage(Event event) {
         switch (event) {
@@ -196,6 +271,18 @@ public class WaitingRoomController implements MessageHandler {
         }
     }
 
+    /**
+     * Determines whether this handler can process the given message type.
+     *
+     * <p>This method defines which message types this controller is interested in
+     * receiving. It returns {@code true} only for lobby-related and game start events:</p>
+     *
+     * @param messageType the message type to check for compatibility
+     * @return {@code true} if this handler can process the given message type,
+     *         {@code false} otherwise
+     *
+     * @see MessageHandler#canHandle(MessageType)
+     */
     @Override
     public boolean canHandle(MessageType messageType) {
         return List.of(
@@ -206,5 +293,4 @@ public class WaitingRoomController implements MessageHandler {
                 MessageType.ERROR
         ).contains(messageType);
     }
-
 }

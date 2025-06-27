@@ -11,23 +11,68 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
 /**
- * Gestisce la visualizzazione delle istruzioni e dei messaggi di stato per la GUI
- * in modo simile al DisplayUpdater della TUI.
+ * Manages the display of instructions and status messages for the GUI,
+ * providing dynamic guidance to players based on their current game state.
+ *
+ * <p>This class serves as the GUI equivalent of the TUI's DisplayUpdater,
+ * automatically updating instruction labels and status messages to help
+ * players understand what actions they can take in each phase of the game.</p>
  */
 public class InstructionDisplayManager {
 
+    /**
+     * Client instance for accessing game state and player information.
+     */
     private final Client client;
+
+    /**
+     * Label displaying detailed instructions for the current game state.
+     */
     private final Label instructionLabel;
+
+    /**
+     * Label displaying brief status messages about the current phase.
+     */
     private final Label statusMessageLabel;
+
+    /**
+     * Flag indicating whether the game is running in learner mode,
+     * affecting which instructions are displayed.
+     */
     private final boolean isLearnerMode;
 
-    // Colori per diversi tipi di messaggi
-    private static final String INFO_COLOR = "#4A90E2";      // Blu per istruzioni
-    private static final String WARNING_COLOR = "#F5A623";   // Arancione per avvertimenti
-    private static final String ERROR_COLOR = "#D0021B";     // Rosso per errori
-    private static final String SUCCESS_COLOR = "#7ED321";   // Verde per successo
-    private static final String WAITING_COLOR = "#9013FE";   // Viola per attesa
+    /**
+     * Color hex code for informational messages (blue).
+     */
+    private static final String INFO_COLOR = "#4A90E2";
 
+    /**
+     * Color hex code for warning messages (orange).
+     */
+    private static final String WARNING_COLOR = "#F5A623";
+
+    /**
+     * Color hex code for error messages (red).
+     */
+    private static final String ERROR_COLOR = "#D0021B";
+
+    /**
+     * Color hex code for success messages (green).
+     */
+    private static final String SUCCESS_COLOR = "#7ED321";
+
+    /**
+     * Color hex code for waiting state messages (purple).
+     */
+    private static final String WAITING_COLOR = "#9013FE";
+
+    /**
+     * Constructs a new InstructionDisplayManager with the specified client and labels.
+     *
+     * @param client The client instance for accessing game state
+     * @param instructionLabel The label to display detailed instructions
+     * @param statusMessageLabel The label to display status messages
+     */
     public InstructionDisplayManager(Client client, Label instructionLabel, Label statusMessageLabel) {
         this.client = client;
         this.instructionLabel = instructionLabel;
@@ -36,7 +81,9 @@ public class InstructionDisplayManager {
     }
 
     /**
-     * Aggiorna le istruzioni e i messaggi di stato basandosi sullo stato del giocatore
+     * Updates both instructions and status messages based on the current player state.
+     * This method should be called whenever the game state changes to ensure
+     * the displayed information remains current and relevant.
      */
     public void updateInstructions() {
         Platform.runLater(() -> {
@@ -46,9 +93,6 @@ public class InstructionDisplayManager {
         });
     }
 
-    /**
-     * Aggiorna le istruzioni specifiche per ogni stato
-     */
     private void updateInstructionsForState(PlayerState state) {
         String instructions = getInstructionsForState(state);
         String color = getColorForState(state);
@@ -56,9 +100,6 @@ public class InstructionDisplayManager {
         setLabelText(instructionLabel, instructions, color);
     }
 
-    /**
-     * Aggiorna il messaggio di stato
-     */
     private void updateStatusMessage(PlayerState state) {
         String statusMessage = getStatusMessageForState(state);
         String color = getStatusColorForState(state);
@@ -66,9 +107,6 @@ public class InstructionDisplayManager {
         setLabelText(statusMessageLabel, statusMessage, color);
     }
 
-    /**
-     * Restituisce le istruzioni per lo stato corrente
-     */
     private String getInstructionsForState(PlayerState state) {
         return switch (state) {
             case BUILD, LOOK_CARD_PILE -> getBuildPhaseInstructions();
@@ -91,9 +129,6 @@ public class InstructionDisplayManager {
         };
     }
 
-    /**
-     * Restituisce il messaggio di stato per lo stato corrente
-     */
     private String getStatusMessageForState(PlayerState state) {
         return switch (state) {
             case BUILD, LOOK_CARD_PILE -> "Building Phase - Construct your ship";
@@ -116,9 +151,6 @@ public class InstructionDisplayManager {
         };
     }
 
-    /**
-     * Restituisce il colore appropriato per lo stato
-     */
     private String getColorForState(PlayerState state) {
         return switch (state) {
             case CHECK, WAIT_SHIP_PART -> ERROR_COLOR;
@@ -130,9 +162,6 @@ public class InstructionDisplayManager {
         };
     }
 
-    /**
-     * Restituisce il colore per il messaggio di stato
-     */
     private String getStatusColorForState(PlayerState state) {
         return switch (state) {
             case CHECK, WAIT_SHIP_PART -> ERROR_COLOR;
@@ -141,8 +170,6 @@ public class InstructionDisplayManager {
             default -> INFO_COLOR;
         };
     }
-
-    // Metodi per le istruzioni specifiche di ogni fase
 
     private String getBuildPhaseInstructions() {
         StringBuilder sb = new StringBuilder();
@@ -220,7 +247,7 @@ public class InstructionDisplayManager {
         return "• You have too many goods and must remove some\n" +
                 "• Drag goods from cargo holds back to the panel\n" +
                 "• Or use batteries to avoid removing goods\n" +
-                "• Drag batteries to battery components if needed\n" +
+                "• Drag batteries from battery components if needed\n" +
                 "• Click 'Done' when finished";
     }
 
@@ -284,9 +311,6 @@ public class InstructionDisplayManager {
                 "• Congratulations on completing your space adventure!";
     }
 
-    /**
-     * Determina la fase corrente del gioco
-     */
     private String getCurrentPhase() {
         ClientGameModel model = client.getGameController().getModel();
         for (ClientPlayer p : model.getBoard().getAllPlayers()) {
@@ -303,23 +327,23 @@ public class InstructionDisplayManager {
         return "flight";
     }
 
-    /**
-     * Imposta il testo e il colore di una label
-     */
     private void setLabelText(Label label, String text, String colorHex) {
         if (label != null) {
             label.setText(text);
-            label.setStyle("-fx-text-fill: " + colorHex + "; -fx-font-size: 12px;");
+            label.setStyle("-fx-text-fill: " + colorHex + "; -fx-font-size: 15px; -fx-font-weight: normal;");
         }
     }
 
     /**
-     * Mostra un messaggio temporaneo di errore
+     * Displays a temporary error message that automatically reverts after 5 seconds.
+     * Error messages are shown in red color to indicate their importance.
+     *
+     * @param errorMessage The error message to display
      */
     public void showErrorMessage(String errorMessage) {
         Platform.runLater(() -> {
             setLabelText(statusMessageLabel, "ERROR: " + errorMessage, ERROR_COLOR);
-            // Ripristina il messaggio normale dopo 5 secondi
+            // Restore normal message after 5 seconds
             new Thread(() -> {
                 try {
                     Thread.sleep(5000);
@@ -332,12 +356,15 @@ public class InstructionDisplayManager {
     }
 
     /**
-     * Mostra un messaggio temporaneo di successo
+     * Displays a temporary success message that automatically reverts after 3 seconds.
+     * Success messages are shown in green color to indicate positive outcomes.
+     *
+     * @param successMessage The success message to display
      */
     public void showSuccessMessage(String successMessage) {
         Platform.runLater(() -> {
             setLabelText(statusMessageLabel, successMessage, SUCCESS_COLOR);
-            // Ripristina il messaggio normale dopo 3 secondi
+            // Restore normal message after 3 seconds
             new Thread(() -> {
                 try {
                     Thread.sleep(3000);
@@ -350,14 +377,17 @@ public class InstructionDisplayManager {
     }
 
     /**
-     * Aggiorna le istruzioni quando lo stato del giocatore cambia
+     * Triggers an update of instructions when the player state changes.
+     * This method should be called by controllers when they detect
+     * state changes that require updated guidance.
      */
     public void onPlayerStateChanged() {
         updateInstructions();
     }
 
     /**
-     * Pulisce i messaggi e reimposta lo stato iniziale
+     * Resets both labels to initial state with default messages.
+     * Used when starting a new game or initializing the interface.
      */
     public void reset() {
         Platform.runLater(() -> {

@@ -26,9 +26,6 @@ import java.util.List;
 /**
  * Controller for the main menu interface.
  * Handles lobby creation, joining, and side panel management.
- *
- * @author Your Name
- * @version 1.0
  */
 public class MenuController implements MessageHandler {
 
@@ -44,7 +41,6 @@ public class MenuController implements MessageHandler {
         MessageDispatcher.getInstance().registerHandler(this);
         setStatus("");
     }
-
 
     @FXML
     private void handleCreateLobby() {
@@ -73,9 +69,6 @@ public class MenuController implements MessageHandler {
         setStatus("");
     }
 
-    /**
-     * Displays create lobby panel with input fields and mode selection.
-     */
     private void showCreateLobbyPanel() {
         sidePanelContent.getChildren().clear();
 
@@ -173,9 +166,6 @@ public class MenuController implements MessageHandler {
         return createBtn;
     }
 
-    /**
-     * Displays the join lobby panel with lobby ID input.
-     */
     private void showJoinLobbyPanel() {
         sidePanelContent.getChildren().clear();
 
@@ -197,9 +187,6 @@ public class MenuController implements MessageHandler {
         setStatus("Enter lobby ID");
     }
 
-    /**
-     * Displays the join random lobby panel with game mode selection.
-     */
     private void showJoinRandomPanel() {
         sidePanelContent.getChildren().clear();
 
@@ -224,9 +211,6 @@ public class MenuController implements MessageHandler {
         setStatus("Choose your game mode");
     }
 
-    /**
-     * Attempts to join a lobby with the specified ID.
-     */
     private void joinLobbyById(String lobbyId) {
         if (lobbyId.isEmpty()) {
             setErrorStatus("Please enter a lobby ID");
@@ -238,24 +222,21 @@ public class MenuController implements MessageHandler {
         closeSidePanel();
     }
 
-    /**
-     * Updates the status label with a normal message.
-     */
     private void setStatus(String message) {
         statusLabel.setText(message);
         statusLabel.getStyleClass().removeAll("error-text", "success-text");
         statusLabel.getStyleClass().add("status-text");
     }
 
-    /**
-     * Updates the status label with an error message in red.
-     */
     private void setErrorStatus(String message) {
         statusLabel.setText(message);
         statusLabel.getStyleClass().removeAll("status-text", "success-text");
         statusLabel.getStyleClass().add("error-text");
     }
 
+    /**
+     * Handles an incoming game-related message event.
+     */
     @Override
     public void handleMessage(Event event) {
         switch (event) {
@@ -270,6 +251,12 @@ public class MenuController implements MessageHandler {
         }
     }
 
+    /**
+     * Determines whether this controller can handle a specific type of message.
+     *
+     * @param messageType the type of message to check
+     * @return {@code true} if the message type is supported, {@code false} otherwise
+     */
     @Override
     public boolean canHandle(MessageType messageType) {
         return List.of(

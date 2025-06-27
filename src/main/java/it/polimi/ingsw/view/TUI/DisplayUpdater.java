@@ -11,18 +11,41 @@ import it.polimi.ingsw.common.model.enums.PlayerState;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages and updates the text-based user interface display for the Galaxy Trucker game client.
+ *
+ * This class is responsible for rendering different screens and game states in the Terminal User Interface (TUI).
+ */
 public class DisplayUpdater {
 
+    /**
+     * List of cards that the player has looked at during the game.
+     * This is used to display previously viewed cards when the player
+     * is in the LOOK_CARD_PILE state.
+     */
     private final List<ClientCard> lookedCards;
 
+    /**
+     * Constructs a new DisplayUpdater with an empty list of looked cards.
+     */
     public DisplayUpdater() {
         lookedCards = new ArrayList<>();
     }
 
+    /**
+     * Returns the list of cards that have been looked at by the player.
+     */
     public List<ClientCard> getLookedCards() {
         return lookedCards;
     }
 
+    /**
+     * Updates the display based on the current client state.
+     *
+     * This is the main method that determines what should be displayed
+     * based on the current state of the client. It acts as a dispatcher
+     * to the appropriate display method for each client state.
+     */
     public void updateDisplay() {
         switch (ViewTui.getClientInstance().getState()) {
             case USERNAME:
@@ -77,17 +100,17 @@ public class DisplayUpdater {
                     System.out.println(Constants.displayCards(lookedCards, 3));
 
                 Chroma.println(
-                       "[ship <username>]            - view <username>'s ship\n" +
-                            "[pick <id>]                  - pick a component\n" +
-                            "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
-                            "[release <id>]               - release the picked component\n" +
-                            (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
-                            (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[rotate-hourglass]           - rotate the hourglass\n") +
-                            "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
-                            "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
-                            "[look-cards <id>]            - view specific card pile (0, 1 or 2)\n" +
-                            "[ready]                      - end building phase\n" +
-                            "[q]                          - go back to the main menù",
+                        "[ship <username>]            - view <username>'s ship\n" +
+                                "[pick <id>]                  - pick a component\n" +
+                                "[insert <id> <x> <y>]        - inserts the component into (x,y)\n" +
+                                "[release <id>]               - release the picked component\n" +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[reserve <id>]               - reserve the picked component\n") +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[rotate-hourglass]           - rotate the hourglass\n") +
+                                "[move <id> <x> <y>]          - moves the component <id> into the position (x,y) of the ship\n" +
+                                "[rotate <id> <times>]        - rotate the selected component clockwise n - times\n" +
+                                "[look-cards <id>]            - view specific card pile (0, 1 or 2)\n" +
+                                "[ready]                      - end building phase\n" +
+                                "[q]                          - go back to the main menù",
                         Chroma.BLUE
                 );
                 System.out.print("> ");
@@ -131,14 +154,14 @@ public class DisplayUpdater {
 
                 Chroma.println("Oh no! Your ship has broken in two or more parts :(. You have to fix it before you can continue...", Chroma.RED_BOLD);
                 Chroma.println(
-                """
-                    ENTER the index part you want to keep from the ship
-                    [<id>]                              - index part of the ship (ex. 0, 1, ...)
-                    [ship <username>]                   - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                        - go back to starting deck as soon as possible\n") +
-                    "[q]                                 - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            ENTER the index part you want to keep from the ship
+                            [<id>]                              - index part of the ship (ex. 0, 1, ...)
+                            [ship <username>]                   - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                        - go back to starting deck as soon as possible\n") +
+                                "[q]                                 - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -154,15 +177,15 @@ public class DisplayUpdater {
 
                 Chroma.println("You might want to activate DOUBLE cannons!", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                """
-                    ENTER a series of cannons and battery components from which to use batteries
-                    in order to activate the DOUBLE cannons you wish to activate
-                    [<cannon1_id> ... <cannonN_id> - <battery1_id> ... <batteryN_id>]
-                    [ship <username>]                                                   - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                                        - go back to starting deck as soon as possible\n") +
-                    "[q]                                                                 - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            ENTER a series of cannons and battery components from which to use batteries
+                            in order to activate the DOUBLE cannons you wish to activate
+                            [<cannon1_id> ... <cannonN_id> - <battery1_id> ... <batteryN_id>]
+                            [ship <username>]                                                   - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                                        - go back to starting deck as soon as possible\n") +
+                                "[q]                                                                 - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -172,15 +195,15 @@ public class DisplayUpdater {
 
                 Chroma.println("You might want to activate DOUBLE engines!", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                """
-                    ENTER a series of engines battery components from which to use batteries
-                    in order to activate the DOUBLE engines you wish to activate
-                    [<engine1_id> ... <engineN_id> - <battery1_id> ... <batteryN_id>]
-                    [ship <username>]                                                       - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                                            - go back to starting deck as soon as possible\n") +
-                    "[q]                                                                     - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            ENTER a series of engines battery components from which to use batteries
+                            in order to activate the DOUBLE engines you wish to activate
+                            [<engine1_id> ... <engineN_id> - <battery1_id> ... <batteryN_id>]
+                            [ship <username>]                                                       - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                                            - go back to starting deck as soon as possible\n") +
+                                "[q]                                                                     - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -190,14 +213,14 @@ public class DisplayUpdater {
 
                 Chroma.println("You have to add goods!", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                    """
-                    Send the new configurations of goods
-                    [<cargo_id> <RED BLUE YELLOW> ...]
-                    [ship <username>]                               - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                    - go back to starting deck as soon as possible\n") +
-                    "[q]                                             - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                        Send the new configurations of goods
+                        [<cargo_id> <RED BLUE YELLOW> ...]
+                        [ship <username>]                               - view <username>'s ship
+                        """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                    - go back to starting deck as soon as possible\n") +
+                                "[q]                                             - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -207,15 +230,15 @@ public class DisplayUpdater {
 
                 Chroma.println("You have to remove some goods...", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                """
-                    Send the new configurations of goods in your ship and add batteries if you
-                    haven't enough goods to remove
-                    [<cargo_id> <RED BLUE YELLOW> ... - <battery_id> ... <batteryN_id>]
-                    [ship <username>]                                                       - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                                            - go back to starting deck as soon as possible\n") +
-                    "[q]                                                                     - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            Send the new configurations of goods in your ship and add batteries if you
+                            haven't enough goods to remove
+                            [<cargo_id> <RED BLUE YELLOW> ... - <battery_id> ... <batteryN_id>]
+                            [ship <username>]                                                       - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                                                            - go back to starting deck as soon as possible\n") +
+                                "[q]                                                                     - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -230,14 +253,14 @@ public class DisplayUpdater {
                 this.printGameInfo(board, ship, state);
 
                 Chroma.println(
-                """
-                    ENTER a series of cabin components in order to remove crew/alien
-                    [<cabin1_id> <cabin2_id> ... <cabinN_id>]
-                    [ship <username>]                  - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
-                    "[q]                                - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            ENTER a series of cabin components in order to remove crew/alien
+                            [<cabin1_id> <cabin2_id> ... <cabinN_id>]
+                            [ship <username>]                  - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
+                                "[q]                                - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -247,15 +270,15 @@ public class DisplayUpdater {
 
                 Chroma.println("You might want to activate shields!", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                """
-                    ENTER a battery component from which to use a battery
-                    in order to activate the shield or press enter to not activate it
-                    [<battery_id>]
-                    [ship <username>]                  - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
-                    "[q]                                - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            ENTER a battery component from which to use a battery
+                            in order to activate the shield or press enter to not activate it
+                            [<battery_id>]
+                            [ship <username>]                  - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
+                                "[q]                                - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -265,13 +288,13 @@ public class DisplayUpdater {
 
                 Chroma.println("You might want to take the reward!", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                """
-                    [<true/false>]                     - take reward or not
-                    [ship <username>]                  - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
-                    "[q]                                - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            [<true/false>]                     - take reward or not
+                            [ship <username>]                  - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
+                                "[q]                                - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -281,14 +304,14 @@ public class DisplayUpdater {
 
                 Chroma.println("You might want to land on a planet!", Chroma.YELLOW_BOLD);
                 Chroma.println(
-                """
-                    ENTER the index of the planet you wish to land on
-                    [<id>]                             - indexes from top to bottom (ex. 0,1,...)
-                    [ship <username>]                  - view <username>'s ship
-                    """ +
-                    (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
-                    "[q]                                - go back to the main menù",
-                    Chroma.BLUE
+                        """
+                            ENTER the index of the planet you wish to land on
+                            [<id>]                             - indexes from top to bottom (ex. 0,1,...)
+                            [ship <username>]                  - view <username>'s ship
+                            """ +
+                                (ViewTui.getClientInstance().getLobby().isLearnerMode() ? "" : "[end-flight]                       - go back to starting deck as soon as possible\n") +
+                                "[q]                                - go back to the main menù",
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -300,9 +323,9 @@ public class DisplayUpdater {
                 Chroma.println("\nNOT your turn. Waiting for other players' actions...", Chroma.YELLOW_BOLD);
                 Chroma.println(
                         (phase.equals("build") && !ViewTui.getClientInstance().getLobby().isLearnerMode() ? "[rotate-hourglass]                 - rotate the hourglass\n" : "") +
-                            "[ship <username>]                  - view <username>'s ship\n" +
-                            (phase.equals("flight") && !ViewTui.getClientInstance().getLobby().isLearnerMode() ? "[end-flight]                       - rotate the hourglass\n" : "") +
-                            "[q]                                - go back to the main menù",
+                                "[ship <username>]                  - view <username>'s ship\n" +
+                                (phase.equals("flight") && !ViewTui.getClientInstance().getLobby().isLearnerMode() ? "[end-flight]                       - rotate the hourglass\n" : "") +
+                                "[q]                                - go back to the main menù",
                         Chroma.BLUE
                 );
                 System.out.print("> ");
@@ -313,11 +336,11 @@ public class DisplayUpdater {
 
                 Chroma.println("\nGAME FINISHED", Chroma.GREEN_BOLD);
                 Chroma.println(
-                """
-                    [ship <username>]                  - view <username>'s ship
-                    [q]                               - go back to the main menù
-                    """,
-                    Chroma.BLUE
+                        """
+                            [ship <username>]                  - view <username>'s ship
+                            [q]                               - go back to the main menù
+                            """,
+                        Chroma.BLUE
                 );
                 System.out.print("> ");
             }
@@ -325,6 +348,16 @@ public class DisplayUpdater {
         }
     }
 
+    /**
+     * Determines the current game phase based on all players' states.
+     *
+     * This static utility method analyzes the states of all players in the game
+     * to determine what phase the game is currently in. This information is used
+     * to provide context-appropriate commands and information.
+     *
+     * @return a string representing the current game phase:
+     *         "build", "alien", "check", or "flight"
+     */
     public static String getPhase() {
         ClientGameModel model = ViewTui.getClientInstance().getGameController().getModel();
         String phase = "";
@@ -363,5 +396,4 @@ public class DisplayUpdater {
             }
         }
     }
-
 }

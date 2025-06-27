@@ -9,15 +9,32 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * Utility class for managing scene navigation in the JavaFX application.
+ *
+ * The class follows a static utility pattern and maintains references to
+ * the primary stage and current scene for efficient scene switching.
+ */
 public class SceneManager {
 
     private static Stage primaryStage;
     private static Scene scene = null;
 
+    /**
+     * Initializes the SceneManager with the primary stage.
+     */
     public static void init(Stage stage) {
         primaryStage = stage;
     }
 
+    /**
+     * Navigates to a new scene by loading the specified FXML file.
+     *
+     * @param <T> the type of the controller, must extend MessageHandler
+     * @param fxmlPath the path to the FXML file to load (relative to resources)
+     * @param oldController the previous controller to unregister, or null if none
+     * @param callback a consumer that receives the new controller for initialization, or null if not needed
+     */
     public static <T extends MessageHandler> void navigateToScene(String fxmlPath, MessageHandler oldController, Consumer<T> callback) {
         MessageDispatcher.getInstance().setTransitioning(true);
 
@@ -46,7 +63,6 @@ public class SceneManager {
             scene = view.getScene();
 
         } catch (IOException e) {
-            // TODO cosa metto?
             e.printStackTrace();
         } finally {
             MessageDispatcher.getInstance().setTransitioning(false);

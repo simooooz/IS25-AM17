@@ -497,7 +497,7 @@ public class FlightPhaseController implements MessageHandler {
     }
 
     private void updateCardCounter() {
-        cardCounterLabel.setText("Cards played: " + (client.getGameController().getModel().getBoard().getCardPile().size()) + " / " + totalCards);
+        cardCounterLabel.setText("Cards resolved so far: " + (client.getGameController().getModel().getBoard().getCardPile().size()) + " / " + totalCards);
     }
 
 
@@ -1113,7 +1113,7 @@ public class FlightPhaseController implements MessageHandler {
                     }
                     indexBooleanButtonsContainer.getChildren().addAll(planetsButtons);
                     indexBooleanButtonsContainer.setVisible(true);
-                    indexBooleanButtonsContainer.setSpacing(10);
+                    indexBooleanButtonsContainer.setSpacing(5);
                 }
 
                 mainButton.setOnAction(_ -> client.send(MessageType.GET_INDEX, index));

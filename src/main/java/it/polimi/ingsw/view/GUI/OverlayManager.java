@@ -8,22 +8,55 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * Manages overlay functionality for JavaFX applications, providing a modal-like
+ * interface with a semi-transparent background and centered content area.
+ *
+ * This class creates and manages an overlay that appears on top of the main scene,
+ * featuring a dark semi-transparent background and a centered rectangular content area.
+ * The overlay can be dismissed by clicking outside the content area.
+ *
+ */
 public class OverlayManager {
 
+    /**
+     * The main overlay container that holds all overlay elements.
+     */
     private StackPane overlayPane;
-    private HBox centralHBox;
-    private Pane rootPane; // Il tuo pane principale della scena
 
+    /**
+     * The central content area of the overlay where UI elements can be placed.
+     */
+    private HBox centralHBox;
+
+    /**
+     * Reference to the root pane of the main scene where the overlay will be displayed.
+     */
+    private Pane rootPane;
+
+    /**
+     * Constructs a new OverlayManager for the specified root pane.
+     *
+     * @param rootPane the main pane of the scene where the overlay will be displayed.
+     *                 Must not be null and should be the root container of the scene.
+     */
     public OverlayManager(Pane rootPane) {
         this.rootPane = rootPane;
     }
 
+    /**
+     * Displays the overlay with a semi-transparent background and centered content area.
+     *
+     * @param callback a {@link Runnable} that will be executed when the overlay is closed.
+     *                 This can be used to perform cleanup operations or update the UI state.
+     *                 Can be null if no callback is needed.
+     */
     public void showOverlay(Runnable callback) {
         overlayPane = new StackPane();
 
         Rectangle background = new Rectangle();
         background.setFill(Color.BLACK);
-        background.setOpacity(0.6); // 40% di opacità
+        background.setOpacity(0.6); // 60% opacity
 
         Scene scene = rootPane.getScene();
         background.setWidth(scene.getWidth());
@@ -59,6 +92,15 @@ public class OverlayManager {
         overlayPane.toFront();
     }
 
+    /**
+     * Closes and removes the overlay from the scene.
+     *
+     * If the overlay is not currently displayed, this method has no effect.
+     *
+     * @param callback a {@link Runnable} that will be executed before closing the overlay.
+     *                 This can be used to perform cleanup operations or save state.
+     *                 Can be null if no callback is needed.
+     */
     public void closeOverlay(Runnable callback) {
         if (overlayPane != null && overlayPane.getParent() != null) {
             callback.run();
@@ -68,8 +110,13 @@ public class OverlayManager {
         }
     }
 
+    /**
+     * Returns the central content area of the overlay.
+     *
+     * @return the central {@link HBox} container of the overlay, or null if
+     *         the overlay is not currently displayed
+     */
     public HBox getCentralHBox() {
         return centralHBox;
     }
-
 }

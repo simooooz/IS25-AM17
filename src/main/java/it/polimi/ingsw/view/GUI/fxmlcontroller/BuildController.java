@@ -39,47 +39,148 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Controller for the ship building interface. Handles component placement on the ship grid
- * and manages the visual representation of available components. Implements performance
- * optimizations through caching and incremental updates.
+ * Controller for the ship building interface in the Galaxy Trucker game.
+ * This controller manages the ship construction phase where players can drag and drop
+ * components onto their ship grid, rotate components, reserve components, and view card piles.
+ *
+ * <p>The controller handles both the local player's ship building interface and displays
+ * other players' ships in real-time. It implements performance optimizations through
+ * caching and incremental updates using component and slot maps.</p>
  */
 public class BuildController implements MessageHandler, Initializable {
 
+    /**
+     * Label displaying the remaining time in the current building phase.
+     */
     @FXML public Label timeLeft;
+
+    /**
+     * Label showing the current hourglass position in the game.
+     */
     @FXML public Label hourglassPos;
+
+    /**
+     * Container holding the timer display elements.
+     */
     @FXML public VBox timerContainer;
+
+    /**
+     * Container holding both card piles and timer elements.
+     */
     @FXML public HBox cardsAndTimerContainer;
 
+    /**
+     * Button allowing players to indicate they are ready to proceed to the next phase.
+     */
     @FXML public Button setReadyButton;
+
+    /**
+     * Label displaying game status messages and error information.
+     */
     @FXML public Label statusLabel;
 
+    /**
+     * Manager for displaying overlay windows such as card pile views.
+     */
     private OverlayManager overlayManager;
+
+    /**
+     * Root anchor pane of the build interface.
+     */
     @FXML public AnchorPane root;
+
+    /**
+     * ImageView for the first card pile (deck 0).
+     */
     @FXML public ImageView pile_0;
+
+    /**
+     * ImageView for the second card pile (deck 1).
+     */
     @FXML public ImageView pile_1;
+
+    /**
+     * ImageView for the third card pile (deck 2).
+     */
     @FXML public ImageView pile_2;
 
+    /**
+     * Container displaying other players' ships and their current states.
+     */
     @FXML public HBox otherPlayersContainer;
 
+    /**
+     * ImageView displaying the background ship template.
+     */
     @FXML private ImageView shipImageView;
+
+    /**
+     * Grid pane representing the player's ship construction area.
+     */
     @FXML private GridPane shipGrid;
+
+    /**
+     * Flow pane containing available components for placement.
+     */
     @FXML private FlowPane componentsFlowPane;
 
+    /**
+     * Client instance for server communication and game state access.
+     */
     private Client client;
 
+    /**
+     * Map linking component IDs to their corresponding ship slot rectangles.
+     * Used for efficient slot management and event handling.
+     */
     private final Map<Integer, Rectangle> slotMap = new HashMap<>();
+
+    /**
+     * Map linking component IDs to their corresponding ImageView representations.
+     * Used for efficient component rendering and updates.
+     */
     private final Map<Integer, ImageView> componentMap = new HashMap<>();
 
+    /**
+     * String tracking the current local command being executed.
+     * Used to handle multi-step operations like component placement and rotation.
+     */
     private String localCommand = "";
+
+    /**
+     * Timeline for managing the countdown timer animation.
+     */
     private Timeline timeline;
+
+    /**
+     * Remaining time in seconds for the current building phase.
+     */
     private int timeRemaining;
 
+    /**
+     * Width of tiles in the main player's ship grid.
+     */
     private static final double TILE_WIDTH = 70.0;
+
+    /**
+     * Height of tiles in the main player's ship grid.
+     */
     private static final double TILE_HEIGHT = 70.0;
+
+    /**
+     * Width of tiles in other players' ship grids (smaller for overview).
+     */
     private static final double OTHER_PLAYERS_TILE_WIDTH = 36.0;
+
+    /**
+     * Height of tiles in other players' ship grids (smaller for overview).
+     */
     private static final double OTHER_PLAYERS_TILE_HEIGHT = 35.8;
 
-
+    /**
+     * Event handler for drag over events on ship slots.
+     * Accepts component drops with MOVE transfer mode.
+     */
     EventHandler<DragEvent> slotDragOverHandler = (DragEvent event) -> {
         event.acceptTransferModes(TransferMode.MOVE);
         event.consume();
@@ -189,6 +290,15 @@ public class BuildController implements MessageHandler, Initializable {
         event.consume();
     };
 
+    /**
+     * Initializes the controller when the FXML file is loaded.
+     * Sets up message handling, client connection, UI components, and game mode specific features.
+     *
+     * @param url The location used to resolve relative paths for the root object,
+     *            or null if not known
+     * @param resourceBundle The resources used to localize the root object,
+     *                      or null if not localized
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         MessageDispatcher.getInstance().registerHandler(this);
@@ -453,6 +563,11 @@ public class BuildController implements MessageHandler, Initializable {
         return iv;
     }
 
+    /**
+     * Starts the countdown timer for the building phase.
+     * Initializes the timer at 60 seconds and updates the display every second.
+     * Changes appearance and behavior when time is running low or expires.
+     */
     public void startCountdown() {
         timeRemaining = 60;
         timeLeft.setStyle("-fx-text-fill: #f39c12;");
@@ -521,6 +636,12 @@ public class BuildController implements MessageHandler, Initializable {
         client.send(MessageType.LEAVE_GAME);
     }
 
+    /**
+     * Handles the set ready action when the player is finished building.
+     * Finalizes any pending component insertion before sending the ready status.
+     *
+     * @param event The action event from the ready button click
+     */
     @SuppressWarnings("Duplicates")
     @FXML
     public void setReadyHandler(ActionEvent event) {
@@ -540,7 +661,7 @@ public class BuildController implements MessageHandler, Initializable {
         grid.add(iv, col, row);
     }
 
-    void revealComponent(ClientComponent component) {
+    private void revealComponent(ClientComponent component) {
         ImageView iv = componentMap.get(component.getId());
         String imagePath = "/images/tiles/GT-new_tiles_16_for web" + component.getId() + ".jpg";
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
@@ -574,6 +695,14 @@ public class BuildController implements MessageHandler, Initializable {
         shipImageView.setOpacity(0.3);
     }
 
+    /**
+     * Handles incoming game events and updates the UI accordingly.
+     * Processes various types of events including component actions, player state changes,
+     * timer events, and lobby events. Each event type triggers specific UI updates
+     * and visual feedback.
+     *
+     * @param event The GameEvent to process
+     */
     @SuppressWarnings("Duplicates")
     @Override
     public void handleMessage(Event event) {
@@ -756,7 +885,7 @@ public class BuildController implements MessageHandler, Initializable {
                 boolean allReady = e.states().values().stream().noneMatch(s -> s == PlayerState.BUILD || s == PlayerState.LOOK_CARD_PILE);
                 if (allReady) {
                     SceneManager.navigateToScene("/fxml/gameFlight.fxml", this, (FlightPhaseController controller) ->
-                        controller.setImageMap(componentMap)
+                            controller.setImageMap(componentMap)
                     );
 
                     return;
@@ -806,6 +935,13 @@ public class BuildController implements MessageHandler, Initializable {
         }
     }
 
+    /**
+     * Determines whether this controller can handle a specific message type.
+     * This controller handles multiple message types related to building phase gameplay.
+     *
+     * @param messageType The type of message to check for compatibility
+     * @return true if the message type can be handled by this controller, false otherwise
+     */
     @Override
     public boolean canHandle(MessageType messageType) {
         return List.of(
