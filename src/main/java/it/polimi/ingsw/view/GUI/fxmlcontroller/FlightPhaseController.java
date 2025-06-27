@@ -485,9 +485,8 @@ public class FlightPhaseController implements MessageHandler {
     }
 
     private void updateCardCounter() {
-        cardCounterLabel.setText("Cards resolved so far: " + (client.getGameController().getModel().getBoard().getCardPile().size()) + " / " + totalCards);
+        cardCounterLabel.setText("Cards: " + (client.getGameController().getModel().getBoard().getCardPile().size()) + " / " + totalCards);
     }
-
 
     /**
      * Sets the image map for game components and initializes the game board.
