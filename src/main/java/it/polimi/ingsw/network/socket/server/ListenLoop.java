@@ -39,7 +39,7 @@ public class ListenLoop extends Thread {
 
                 if (!(read instanceof Heartbeat)) {
                     Message message = (Message) read;
-                    // System.out.println("[SERVER LISTEN LOOP] Received message: " + message.getMessageType());
+                    System.out.println("[SERVER LISTEN LOOP] Received message: " + message.getMessageType());
                     clientHandler.receive(message);
                 } else {
                     this.clientHandler.setLastPing(System.currentTimeMillis());

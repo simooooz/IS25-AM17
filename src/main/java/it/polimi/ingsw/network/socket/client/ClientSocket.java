@@ -214,6 +214,8 @@ public class ClientSocket extends Client {
                 throw new ClientException();
             return obj;
         } catch (IOException | ClassNotFoundException | ClientException e) {
+            System.out.println("[CLIENT SOCKET - sendObject] " + System.currentTimeMillis());
+            e.printStackTrace();
             this.closeConnection();
             throw new ClientException(e.getMessage());
         }
@@ -231,6 +233,8 @@ public class ClientSocket extends Client {
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {
+            System.out.println("[CLIENT SOCKET - sendObject] " + System.currentTimeMillis());
+            e.printStackTrace();
             this.closeConnection();
             throw new ClientException(e.getMessage());
         }

@@ -125,8 +125,10 @@ public class SocketServer extends ServerBasis implements Runnable {
         for (Map.Entry<String, ClientHandler> entry : connectionsCopy.entrySet()) {
             ClientHandler clientHandler = entry.getValue();
             String connectionCode = entry.getKey();
-            if (now - clientHandler.getLastPing() > Constants.NETWORK_TIMEOUT)
+            if (now - clientHandler.getLastPing() > Constants.NETWORK_TIMEOUT) {
+                System.out.println("[SOCKET SERVER - checkActiveClients] " + now);
                 closeConnection(connectionCode);
+            }
         }
 
     }

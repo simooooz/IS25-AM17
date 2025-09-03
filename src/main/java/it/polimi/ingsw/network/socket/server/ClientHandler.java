@@ -61,6 +61,8 @@ public class ClientHandler extends User {
             this.output.writeObject(data);
             this.output.flush();
         } catch (IOException e) {
+            System.out.println("[CLIENT HANDLER - sendObject] " + System.currentTimeMillis());
+            e.printStackTrace();
             SocketServer.getInstance().closeConnection(connectionCode);
         }
     }
@@ -75,6 +77,8 @@ public class ClientHandler extends User {
         try {
             return input.readObject();
         } catch (IOException | ClassNotFoundException e) {
+            System.out.println("[CLIENT HANDLER - readObject] " + System.currentTimeMillis());
+            e.printStackTrace();
             SocketServer.getInstance().closeConnection(connectionCode);
             throw new ServerException("[CLIENT CONNECTION] Object is null or could not be read");
         }
@@ -105,7 +109,8 @@ public class ClientHandler extends User {
         try {
             message.execute(this);
         } catch (RuntimeException e) {
-            // System.err.println("[CLIENT HANDLER] Receive method has caught a RuntimeException: " + e.getMessage());
+            System.err.println("[CLIENT HANDLER] Receive method has caught a RuntimeException: " + e.getMessage());
+            e.printStackTrace();
             try {
                 Message errorMessage = Constants.createMessage(MessageType.ERROR, e.getMessage());
                 this.sendObject(errorMessage);

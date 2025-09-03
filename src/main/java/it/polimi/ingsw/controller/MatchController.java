@@ -68,6 +68,7 @@ public class MatchController {
             lobbies.put(name, lobby);
             lobby.addPlayer(username); // Join in the newly created lobby
         } catch (RuntimeException e) {
+            e.printStackTrace();
             EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
@@ -91,6 +92,7 @@ public class MatchController {
                     .orElseThrow(() -> new LobbyNotFoundException("Specified lobby not found or cannot be joined"));
             lobby.addPlayer(username);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
@@ -114,6 +116,7 @@ public class MatchController {
             Lobby lobby = availableLobbies.get(new Random().nextInt(availableLobbies.size()));
             lobby.addPlayer(username);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
@@ -139,6 +142,7 @@ public class MatchController {
             if (lobby.toDelete())
                 lobbies.remove(lobby.getGameID());
         } catch (RuntimeException e) {
+            e.printStackTrace();
             EventContext.emit(new ErrorEvent(e.getMessage()));
         }
 
@@ -164,6 +168,7 @@ public class MatchController {
 
             lobby.rejoinPlayer(username);
         } catch (RuntimeException e) { // Don't rejoin and return empty list
+            e.printStackTrace();
             EventContext.clear();
             return List.of();
         }
