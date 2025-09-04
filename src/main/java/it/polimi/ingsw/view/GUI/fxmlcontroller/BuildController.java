@@ -90,6 +90,11 @@ public class BuildController implements MessageHandler, Initializable {
     @FXML public AnchorPane root;
 
     /**
+     * Container holding card piles.
+     */
+    @FXML public HBox piles;
+
+    /**
      * ImageView for the first card pile (deck 0).
      */
     @FXML public ImageView pile_0;
@@ -879,8 +884,10 @@ public class BuildController implements MessageHandler, Initializable {
             }
             case PlayersStateUpdatedEvent e -> {
 
-                if (e.states().get(client.getUsername()) == PlayerState.WAIT)
-                    setReadyButton.setVisible(false);
+                if (e.states().get(client.getUsername()) == PlayerState.WAIT) {
+                    setReadyButton.setDisable(true);
+                    piles.setVisible(false);
+                }
 
                 boolean allReady = e.states().values().stream().noneMatch(s -> s == PlayerState.BUILD || s == PlayerState.LOOK_CARD_PILE);
                 if (allReady) {
