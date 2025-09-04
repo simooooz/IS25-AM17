@@ -871,7 +871,7 @@ public class FlightPhaseController implements MessageHandler {
         switch (state) {
             case CHECK -> {
                 mainButton.setText("Done");
-                mainButton.setOnAction(_ -> client.send(MessageType.CHECK_SHIP, list1));
+                mainButton.setOnAction(_ -> client.send(MessageType.CHECK_SHIP, new ArrayList<>(list1)));
 
                 paneMap.forEach((id, pane) -> {
                     if (shipGrid.lookup("#component_" + id) != null) {
@@ -927,7 +927,7 @@ public class FlightPhaseController implements MessageHandler {
                             }
                         }
                     });
-                    client.send(MessageType.ACTIVATE_CANNONS, list2, list1);
+                    client.send(MessageType.ACTIVATE_CANNONS, new ArrayList<>(list2), new ArrayList<>(list1));
                 });
             }
             case WAIT_ENGINES -> {
@@ -951,7 +951,7 @@ public class FlightPhaseController implements MessageHandler {
                             }
                         }
                     });
-                    client.send(MessageType.ACTIVATE_ENGINES, list2, list1);
+                    client.send(MessageType.ACTIVATE_ENGINES, new ArrayList<>(list2), new ArrayList<>(list1));
                 });
             }
             case WAIT_ROLL_DICES -> {
@@ -1008,7 +1008,7 @@ public class FlightPhaseController implements MessageHandler {
                             }
                         }
                     });
-                    client.send(MessageType.REMOVE_CREW, list1);
+                    client.send(MessageType.REMOVE_CREW, new ArrayList<>(list1));
                 });
             }
             case WAIT_REMOVE_GOODS, WAIT_GOODS -> {
@@ -1044,7 +1044,7 @@ public class FlightPhaseController implements MessageHandler {
                             }
                         }
                     });
-                    client.send(MessageType.UPDATE_GOODS, newDisposition, list2);
+                    client.send(MessageType.UPDATE_GOODS, newDisposition, new ArrayList<>(list2));
                 });
             }
             case WAIT_INDEX -> {
