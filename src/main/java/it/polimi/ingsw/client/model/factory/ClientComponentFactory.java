@@ -9,10 +9,7 @@ import it.polimi.ingsw.common.model.enums.ConnectorType;
 import it.polimi.ingsw.common.model.enums.DirectionType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClientComponentFactory {
 
@@ -43,6 +40,8 @@ public class ClientComponentFactory {
             components.add(component);
             componentsMap.put(componentJson.get("id").asInt(), component);
         }
+
+        Collections.shuffle(components);
     }
 
     public List<ClientComponent> getComponents(){

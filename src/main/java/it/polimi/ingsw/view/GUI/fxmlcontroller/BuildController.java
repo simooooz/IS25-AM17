@@ -360,7 +360,8 @@ public class BuildController implements MessageHandler, Initializable {
     }
 
     private void setupComponentMap() {
-        List<ClientComponent> components = client.getGameController().getModel().getBoard().getMapIdComponents().values().stream().toList();
+        List<ClientComponent> components = new ArrayList<>(client.getGameController().getModel().getBoard().getMapIdComponents().values().stream().toList());
+        Collections.shuffle(components);
         for (ClientComponent c : components) {
             ImageView iv = createComponentImage(c);
             componentMap.put(c.getId(), iv);
