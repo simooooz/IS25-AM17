@@ -672,12 +672,12 @@
                 "directionFrom": "EAST"
               },
               {
-                "isBig": true,
-                "directionFrom": "SOUTH"
-              },
-              {
                 "isBig": false,
                 "directionFrom": "WEST"
+              },
+              {
+                "isBig": true,
+                "directionFrom": "SOUTH"
               }
             ]
           }
