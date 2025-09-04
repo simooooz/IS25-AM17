@@ -35,9 +35,19 @@ public class ClientSocket extends Client {
     private ObjectOutputStream output;
 
     /**
+     * Output lock for sending objects from multiple threads
+     */
+    private final Object outputLock = new Object();
+
+    /**
      * Input stream for receiving serialized objects from the server
      */
     private ObjectInputStream input;
+
+    /**
+     * Input lock for sending objects from multiple threads
+     */
+    private final Object inputLock = new Object();
 
     /** Thread for listening to server messages */
     private ListenLoopOfClient listenLoop;
@@ -151,6 +161,7 @@ public class ClientSocket extends Client {
      */
     private void sendPing() {
         try {
+            System.out.println("[CLIENT SOCKET] Sending ping at " + System.currentTimeMillis());
             sendObject(new Heartbeat());
         } catch (ClientException e) {
             // Error while sending ping, do nothing
@@ -208,16 +219,15 @@ public class ClientSocket extends Client {
      * @throws ClientException if reading fails
      */
     public Object readObject() throws ClientException {
-        try {
-            Object obj = this.input.readObject();
-            if (obj == null)
-                throw new ClientException();
-            return obj;
-        } catch (IOException | ClassNotFoundException | ClientException e) {
-            System.out.println("[CLIENT SOCKET - sendObject] " + System.currentTimeMillis());
-            e.printStackTrace();
-            this.closeConnection();
-            throw new ClientException(e.getMessage());
+        synchronized (this.inputLock) {
+            try {
+                return this.input.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("[CLIENT SOCKET - readObject] " + System.currentTimeMillis());
+                e.printStackTrace();
+                this.closeConnection();
+                throw new ClientException(e.getMessage());
+            }
         }
     }
 
@@ -228,15 +238,17 @@ public class ClientSocket extends Client {
      * @throws ClientException if sending fails
      */
     public void sendObject(Object data) throws ClientException {
-        try {
-            this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
-            this.output.writeObject(data);
-            this.output.flush();
-        } catch (IOException e) {
-            System.out.println("[CLIENT SOCKET - sendObject] " + System.currentTimeMillis());
-            e.printStackTrace();
-            this.closeConnection();
-            throw new ClientException(e.getMessage());
+        synchronized (this.outputLock) {
+            try {
+                // this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
+                this.output.writeObject(data);
+                this.output.flush();
+            } catch (IOException e) {
+                System.out.println("[CLIENT SOCKET - sendObject] " + System.currentTimeMillis());
+                e.printStackTrace();
+                this.closeConnection();
+                throw new ClientException(e.getMessage());
+            }
         }
     }
 

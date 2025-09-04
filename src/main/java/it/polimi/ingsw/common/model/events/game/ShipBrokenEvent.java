@@ -4,6 +4,7 @@ import it.polimi.ingsw.common.model.events.EventVisibility;
 import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.network.messages.MessageType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record ShipBrokenEvent(String username, List<List<Integer>> parts) implements Event {
@@ -20,7 +21,10 @@ public record ShipBrokenEvent(String username, List<List<Integer>> parts) implem
 
     @Override
     public Object[] getArgs() {
-        return new Object[]{username, parts};
+        List<List<Integer>> partsCopy = parts.stream()
+            .map(group -> (List<Integer>) new ArrayList<>(group))
+            .toList();
+        return new Object[]{username, partsCopy};
     }
 
     @Override

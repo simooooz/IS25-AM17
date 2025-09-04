@@ -29,9 +29,19 @@ public class ClientHandler extends User {
     private ObjectOutputStream output;
 
     /**
+     * Output lock for sending objects from multiple threads
+     */
+    private final Object outputLock = new Object();
+
+    /**
      * Input stream for receiving serialized objects from the client
      */
     private ObjectInputStream input;
+
+    /**
+     * Input lock for reading objects from multiple threads
+     */
+    private final Object inputLock = new Object();
 
     /** Thread for listening to client messages */
     private ListenLoop listenLoop;
@@ -56,14 +66,16 @@ public class ClientHandler extends User {
      * @throws ServerException if sending fails
      */
     public void sendObject(Object data) throws ServerException {
-        try {
-            this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
-            this.output.writeObject(data);
-            this.output.flush();
-        } catch (IOException e) {
-            System.out.println("[CLIENT HANDLER - sendObject] " + System.currentTimeMillis());
-            e.printStackTrace();
-            SocketServer.getInstance().closeConnection(connectionCode);
+        synchronized (this.outputLock) {
+            try {
+                // this.output.reset(); // Use reset otherwise it sends a previous instance of the objects
+                this.output.writeObject(data);
+                this.output.flush();
+            } catch (IOException e) {
+                System.out.println("[CLIENT HANDLER - sendObject] " + System.currentTimeMillis());
+                e.printStackTrace();
+                SocketServer.getInstance().closeConnection(connectionCode);
+            }
         }
     }
 
@@ -74,13 +86,15 @@ public class ClientHandler extends User {
      * @throws ServerException if reading fails or object is null
      */
     public Object readObject() throws ServerException {
-        try {
-            return input.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("[CLIENT HANDLER - readObject] " + System.currentTimeMillis());
-            e.printStackTrace();
-            SocketServer.getInstance().closeConnection(connectionCode);
-            throw new ServerException("[CLIENT CONNECTION] Object is null or could not be read");
+        synchronized (this.inputLock) {
+            try {
+                return input.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("[CLIENT HANDLER - readObject] " + System.currentTimeMillis());
+                e.printStackTrace();
+                SocketServer.getInstance().closeConnection(connectionCode);
+                throw new ServerException("[CLIENT CONNECTION] Object is null or could not be read");
+            }
         }
     }
 

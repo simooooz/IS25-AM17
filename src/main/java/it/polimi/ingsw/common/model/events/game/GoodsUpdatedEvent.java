@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.model.events.EventVisibility;
 import it.polimi.ingsw.common.model.events.UniqueEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record GoodsUpdatedEvent(Integer id, List<ColorType> goods) implements UniqueEvent {
@@ -17,7 +18,7 @@ public record GoodsUpdatedEvent(Integer id, List<ColorType> goods) implements Un
 
     @Override
     public Object[] getArgs() {
-        return new Object[]{id, goods};
+        return new Object[]{ id, new ArrayList<>(goods) };
     }
 
     @Override

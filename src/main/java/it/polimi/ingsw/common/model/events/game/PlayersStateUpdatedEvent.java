@@ -5,6 +5,7 @@ import it.polimi.ingsw.common.model.events.EventVisibility;
 import it.polimi.ingsw.common.model.events.UniqueEvent;
 import it.polimi.ingsw.network.messages.MessageType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public record PlayersStateUpdatedEvent(Map<String, PlayerState> states) implements UniqueEvent {
@@ -17,7 +18,7 @@ public record PlayersStateUpdatedEvent(Map<String, PlayerState> states) implemen
 
     @Override
     public Object[] getArgs() {
-        return new Object[]{states};
+        return new Object[]{ new HashMap<>(states) };
     }
 
 }

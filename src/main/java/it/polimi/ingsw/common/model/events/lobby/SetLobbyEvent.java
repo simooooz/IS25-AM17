@@ -4,6 +4,7 @@ import it.polimi.ingsw.common.model.events.EventVisibility;
 import it.polimi.ingsw.common.model.events.Event;
 import it.polimi.ingsw.network.messages.MessageType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record SetLobbyEvent(String name, List<String> players, Boolean learnerMode, Integer maxPlayers) implements Event {
@@ -16,7 +17,7 @@ public record SetLobbyEvent(String name, List<String> players, Boolean learnerMo
 
     @Override
     public Object[] getArgs() {
-        return new Object[]{name, players, learnerMode, maxPlayers};
+        return new Object[]{name, new ArrayList<>(players), learnerMode, maxPlayers};
     }
 
 }
