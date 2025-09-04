@@ -16,7 +16,6 @@ import it.polimi.ingsw.network.messages.MessageType;
 import it.polimi.ingsw.view.GUI.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -148,7 +147,7 @@ public class BuildController implements MessageHandler, Initializable {
 
     /**
      * String tracking the current local command being executed.
-     * Used to handle multi-step operations like component placement and rotation.
+     * Used to handle multistep operations like component placement and rotation.
      */
     private String localCommand = "";
 
